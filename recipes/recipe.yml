@@ -18,9 +18,41 @@ modules:
   - type: rpm-ostree
     repos:
       - https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-%OS_VERSION%/atim-starship-fedora-%OS_VERSION%.repo
+      - https://rpm.librewolf.net/librewolf-repo.repo
     install:
-      - micro
+      - firejail
+      - firewall-config
+      - https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
+      - fish
+      - bat
+      - eza
       - starship
+      - micro
+      - neovim
+      - tmux
+      - cowsay
+      - cryfs
+      - ptyxis
+      - bleachbit
+      - awf-gtk2
+      - awf-gtk3
+      - awf-gtk4
+      - librewolf
+      - dosfstools
+      - exfatprogs
+      - gpart
+      - gparted
+      - dmraid
+      - zstd
+      - uresourced
+      - irqbalance
+      - bottles
+      - goverlay
+      - gamescope
+      - gamemode
+      - mangohud
+      - vkBasalt
+      - fluidsynth
     remove:
       # example: removing firefox (in favor of the flatpak)
       #- firefox
@@ -38,6 +70,11 @@ modules:
       - gnome-shell-extension-just-perfection
       - openssh-askpass
 
+  - type: script
+    scripts:
+      - cleanup.sh
+      - setup.sh
+
   - type: default-flatpaks
     notify: true # Send notification after install/uninstall is finished (true/false)
     system:
@@ -54,6 +91,41 @@ modules:
       # Installing different branches of the same Flatpak is not supported.
       remove:
       # - org.gnome.eog
+      -org.mozilla.firefox
+      -com.mattjakeman.ExtensionManager
+      -com.github.Matoking.protontricks
+      -io.github.fastrizwaan.WineZGUI
+      -io.github.dvlv.boxbuddyrs
+      -it.mijorus.gearlever
+      -com.github.tchx84.Flatseal
+      -io.github.flattool.Warehouse
+      -io.missioncenter.MissionCenter
+      -com.vysp3r.ProtonPlus
+      -org.gnome.Calculator
+      -org.gnome.Calendar
+      -org.gnome.Characters
+      -org.gnome.Contacts
+      -org.gnome.Papers
+      -org.gnome.Logs
+      -org.gnome.Loupe
+      -org.gnome.NautilusPreviewer
+      -org.gnome.TextEditor
+      -org.gnome.Weather
+      -org.gnome.baobab
+      -org.gnome.clocks
+      -org.gnome.font-viewer
+      -io.github.nokse22.Exhibit
+
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - FiraCode
+        - Hack
+        - JetBrainsMono
+        - NerdFontsSymbolsOnly
+      google-fonts:
+        - Roboto
+        - Open Sans
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
 

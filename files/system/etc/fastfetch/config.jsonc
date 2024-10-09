@@ -1,0 +1,156 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "general": {
+        "multithreading": true
+    },
+    "logo": {
+        //"type": "small",
+        "padding": {
+            "top": 4,
+            "right": 1,
+            "left":1
+        }
+    },
+    "display": {
+        "separator": " ",
+        "constants": [
+            "········",
+            "→"
+         ]
+    },
+    "modules": [
+        {
+            "type": "custom",
+            "format": "{#93;1}{$1}{#93;1}󰮯 • {#91;1}󰊠 • {#92;1}󰊠 • {#93;1}󰊠 • {#94;1}󰊠 • {#95;1}󰊠 • {#96;1}󰊠 • {#97;1}󰊠 • {#90;1}󰊠 {#93;1}{$1}"
+        },
+        {
+            "type": "os",
+            "key": "{#93;1}OS╭─ {$2}",
+            "format": "{2} {9}"
+        },
+        {
+            "type": "kernel",
+            "key": "{#93;1}  ├─ {$2}"
+        },
+        {
+            "type": "gpu",
+            "key": "{#93;1}  ├─ {$2}",
+            "hideType": "integrated",
+            "format": "{3}"
+        },
+        {
+            "type": "initsystem",
+            "key": "{#93;1}  ├─󰨾 {$2}", // 󰨾  
+            "format": "{1} [{4}]"
+        },
+        {
+            "type": "shell",
+            "key": "{#93;1}  ├─ {$2}"
+        },
+        {
+            "type": "packages",
+            "key": "{#93;1}  ├─ {$2}"//, //  󰇟 
+            //"format": "{?2}{2} pacman {?}{?3}{3} manjaro {?}{?4}{4} dpkg {?}{?5}{5} rpm {?}{?6}{6} emerge {?}{?7}{7} eopkg {?}{?8}{8} xbps {?}{?9}{9} nix-sys {?}{?10}{10} nix {?}{?11}{11} nix-default {?}{?12}{12} apk {?}{?13}{13} pkg {?}{?16}{16} snap {?}{?17}{17} brew {?}{?18}{18} brew-cask {?}{?19}{19} macport {?}{?20}{20} scoop {?}{?21}{21} choco {?}{?22}{22} pkgtool {?}{?23}{23} paludis {?}{?24}{24} winget {?}{?25}{25} opkg {?}{?26}{26} am {?}{?27}{27} sorcery {?}{?28}{28} lpkg {?}{?29}{29} lpkgbuild {?}{?30}{30} guix-sys {?}{?31}{31} guix-user {?}{?32}{32} guix-home {?}{?14}{14}+{15} flatpak"
+           //{?}{?16}{16} snap,
+        },
+        {
+            "type": "processes",
+            "key": "{#93;1}  ├─ {$2}"
+        },
+        {
+            "type": "uptime",
+            "key": "{#93;1}  ├─ {$2}"
+        },
+        {
+            "type": "locale",
+            "key": "{#93;1}  ╰─󰈻 {$2}"
+        },
+        "break",
+
+        {
+            "type": "de",
+            "key": "{#96;1}DE╭─󱄄 {$2}"
+        },
+        {
+            "type": "wm",
+            "key": "{#96;1}  ├─🗗 {$2}"
+        },
+        {
+            "type": "theme",
+            "key": "{#96;1}  ├─ {$2}",
+            "format": "{2}"
+        },
+        {
+            "type": "icons",
+            "key": "{#96;1}  ├─ {$2}",
+            "format": "{2}"
+        },
+        {
+            "type": "cursor",
+            "key": "{#96;1}  ├─󰳽 {$2}"
+        },
+        {
+            "type": "font",
+            "key": "{#96;1}  ├─ {$2}",
+            "format": "{2}"
+        },
+        {
+            "type": "terminal",
+            "key": "{#96;1}  ├─ {$2}"
+            //"format": "{3}"
+        },
+        {
+            "type": "terminalfont",
+            //"type": "command",
+            //"text": "fastfetch -l none --key-type none -s terminalfont | grep . || echo 'FiraCode Nerd Font'",
+            "key": "{#96;1}  ├─󰉿 {$2}"
+        },
+        {
+            "type": "terminaltheme",
+            "key": "{#96;1}  ╰─󰧷 {$2}",
+            "format": "FG:{1} BG:{3} [{4}]"
+        },
+        "break",
+
+        {
+            "type": "host",
+            "key": "PC╭─ {$2}",
+            "format": "{5} {2}"
+        },
+        {
+            "type": "display",
+            "key": "  ├─󰹑 {$2}",
+            "format": "{1}x{2} @ {3:3}Hz in {12:2}\" [{6}]"
+        },
+        {
+            "type": "bluetooth",
+            "key": "  ├─ {$2}"
+        },
+        {
+            "type": "cpu",
+            "key": "  ├─ {$2}",
+            "showPeCoreCount": true,
+            "format": "{1} {?9}({9})"
+        },
+        {
+            "type": "gpu",
+            "key": "  ├─󱉽 {$2}", //  󱩄 󱩃 󰐿 󰢮 󰤽 󱉽 󰘚 󰚗
+            "hideType": "none",
+            "format": "{1} {2} [{6}]"
+        },
+        {
+            "type": "disk",
+            "key": "  ├─ {$2}",
+            "format": "{3} - {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}"
+        },
+        {
+            "type": "memory",
+            "key": "  ╰─ {$2}",
+            "format": "{3} - {1} {4} {2}"
+        },
+        {
+            "type": "custom",
+            "format": "{#93;1}{$1}{#33;1}󰮯 • {#31;1}󰊠 • {#32;1}󰊠 • {#33;1}󰊠 • {#34;1}󰊠 • {#35;1}󰊠 • {#36;1}󰊠 • {#37;1}󰊠 • {#30;1}󰊠 {#93;1}{$1}"
+        }
+    ]
+}

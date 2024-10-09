@@ -1,0 +1,12 @@
+[Unit]
+Description=everyFewMins
+DefaultDependencies=no
+Before=default.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/performance-tweaks.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target

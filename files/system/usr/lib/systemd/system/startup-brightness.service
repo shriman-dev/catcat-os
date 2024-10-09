@@ -1,0 +1,12 @@
+######################################
+[Unit]
+Description=Set lower brightness on startup
+After=systemd-backlight@backlight:amdgpu_bl0.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'echo 1 > /sys/class/backlight/amdgpu_bl0/brightness'
+
+[Install]
+WantedBy=systemd-backlight@backlight:amdgpu_bl0.service
+######################################
