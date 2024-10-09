@@ -1,7 +1,7 @@
 # image will be published to ghcr.io/<user>/<name>
 name: catcat-os
 # description will be included in the image's metadata
-description: neat cat os
+description: meow
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia
@@ -17,14 +17,26 @@ modules:
 
   - type: rpm-ostree
     repos:
-      # - https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-%OS_VERSION%/atim-starship-fedora-%OS_VERSION%.repo
+      - https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-%OS_VERSION%/atim-starship-fedora-%OS_VERSION%.repo
     install:
-      # - micro
-      # - starship
+      - micro
+      - starship
     remove:
       # example: removing firefox (in favor of the flatpak)
-      - firefox
-      - firefox-langpacks
+      #- firefox
+      #- firefox-langpacks
+      #- gnome-initial-setup
+      - fastfetch
+      - ibus-libpinyin
+      - ibus-libzhuyin
+      - ibus-m17n
+      - ibus-mozc
+      - ibus-typing-booster
+      - gnome-browser-connector
+      - nautilus-gsconnect
+      - plocate
+      - gnome-shell-extension-just-perfection
+      - openssh-askpass
 
   - type: default-flatpaks
     notify: true # Send notification after install/uninstall is finished (true/false)
