@@ -61,6 +61,7 @@ modules:
       - fastfetch
       - ibus-libpinyin
       - ibus-libzhuyin
+      - ibus-hangul
       - ibus-m17n
       - ibus-mozc
       - ibus-typing-booster
