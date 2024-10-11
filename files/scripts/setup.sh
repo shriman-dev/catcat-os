@@ -2,7 +2,9 @@
 
 set -oue pipefail
 
-sed -i '/^PRETTY_NAME/s/Bazzite/CatCat/' /usr/lib/os-release
+sed -i '/^ID/s/bazzite/catcat/' /usr/lib/*release
+sed -i '/^DEFAULT_HOSTNAME/s/bazzite/catcat/' /usr/lib/*release
+sed -i 's/Bazzite/CatCat/' /etc/*release
 sed -i "s|.*issue_discards =.*|issue_discards = 1|"  /etc/lvm/lvm.conf
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
