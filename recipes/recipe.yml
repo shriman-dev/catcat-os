@@ -18,7 +18,7 @@ modules:
   - type: rpm-ostree
     repos:
       - https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-%OS_VERSION%/atim-starship-fedora-%OS_VERSION%.repo
-      - https://rpm.librewolf.net/librewolf-repo.repo
+      #- https://rpm.librewolf.net/librewolf-repo.repo
     install:
       - firejail
       - firewall-config
@@ -37,7 +37,7 @@ modules:
       - awf-gtk2
       - awf-gtk3
       - awf-gtk4
-      - librewolf
+      #- librewolf
       - dosfstools
       - exfatprogs
       - gpart
