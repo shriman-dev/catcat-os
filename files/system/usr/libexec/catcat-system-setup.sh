@@ -11,7 +11,7 @@ replace-x-add() {
 grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
-if [ ! -f '/etc/catcat-os' ]; then
+if [ ! -f '/etc/catcat-os/first-boot' ]; then
 mkdir -p /boot/grub_themes
 cp -rf /usr/share/grub/themes/* /boot/grub_themes
 
@@ -29,7 +29,8 @@ rpm-ostree initramfs --enable
 
 hostnamectl set-hostname --static "catcat"
 
-echo 'first boot' > /etc/catcat-os
+mkdir -p /etc/catcat-os/
+echo 'first boot' > /etc/catcat-os/first-boot
 
 fi
 
