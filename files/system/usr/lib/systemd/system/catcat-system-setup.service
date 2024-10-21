@@ -1,6 +1,5 @@
 [Unit]
 Description=Configure catcat system
-After=rpm-ostreed.service
 
 [Service]
 Type=simple
