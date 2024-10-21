@@ -1,8 +1,11 @@
 [Unit]
-Description=Configure catcat system
+Description=Configure Bazzite for current hardware
+After=rpm-ostreed.service tuned.service
+Before=systemd-user-sessions.service jupiter-biosupdate.service jupiter-controller-update.service
 
 [Service]
-Type=simple
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/libexec/catcat-system-setup
 
 [Install]
