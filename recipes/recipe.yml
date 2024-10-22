@@ -105,20 +105,20 @@ modules:
       - org.gnome.TextEditor
       - io.github.nokse22.Exhibit
 
-  - type: gnome-extensions
-    install:
-      - Clipboard History
-      - Color Picker
-      - Compiz windows effect
-      - "CHC-E (Custom Hot Corners - Extended)"
-      - Hide Universal Access
-      - "[QSTweak] Quick Setting Tweaker"
-      - SettingsCenter
-      - Status Area Horizontal Spacing
-      - TopHat
-      - User Themes
-      - Vitals
-      - Window Gestures
+#  - type: gnome-extensions
+#    install:
+#      - Clipboard History
+#      - Color Picker
+#      - Compiz windows effect
+#      - "CHC-E (Custom Hot Corners - Extended)"
+#      - Hide Universal Access
+#      - "[QSTweak] Quick Setting Tweaker"
+#      - SettingsCenter
+#      - Status Area Horizontal Spacing
+#      - TopHat
+#      - User Themes
+#      - Vitals
+#      - Window Gestures
 
   - type: fonts
     fonts:
