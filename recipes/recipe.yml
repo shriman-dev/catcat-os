@@ -34,6 +34,16 @@ modules:
       - cryfs
       - ptyxis
       - bleachbit
+      - gnome-shell-extension-appindicator
+      - gnome-shell-extension-blur-my-shell
+      - gnome-shell-extension-caffeine
+      - gnome-shell-extension-dash-to-dock
+      - gnome-shell-extension-dash-to-panel
+      - gnome-shell-extension-drive-menu
+      - gnome-shell-extension-forge
+      - gnome-shell-extension-gsconnect
+      - gnome-shell-extension-user-theme
+      - gnome-shell-extension-gamemode
       - awf-gtk2
       - awf-gtk3
       - awf-gtk4
@@ -98,18 +108,12 @@ modules:
 
   - type: gnome-extensions
     install:
-      - AppIndicator and KStatusNotifierItem Support
-      - Blur my Shell
-      - Caffeine
       - Clipboard History
       - Color Picker
       - Compiz windows effect
       - Custom Hot Corners - Extended
-      - Dash to Panel
-      - Removable Drive Menu
-      - Forge
       - Hide Universal Access
-      - [QSTweak] Quick Setting Tweaker
+      - "[QSTweak] Quick Setting Tweaker"
       - SettingsCenter
       - Status Area Horizontal Spacing
       - TopHat
