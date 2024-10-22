@@ -121,13 +121,6 @@ modules:
       - Vitals
       - Window Gestures
 
-  - type: script
-    snippets:
-    - "curl -Lo /tmp/unite.zip $(curl -s -X GET https://api.github.com/repos/hardpixel/unite-shell/releases/latest | grep -i '"browser_download_url": "[^"]*.zip"' | cut -d'"' -f4)"
-    - "gnome-extensions /tmp/install unite.zip"
-
-
-
   - type: fonts
     fonts:
       nerd-fonts:

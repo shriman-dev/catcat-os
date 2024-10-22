@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+curl -Lo /tmp/unite.zip $(curl -s -X GET https://api.github.com/repos/hardpixel/unite-shell/releases/latest | grep -i '"browser_download_url": "[^"]*.zip"' | cut -d'"' -f4)
+
+gnome-extensions /tmp/install unite.zip
+
+
 set -oue pipefail
 
 sed -i '/^ID/s/bazzite/catcat/' /usr/lib/*release
