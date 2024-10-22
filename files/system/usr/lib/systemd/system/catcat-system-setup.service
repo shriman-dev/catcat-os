@@ -1,8 +1,12 @@
 [Unit]
 Description=Configure cacat os for current system
+After=rpm-ostreed.service
+Before=bazzite-hardware-setup.service
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/libexec/catcat-system-setup
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
