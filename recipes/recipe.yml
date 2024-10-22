@@ -95,6 +95,35 @@ modules:
       - org.gnome.TextEditor
       - io.github.nokse22.Exhibit
 
+
+  - type: gnome-extensions
+    install:
+      - AppIndicator and KStatusNotifierItem Support
+      - Blur my Shell
+      - Caffeine
+      - Clipboard History
+      - Color Picker
+      - Compiz windows effect
+      - Custom Hot Corners - Extended
+      - Dash to Panel
+      - Removable Drive Menu
+      - Forge
+      - Hide Universal Access
+      - [QSTweak] Quick Setting Tweaker
+      - SettingsCenter
+      - Status Area Horizontal Spacing
+      - TopHat
+      - User Themes
+      - Vitals
+      - Window Gestures
+
+  - type: script
+    snippets:
+    - "curl -Lo /tmp/unite.zip $(curl -s -X GET https://api.github.com/repos/hardpixel/unite-shell/releases/latest | grep -i '"browser_download_url": "[^"]*.zip"' | cut -d'"' -f4)"
+    - "gnome-extensions /tmp/install unite.zip"
+
+
+
   - type: fonts
     fonts:
       nerd-fonts:
