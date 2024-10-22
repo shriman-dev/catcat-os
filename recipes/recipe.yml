@@ -105,7 +105,6 @@ modules:
       - org.gnome.TextEditor
       - io.github.nokse22.Exhibit
 
-
   - type: gnome-extensions
     install:
       - Clipboard History
