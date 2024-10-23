@@ -23,8 +23,16 @@ echo 0 | tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag
 [ "$1" == "tune" ] && tune-response-time
 
 auto-performance-powersave() {
-echo ${1/powersave/power-saver}
+echo ${1}
+
+if command -vq powerprofilesctl ; then
 [ "${1/powersave/power-saver}" == "$( powerprofilesctl get )" ] || powerprofilesctl set ${1/powersave/power-saver}
+fi
+
+if command -vq tuned-adm ; then
+tuned-adm active | grep -i "${1}" || tuned-adm profile ${1/performance/throughput-performance}
+fi
+
 #echo performance | tee /sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference
 scaling_governor='/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
 power_policy='/sys/module/pcie_aspm/parameters/policy'
