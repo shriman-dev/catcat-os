@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-curl -Lo /tmp/unite.zip $(curl -s -X GET https://api.github.com/repos/hardpixel/unite-shell/releases/latest | grep -i '"browser_download_url": "[^"]*.zip"' | cut -d'"' -f4)
-
-gnome-extensions /tmp/install unite.zip
-
-
 set -oue pipefail
+pwd
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 sed -i '/^ID/s/bazzite/catcat/' /usr/lib/*release
 sed -i '/^DEFAULT_HOSTNAME/s/bazzite/catcat/' /usr/lib/*release
@@ -20,3 +18,39 @@ sed  -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minim
 
 systemctl enable fstrim.timer nix.mount \
                  everyFewMins.service everyFewMins.timer catcat-system-setup.service
+
+
+gtk-themes(){
+cd /tmp/
+
+curl -Lo Colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
+
+tar -xf Colloid-gtk-theme
+chmod -x Colloid-gtk-theme/install.sh
+
+cp -vf ${SCRIPT_DIR}/_color-palette-catppuccin.scss Colloid-gtk-theme/src/sass
+sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' Colloid-gtk-theme/src/sass/_variables.scss
+sed  -i 's/\$modal-radius: .*;/\$modal-radius: 12px;/g' Colloid-gtk-theme/src/sass/_variables.scss
+sed  -i 's/\$corner-radius: .*;/\$corner-radius: 12px;/g' Colloid-gtk-theme/src/sass/_variables.scss
+
+sed  -i 's/\$base_radius: .*;/\$base_radius: 12px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$icon_radius: .*;/\$icon_radius: 20px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+
+
+Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
+
+cd -
+}
+gtk-themes
+
+
+shell-exts(){
+
+curl -Lo /tmp/unite.zip $(curl -s -X GET https://api.github.com/repos/hardpixel/unite-shell/releases/latest | grep -i '"browser_download_url": "[^"]*.zip"' | cut -d'"' -f4)
+
+gnome-extensions install /tmp/unite.zip
+
+
+}
+shell-exts

@@ -1,7 +1,7 @@
 [Unit]
 Description=Configure cacat os for current system
 After=rpm-ostreed.service
-Before=bazzite-hardware-setup.service
+Before=systemd-user-sessions.service bazzite-hardware-setup.service
 
 [Service]
 Type=oneshot

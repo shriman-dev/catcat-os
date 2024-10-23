@@ -34,6 +34,10 @@ modules:
       - cryfs
       - ptyxis
       - bleachbit
+      - gtk-murrine-engine
+      - gtk2-engines
+      - gtk-murrine-engine
+      - sassc
       - gnome-shell-extension-appindicator
       - gnome-shell-extension-blur-my-shell
       - gnome-shell-extension-caffeine
@@ -105,20 +109,20 @@ modules:
       - org.gnome.TextEditor
       - io.github.nokse22.Exhibit
 
-#  - type: gnome-extensions
-#    install:
-#      - Clipboard History
-#      - Color Picker
-#      - Compiz windows effect
-#      - "CHC-E (Custom Hot Corners - Extended)"
-#      - Hide Universal Access
-#      - "[QSTweak] Quick Setting Tweaker"
-#      - SettingsCenter
-#      - Status Area Horizontal Spacing
-#      - TopHat
-#      - User Themes
-#      - Vitals
-#      - Window Gestures
+  - type: gnome-extensions
+    install:
+      - Clipboard History
+      - Color Picker
+      - Compiz windows effect
+      - "CHC-E (Custom Hot Corners - Extended)"
+      - Hide Universal Access
+      - "[QSTweak] Quick Setting Tweaker"
+      - SettingsCenter
+      - Status Area Horizontal Spacing
+      - TopHat
+      - User Themes
+      - Vitals
+      - Window Gestures
 
   - type: fonts
     fonts:
