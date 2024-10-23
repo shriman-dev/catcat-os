@@ -21,11 +21,11 @@ systemctl enable fstrim.timer nix.mount \
 
 
 gtk-themes(){
-cd /tmp/
 
-curl -Lo colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
+curl -Lo /tmp/colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
 
-tar -xf colloid-gtk-theme
+mkdir -p /tmp/Colloid-gtk-theme
+tar -xf /tmp/colloid-gtk-theme -C /tmp/Colloid-gtk-theme --strip-components=1
 
 cp -vf ${SCRIPT_DIR}/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
 sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
@@ -37,9 +37,8 @@ sed  -i 's/\$icon_radius: .*;/\$icon_radius: 20px;/g' /tmp/Colloid-gtk-theme/src
 sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
 
 
-Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
+/tmp/Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
 
-cd -
 }
 gtk-themes
 
