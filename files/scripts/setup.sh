@@ -23,9 +23,9 @@ systemctl enable fstrim.timer nix.mount \
 gtk-themes(){
 cd /tmp/
 
-curl -Lo Colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
+curl -Lo colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
 
-tar -xf Colloid-gtk-theme
+tar -xf colloid-gtk-theme
 
 cp -vf ${SCRIPT_DIR}/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
 sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
