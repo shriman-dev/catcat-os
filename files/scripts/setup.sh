@@ -26,16 +26,15 @@ cd /tmp/
 curl -Lo Colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
 
 tar -xf Colloid-gtk-theme
-chmod -x Colloid-gtk-theme/install.sh
 
-cp -vf ${SCRIPT_DIR}/_color-palette-catppuccin.scss Colloid-gtk-theme/src/sass
-sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' Colloid-gtk-theme/src/sass/_variables.scss
-sed  -i 's/\$modal-radius: .*;/\$modal-radius: 12px;/g' Colloid-gtk-theme/src/sass/_variables.scss
-sed  -i 's/\$corner-radius: .*;/\$corner-radius: 12px;/g' Colloid-gtk-theme/src/sass/_variables.scss
+cp -vf ${SCRIPT_DIR}/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
+sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
+sed  -i 's/\$modal-radius: .*;/\$modal-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
+sed  -i 's/\$corner-radius: .*;/\$corner-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
 
-sed  -i 's/\$base_radius: .*;/\$base_radius: 12px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
-sed  -i 's/\$icon_radius: .*;/\$icon_radius: 20px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
-sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$base_radius: .*;/\$base_radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$icon_radius: .*;/\$icon_radius: 20px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
 
 
 Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
