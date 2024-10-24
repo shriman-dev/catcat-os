@@ -2,6 +2,8 @@
 
 set -oue pipefail
 
+#rm -vf /usr/share/pixmaps/fedora*
+#rm -vf /usr/share/pixmaps/bootloader/fedora.icns
 
 chmod 000 /usr/bin/ibus
 chmod 000 /usr/bin/ibus-daemon
