@@ -126,6 +126,7 @@ modules:
 
   - type: fonts
     fonts:
+      - Inter
       nerd-fonts:
         - FiraCode
         - Hack

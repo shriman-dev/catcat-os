@@ -7,7 +7,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 sed -i '/^ID/s/bazzite/catcat/' /usr/lib/*release
 sed -i '/^DEFAULT_HOSTNAME/s/bazzite/catcat/' /usr/lib/*release
-sed -i 's/Bazzite/CatCat/' /etc/*release
+sed -i 's/Bazzite/CatCat OS/' /etc/*release
 sed -i "s|.*issue_discards =.*|issue_discards = 1|"  /etc/lvm/lvm.conf
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
@@ -38,6 +38,13 @@ sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' /tmp/Colloid-gtk-theme
 
 
 /tmp/Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
+
+curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
+
+mkdir -p /tmp/Lavanda-gtk-theme
+tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
+
+/tmp/Lavanda-gtk-theme/install.sh
 
 }
 gtk-themes
