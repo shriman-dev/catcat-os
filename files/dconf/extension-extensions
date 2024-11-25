@@ -480,7 +480,7 @@ eye-blinking=false
 eye-depth=1.0
 panel-alignment=2
 panel-priority=16
-popup-menu-message='meoooow'
+popup-menu-message='meoooo'
 
 [org/gnome/shell/extensions/inputmethod-shortcuts]
 imkey-1=@as []
