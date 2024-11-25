@@ -1,0 +1,12 @@
+[org/gnome/desktop/wm/preferences]
+button-layout='appmenu:minimize,close'
+focus-mode='click'
+num-workspaces=5
+titlebar-font='Inter Bold 11'
+
+[org/gnome/mutter]
+attach-modal-dialogs=false
+auto-maximize=false
+center-new-windows=true
+dynamic-workspaces=false
+workspaces-only-on-primary=false

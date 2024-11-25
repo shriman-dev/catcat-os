@@ -1,0 +1,33 @@
+[org/gnome/gedit/plugins]
+active-plugins=['time', 'textsize', 'sort', 'snippets', 'smartspaces', 'sessionsaver', 'quickopen', 'quickhighlight', 'pythonconsole', 'multiedit', 'modelines', 'joinlines', 'git', 'filebrowser', 'drawspaces', 'docinfo', 'colorpicker', 'codecomment', 'bookmarks']
+
+[org/gnome/gedit/preferences/editor]
+use-default-font=false
+editor-font='FiraCode Nerd Font 11'
+wrap-last-split-mode='word'
+
+
+
+scheme='catppuccin_mocha'
+auto-save=false
+auto-save-interval=1
+display-right-margin=false
+background-pattern='none'
+tabs-size=4
+insert-spaces=true
+display-line-numbers=true
+right-margin-position=80
+wrap-mode='word'
+highlight-current-line=true
+bracket-matching=true
+
+[org/gnome/gedit/preferences/ui]
+side-panel-visible=false
+bottom-panel-visible=false
+statusbar-visible=true
+
+[org/gnome/gedit/plugins/drawspaces]
+matrix=[11, 10, 11]
+
+[org/gnome/gedit/plugins/spell]
+highlight-misspelled=true

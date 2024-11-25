@@ -1,0 +1,11 @@
+[io/github/jeffshee/hanabi-extension]
+content-fit=0
+enable-nvsl=true
+enable-va=true
+low-battery-threshold=30
+mute=true
+pause-on-battery=2
+pause-on-maximize-or-fullscreen=1
+show-panel-menu=true
+startup-delay=10
+video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'

@@ -1,0 +1,35 @@
+[org/nemo/icon-view]
+captions=['size', 'date_modified_with_time', 'permissions']
+
+[org/nemo/list-view]
+default-column-order=['size', 'name', 'date_modified', 'type', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']
+default-visible-columns=['size', 'name', 'date_modified', 'permissions']
+
+[org/nemo/preferences]
+click-double-parent-folder=true
+date-format='iso'
+inherit-folder-viewer=true
+inherit-show-thumbnails=true
+show-advanced-permissions=true
+show-compact-view-icon-toolbar=false
+show-directory-item-counts='always'
+show-full-path-titles=false
+show-hidden-files=true
+show-home-icon-toolbar=true
+show-image-thumbnails='always'
+show-reload-icon-toolbar=true
+show-up-icon-toolbar=false
+size-prefixes='base-2'
+thumbnail-limit=uint64 10485760
+tooltips-in-list-view=false
+tooltips-on-desktop=false
+
+[org/nemo/preferences/menu-config]
+selection-menu-copy-to=true
+selection-menu-duplicate=true
+selection-menu-make-link=true
+selection-menu-move-to=true
+
+[org/nemo/sidebar-panels/tree]
+show-only-directories=false
+

@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if [ ! -f '~/.config/catcat-os/first-boot' ]; then
+
+  # default configs for user home
+  cp -vrnP /etc/skel/* ~/
+
+  # desktop files
+  if flatpak list | grep -i "freetube"; then
+  mkdir -p ~/.local/share/applications
+  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
+  fi
+
+  # theme flatpak apps
+  mkdir -p ~/.local/share/themes
+  mkdir -p ~/.local/share/icons
+  mkdir -p ~/.local/share/fonts
+
+  find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -rf {} ~/.local/share/themes \;
+  find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -rf {} ~/.local/share/themes \;
+
+  ln -srfTv $HOME/.local/share/icons $HOME/.icons
+  ln -srfTv $HOME/.local/share/themes $HOME/.themes
+
+  sh -c "echo '[Context]
+devices=!all;
+filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
+
+[Environment]
+QT_STYLE_OVERRIDE=kvantum
+' > $HOME/.local/share/flatpak/overrides/global"
+
+  mkdir -p ~/.config/catcat-os
+  echo 'first boot' > ~/.config/catcat-os/first-boot
+
+fi
+
+# set folder icons
+gio set ~/Me metadata::custom-icon-name "user-home"
+gio set ~/Me/Backups metadata::custom-icon-name "folder-backup"
+gio set ~/Me/Devel metadata::custom-icon-name "folder-code"
+gio set ~/Me/Ebooks metadata::custom-icon-name "folder-books"
+gio set ~/Me/Games metadata::custom-icon-name "folder-games"
+gio set ~/Me/Notes metadata::custom-icon-name "folder-notes"
+gio set ~/Me/Scripts metadata::custom-icon-name "folder-script"
+gio set ~/Me/Secure metadata::custom-icon-name "folder-locked"
+gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
+
+#gio set ~/Me/Notes
+gtk-update-icon-cache
+gtk4-update-icon-cache
+
+
+
+
+
+
+
+
+
+
+
+
+
+
