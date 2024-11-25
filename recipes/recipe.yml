@@ -352,7 +352,7 @@ modules:
       - 615  # appindicator support
       - 3628 # arc menu
       - 16   # auto move windows
-      - 5425 # battery-time
+      #- 5425 # battery-time
       - 4012 # bed time mode
       - 1401 # bluetooth quick connect
       - 3193 # blur my shell
