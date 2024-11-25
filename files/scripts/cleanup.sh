@@ -59,5 +59,6 @@ rm -vf /usr/share/fish/vendor_conf.d/nano-default-editor.fish
 rm -vf /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
 rm -vf /usr/share/fish/functions/fish_greeting.fish
 rm -vf /usr/share/applications/gnome-ssh-askpass.desktop
+rm -vf /usr/share/applications/bazzite-steam-bpm.desktop
 rm -vf /usr/libexec/topgrade/mozilla-gnome-theme-update
 

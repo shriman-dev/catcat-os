@@ -1,15 +1,14 @@
 #!/bin/bash
 
-if [ ! -f '~/.config/catcat-os/first-boot' ]; then
+if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
 
   # default configs for user home
-  cp -vrnP /etc/skel/* ~/
+  rsync -vrlu --ignore-existing /etc/skel/* ~/
 
-  # desktop files
-  if flatpak list | grep -i "freetube"; then
-  mkdir -p ~/.local/share/applications
-  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
-  fi
+  for file in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f);
+  do
+  dconf load / < $file
+  done
 
   # theme flatpak apps
   mkdir -p ~/.local/share/themes
@@ -22,7 +21,7 @@ if [ ! -f '~/.config/catcat-os/first-boot' ]; then
   ln -srfTv $HOME/.local/share/icons $HOME/.icons
   ln -srfTv $HOME/.local/share/themes $HOME/.themes
 
-  sh -c "echo '[Context]
+  grep 'devices=!all' $HOME/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
 
@@ -30,10 +29,20 @@ filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;
 QT_STYLE_OVERRIDE=kvantum
 ' > $HOME/.local/share/flatpak/overrides/global"
 
-  mkdir -p ~/.config/catcat-os
-  echo 'first boot' > ~/.config/catcat-os/first-boot
+  mkdir -p ~/.local/share/catcat-os
+  echo 'first boot' > ~/.local/share/catcat-os/first-boot
 
 fi
+
+  # desktop files
+  mkdir -p ~/.local/share/applications
+  if flatpak list | grep -i "freetube"; then
+  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
+  fi
+
+  if flatpak list | grep -i "librewolf"; then
+  sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
+  fi
 
 # set folder icons
 gio set ~/Me metadata::custom-icon-name "user-home"
