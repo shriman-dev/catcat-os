@@ -354,7 +354,7 @@ modules:
       - 16   # auto move windows
       #- 5425 # battery-time
       - 4012 # bed time mode
-      - 1401 # bluetooth quick connect
+      #- 1401 # bluetooth quick connect
       - 3193 # blur my shell
       - 4679 # burn my windows
       - 517  # caffeine
