@@ -350,44 +350,44 @@ modules:
   - type: gnome-extensions
     install:
       - 615  # appindicator support
-      - 3628 # arc menu
-      - 16   # auto move windows
+      #- 3628 # arc menu
+      #- 16   # auto move windows
       #- 5425 # battery-time
-      - 4012 # bed time mode
+      #- 4012 # bed time mode
       #- 1401 # bluetooth quick connect
       - 3193 # blur my shell
-      - 4679 # burn my windows
+      #- 4679 # burn my windows
       - 517  # caffeine
       - 4839 # Clipboard History
-      - 3396 # Color Picker
-      - 3210 # Compiz windows effect
+      #- 3396 # Color Picker
+      #- 3210 # Compiz windows effect
       - 4167 # "CHC-E (Custom Hot Corners - Extended)"
-      - 307  # dash to dock
+      #- 307  # dash to dock
       - 1160 # dash to panel
-      - 3780 # ddterm
+      #- 3780 # ddterm
       #- 4783 # default workspace
-      - 4648 # desktop cube
-      - 3539 # downfall
-      - 7036 # eye on cursor
+      #- 4648 # desktop cube
+      #- 3539 # downfall
+      #- 7036 # eye on cursor
       - 4481 # forge
-      - 7074 # gamemode
+      #- 7074 # gamemode
       - 2398 # Hide Universal Access
-      - 36   # lock keys
+      #- 36   # lock keys
       - 3795 # notification timeout
-      - 4805 # panel corners
+      #- 4805 # panel corners
       #- 5446 # "[QSTweak] Quick Setting Tweaker"
-      - 5292 # quick touchpad toggle
-      - 5105 # reboot to uefi
+      #- 5292 # quick touchpad toggle
+      #- 5105 # reboot to uefi
       - 7    # removable drive menu
-      - 2986 # runcat
-      - 2899 # SettingsCenter
-      - 355  # Status Area Horizontal Spacing
-      - 5219 # TopHat
+      #- 2986 # runcat
+      #- 2899 # SettingsCenter
+      #- 355  # Status Area Horizontal Spacing
+      #- 5219 # TopHat
       #- 5506 # user avatar in qs
       - 19   # user themes
       - 1460 # Vitals
-      - 6343 # Window Gestures
-      - 4788 # workspace switcher manager
+      #- 6343 # Window Gestures
+      #- 4788 # workspace switcher manager
 
   - type: fonts
     fonts:
