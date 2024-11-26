@@ -347,8 +347,8 @@ modules:
       - it.mijorus.gearlever
       - io.github.nokse22.Exhibit
 
-  - type: gnome-extensions
-    install:
+#  - type: gnome-extensions
+#    install:
       #- 615  # appindicator support
       #- 3628 # arc menu
       #- 16   # auto move windows
