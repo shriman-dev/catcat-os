@@ -49,7 +49,7 @@ show-border=false
 spacing=12
 
 [org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4/element-data/2a9adcfd-5ed3-4bf0-8159-cc66eb407d66]
-date-format='%a, %b %d'
+date-format='%a %b %d'
 font-family-override=(false, 'Cantarell')
 font-size=16
 foreground-color='rgb(205,214,244)'
