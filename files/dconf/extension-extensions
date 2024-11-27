@@ -204,12 +204,6 @@ private-mode=false
 process-primary-selection=true
 window-width-percentage=23
 
-[org/gnome/shell/extensions/clipboard-indicator]
-history-size=70
-move-item-first=true
-pinned-on-bottom=true
-topbar-preview-size=30
-
 [org/gnome/shell/extensions/color-picker]
 color-history=[uint32 3618644, 1973806, 3618644, 1973806, 13489908, 16429959, 4210777, 16429959]
 enable-systray=true
@@ -384,7 +378,7 @@ leftbox-padding=1
 leftbox-size=0
 overview-click-to-exit=true
 panel-anchors='{"0":"MIDDLE"}'
-panel-element-positions='{"0":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":false,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
+panel-element-positions='{"0":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":false,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
 panel-lengths='{"0":100}'
 panel-positions='{"0":"TOP"}'
 panel-sizes='{"0":28}'
@@ -794,7 +788,7 @@ datemenu-remove-media-control=false
 datemenu-remove-notifications=false
 input-always-show=true
 input-show-selected=false
-list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":true},{"name":"NMWiredToggle","title":null,"visible":true},{"name":"NMWirelessToggle","title":null,"visible":true},{"name":"NMModemToggle","title":null,"visible":true},{"name":"NMBluetoothToggle","title":null,"visible":true},{"name":"NMVpnToggle","title":null,"visible":true},{"name":"BluetoothToggle","title":"Bluetooth","visible":false},{"name":"PowerProfilesToggle","title":"Power Mode","visible":false},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":true},{"name":"RfkillToggle","title":"Airplane Mode","visible":false},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":null,"visible":false},{"name":"St_BoxLayout","title":null,"visible":true}]'
+list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":true},{"name":"InputStreamSlider","title":null,"visible":true},{"name":"BrightnessItem","title":null,"visible":true},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"BedtimeModeToggle","title":"Bedtime Mode","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"CaffeineToggle","title":"Caffeine","visible":true},{"name":"FeatureToggle","title":"Touchpad","visible":true},{"name":"FeatureToggle","title":"DownFall","visible":true},{"name":"ServiceToggle","title":"GSConnect","visible":true},{"name":"SettingsCenterMenuToggle","title":"S-Center","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false},{"name":"St_BoxLayout","title":null,"visible":true}]'
 media-control-enabled=false
 notifications-enabled=false
 output-show-selected=false
