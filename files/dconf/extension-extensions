@@ -26,6 +26,7 @@ menu-separator-color='rgba(255,255,255,0.1)'
 multi-monitor=false
 position-in-panel='Center'
 prefs-visible-page=0
+recently-installed-apps=['com.github.amezin.ddterm.desktop']
 search-entry-border-radius=(true, 25)
 show-activities-button=true
 show-category-sub-menus=true
@@ -36,6 +37,53 @@ application-list=['org.garudalinux.firedragon.desktop:4', 'io.freetubeapp.FreeTu
 [org/gnome/shell/extensions/azclock]
 changed-data=@a{ss} {}
 create-initial-widget=false
+widgets=[{'f08eab7a-9e99-4a20-827e-97af85f929b4': <{'enabled': <true>}>}]
+
+[org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4]
+anchor-point='Center'
+elements=[@a{sv} {}, {'a4afdcd3-178d-4c01-ade2-b3abf7db1b94': <{'enabled': <true>}>}, {'2a9adcfd-5ed3-4bf0-8159-cc66eb407d66': <{'enabled': <true>}>}]
+location=(975, 906)
+name='Analog Clock Widget'
+show-background=false
+show-border=false
+spacing=12
+
+[org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4/element-data/2a9adcfd-5ed3-4bf0-8159-cc66eb407d66]
+date-format='%a %b %d'
+font-family-override=(false, 'Cantarell')
+font-size=18
+foreground-color='rgb(205,214,244)'
+name='Date Label'
+shadow=(false, 'black', 2, 2, 0, 4)
+show-background=false
+show-border=false
+
+[org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4/element-data/a4afdcd3-178d-4c01-ade2-b3abf7db1b94]
+background-color='rgba(205,214,244,0)'
+border-color='black'
+border-radius=999
+border-width=2
+clock-button-color='rgb(205,214,244)'
+clock-button-style=1
+clock-face-shadow=(false, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 3)
+clock-face-style=2
+clock-size=210
+element-type='Analog_Clock'
+foreground-color='rgb(205,214,244)'
+hour-hand-color='rgb(205,214,244)'
+hour-hand-shadow=(false, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 3)
+hour-hand-style=1
+minute-hand-adjust-with-seconds=true
+minute-hand-color='rgb(205,214,244)'
+minute-hand-shadow=(false, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 3)
+minute-hand-style=1
+name='Analog Clock'
+second-hand-color='rgb(250,179,135)'
+second-hand-shadow=(false, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 3)
+second-hand-style=1
+shadow=(false, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 0)
+show-border=false
+smooth-hand-ticks=false
 
 [org/gnome/shell/extensions/aztaskbar]
 clock-font-size=(false, 12)
@@ -74,6 +122,7 @@ bluetooth-auto-power-on=true
 show-battery-value-on=true
 
 [org/gnome/shell/extensions/blur-my-shell]
+pipelines={'pipeline_default': {'name': <'Default'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_000000000000'>, 'params': <{'radius': <30>, 'brightness': <0.59999999999999998>}>}>]>}, 'pipeline_default_rounded': {'name': <'Default rounded'>, 'effects': <[<{'type': <'corner'>, 'id': <'effect_000000000002'>, 'params': <{'radius': <22>}>}>, <{'type': <'native_static_gaussian_blur'>, 'id': <'effect_89048584225338'>, 'params': <{'unscaled_radius': <20>}>}>]>}}
 settings-version=2
 
 [org/gnome/shell/extensions/blur-my-shell/appfolder]
@@ -84,6 +133,9 @@ style-dialogs=2
 [org/gnome/shell/extensions/blur-my-shell/applications]
 blur=false
 enable-all=false
+
+[org/gnome/shell/extensions/blur-my-shell/coverflow-alt-tab]
+pipeline='pipeline_default'
 
 [org/gnome/shell/extensions/blur-my-shell/dash-to-dock]
 blur=true
@@ -107,8 +159,11 @@ style-components=1
 [org/gnome/shell/extensions/blur-my-shell/panel]
 blur=false
 brightness=0.55000000000000004
+force-light-text=false
+override-background=true
 pipeline='pipeline_default'
 sigma=10
+static-blur=true
 
 [org/gnome/shell/extensions/blur-my-shell/screenshot]
 pipeline='pipeline_default'
@@ -116,6 +171,13 @@ pipeline='pipeline_default'
 [org/gnome/shell/extensions/blur-my-shell/window-list]
 brightness=0.55000000000000004
 sigma=10
+
+[org/gnome/shell/extensions/bring-out-submenu-of-power-off-logout]
+hide-hibernate-button=true
+hide-hybrid-sleep-button=true
+hide-lock-button=false
+hide-suspend-button=true
+hide-switch-user-button=true
 
 [org/gnome/shell/extensions/burn-my-windows]
 active-profile='/home/shriman/.config/burn-my-windows/profiles/1679372508290696.conf'
@@ -142,6 +204,12 @@ private-mode=false
 process-primary-selection=true
 window-width-percentage=23
 
+[org/gnome/shell/extensions/clipboard-indicator]
+history-size=70
+move-item-first=true
+pinned-on-bottom=true
+topbar-preview-size=30
+
 [org/gnome/shell/extensions/color-picker]
 color-history=[uint32 3618644, 1973806, 3618644, 1973806, 13489908, 16429959, 4210777, 16429959]
 enable-systray=true
@@ -156,6 +224,17 @@ mass=60.0
 resize-effect=true
 speedup-factor-divider=2.5
 spring-k=6.0
+
+[org/gnome/shell/extensions/coverflowalttab]
+current-workspace-only='all-currentfirst'
+dim-factor=0.0
+easing-function='ease-out-cubic'
+hide-panel=false
+perspective-correction-method='Move Camera'
+position='Bottom'
+switcher-background-color=(0.98039215686274506, 0.70196078431372544, 0.52941176470588236)
+switcher-looping-method='Carousel'
+switcher-style='Coverflow'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/misc]
 action-event-delay=50
@@ -272,6 +351,7 @@ show-apps-always-in-the-edge=true
 show-apps-at-top=false
 show-favorites=true
 show-mounts-network=true
+show-mounts-only-mounted=true
 show-trash=false
 transparency-mode='FIXED'
 
@@ -350,6 +430,12 @@ window-preview-title-font-weight='inherit'
 window-preview-title-position='TOP'
 window-preview-use-custom-icon-size=true
 
+[org/gnome/shell/extensions/date-menu-formatter]
+apply-all-panels=false
+font-size=10
+text-align='center'
+use-default-calendar=false
+
 [org/gnome/shell/extensions/default-workspace]
 default-workspace-number=3
 
@@ -358,6 +444,9 @@ enable-desktop-dragging=false
 enable-desktop-edge-switch=false
 enable-panel-dragging=false
 window-parallax=1.0
+
+[org/gnome/shell/extensions/dim-background-windows]
+dimming-enabled=true
 
 [org/gnome/shell/extensions/downfall]
 clutteranimmode=0
@@ -413,6 +502,9 @@ tracker-opacity=60
 tracker-refresh-rate=144
 tracker-shape='Motif_3'
 tracker-size=128
+
+[org/gnome/shell/extensions/flypie]
+menu-configuration='[{"name":"Example Menu","icon":"flypie-symbolic-#46a","shortcut":"<Primary>space","centered":false,"id":0,"children":[{"name":"Sound","icon":"flypie-multimedia-symbolic-#c86","children":[{"name":"Mute","icon":"flypie-multimedia-mute-symbolic-#853","type":"Shortcut","data":"AudioMute","angle":-1},{"name":"Play / Pause","icon":"flypie-multimedia-playpause-symbolic-#853","type":"Shortcut","data":"AudioPlay","angle":-1},{"name":"Next Title","icon":"flypie-multimedia-next-symbolic-#853","type":"Shortcut","data":"AudioNext","angle":90},{"name":"Previous Title","icon":"flypie-multimedia-previous-symbolic-#853","type":"Shortcut","data":"AudioPrev","angle":270}],"type":"CustomMenu","data":{},"angle":-1},{"name":"Favorites","icon":"flypie-menu-favorites-symbolic-#da3","type":"Favorites","data":{},"angle":-1},{"name":"Next Workspace","icon":"flypie-go-right-symbolic-#6b5","type":"Shortcut","data":{"shortcut":"<Control><Alt>Right"},"angle":-1},{"name":"Maximize Window","icon":"flypie-window-maximize-symbolic-#b68","type":"Shortcut","data":"<Alt>F10","angle":-1},{"name":"Fly-Pie Settings","icon":"flypie-menu-system-symbolic-#3ab","type":"Command","data":"gnome-extensions prefs flypie@schneegans.github.com","angle":-1},{"name":"Close Window","icon":"flypie-window-close-symbolic-#a33","type":"Shortcut","data":"<Alt>F4","angle":-1},{"name":"Previous Workspace","icon":"flypie-go-left-symbolic-#6b5","type":"Shortcut","data":{"shortcut":"<Control><Alt>Left"},"angle":-1},{"name":"Running Apps","icon":"flypie-menu-running-apps-symbolic-#65a","type":"RunningApps","data":{"activeWorkspaceOnly":false,"appGrouping":true,"hoverPeeking":true,"nameRegex":""},"angle":-1}],"type":"CustomMenu","data":{}}]'
 
 [org/gnome/shell/extensions/forge]
 css-last-update=uint32 37
@@ -482,6 +574,14 @@ panel-alignment=2
 panel-priority=16
 popup-menu-message='meoooo'
 
+[org/gnome/shell/extensions/gnome-ui-tune]
+hide-search=false
+increase-thumbnails-size='200%'
+restore-thumbnails-background=false
+
+[org/gnome/shell/extensions/hibernate-status-button]
+show-hybrid-sleep-dialog=false
+
 [org/gnome/shell/extensions/inputmethod-shortcuts]
 imkey-1=@as []
 imkey-2=@as []
@@ -518,6 +618,9 @@ window-picker-icon=true
 workspace-background-corner-size=0
 workspace-switcher-size=0
 
+[org/gnome/shell/extensions/libpanel]
+layout=[['gnome@main', 'quick-settings-audio-panel@rayzeq.github.io/main']]
+
 [org/gnome/shell/extensions/lineup]
 indicator-width=40
 max-width=40
@@ -527,11 +630,20 @@ min-width=40
 notification-preferences='osd'
 style='show-hide-capslock'
 
+[org/gnome/shell/extensions/ncom/github/hermes83/compiz-alike-magic-lamp-effect]
+duration=150.0
+effect='default'
+x-tiles=50.0
+y-tiles=50.0
+
 [org/gnome/shell/extensions/nightlightsliderupdated]
 enable-always=false
 show-always=false
 show-status-icon=true
 swap-axis=true
+
+[org/gnome/shell/extensions/nothing-to-say]
+icon-visibility='always'
 
 [org/gnome/shell/extensions/notification-timeout]
 always-normal=false
@@ -622,6 +734,13 @@ width-bottom=true
 width-top=true
 wmaxbar=true
 
+[org/gnome/shell/extensions/openweatherrefined]
+actual-city=2
+has-run=true
+last-init-error='(2024/10/26) Gio.IOErrorEnum: Could not connect to api.infoip.io: Connection refused'
+locs=[(uint32 1, '', uint32 1, ''), (1, '', 1, ''), (0, 'Mumbai City, Maharashtra, India', 0, '18.9733536,72.82810491917377')]
+my-loc-prov='ipinfoio'
+
 [org/gnome/shell/extensions/order-icons]
 order-icons-center=@as []
 order-icons-left=['vitalsMenu', 'TopHat']
@@ -646,6 +765,21 @@ left='workspace'
 right='workspace'
 wrap=false
 
+[org/gnome/shell/extensions/quick-settings-audio-panel]
+always-show-input-slider=true
+autohide-profile-switcher=true
+create-balance-slider=false
+create-profile-switcher=true
+create-sink-mixer=false
+ignore-css=true
+media-control='duplicate'
+merge-panel=false
+move-master-volume=false
+ordering=['sink-mixer', 'volume-output', 'volume-input', 'balance-slider', 'mixer', 'profile-switcher', 'media']
+panel-position='top'
+remove-output-slider=false
+show-current-device=false
+
 [org/gnome/shell/extensions/quick-settings-avatar]
 avatar-nobackground=true
 avatar-position=1
@@ -669,8 +803,58 @@ volume-mixer-position='bottom'
 [org/gnome/shell/extensions/runcat]
 idle-threshold=8
 
+[org/gnome/shell/extensions/space-bar/appearance]
+active-workspace-background-color='rgba(205,214,244,0)'
+active-workspace-border-radius=255
+active-workspace-border-width=0
+active-workspace-font-weight='700'
+active-workspace-padding-h=6
+active-workspace-padding-v=2
+active-workspace-text-color='rgb(205,214,244)'
+application-styles='.space-bar {\n  -natural-hpadding: 12px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 0px;\n  background-color: rgba(205,214,244,0);\n  color: rgb(205,214,244);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.69);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.4);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}'
+empty-workspace-border-radius=255
+empty-workspace-border-width=0
+empty-workspace-font-weight='700'
+empty-workspace-padding-h=6
+empty-workspace-padding-v=2
+empty-workspace-text-color='rgba(205,214,244,0.4)'
+inactive-workspace-border-radius=255
+inactive-workspace-border-width=0
+inactive-workspace-font-weight='700'
+inactive-workspace-padding-h=6
+inactive-workspace-padding-v=2
+inactive-workspace-text-color='rgba(205,214,244,0.69)'
+workspace-margin=0
+
+[org/gnome/shell/extensions/space-bar/behavior]
+always-show-numbers=false
+custom-label-named='{{name}}'
+custom-label-unnamed='●'
+enable-custom-label=true
+enable-custom-label-in-menu=false
+indicator-style='workspaces-bar'
+position='center'
+position-index=1
+scroll-wheel='workspaces-bar'
+scroll-wheel-horizontal='normal'
+show-empty-workspaces=true
+smart-workspace-names=false
+system-workspace-indicator=false
+toggle-overview=true
+
+[org/gnome/shell/extensions/space-bar/shortcuts]
+enable-activate-workspace-shortcuts=false
+
+[org/gnome/shell/extensions/space-bar/state]
+version=31
+
 [org/gnome/shell/extensions/status-area-horizontal-spacing]
 hpadding=1
+
+[org/gnome/shell/extensions/top-bar-organizer]
+center-box-order=['Space Bar', 'Spacer', 'ArcMenu']
+left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu']
+right-box-order=['Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
 
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'
@@ -685,6 +869,9 @@ show-cpu=true
 show-disk=true
 show-icons=false
 show-net=false
+
+[org/gnome/shell/extensions/transparent-window-moving]
+window-opacity=220
 
 [org/gnome/shell/extensions/unite]
 app-menu-max-width=0
@@ -726,6 +913,9 @@ show-gpu=true
 storage-path='/'
 update-time=1
 use-higher-precision=true
+
+[org/gnome/shell/extensions/weatherornot]
+position='left'
 
 [org/gnome/shell/extensions/windowgestures]
 gesture-acceleration=25

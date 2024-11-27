@@ -9,4 +9,5 @@ attach-modal-dialogs=false
 auto-maximize=false
 center-new-windows=true
 dynamic-workspaces=false
+overlay-key='Super_L'
 workspaces-only-on-primary=false

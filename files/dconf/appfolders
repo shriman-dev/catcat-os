@@ -47,7 +47,7 @@ name='VM-Tainer'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Utilities]
-apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'net.codelogistics.clicker.desktop' 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop']
+apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'net.codelogistics.clicker.desktop', 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop']
 name='Utilities'
 translate=false
 
