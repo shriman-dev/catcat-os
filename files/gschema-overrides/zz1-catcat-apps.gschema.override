@@ -99,8 +99,6 @@ show-create-link=true
 show-delete-permanently=true
 show-directory-item-counts='always'
 show-hidden-files=true
-type-ahead-search=true
-
 
 [org.nemo.icon-view]
 captions=['size', 'date_modified_with_time', 'permissions']
