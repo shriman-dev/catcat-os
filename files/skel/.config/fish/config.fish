@@ -46,8 +46,8 @@ if test -f $HOME/.fish_profile
 end
 
 # Replace user home path in history with $HOME variable
-sed -i -e "s|'/var/home/$USER\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"/var/home/$USER"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"/var/home/$USER"'|\$HOME|g' $HOME/.local/share/fish/fish_history
-sed -i -e "s|'$HOME\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"$HOME"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"$HOME"'|\$HOME|g' $HOME/.local/share/fish/fish_history
+sed -i -e "s|'/var/home/$USER\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"/var/home/$USER"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"/var/home/$USER"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1
+sed -i -e "s|'$HOME\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"$HOME"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"$HOME"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1
 
 ## Run fastfetch if session is interactive
 if status --is-interactive && type -q fastfetch

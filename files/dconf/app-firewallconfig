@@ -1,4 +1,0 @@
-[org/fedoraproject/FirewallConfig]
-show-active-bindings=true
-show-ipsets=true
-show-lockdown-whitelist=true

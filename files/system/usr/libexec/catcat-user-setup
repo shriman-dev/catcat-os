@@ -7,20 +7,12 @@ if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
 
   for file in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f);
   do
-  dconf load / < $file
+  echo
+  #dconf load / < $file
   done
 
+
   # theme flatpak apps
-  mkdir -p ~/.local/share/themes
-  mkdir -p ~/.local/share/icons
-  mkdir -p ~/.local/share/fonts
-
-  find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -rf {} ~/.local/share/themes \;
-  find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -rf {} ~/.local/share/themes \;
-
-  ln -srfTv $HOME/.local/share/icons $HOME/.icons
-  ln -srfTv $HOME/.local/share/themes $HOME/.themes
-
   grep 'devices=!all' $HOME/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
@@ -34,15 +26,27 @@ QT_STYLE_OVERRIDE=kvantum
 
 fi
 
-  # desktop files
-  mkdir -p ~/.local/share/applications
-  if flatpak list | grep -i "freetube"; then
-  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
-  fi
+# theme flatpak apps
+mkdir -p ~/.local/share/themes
+mkdir -p ~/.local/share/icons
+mkdir -p ~/.local/share/fonts
 
-  if flatpak list | grep -i "librewolf"; then
-  sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
-  fi
+ln -srfTv $HOME/.local/share/icons $HOME/.icons
+ln -srfTv $HOME/.local/share/themes $HOME/.themes
+
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec rsync -vrlu {} ~/.local/share/themes \;
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec rsync -vrlu {} ~/.local/share/themes \;
+
+
+# desktop files
+mkdir -p ~/.local/share/applications
+if flatpak list | grep -i "freetube"; then
+sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
+fi
+
+if flatpak list | grep -i "librewolf"; then
+sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
+fi
 
 # set folder icons
 gio set ~/Me metadata::custom-icon-name "user-home"
@@ -55,7 +59,6 @@ gio set ~/Me/Scripts metadata::custom-icon-name "folder-script"
 gio set ~/Me/Secure metadata::custom-icon-name "folder-locked"
 gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
 
-#gio set ~/Me/Notes
 gtk-update-icon-cache
 gtk4-update-icon-cache
 

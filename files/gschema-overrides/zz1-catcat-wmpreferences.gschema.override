@@ -1,10 +1,10 @@
-[org/gnome/desktop/wm/preferences]
+[org.gnome.desktop.wm.preferences]
 button-layout='appmenu:minimize,close'
 focus-mode='click'
 num-workspaces=5
 titlebar-font='Inter Bold 11'
 
-[org/gnome/mutter]
+[org.gnome.mutter]
 attach-modal-dialogs=false
 auto-maximize=false
 center-new-windows=true

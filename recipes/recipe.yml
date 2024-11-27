@@ -20,7 +20,7 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
       - source: dconf
-        destination: /etc/dconf/db/distro.d/
+        destination: /etc/dconf/
       - source: skel
         destination: /usr/etc/skel/
 
@@ -405,9 +405,20 @@ modules:
         - Roboto
         - Open Sans
 
-  - type: bling
-    install:
-      - dconf-update-service # a service unit that updates the dconf db on boot
+#  - type: bling
+#    install:
+#      - dconf-update-service # a service unit that updates the dconf db on boot
+
+  - type: gschema-overrides
+    include:
+      - zz1-catcat-keybindings.gschema.override
+      - zz1-catcat-apps.gschema.override
+      - zz1-catcat-extensions.gschema.override
+      - zz1-catcat-background.gschema.override
+      - zz1-catcat-interface.gschema.override
+      - zz1-catcat-shell.gschema.override
+      - zz1-catcat-wmpreferences.gschema.override
+      - zz1-catcat-defaults.gschema.override
 
   - type: script
     scripts:
