@@ -42,16 +42,16 @@ widgets=[{'f08eab7a-9e99-4a20-827e-97af85f929b4': <{'enabled': <true>}>}]
 [org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4]
 anchor-point='Center'
 elements=[@a{sv} {}, {'a4afdcd3-178d-4c01-ade2-b3abf7db1b94': <{'enabled': <true>}>}, {'2a9adcfd-5ed3-4bf0-8159-cc66eb407d66': <{'enabled': <true>}>}]
-location=(975, 906)
+location=(960, 906)
 name='Analog Clock Widget'
 show-background=false
 show-border=false
 spacing=12
 
 [org/gnome/shell/extensions/azclock/widget-data/f08eab7a-9e99-4a20-827e-97af85f929b4/element-data/2a9adcfd-5ed3-4bf0-8159-cc66eb407d66]
-date-format='%a %b %d'
+date-format='%a, %b %d'
 font-family-override=(false, 'Cantarell')
-font-size=18
+font-size=16
 foreground-color='rgb(205,214,244)'
 name='Date Label'
 shadow=(false, 'black', 2, 2, 0, 4)
