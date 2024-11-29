@@ -239,6 +239,7 @@ modules:
       enabled:
       - syncthing.service
       - catcat-user-setup.service
+      - libadwaita-theme-sync.service
       disabled:
       - tracker-miner-fs-3.servicee
       - tracker-miner-fs-control-3.service

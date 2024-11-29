@@ -2,9 +2,6 @@
 
 if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
 
-  # default configs for user home
-  rsync -vrlu --ignore-existing /etc/skel/* ~/
-
   for file in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f);
   do
   echo
@@ -12,7 +9,29 @@ if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
   done
 
 
-  # theme flatpak apps
+  # desktop files
+  mkdir -p ~/.local/share/applications
+  if flatpak list | grep -i "freetube"; then
+  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
+  fi
+
+  if flatpak list | grep -i "librewolf"; then
+  sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
+  fi
+
+  if flatpak list | grep -i "ArmCord"; then
+  sed 's|^Icon=.*|Icon=discord|' /var/lib/flatpak/exports/share/applications/xyz.armcord.ArmCord.desktop > ~/.local/share/applications/xyz.armcord.ArmCord.desktop
+  fi
+
+  mkdir -p ~/.local/share/catcat-os
+  echo 'first boot' > ~/.local/share/catcat-os/first-boot
+
+fi
+
+# default configs for user home
+rsync -vrlu --ignore-existing /etc/skel/* ~/
+
+# theme flatpak apps
   grep 'devices=!all' $HOME/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
@@ -21,12 +40,6 @@ filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;
 QT_STYLE_OVERRIDE=kvantum
 ' > $HOME/.local/share/flatpak/overrides/global"
 
-  mkdir -p ~/.local/share/catcat-os
-  echo 'first boot' > ~/.local/share/catcat-os/first-boot
-
-fi
-
-# theme flatpak apps
 mkdir -p ~/.local/share/themes
 mkdir -p ~/.local/share/icons
 mkdir -p ~/.local/share/fonts
@@ -34,19 +47,8 @@ mkdir -p ~/.local/share/fonts
 ln -srfTv $HOME/.local/share/icons $HOME/.icons
 ln -srfTv $HOME/.local/share/themes $HOME/.themes
 
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec rsync -vrlu {} ~/.local/share/themes \;
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec rsync -vrlu {} ~/.local/share/themes \;
-
-
-# desktop files
-mkdir -p ~/.local/share/applications
-if flatpak list | grep -i "freetube"; then
-sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
-fi
-
-if flatpak list | grep -i "librewolf"; then
-sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
-fi
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prvfu {} ~/.local/share/themes \;
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prvfu {} ~/.local/share/themes \;
 
 # set folder icons
 gio set ~/Me metadata::custom-icon-name "user-home"

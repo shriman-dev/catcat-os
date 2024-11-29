@@ -58,12 +58,14 @@ show-systemindicator=false
 
 [org.gnome.shell.extensions.arcmenu]
 apps-show-extra-details=false
-arc-menu-icon=29
+arc-menu-icon=64
+arcmenu-hotkey=['<Alt>Super_L']
 button-item-icon-size='Default'
 button-padding=0
 context-menu-items=[{'id': 'ArcMenu_Settings', 'name': 'ArcMenu Settings', 'icon': 'ArcMenu_ArcMenuIcon'}, {'id': 'ArcMenu_PanelExtensionSettings', 'name': 'Panel Extension Settings', 'icon': 'application-x-addon-symbolic'}, {'id': 'ArcMenu_Separator', 'name': 'Separator', 'icon': 'list-remove-symbolic'}, {'id': 'ArcMenu_PowerOptions', 'name': 'Power Options', 'icon': 'system-shutdown-symbolic'}, {'id': 'ArcMenu_ActivitiesOverview', 'name': 'Activities Overview', 'icon': 'view-fullscreen-symbolic'}, {'id': 'ArcMenu_ShowDesktop', 'name': 'Show Desktop', 'icon': 'computer-symbolic'}]
-custom-menu-button-icon-size=25.0
+custom-menu-button-icon-size=16.0
 dash-to-panel-standalone=false
+distro-icon=20
 force-menu-location='TopCentered'
 gnome-dash-show-applications=true
 highlight-search-result-terms=true
@@ -71,6 +73,12 @@ max-search-results=10
 menu-background-color='rgba(48,48,49,0.98)'
 menu-border-color='rgb(60,60,60)'
 menu-button-appearance='Icon'
+menu-button-bg-color=(false, 'rgba(242,242,242,0.2)')
+menu-button-border-color=(false, 'rgb(205,214,244)')
+menu-button-border-radius=(false, 22)
+menu-button-border-width=(false, 2)
+menu-button-fg-color=(false, 'rgb(242,242,242)')
+menu-button-hover-bg-color=(false, 'rgba(242,242,242,0.15)')
 menu-button-icon='Menu_Icon'
 menu-button-position-offset=0
 menu-foreground-color='rgb(223,223,223)'
@@ -93,6 +101,7 @@ position-in-panel='Center'
 prefs-visible-page=0
 quicklinks-item-icon-size='Default'
 recently-installed-apps=['com.github.amezin.ddterm.desktop']
+runner-hotkey-open-primary-monitor=false
 search-entry-border-radius=(true, 25)
 search-provider-open-windows=true
 search-provider-recent-files=true
@@ -310,7 +319,7 @@ custom-menu-2=['win-control-submenu', 'minimize-win', 'maximize-win', 'close-win
 custom-tint-color='rgb(255,163,72)'
 panel-menu-enable=false
 show-osd-monitor-indexes=false
-supported-active-extensions=@as []
+supported-active-extensions=['arcmenu']
 win-thumbnail-scale=50
 
 [org.gnome.shell.extensions.custom-hot-corners-extended.monitor-0-bottom-left-1]
@@ -685,6 +694,7 @@ workspace-switcher-size=0
 
 [org.gnome.shell.extensions.libpanel]
 layout=[['gnome@main', 'quick-settings-audio-panel@rayzeq.github.io/main']]
+single-column=false
 
 [org.gnome.shell.extensions.lineup]
 indicator-width=40
@@ -709,6 +719,7 @@ swap-axis=true
 
 [org.gnome.shell.extensions.nothing-to-say]
 icon-visibility='always'
+play-feedback-sounds=true
 
 [org.gnome.shell.extensions.notification-timeout]
 always-normal=false
@@ -834,8 +845,10 @@ wrap=false
 always-show-input-slider=true
 autohide-profile-switcher=true
 create-balance-slider=false
+create-mixer-sliders=true
 create-profile-switcher=true
 create-sink-mixer=false
+filters=['gnome-shell*']
 ignore-css=true
 media-control='duplicate'
 merge-panel=false
@@ -843,6 +856,7 @@ move-master-volume=false
 ordering=['sink-mixer', 'volume-output', 'volume-input', 'balance-slider', 'mixer', 'profile-switcher', 'media']
 panel-position='top'
 remove-output-slider=false
+separate-indicator=false
 show-current-device=false
 
 [org.gnome.shell.extensions.quick-settings-avatar]
@@ -857,15 +871,17 @@ add-unsafe-quick-toggle-enabled=false
 datemenu-fix-weather-widget=true
 datemenu-remove-media-control=false
 datemenu-remove-notifications=false
-input-always-show=true
+input-always-show=false
 input-show-selected=false
-list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":true},{"name":"InputStreamSlider","title":null,"visible":true},{"name":"BrightnessItem","title":null,"visible":true},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"BedtimeModeToggle","title":"Bedtime Mode","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"CaffeineToggle","title":"Caffeine","visible":true},{"name":"FeatureToggle","title":"Touchpad","visible":true},{"name":"FeatureToggle","title":"DownFall","visible":true},{"name":"ServiceToggle","title":"GSConnect","visible":true},{"name":"SettingsCenterMenuToggle","title":"S-Center","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false},{"name":"St_BoxLayout","title":null,"visible":true}]'
+list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
 media-control-enabled=false
 notifications-enabled=false
 output-show-selected=false
+volume-mixer-enabled=false
 volume-mixer-position='bottom'
 
 [org.gnome.shell.extensions.runcat]
+displaying-items='character-only'
 idle-threshold=8
 
 [org.gnome.shell.extensions.space-bar.appearance]
@@ -919,7 +935,7 @@ hpadding=1
 [org.gnome.shell.extensions.top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer']
 left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu']
-right-box-order=['Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
+right-box-order=['quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
 
 [org.gnome.shell.extensions.tophat]
 cpu-display='chart'
@@ -936,7 +952,7 @@ show-icons=false
 show-net=false
 
 [org.gnome.shell.extensions.transparent-window-moving]
-window-opacity=220
+window-opacity=230
 
 [org.gnome.shell.extensions.unite]
 app-menu-max-width=0

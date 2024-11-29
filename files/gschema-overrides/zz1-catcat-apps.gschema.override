@@ -157,4 +157,4 @@ allow-updates=false
 download-updates=false
 download-updates-notify=false
 first-run=false
-flatpak-purge-timestamp=int64 1732712351
+flatpak-purge-timestamp=int64 1732782003
