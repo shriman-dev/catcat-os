@@ -935,7 +935,7 @@ hpadding=1
 [org.gnome.shell.extensions.top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer']
 left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu']
-right-box-order=['quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
+right-box-order=['/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
 
 [org.gnome.shell.extensions.tophat]
 cpu-display='chart'
