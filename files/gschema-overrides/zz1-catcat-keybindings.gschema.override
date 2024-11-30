@@ -9,3 +9,14 @@ magnifier=['<Control>Insert']
 magnifier-zoom-in=['<Control>Page_Up']
 magnifier-zoom-out=['<Control>Page_Down']
 
+
+[org.gnome.shell.keybindings]
+screenshot=['<Control>Print']
+show-screenshot-ui=['<Shift>Print']
+
+[org.gnome.settings-daemon.plugins.media-keys]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']
+magnifier=['<Control>Insert']
+magnifier-zoom-in=['<Control>Page_Up']
+magnifier-zoom-out=['<Control>Page_Down']
+
