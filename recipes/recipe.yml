@@ -20,7 +20,7 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
       - source: dconf
-        destination: /etc/dconf/
+        destination: /etc/dconf/db/distro.d/
       - source: skel
         destination: /usr/etc/skel/
 
@@ -217,6 +217,7 @@ modules:
       - tracker-miner-rss-3.service
       - tracker-writeback-3.service
       - tracker-xdg-portal-3.service
+      - dconf-update.service
       masked:
       - sshd.service
       - tracker-miner-fs-3.servicee
@@ -413,18 +414,6 @@ modules:
   - type: script
     scripts:
       - setup.sh
-
-  - type: gschema-overrides
-    include:
-      - zz1-catcat-keybindings.gschema.override
-      - zz1-catcat-apps.gschema.override
-      #- zz1-catcat-extensions.gschema.override
-      - zz1-catcat-background.gschema.override
-      - zz1-catcat-interface.gschema.override
-      - zz1-catcat-shell.gschema.override
-      - zz1-catcat-wmpreferences.gschema.override
-      - zz1-catcat-defaults.gschema.override
-
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
 

@@ -1,19 +1,19 @@
-[org.freedesktop.tracker.miner.files]
+[org/freedesktop/tracker/miner/files]
 crawling-interval=-2
 enable-monitors=false
 index-recursive-directories=['']
 
-[org.gnome.desktop.datetime]
+[org/gnome/desktop/datetime]
 automatic-timezone=true
 
-[org.gnome.desktop.notifications]
+[org/gnome/desktop/notifications]
 show-in-lock-screen=false
 
-[org.gnome.desktop.peripherals.mouse]
+[org/gnome/desktop/peripherals/mouse]
 accel-profile='adaptive'
 speed=0.11111111
 
-[org.gnome.desktop.peripherals.touchpad]
+[org/gnome/desktop/peripherals/touchpad]
 accel-profile='adaptive'
 click-method='fingers'
 natural-scroll=true
@@ -21,7 +21,7 @@ speed=0.11111111
 tap-to-click=true
 two-finger-scrolling-enabled=true
 
-[org.gnome.desktop.privacy]
+[org/gnome/desktop/privacy]
 disable-camera=true
 disable-microphone=true
 hide-identity=true
@@ -34,26 +34,26 @@ remove-old-trash-files=true
 report-technical-problems=false
 send-software-usage-stats=false
 
-[org.gnome.login-screen]
+[org/gnome/login-screen]
 allowed-failures=5
 banner-message-enable=true
 banner-message-text='Meow'
 logo=''
 
-[org.gnome.settings-daemon.plugins.color]
+[org/gnome/settings-daemon/plugins/color]
 night-light-enabled=false
 night-light-schedule-automatic=false
 night-light-schedule-from=7.0
 night-light-schedule-to=7.0
 night-light-temperature=uint32 2154
 
-[org.gnome.settings-daemon.plugins.housekeeping]
+[org/gnome/settings-daemon/plugins/housekeeping]
 free-percent-notify=0.10000000000000001
 
-[org.gnome.system.location]
+[org/gnome/system/location]
 enabled=false
 
-[org.gtk.gtk4.settings.file-chooser]
+[org/gtk/gtk4/settings/file-chooser]
 clock-format='12h'
 date-format='with-time'
 expand-folders=true
@@ -66,7 +66,7 @@ sort-order='descending'
 type-format='category'
 view-type='list'
 
-[org.gtk.settings.file-chooser]
+[org/gtk/settings/file-chooser]
 clock-format='12h'
 date-format='with-time'
 expand-folders=true

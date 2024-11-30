@@ -5,6 +5,8 @@ pwd
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+/usr/bin/dconf update
+
 rm -rvf /etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
