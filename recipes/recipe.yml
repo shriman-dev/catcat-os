@@ -14,7 +14,7 @@ modules:
     include:
       - zz1-catcat-keybindings.gschema.override
       - zz1-catcat-apps.gschema.override
-      - zz1-catcat-extensions.gschema.override
+      #- zz1-catcat-extensions.gschema.override
       - zz1-catcat-background.gschema.override
       - zz1-catcat-interface.gschema.override
       - zz1-catcat-shell.gschema.override

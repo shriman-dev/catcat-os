@@ -100,6 +100,7 @@ show-delete-permanently=true
 show-directory-item-counts='always'
 show-hidden-files=true
 
+
 [org.nemo.icon-view]
 captions=['size', 'date_modified_with_time', 'permissions']
 
