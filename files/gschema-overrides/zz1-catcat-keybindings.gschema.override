@@ -1,18 +1,3 @@
-[org.gnome.desktop.wm.keybindings]
-move-to-workspace-down=['<Control><Shift><Alt>Down']
-move-to-workspace-left=['<Control>Left', '<Super><Shift>Page_Up']
-move-to-workspace-right=['<Control>Right', '<Super><Shift>Page_Down']
-move-to-workspace-up=['<Control><Shift><Alt>Up']
-panel-run-dialog=['<Super>r']
-switch-to-workspace-down=['<Control><Alt>Down']
-switch-to-workspace-left=['<Super>Page_Up', '<Super><Alt>Left', '<Control><Alt>Left']
-switch-to-workspace-right=['<Super>Page_Down', '<Super><Alt>Right', '<Control><Alt>Right']
-switch-to-workspace-up=['<Control><Alt>Up']
-toggle-fullscreen=['<Control><Super>f']
-
-[org.gnome.shell.keybindings]
-screenshot=['<Control>Print']
-show-screenshot-ui=['<Shift>Print']
 
 [org.gnome.shell.keybindings]
 screenshot=['<Control>Print']
