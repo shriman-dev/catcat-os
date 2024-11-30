@@ -248,13 +248,14 @@ hide-suspend-button=true
 hide-switch-user-button=true
 
 [org/gnome/shell/extensions/burn-my-windows]
-active-profile='/home/shriman/.config/burn-my-windows/profiles/1679372508290696.conf'
+active-profile='/var/home/shriman/.config/burn-my-windows/profiles/1679372508290696.conf'
 last-extension-version=39
 last-prefs-version=41
 prefs-open-count=7
 preview-effect=''
 
 [org/gnome/shell/extensions/caffeine]
+countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
@@ -273,7 +274,6 @@ process-primary-selection=true
 window-width-percentage=23
 
 [org/gnome/shell/extensions/color-picker]
-color-history=[uint32 3618644, 1973806, 3618644, 1973806, 13489908, 16429959, 4210777, 16429959]
 enable-systray=true
 menu-size=uint32 8
 notify-style=uint32 0
@@ -570,7 +570,7 @@ menu-configuration='[{"name":"Example Menu","icon":"flypie-symbolic-#46a","short
 
 [org/gnome/shell/extensions/forge]
 css-last-update=uint32 37
-css-updated='1724415535235'
+css-updated='1732972388306'
 dnd-center-layout='tabbed'
 float-always-on-top-enabled=false
 focus-border-toggle=false

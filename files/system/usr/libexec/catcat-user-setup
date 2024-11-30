@@ -30,6 +30,10 @@ fi
 
 # default configs for user home
 rsync -vrlu --ignore-existing /etc/skel/* ~/
+#cp -Prvfu /etc/skel/.local/share/gnome-shell/extensions/* ~/.local/share/gnome-shell/extensions/
+
+dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+
 
 # theme flatpak apps
   grep 'devices=!all' $HOME/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
