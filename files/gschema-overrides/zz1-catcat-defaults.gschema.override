@@ -40,19 +40,6 @@ banner-message-enable=true
 banner-message-text='Meow'
 logo=''
 
-[org.gnome.settings-daemon.peripherals.touchscreen]
-orientation-lock=true
-
-[org.gnome.settings-daemon.plugins.color]
-night-light-enabled=false
-night-light-schedule-automatic=false
-night-light-schedule-from=22.500000000000025
-night-light-schedule-to=7.0
-night-light-temperature=uint32 1500
-
-[org.gnome.settings-daemon.plugins.housekeeping]
-free-percent-notify=0.10000000000000001
-
 [org.gnome.system.location]
 enabled=false
 
