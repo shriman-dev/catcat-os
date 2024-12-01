@@ -863,7 +863,7 @@ datemenu-remove-media-control=false
 datemenu-remove-notifications=false
 input-always-show=false
 input-show-selected=false
-list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
+list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":false},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
 media-control-enabled=false
 notifications-enabled=false
 output-show-selected=false
@@ -871,7 +871,7 @@ volume-mixer-enabled=false
 volume-mixer-position='bottom'
 
 [org/gnome/shell/extensions/runcat]
-displaying-items='character-only'
+displaying-items='character-and-percentage'
 idle-threshold=8
 
 [org/gnome/shell/extensions/space-bar/appearance]
@@ -930,6 +930,7 @@ right-box-order=['/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_424
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'
 cpu-show-cores=true
+disk-display='both'
 disk-monitor-mode='activity'
 mem-display='numeric'
 meter-fg-color='rgb(205,214,244)'

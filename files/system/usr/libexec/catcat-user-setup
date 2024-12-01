@@ -8,17 +8,14 @@ if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
 
   # desktop files
   mkdir -p ~/.local/share/applications
-  if flatpak list | grep -i "freetube"; then
-  sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
-  fi
+  flatpak list | grep -i "freetube" && sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
 
-  if flatpak list | grep -i "librewolf"; then
-  sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
-  fi
 
-  if flatpak list | grep -i "ArmCord"; then
-  sed 's|^Icon=.*|Icon=discord|' /var/lib/flatpak/exports/share/applications/xyz.armcord.ArmCord.desktop > ~/.local/share/applications/xyz.armcord.ArmCord.desktop
-  fi
+  flatpak list | grep -i "librewolf" && sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
+
+
+  flatpak list | grep -i "ArmCord" && sed 's|^Icon=.*|Icon=discord|' /var/lib/flatpak/exports/share/applications/xyz.armcord.ArmCord.desktop > ~/.local/share/applications/xyz.armcord.ArmCord.desktop
+
 
   mkdir -p ~/.local/share/catcat-os
   echo 'first boot' > ~/.local/share/catcat-os/first-boot
@@ -28,8 +25,11 @@ fi
 # default configs for user home
 rsync -vrlu --ignore-existing /etc/skel/* ~/
 #cp -Prfu /etc/skel/.local/share/gnome-shell/extensions/* ~/.local/share/gnome-shell/extensions/
+[ ! -f "$HOME/.config/burn-my-windows/profiles/1679372508290696.conf" ] && cp -Prf /etc/skel/.config/burn-my-windows $HOME/.config/
 
 dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+
+[ -d "$HOME/Me" ] && ! grep "/Me/" && cp -Prf /etc/skel/.config/user-dirs.dirs $HOME/.config/ && cp -Prf /etc/skel/.config/gtk-3.0 $HOME/.config/
 
 
 # theme flatpak apps
@@ -64,17 +64,5 @@ gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
 
 gtk-update-icon-cache
 gtk4-update-icon-cache
-
-
-
-
-
-
-
-
-
-
-
-
 
 
