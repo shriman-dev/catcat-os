@@ -148,7 +148,7 @@ restore-session=true
 restore-window-size=true
 scrollbar-policy='system'
 use-system-font=true
-window-size=(uint32 93, uint32 47)
+window-size=(uint32 93, uint32 46)
 
 [org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
 label='default-shell'

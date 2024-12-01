@@ -1,12 +1,9 @@
 #!/bin/bash
+shopt -s extglob
 
 if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
-
-  for file in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f);
-  do
-  echo
-  #dconf load / < $file
-  done
+  # default configs for user home
+  cp -Prfu /etc/skel/* ~/
 
 
   # desktop files
@@ -30,7 +27,7 @@ fi
 
 # default configs for user home
 rsync -vrlu --ignore-existing /etc/skel/* ~/
-#cp -Prvfu /etc/skel/.local/share/gnome-shell/extensions/* ~/.local/share/gnome-shell/extensions/
+#cp -Prfu /etc/skel/.local/share/gnome-shell/extensions/* ~/.local/share/gnome-shell/extensions/
 
 dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
@@ -51,8 +48,8 @@ mkdir -p ~/.local/share/fonts
 ln -srfTv $HOME/.local/share/icons $HOME/.icons
 ln -srfTv $HOME/.local/share/themes $HOME/.themes
 
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prvfu {} ~/.local/share/themes \;
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prvfu {} ~/.local/share/themes \;
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prfu {} ~/.local/share/themes \;
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prfu {} ~/.local/share/themes \;
 
 # set folder icons
 gio set ~/Me metadata::custom-icon-name "user-home"
