@@ -3,7 +3,7 @@ shopt -s extglob
 
 if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
   # default configs for user home
-  cp -Prfu /etc/skel/* ~/
+  cp -Prf /etc/skel/* ~/
 
 
   # desktop files
