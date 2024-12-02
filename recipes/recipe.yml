@@ -169,6 +169,8 @@ modules:
       # extras
       #- librewolf
       - bleachbit
+      - optimizer
+      - gnome-system-monitor
       - uresourced
       - irqbalance
     remove:
