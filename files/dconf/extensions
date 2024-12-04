@@ -25,11 +25,12 @@ palette=['rgb(48,48,73)', 'rgb(255,133,133)', 'rgb(162,255,155)', 'rgb(255,221,1
 panel-icon-type='toggle-and-menu-button'
 scrollback-lines=1000000000
 scrollback-unlimited=false
+shortcut-font-scale-increase=['<Control>equal']
 theme-variant='dark'
 use-system-font=true
 use-theme-colors=false
 window-maximize=false
-window-size=0.65114068441064643
+window-size=0.71619047619047616
 window-skip-taskbar=true
 window-type-hint='normal'
 
