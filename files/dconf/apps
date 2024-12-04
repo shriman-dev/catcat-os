@@ -9,7 +9,7 @@ show-lockdown-whitelist=true
 [org/gnome/gnome-system-monitor]
 current-tab='processes'
 disks-interval=30000
-maximized=false
+maximized=true
 network-total-in-bits=false
 process-memory-in-iec=false
 resources-memory-in-iec=false
@@ -76,7 +76,7 @@ col-6-visible=false
 col-6-width=90
 col-8-visible=true
 col-8-width=79
-columns-order=[12, 1, 15, 8, 0, 14, 18, 26, 2, 3, 4, 6, 9, 10, 11, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 7]
+columns-order=[12, 1, 15, 8, 0, 14, 23, 22, 18, 26, 2, 3, 4, 6, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 7]
 sort-col=15
 sort-order=0
 
@@ -145,11 +145,11 @@ default-profile-uuid='db8703c64d752ad6daf64e776707763b'
 font-name='FiraCode Nerd Font 11'
 interface-style='dark'
 profile-uuids=['80a34f2cafa4b10d8524dd1966ea26f3', 'db8703c64d752ad6daf64e776707763b']
-restore-session=true
+restore-session=false
 restore-window-size=true
 scrollbar-policy='system'
 use-system-font=true
-window-size=(uint32 93, uint32 48)
+window-size=(uint32 189, uint32 44)
 
 [org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
 label='default-shell'
@@ -168,6 +168,7 @@ login-shell=true
 opacity=1.0
 palette='Catppuccin-Mocha-mine'
 preserve-container='never'
+preserve-directory='never'
 scrollback-lines=2147483647
 use-custom-command=true
 

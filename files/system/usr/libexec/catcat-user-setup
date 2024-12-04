@@ -29,7 +29,7 @@ rsync -vrlu --ignore-existing /etc/skel/* ~/
 
 dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
-[ -d "$HOME/Me" ] && ! grep "/Me/" $HOME/.config/user-dirs.dirs && cp -Prf /etc/skel/.config/user-dirs.dirs $HOME/.config/ &&  cp -Prf /etc/skel/.config/gtk-3.0 $HOME/.config/
+[ -d "$HOME/Me" ] && ! grep "/Me/" $HOME/.config/user-dirs.dirs && cp -Prf /etc/skel/.config/user-dirs.dirs $HOME/.config/ && cp -Prf /etc/skel/.config/gtk-3.0 $HOME/.config/
 
 
 # theme flatpak apps

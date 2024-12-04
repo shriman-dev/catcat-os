@@ -10,10 +10,15 @@ chmod 000 /usr/bin/ibus
 chmod 000 /usr/bin/ibus-daemon
 chmod 000 /usr/bin/ibus-setup
 
-#chmod 000 /usr/libexec/evolution-source-registry
-#chmod 000 /usr/libexec/evolution-addressbook-factory
-#chmod 000 /usr/libexec/evolution-calendar-factory
-#chmod 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
+chmod 000 /usr/libexec/evolution-source-registry
+chmod 000 /usr/libexec/evolution-addressbook-factory
+chmod 000 /usr/libexec/evolution-calendar-factory
+chmod 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
+
+chmod 000 /usr/libexec/goa-daemon 
+chmod 000 /usr/libexec/goa-identity-service 
+
+
 
 
 systemctl disable brew-dir-fix.service brew-setup.service brew-update.service \
@@ -29,7 +34,7 @@ rm -vf /usr/lib/systemd/system/brew-upgrade.service
 
 systemctl disable input-remapper.service NetworkManager-wait-online.service \
                   systemd-networkd-wait-online.service tailscaled.service \
-                  setroubleshootd.service
+                  setroubleshootd.service cups.service ublue-update.service
 
 systemctl  disable sshd.service
 systemctl --global mask sshd.service

@@ -204,6 +204,7 @@ modules:
       - catcat-system-setup.service
       - auto-power-profile.service
       disabled:
+      - cups.service
       - flatpak-system-update.timer
       - brew-dir-fix.service
       - brew-setup.service
@@ -220,6 +221,7 @@ modules:
       - tracker-writeback-3.service
       - tracker-xdg-portal-3.service
       - dconf-update.service
+      - ublue-update.service
       masked:
       - sshd.service
       - tracker-miner-fs-3.servicee
