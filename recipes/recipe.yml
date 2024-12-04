@@ -169,7 +169,7 @@ modules:
       # extras
       #- librewolf
       - bleachbit
-      - optimizer
+      #- optimizer
       - gnome-system-monitor
       - uresourced
       - irqbalance
