@@ -99,6 +99,7 @@ show-create-link=true
 show-delete-permanently=true
 show-directory-item-counts='always'
 show-hidden-files=true
+show-image-thumbnails='always'
 
 
 [org/nemo/icon-view]
@@ -148,7 +149,7 @@ restore-session=true
 restore-window-size=true
 scrollbar-policy='system'
 use-system-font=true
-window-size=(uint32 93, uint32 46)
+window-size=(uint32 93, uint32 48)
 
 [org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
 label='default-shell'

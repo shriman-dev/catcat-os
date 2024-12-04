@@ -1,6 +1,8 @@
 [org/gnome/desktop/wm/preferences]
+action-middle-click-titlebar='toggle-maximize'
+auto-raise=true
 button-layout='appmenu:minimize,close'
-focus-mode='click'
+focus-mode='sloppy'
 num-workspaces=5
 titlebar-font='Inter Bold 11'
 

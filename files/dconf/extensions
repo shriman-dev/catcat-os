@@ -63,7 +63,7 @@ arcmenu-hotkey=['<Alt>Super_L']
 button-item-icon-size='Default'
 button-padding=0
 context-menu-items=[{'id': 'ArcMenu_Settings', 'name': 'ArcMenu Settings', 'icon': 'ArcMenu_ArcMenuIcon'}, {'id': 'ArcMenu_PanelExtensionSettings', 'name': 'Panel Extension Settings', 'icon': 'application-x-addon-symbolic'}, {'id': 'ArcMenu_Separator', 'name': 'Separator', 'icon': 'list-remove-symbolic'}, {'id': 'ArcMenu_PowerOptions', 'name': 'Power Options', 'icon': 'system-shutdown-symbolic'}, {'id': 'ArcMenu_ActivitiesOverview', 'name': 'Activities Overview', 'icon': 'view-fullscreen-symbolic'}, {'id': 'ArcMenu_ShowDesktop', 'name': 'Show Desktop', 'icon': 'computer-symbolic'}]
-custom-menu-button-icon-size=16.0
+custom-menu-button-icon-size=20.0
 distro-icon=20
 force-menu-location='TopCentered'
 highlight-search-result-terms=true
@@ -100,7 +100,7 @@ show-hidden-recent-files=false
 show-search-result-details=true
 
 [org/gnome/shell/extensions/auto-move-windows]
-application-list=['org.garudalinux.firedragon.desktop:4', 'io.freetubeapp.FreeTube.desktop:4', 'com.valvesoftware.Steam.desktop:2', 'librewolf.desktop:4', 'steam.desktop:2']
+application-list=['org.garudalinux.firedragon.desktop:4', 'io.freetubeapp.FreeTube.desktop:4', 'com.valvesoftware.Steam.desktop:2', 'steam.desktop:2', 'io.gitlab.librewolf-community.desktop:4']
 
 [org/gnome/shell/extensions/azclock]
 changed-data=@a{ss} {}
@@ -159,7 +159,8 @@ clock-position-in-panel='RIGHT'
 clock-position-offset=0
 dance-urgent=true
 desaturation-factor=0.0
-favorites=false
+favorites=true
+favorites-on-all-monitors=true
 icon-size=20
 icon-style='REGULAR'
 indicator-color-focused='rgb(250,179,135)'
@@ -176,7 +177,7 @@ position-offset=3
 scroll-action='NO_ACTION'
 show-apps-button=(false, 0)
 show-panel-activities-button=true
-show-running-apps=false
+show-running-apps=true
 show-weather-by-clock='LEFT'
 
 [org/gnome/shell/extensions/bedtime-mode]
@@ -307,7 +308,7 @@ custom-menu-2=['win-control-submenu', 'minimize-win', 'maximize-win', 'close-win
 custom-tint-color='rgb(255,163,72)'
 panel-menu-enable=false
 show-osd-monitor-indexes=false
-supported-active-extensions=@as []
+supported-active-extensions=['arcmenu']
 win-thumbnail-scale=50
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-1]
@@ -449,7 +450,7 @@ panel-anchors='{"0":"MIDDLE"}'
 panel-element-positions='{"0":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":false,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
 panel-lengths='{"0":100}'
 panel-positions='{"0":"TOP"}'
-panel-sizes='{"0":28}'
+panel-sizes='{"0":30}'
 preview-custom-opacity=0
 preview-middle-click-close=false
 preview-use-custom-opacity=true
@@ -492,6 +493,45 @@ window-preview-title-font-weight='inherit'
 window-preview-title-position='TOP'
 window-preview-use-custom-icon-size=true
 
+[org/gnome/shell/extensions/dash2dock-lite]
+animation-bounce=0.0
+animation-magnify=0.01
+animation-rise=0.0
+animation-spread=0.32000000000000001
+apps-icon=true
+apps-icon-front=true
+autohide-dash=true
+autohide-speed=0.40000000000000002
+background-color=(0.0, 0.0, 0.0, 0.0)
+border-radius=2.9278350515463916
+clock-icon=false
+dock-location=0
+dock-padding=0.0
+downloads-icon=false
+edge-distance=0.39884393063583823
+favorites-only=false
+icon-effect=0
+icon-shadow=false
+icon-size=0.25252525252525254
+icon-spacing=0.0
+items-pullout-angle=0.5
+max-recent-items=0
+mounted-icon=true
+msg-to-ext=''
+multi-monitor-preference=1
+notification-badge-color=(1.0, 0.62333333492279053, 0.62333333492279053, 1.0)
+notification-badge-style=1
+open-app-animation=true
+panel-mode=false
+preferred-monitor=0
+pressure-sense=true
+pressure-sense-sensitivity=0.59999999999999998
+running-indicator-size=0
+running-indicator-style=1
+scroll-sensitivity=0.59999999999999998
+shrink-icons=true
+trash-icon=false
+
 [org/gnome/shell/extensions/date-menu-formatter]
 apply-all-panels=false
 font-size=10
@@ -509,6 +549,10 @@ window-parallax=1.0
 
 [org/gnome/shell/extensions/dim-background-windows]
 dimming-enabled=true
+
+[org/gnome/shell/extensions/ding]
+check-x11wayland=true
+show-network-volumes=true
 
 [org/gnome/shell/extensions/downfall]
 clutteranimmode=0
@@ -580,8 +624,8 @@ quick-settings-enabled=true
 showtab-decoration-enabled=true
 stacked-tiling-mode-enabled=false
 tiling-mode-enabled=true
-window-gap-size=uint32 2
-window-gap-size-increment=uint32 2
+window-gap-size=uint32 3
+window-gap-size-increment=uint32 1
 workspace-skip-tile=''
 
 [org/gnome/shell/extensions/forge/keybindings]
@@ -863,7 +907,7 @@ datemenu-remove-media-control=false
 datemenu-remove-notifications=false
 input-always-show=false
 input-show-selected=false
-list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":true},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":true},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"CaffeineToggle","title":"Caffeine","visible":true},{"name":"FeatureToggle","title":"DownFall","visible":true},{"name":"ServiceToggle","title":"GSConnect","visible":true},{"name":"FeatureToggle","title":"Touchpad","visible":true},{"name":"SettingsCenterMenuToggle","title":"S-Center","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
+list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":false},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
 media-control-enabled=false
 notifications-enabled=false
 output-show-selected=false
@@ -879,23 +923,26 @@ active-workspace-background-color='rgba(205,214,244,0)'
 active-workspace-border-radius=255
 active-workspace-border-width=0
 active-workspace-font-weight='700'
-active-workspace-padding-h=6
+active-workspace-padding-h=4
 active-workspace-padding-v=2
 active-workspace-text-color='rgb(205,214,244)'
-application-styles='.space-bar {\n  -natural-hpadding: 12px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 0px;\n  background-color: rgba(205,214,244,0);\n  color: rgb(205,214,244);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.69);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.4);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 6px;\n}'
+application-styles='.space-bar {\n  -natural-hpadding: 12px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 0px;\n  background-color: rgba(205,214,244,0);\n  color: rgb(205,214,244);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.69);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.4);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}'
+custom-styles-enabled=false
+custom-styles-failed=false
 empty-workspace-border-radius=255
 empty-workspace-border-width=0
 empty-workspace-font-weight='700'
-empty-workspace-padding-h=6
+empty-workspace-padding-h=4
 empty-workspace-padding-v=2
 empty-workspace-text-color='rgba(205,214,244,0.4)'
 inactive-workspace-border-radius=255
 inactive-workspace-border-width=0
 inactive-workspace-font-weight='700'
-inactive-workspace-padding-h=6
+inactive-workspace-padding-h=4
 inactive-workspace-padding-v=2
 inactive-workspace-text-color='rgba(205,214,244,0.69)'
 workspace-margin=0
+workspaces-bar-padding=12
 
 [org/gnome/shell/extensions/space-bar/behavior]
 always-show-numbers=false
@@ -922,10 +969,16 @@ version=31
 [org/gnome/shell/extensions/status-area-horizontal-spacing]
 hpadding=1
 
+[org/gnome/shell/extensions/system-monitor]
+layout='vertical'
+memory-calculation-method='all'
+position='left'
+refresh-interval=1
+
 [org/gnome/shell/extensions/top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer']
-left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu']
-right-box-order=['appindicator-kstatusnotifieritem-com.dec05eba.gpu_screen_recorder', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
+left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu', 'System_Monitor@bghome.gmail.com']
+right-box-order=['ForceQuitButton', 'appindicator-kstatusnotifieritem-com.dec05eba.gpu_screen_recorder', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'color-picker@tuberry', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls', 'dateMenu']
 
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'
@@ -976,12 +1029,14 @@ fixed-widths=false
 hide-icons=false
 hot-sensors=['__temperature_avg__', '__network-tx_max__', '__network-rx_max__']
 icon-style=0
+include-static-gpu-info=true
 include-static-info=true
-memory-measurement=0
+memory-measurement=1
 menu-centered=false
 position-in-panel=0
 show-battery=true
 show-gpu=true
+storage-measurement=1
 storage-path='/'
 update-time=1
 use-higher-precision=true
