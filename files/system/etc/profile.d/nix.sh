@@ -1,3 +1,4 @@
+<<'###'
 if ystemctl --quiet is-active nix.mount; then
 
 	# Source global configuration
@@ -19,3 +20,4 @@ if ystemctl --quiet is-active nix.mount; then
 	unset NIX_STATE_HOME
 
 fi
+###
