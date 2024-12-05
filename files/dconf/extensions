@@ -89,7 +89,7 @@ pop-default-view='Library Home'
 pop-folders-data={'Library Home': 'Library Home', 'FileViewers': 'File Viewers', 'Graphics': 'Graphics', 'Docs': 'Docs', 'Net': 'Net', 'Stores': 'Stores', 'Sysmon': 'Sysmon', 'DiskBackup': 'Disk & Backup', 'SysSecurity': 'Sys & Security', 'VMTainer': 'VM-Tainer', 'Utilities': 'Utilities', 'Tweaks': 'Tweaks', 'ProdDevel': 'Prod & Devel', 'Gaming': 'Gaming', 'Tools': 'Tools', 'Optimize': 'Optimize', 'Others': 'Others'}
 prefs-visible-page=0
 quicklinks-item-icon-size='Default'
-recently-installed-apps=['com.github.amezin.ddterm.desktop']
+recently-installed-apps=['com.github.amezin.ddterm.desktop', 'org.mozilla.firefox.desktop']
 runner-hotkey-open-primary-monitor=false
 search-entry-border-radius=(true, 25)
 search-provider-open-windows=true
@@ -444,7 +444,7 @@ intellihide-pressure-threshold=220
 intellihide-pressure-time=1000
 intellihide-show-in-fullscreen=true
 intellihide-use-pressure=true
-leftbox-padding=-1
+leftbox-padding=0
 leftbox-size=0
 overview-click-to-exit=true
 panel-anchors='{"0":"MIDDLE"}'
@@ -979,7 +979,7 @@ refresh-interval=1
 [org/gnome/shell/extensions/top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer']
 left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu', 'System_Monitor@bghome.gmail.com']
-right-box-order=['color-picker@tuberry', 'appindicator-kstatusnotifieritem-EWQvJw3kpw', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'ForceQuitButton', 'appindicator-kstatusnotifieritem-com.dec05eba.gpu_screen_recorder', 'quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls', 'dateMenu']
+right-box-order=['appindicator-kstatusnotifieritem-qIMUU7UbhB', 'appindicator-kstatusnotifieritem-OFB9dExV9P', 'appindicator-kstatusnotifieritem-1dDhtQ33PU', 'color-picker@tuberry', 'appindicator-kstatusnotifieritem-EWQvJw3kpw', '/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', 'ForceQuitButton', 'appindicator-kstatusnotifieritem-com.dec05eba.gpu_screen_recorder', 'quick-settings-audio-panel@rayzeq.github.io', 'appindicator-kstatusnotifieritem-chrome_status_icon_1', 'Nothing to say indicator', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls', 'dateMenu']
 
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'

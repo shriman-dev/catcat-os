@@ -16,6 +16,7 @@ speed=0.11111111
 [org/gnome/desktop/peripherals/touchpad]
 accel-profile='adaptive'
 click-method='fingers'
+disable-while-typing=true
 natural-scroll=true
 speed=0.11111111
 tap-to-click=true
