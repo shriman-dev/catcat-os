@@ -411,9 +411,9 @@ modules:
         - Roboto
         - Open Sans
 
-  - type: bling
-    install:
-      - dconf-update-service # a service unit that updates the dconf db on boot
+#  - type: bling
+#    install:
+#      - dconf-update-service # a service unit that updates the dconf db on boot
 
   - type: script
     scripts:

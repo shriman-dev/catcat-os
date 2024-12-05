@@ -5,7 +5,10 @@ if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
   # default configs for user home
   cp -PTr --update=none  /etc/skel/ ~/
   mv ~/.config/dconf ~/.config/dconf.bak
-  dconf update
+  for i in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f); 
+  do 
+  dconf load / < $i; 
+  done
 
   # desktop files
   mkdir -p ~/.local/share/applications
@@ -26,34 +29,56 @@ fi
 # default configs for user home
 cp -PTr --update=none  /etc/skel/ ~/
 
-[ ! -f "$HOME/.config/burn-my-windows/profiles/1679372508290696.conf" ] && cp -Pr /etc/skel/.config/burn-my-windows $HOME/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+[[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
-[ -d "$HOME/Me" ] && ! grep "/Me/" $HOME/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs $HOME/.config/ && sh -c "echo 'file://$HOME/Me Me
+[[ -d "$HOME/Me" ]] && ! grep "$HOME/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ && sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
 file://$HOME/Me/Downloads Downloads
 file://$HOME/Me/Pictures Pictures
 file://$HOME/Me/Videos Videos
 file://$HOME/Me/Music Music
 file://$HOME/Me/Notes Notes
-admin:/// /' > $HOME/.config/gtk-3.0/bookmarks" && rmdir $HOME/Desktop $HOME/Downloads $HOME/Templates $HOME/Public $HOME/Documents $HOME/Music $HOME/Pictures $HOME/Videos
+admin:/// /' > ~/.config/gtk-3.0/bookmarks"
 
-[ ! -f "$HOME/.mozilla/firefox/profiles.ini" ] && rm -rf $HOME/.mozilla/firefox/profiles.ini
+rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+
+[[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla/firefox/profiles.ini
+
+
+# shell setup
+[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config
+
+[[ -d "$HOME/.shell.d" ]] && cp -Pr /etc/skel/.shell.d ~/
+
+! grep "~/.shell.d" ~/.bashrc && cat << EOF >> ~/.bashrc
+if [ -d ~/.shell.d ]; then
+	for rc in ~/.shell.d/*; do
+		if [ -f "$rc" ]; then
+			. "$rc"
+		fi
+	done
+fi
+
+unset rc
+EOF
+
+! grep "[[ -f ~/.bashrc ]]" ~/.bashrc && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bashrc
 
 # theme flatpak apps
-  grep 'devices=!all' $HOME/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
+grep 'devices=!all' ~/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
 
 [Environment]
 QT_STYLE_OVERRIDE=kvantum
-' > $HOME/.local/share/flatpak/overrides/global"
+' > ~/.local/share/flatpak/overrides/global"
 
 mkdir -p ~/.local/share/themes
 mkdir -p ~/.local/share/icons
 mkdir -p ~/.local/share/fonts
 
-ln -srfTv $HOME/.local/share/icons $HOME/.icons
-ln -srfTv $HOME/.local/share/themes $HOME/.themes
+ln -srfTv ~/.local/share/icons ~/.icons
+ln -srfTv ~/.local/share/themes ~/.themes
 
 find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prfu {} ~/.local/share/themes \;
 find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prfu {} ~/.local/share/themes \;

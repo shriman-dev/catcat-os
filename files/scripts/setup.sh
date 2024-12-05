@@ -44,8 +44,6 @@ sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
-
-
 }
 desktop-files
 
