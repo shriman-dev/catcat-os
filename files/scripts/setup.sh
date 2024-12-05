@@ -40,7 +40,7 @@ sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//' /usr/share/applications/org
 sed -i 's/^Icon=.*/Icon=fish/' /usr/share/applications/org.gnome.Ptyxis.desktop
 sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' /usr/share/applications/org.gnome.Settings.desktop
 sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop
-sed -i 's/^Icon=.*/Icon=/usr/share/icons/yazi.png/' /usr/share/applications/yazi.desktop
+sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' /usr/share/applications/yazi.desktop
 
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
