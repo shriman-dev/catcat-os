@@ -51,6 +51,7 @@ modules:
       # disk/file man
       - compsize
       #- btdu
+      - htop
       - btop
       - ncdu
       - fio

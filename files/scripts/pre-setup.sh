@@ -10,6 +10,7 @@ chmod +x /usr/bin/btdu
 # yazi
 curl -Lo /tmp/yazi.zip https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip
 curl -Lo /usr/share/applications/yazi.desktop https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/yazi.desktop
+curl -Lo /usr/share/icons/yazi.png https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/logo.png
 
 unzip /tmp/yazi.zip
 cp -vf yazi-x86_64-unknown-linux-gnu/yazi /usr/bin/
@@ -38,6 +39,12 @@ cp -vf /tmp/pokemonsay-newgenerations/pokemonthink.sh /usr/bin/
 
 # dualsensectl
 ########
+
+
+# extra
+curl -Lo /usr/share/applications/micro.desktop https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
+
+
 
 cd /tmp/files/scripts
 }

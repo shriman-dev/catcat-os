@@ -2,6 +2,7 @@
 shopt -s extglob
 
 if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
+
   # default configs for user home
   cp -PTr --update=none  /etc/skel/ ~/
   mv ~/.config/dconf ~/.config/dconf.bak
@@ -42,8 +43,7 @@ admin:/// /' > ~/.config/gtk-3.0/bookmarks"
 
 rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
 
-[[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla/firefox/profiles.ini
-
+[[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
 
 # shell setup
 [ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config
@@ -51,6 +51,7 @@ rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures 
 [[ -d "$HOME/.shell.d" ]] && cp -Pr /etc/skel/.shell.d ~/
 
 ! grep "~/.shell.d" ~/.bashrc && cat << EOF >> ~/.bashrc
+
 if [ -d ~/.shell.d ]; then
 	for rc in ~/.shell.d/*; do
 		if [ -f "$rc" ]; then
@@ -60,18 +61,20 @@ if [ -d ~/.shell.d ]; then
 fi
 
 unset rc
+
 EOF
 
-! grep "[[ -f ~/.bashrc ]]" ~/.bashrc && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bashrc
+! grep "[ -f ~/.bashrc ]" ~/.bashrc && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bashrc
 
 # theme flatpak apps
-grep 'devices=!all' ~/.local/share/flatpak/overrides/global || sh -c "echo '[Context]
+! grep 'devices=!all' ~/.local/share/flatpak/overrides/global && cat << EOF >> ~/.local/share/flatpak/overrides/global
+[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
 
 [Environment]
 QT_STYLE_OVERRIDE=kvantum
-' > ~/.local/share/flatpak/overrides/global"
+EOF
 
 mkdir -p ~/.local/share/themes
 mkdir -p ~/.local/share/icons
