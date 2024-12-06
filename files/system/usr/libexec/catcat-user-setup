@@ -1,7 +1,7 @@
 #!/bin/bash
 shopt -s extglob
-
-if [ ! -f '~/.local/share/catcat-os/first-boot' ]; then
+~/.local/share/catcat-os/first-boot
+if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
 
   # default configs for user home
   cp -PTr --update=none  /etc/skel/ ~/
@@ -32,7 +32,9 @@ cp -PTr --update=none  /etc/skel/ ~/
 
 [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
-[[ -d "$HOME/Me" ]] && ! grep "$HOME/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ && sh -c "echo 'file://$HOME/Me Me
+[[ -d "$HOME/Me" ]] && ! grep "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
+
+! grep "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
 file://$HOME/Me/Downloads Downloads
 file://$HOME/Me/Pictures Pictures
