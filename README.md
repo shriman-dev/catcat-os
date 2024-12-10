@@ -6,6 +6,10 @@ To rebase an existing atomic Fedora installation to the latest build:
   ```
   rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os:latest
   ```
+  * for Nvdia GPUs
+  ```
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os-nv:latest
+  ```
 - Reboot to complete the rebase:
   ```
   systemctl reboot
@@ -14,6 +18,11 @@ To rebase an existing atomic Fedora installation to the latest build:
   ```
   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os:latest
   ```
+  * for Nvdia GPUs
+  ```
+  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os-nv:latest
+  ```
+  
 - Reboot again to complete the installation
   ```
   systemctl reboot
