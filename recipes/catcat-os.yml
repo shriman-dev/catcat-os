@@ -418,7 +418,7 @@ modules:
 
   - type: script
     snippets:
-      - "rm -rvf /usr/share/color || true"
+      - "rm -rvf /usr/share/color"
     scripts:
       - setup.sh
 

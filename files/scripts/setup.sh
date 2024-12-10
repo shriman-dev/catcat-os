@@ -52,16 +52,16 @@ desktop-files
 
 themes(){
 mkdir -p /etc/fastfetch/
-cp -vrfu /usr/etc/skel/.config/fastfetch/* /etc/fastfetch/
-cp -vrfu /usr/etc/skel/.config/Kvantum/* /usr/share/Kvantum/
-cp -vrfu /usr/etc/skel/.config/qt5ct/* /usr/share/qt5ct/
+cp -Pvrfu /usr/etc/skel/.config/fastfetch/* /etc/fastfetch/
+cp -Pvrfu /usr/etc/skel/.config/Kvantum/* /usr/share/Kvantum/
+cp -Pvrfu /usr/etc/skel/.config/qt5ct/* /usr/share/qt5ct/
 
 curl -Lo /tmp/colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
 
 mkdir -p /tmp/Colloid-gtk-theme
 tar -xf /tmp/colloid-gtk-theme -C /tmp/Colloid-gtk-theme --strip-components=1
 
-cp -vf ${SCRIPT_DIR}/setup-files/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
+cp -Pvf ${SCRIPT_DIR}/setup-files/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
 sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
 sed  -i 's/\$modal-radius: .*;/\$modal-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
 sed  -i 's/\$corner-radius: .*;/\$corner-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
@@ -74,7 +74,7 @@ sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' /tmp/Colloid-gtk-theme
 /tmp/Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
 
 mkdir -p /usr/share/gnome-shell/theme/
-cp -rf /usr/share/themes/Colloid-Orange-Dark-Catppuccin /usr/share/gnome-shell/theme/
+cp -Prf /usr/share/themes/Colloid-Orange-Dark-Catppuccin /usr/share/gnome-shell/theme/
 ln -svf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/gnome-shell/gnome-shell.css /usr/share/gnome-shell/theme/gnome-shell.css
 
 curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
@@ -89,7 +89,7 @@ themes
 
 
 shell-exts(){
-cp -vrfu /usr/etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/extensions/
+cp -Prfu /usr/etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/extensions/
 
 #sed -i '/"46"/s/"46"/&,/; /"46"/a\    "47"' /usr/share/gnome-shell/extensions/quick-settings-tweaks@qwreey/metadata.json
 
