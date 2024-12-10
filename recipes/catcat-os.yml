@@ -417,8 +417,9 @@ modules:
 #      - dconf-update-service # a service unit that updates the dconf db on boot
 
   - type: script
-    scripts:
+    snippets:
       - "rm -rvf /usr/share/color || true"
+    scripts:
       - setup.sh
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
