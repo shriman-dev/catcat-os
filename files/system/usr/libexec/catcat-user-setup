@@ -1,0 +1,109 @@
+#!/bin/bash
+shopt -s extglob
+
+if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
+
+  # default configs for user home
+  cp -PTr --update=none  /etc/skel/ ~/
+  mv ~/.config/dconf ~/.config/dconf.bak
+  for i in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f); 
+  do 
+  dconf load / < $i; 
+  done
+
+  # desktop files
+  mkdir -p ~/.local/share/applications
+  flatpak list | grep -i "freetube" && sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
+
+
+  flatpak list | grep -i "librewolf" && sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
+
+
+  flatpak list | grep -i "ArmCord" && sed 's|^Icon=.*|Icon=discord|' /var/lib/flatpak/exports/share/applications/xyz.armcord.ArmCord.desktop > ~/.local/share/applications/xyz.armcord.ArmCord.desktop
+
+
+  mkdir -p ~/.local/share/catcat-os
+  echo 'first boot' > ~/.local/share/catcat-os/first-boot
+
+fi
+
+# default configs for user home
+cp -PTr --update=none  /etc/skel/ ~/
+find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
+
+[[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+
+chmod 440 ~/.local/share/gnome-shell/extension-updates
+
+[[ -d "$HOME/Me" ]] && ! grep "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
+
+! grep "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
+file://$HOME/Me/Documents Documents
+file://$HOME/Me/Downloads Downloads
+file://$HOME/Me/Pictures Pictures
+file://$HOME/Me/Videos Videos
+file://$HOME/Me/Music Music
+file://$HOME/Me/Notes Notes
+admin:/// /' > ~/.config/gtk-3.0/bookmarks"
+
+rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+
+[[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
+
+# shell setup
+[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config
+
+[[ -d "$HOME/.shell.d" ]] && cp -Pr /etc/skel/.shell.d ~/
+
+! grep "~/.shell.d" ~/.bashrc && cat << EOF >> ~/.bashrc
+
+if [ -d ~/.shell.d ]; then
+	for rc in ~/.shell.d/*; do
+		if [ -f "$rc" ]; then
+			. "$rc"
+		fi
+	done
+fi
+
+unset rc
+
+EOF
+
+! grep "[ -f ~/.bashrc ]" ~/.bashrc && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bashrc
+
+# theme flatpak apps
+mkdir -p ~/.local/share/flatpak/overrides
+! grep 'devices=!all' ~/.local/share/flatpak/overrides/global && cat << EOF >> ~/.local/share/flatpak/overrides/global
+[Context]
+devices=!all;
+filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
+
+[Environment]
+QT_STYLE_OVERRIDE=kvantum
+EOF
+
+mkdir -p ~/.local/share/themes
+mkdir -p ~/.local/share/icons
+mkdir -p ~/.local/share/fonts
+
+ln -srfTv ~/.local/share/icons ~/.icons
+ln -srfTv ~/.local/share/themes ~/.themes
+
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prfu {} ~/.local/share/themes \;
+find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prfu {} ~/.local/share/themes \;
+
+# set folder icons
+gio set ~/Me metadata::custom-icon-name "user-home"
+gio set ~/Me/Backups metadata::custom-icon-name "folder-backup"
+gio set ~/Me/Devel metadata::custom-icon-name "folder-code"
+gio set ~/Me/Ebooks metadata::custom-icon-name "folder-books"
+gio set ~/Me/Games metadata::custom-icon-name "folder-games"
+gio set ~/Me/Notes metadata::custom-icon-name "folder-notes"
+gio set ~/Me/Scripts metadata::custom-icon-name "folder-script"
+gio set ~/Me/Secure metadata::custom-icon-name "folder-locked"
+gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
+
+#gtk-update-icon-cache
+#gtk4-update-icon-cache
+
+

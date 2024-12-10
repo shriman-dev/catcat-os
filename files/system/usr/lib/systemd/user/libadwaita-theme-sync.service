@@ -1,0 +1,15 @@
+[Unit]
+Description=Sync libadwaita theme with gtk3 theme
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/libadwaita-theme-sync
+
+[Install]
+WantedBy=default.target
+#default.target
+#multi-user.target
+
+
+
+
