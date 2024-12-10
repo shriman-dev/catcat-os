@@ -418,7 +418,7 @@ modules:
 
   - type: script
     scripts:
-      - "rm -rf /usr/share/color"
+      - "rm -rvf /usr/share/color || true"
       - setup.sh
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
