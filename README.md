@@ -49,6 +49,6 @@ sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/cat
 ```
 for Nvdia GPUs
 ```bash
-sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os.pub" &&
-sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
+sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os-nv.pub" &&
+sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os-nv.pub#/etc/pki/containers/catcat-os-nv.pub#" /etc/containers/policy.json
 ```
