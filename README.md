@@ -41,3 +41,14 @@ These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](ht
 ```bash
 cosign verify --key cosign.pub ghcr.io/shriman-dev/catcat-os
 ```
+
+## Fix pub key issue
+```bash
+sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os.pub" &&
+sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
+```
+for Nvdia GPUs
+```bash
+sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os.pub" &&
+sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
+```
