@@ -418,7 +418,7 @@ modules:
 
   - type: script
     snippets:
-      - "rm -rvf /usr/share/color"
+      - "rm -rvf /usr/share/color/icc/colord/B156HAN08_4.icm"
     scripts:
       - setup.sh
 

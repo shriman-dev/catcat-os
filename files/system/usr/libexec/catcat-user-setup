@@ -29,6 +29,10 @@ fi
 
 # default configs for user home
 cp -PTr --update=none  /etc/skel/ ~/
+cp -PTr --update=none  /etc/skel/.config/ ~/.config/
+cp -PTr --update=none  /etc/skel/.local/ ~/.local/
+cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
+cp -PTr --update=none  /etc/skel/.var/ ~/.var/
 find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
 [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
@@ -51,9 +55,7 @@ rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures 
 [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
 
 # shell setup
-[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config
-
-[[ -d "$HOME/.shell.d" ]] && cp -Pr /etc/skel/.shell.d ~/
+[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config/
 
 ! grep "~/.shell.d" ~/.bashrc && cat << EOF >> ~/.bashrc
 
@@ -69,7 +71,7 @@ unset rc
 
 EOF
 
-! grep "[ -f ~/.bashrc ]" ~/.bashrc && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bashrc
+! grep "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
 
 # theme flatpak apps
 mkdir -p ~/.local/share/flatpak/overrides
@@ -91,6 +93,8 @@ ln -srfTv ~/.local/share/themes ~/.themes
 
 find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prfu {} ~/.local/share/themes \;
 find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prfu {} ~/.local/share/themes \;
+
+flatpak list | grep -i "steam" && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
 
 # set folder icons
 gio set ~/Me metadata::custom-icon-name "user-home"

@@ -36,7 +36,7 @@ systemctl enable fstrim.timer nix.mount catcat-system-setup.service \
 
 desktop-files(){
 sed -i 's/^Icon=.*/Icon=user-home/' /usr/share/applications/org.gnome.Nautilus.desktop
-sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//' /usr/share/applications/org.gnome.Nautilus.desktop
+sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' /usr/share/applications/org.gnome.Nautilus.desktop
 sed -i 's/^Icon=.*/Icon=fish/' /usr/share/applications/org.gnome.Ptyxis.desktop
 sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' /usr/share/applications/org.gnome.Settings.desktop
 sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop

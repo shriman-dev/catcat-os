@@ -2,7 +2,7 @@
 folder-children=['FileViewers', 'Graphics', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utilities', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Shotwell.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.Music.desktop', 'org.gnome.Papers.desktop', 'org.gnome.Loupe.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
+apps=['org.gnome.Nautilus.desktop', 'org.gnome.Shotwell.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.Music.desktop', 'org.gnome.Papers.desktop', 'org.gnome.Loupe.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop', 'org.gnome.eog.desktop']
 name='File Viewers'
 translate=false
 
@@ -17,7 +17,7 @@ name='Docs'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Net]
-apps=['io.gitlab.librewolf-community.desktop', 'io.freetubeapp.FreeTube.desktop', 'io.github.giantpinkrobots.varia.desktop', 'org.gnome.Epiphany.desktop']
+apps=['io.gitlab.librewolf-community.desktop', 'io.freetubeapp.FreeTube.desktop', 'io.github.giantpinkrobots.varia.desktop', 'org.gnome.Epiphany.desktop', 'webapp-manager.desktop']
 name='Net'
 translate=false
 
@@ -37,7 +37,7 @@ name='Disk & Backup'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/SysSecurity]
-apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'org.gnome.Ptyxis.desktop', 'app.drey.KeyRack.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop']
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'org.gnome.Ptyxis.desktop', 'com.github.amezin.ddterm.desktop', 'app.drey.KeyRack.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop']
 name='Sys & Security'
 translate=false
 
@@ -46,9 +46,9 @@ apps=['org.gnome.Boxes.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'Waydroid.
 name='VM-Tainer'
 translate=false
 
-[org/gnome/desktop/app-folders/folders/Utilities]
+[org/gnome/desktop/app-folders/folders/Utils]
 apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'net.codelogistics.clicker.desktop', 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop']
-name='Utilities'
+name='Utils'
 translate=false
 
 
@@ -63,7 +63,7 @@ name='Prod & Devel'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Gaming]
-apps=['steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'org.ryujinx.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'com.github.Matoking.protontricks.desktop', 'input-remapper-gtk.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop']
+apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'org.ryujinx.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'com.github.Matoking.protontricks.desktop', 'input-remapper-gtk.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop']
 name='Gaming'
 translate=false
 
