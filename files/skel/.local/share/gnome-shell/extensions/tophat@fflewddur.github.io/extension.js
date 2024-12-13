@@ -1,152 +1,163 @@
-'use strict';
-
 // TopHat: An elegant system resource monitor for the GNOME shell
 // Copyright (C) 2020 Todd Kulesza <todd@dropline.net>
-
-// This file is part of TopHat.
-
-// TopHat is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// TopHat is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with TopHat. If not, see <https://www.gnu.org/licenses/>.
-
-let depFailures = [];
-let missingLibs = [];
-
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as Cpu from './lib/cpu.js';
-import * as Mem from './lib/mem.js';
-import * as Net from './lib/net.js';
-import * as FS from './lib/fs.js';
-
-// TODO: Update the UI if we have trouble loading GTop + friends
-// console.error(`[${Me.metadata.name}] Error loading dependencies: ${err}`);
-// depFailures.push(err);
-// missingLibs.push('GTop');
-
-import * as Config from './lib/config.js';
-import * as Container from './lib/container.js';
-import * as Problem from './lib/problem.js';
-
-const MenuPosition = {
-    LEFT_EDGE: 0,
-    LEFT: 1,
-    CENTER: 2,
-    RIGHT: 3,
-    RIGHT_EDGE: 4,
-};
-
-class TopHat {
-    constructor(settings, metadata) {
-        this.configHandler = new Config.ConfigHandler(settings, metadata);
-        this.container = new Container.TopHatContainer();
-        this.cpu = new Cpu.CpuMonitor(this.configHandler);
-        this.mem = new Mem.MemMonitor(this.configHandler);
-        this.net = new Net.NetMonitor(this.configHandler);
-        this.fs = new FS.FileSystemMonitor(this.configHandler);
-        this.container.addMonitor(this.cpu);
-        this.container.addMonitor(this.mem);
-        this.container.addMonitor(this.fs);
-        this.container.addMonitor(this.net);
-        this.configHandler.connect_void('position-in-panel', () => {
-            this.moveWithinPanel();
+import { File } from './file.js';
+import { Vitals, CpuModel } from './vitals.js';
+import { TopHatContainer } from './container.js';
+import { CpuMonitor } from './cpu.js';
+import { MemMonitor } from './mem.js';
+import { DiskMonitor } from './disk.js';
+import { NetMonitor } from './net.js';
+var MenuPosition;
+(function (MenuPosition) {
+    MenuPosition[MenuPosition["LeftEdge"] = 0] = "LeftEdge";
+    MenuPosition[MenuPosition["Left"] = 1] = "Left";
+    MenuPosition[MenuPosition["Center"] = 2] = "Center";
+    MenuPosition[MenuPosition["Right"] = 3] = "Right";
+    MenuPosition[MenuPosition["RightEdge"] = 4] = "RightEdge";
+})(MenuPosition || (MenuPosition = {}));
+export default class TopHat extends Extension {
+    gsettings;
+    signals = new Array();
+    vitals;
+    container;
+    enable() {
+        // console.log(`[TopHat] enabling version ${this.metadata.version}`);
+        this.gsettings = this.getSettings();
+        const f = new File('/proc/cpuinfo');
+        const cpuModel = this.parseCpuOverview(f.readSync());
+        this.vitals = new Vitals(cpuModel, this.gsettings);
+        this.vitals.start();
+        this.addToPanel();
+        const id = this.gsettings.connect('changed::position-in-panel', () => {
+            this.addToPanel();
         });
+        this.signals.push(id);
+        // console.log('[TopHat] enabled');
     }
-
+    disable() {
+        // console.log(`[TopHat] disabling version ${this.metadata.version}`);
+        this.container?.destroy();
+        this.container = undefined;
+        this.signals.forEach((s) => {
+            this.gsettings?.disconnect(s);
+        });
+        this.signals.length = 0;
+        this.gsettings = undefined;
+        this.vitals?.stop();
+        this.vitals = undefined;
+        // console.log('[TopHat] disabled');
+    }
+    parseCpuOverview(cpuinfo) {
+        const cpus = new Set();
+        const tempMonitors = new Map();
+        // Count the number of physical CPUs
+        const blocks = cpuinfo.split('\n\n');
+        for (const block of blocks) {
+            const m = block.match(/physical id\s*:\s*(\d+)/);
+            if (m) {
+                const id = parseInt(m[1]);
+                cpus.add(id);
+            }
+        }
+        const cores = blocks.length;
+        // Find the temperature sensor for each CPU
+        const base = '/sys/class/hwmon/';
+        const hwmon = new File(base);
+        hwmon.list().forEach((filename) => {
+            const name = new File(`${base}${filename}/name`).readSync();
+            if (name === 'coretemp') {
+                // Intel CPUs
+                const prefix = new File(`${base}${filename}/temp1_label`).readSync();
+                let id = 0;
+                if (prefix) {
+                    const m = prefix.match(/Package id\s*(\d+)/);
+                    if (m) {
+                        id = parseInt(m[1]);
+                    }
+                }
+                const inputPath = `${base}${filename}/temp1_input`;
+                if (new File(inputPath).exists()) {
+                    tempMonitors.set(id, inputPath);
+                }
+            }
+            else if (name === 'k10temp') {
+                // AMD CPUs
+                // temp2 is Tdie, temp1 is Tctl
+                let inputPath = `${base}${filename}/temp2_input`;
+                const f = new File(inputPath);
+                if (!f.exists()) {
+                    inputPath = `${base}${filename}/temp1_input`;
+                }
+                // FIXME: Instead of key=0 here, try to figure out which physical CPU
+                // this monitor represents
+                tempMonitors.set(0, inputPath);
+            }
+        });
+        // Get the model name
+        const lines = cpuinfo.split('\n');
+        const modelRE = /^model name\s*:\s*(.*)$/;
+        let model = '';
+        for (const line of lines) {
+            const m = !model && line.match(modelRE);
+            if (m) {
+                model = m[1];
+                break;
+            }
+        }
+        return new CpuModel(model, cores, cpus.size, tempMonitors);
+    }
     addToPanel() {
-        let pref = this._getPreferredPanelBoxAndPosition();
-        Main.panel.addToStatusArea('TopHat', this.container, pref.position, pref.box);
-        this.container.monitors.forEach(monitor => {
-            // console.debug(`Adding menu to manager for ${monitor.name}`);
-            Main.panel.menuManager.addMenu(monitor.menu);
-            monitor.refresh();
+        if (!this.gsettings) {
+            console.warn('[TopHat] error in addToPanel(): gsettings does not exist');
+            return;
+        }
+        this.container?.destroy();
+        this.container = new TopHatContainer(0.5, 'TopHat');
+        this.container.addMonitor(new CpuMonitor(this.metadata, this.gsettings));
+        this.container.addMonitor(new MemMonitor(this.metadata, this.gsettings));
+        this.container.addMonitor(new DiskMonitor(this.metadata, this.gsettings));
+        this.container.addMonitor(new NetMonitor(this.metadata, this.gsettings));
+        const pref = this.getPreferredPanelAttributes();
+        this.container = Main.panel.addToStatusArea('TopHat', this.container, pref.position, pref.box);
+        this.container?.monitors.forEach((m) => {
+            if (this.vitals) {
+                m.bindVitals(this.vitals);
+                Main.panel._onMenuSet(m);
+            }
         });
+        // Trigger notifications for properties that were set during init and will not change
+        this.vitals?.notify('cpu-model');
+        this.vitals?.notify('summary-interval');
     }
-
-    moveWithinPanel() {
-        let pref = this._getPreferredPanelBoxAndPosition();
-        let boxes = {
-            left: Main.panel._leftBox,
-            center: Main.panel._centerBox,
-            right: Main.panel._rightBox,
-        };
-        let boxContainer = boxes[pref.box] || this._rightBox;
-        Main.panel._addToPanelBox('TopHat', this.container, pref.position, boxContainer);
-    }
-
-    _getPreferredPanelBoxAndPosition() {
+    getPreferredPanelAttributes() {
         let box = 'right';
         let position = 0;
-        switch (this.configHandler.positionInPanel) {
-        case MenuPosition.LEFT_EDGE:
-            box = 'left';
-            position = 0;
-            break;
-        case MenuPosition.LEFT:
-            box = 'left';
-            position = -1;
-            break;
-        case MenuPosition.CENTER:
-            box = 'center';
-            position = 1;
-            break;
-        case MenuPosition.RIGHT:
-            box = 'right';
-            position = 0;
-            break;
-        case MenuPosition.RIGHT_EDGE:
-            box = 'right';
-            position = -1;
-            break;
+        switch (this.gsettings?.get_enum('position-in-panel')) {
+            case MenuPosition.LeftEdge:
+                box = 'left';
+                position = 0;
+                break;
+            case MenuPosition.Left:
+                box = 'left';
+                position = -1;
+                break;
+            case MenuPosition.Center:
+                box = 'center';
+                position = 1;
+                break;
+            case MenuPosition.Right:
+                box = 'right';
+                position = 0;
+                break;
+            case MenuPosition.RightEdge:
+                box = 'right';
+                position = -1;
+                break;
+            default:
+                console.warn('[TopHat] Unknown value for position-in-panel');
         }
-        return {box, position};
-    }
-
-    destroy() {
-        this.container.destroy();
-        this.configHandler.destroy();
-    }
-}
-
-// FIXME: TopHat itself should derive from Extension
-export default class TopHatExt extends Extension {
-    constructor(metadata) {
-        super(metadata);
-        this.tophat = null;
-    }
-
-    enable() {
-        // console.debug(`[TopHat] enabling version ${this.metadata.version}`);
-        if (depFailures.length > 0) {
-            console.warn(`[${this.metadata.name}] missing dependencies, showing problem reporter instead`);
-            // const Problem = this.imports.lib.problem;
-            this.tophat = new Problem.TopHatProblemReporter();
-
-            let msg = _(`It looks like your computer is missing GIRepository (gir) bindings for the following libraries: ${missingLibs.join(', ')}\n\nAfter installing them, you'll need to restart your computer.`);
-            this.tophat.setMessage(msg);
-            this.tophat.setDetails(depFailures.join('\n'));
-
-            Main.panel.addToStatusArea(`${this.metadata.name} Problem Reporter`, this.tophat);
-        } else {
-            this.tophat = new TopHat(this.getSettings(), this.metadata);
-            this.tophat.addToPanel();
-        }
-        // console.debug(`[${this.metadata.name}] enabled`);
-    }
-
-    disable() {
-        if (this.tophat !== null) {
-            this.tophat.destroy();
-            this.tophat = null;
-        }
+        return { box, position };
     }
 }

@@ -59,7 +59,7 @@ export class KeyBindings {
                 const name = `activate-${i + 1}-key`;
                 if (value) {
                     this.addKeyBinding(name, () => {
-                        this._ws.activate(i, { focusWindowIfCurrentWorkspace: true });
+                        this._ws.switchTo(i, 'keyboard-shortcut');
                     });
                 }
                 else {

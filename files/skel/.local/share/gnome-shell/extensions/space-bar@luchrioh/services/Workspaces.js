@@ -102,30 +102,37 @@ export class Workspaces {
     onUpdate(callback, until) {
         this._updateNotifier.subscribe(callback, until);
     }
-    activate(index, { focusWindowIfCurrentWorkspace = false } = {}) {
+    /** Handles a direct switch-to-workspace command by the user. */
+    switchTo(index, cause) {
         const isCurrentWorkspace = global.workspace_manager.get_active_workspace_index() === index;
-        const workspace = global.workspace_manager.get_workspace_by_index(index);
         if (isCurrentWorkspace) {
-            if (focusWindowIfCurrentWorkspace &&
+            if (this._settings.backAndForth.value &&
+                (cause === 'keyboard-shortcut' || this._settings.toggleOverview.value === false)) {
+                this.activatePrevious();
+            }
+            else if (cause === 'keyboard-shortcut' &&
                 this.workspaces[index].hasWindows &&
                 global.display.get_focus_window().is_on_all_workspaces()) {
+                const workspace = global.workspace_manager.get_workspace_by_index(index);
                 this.focusMostRecentWindowOnWorkspace(workspace);
             }
-            else {
-                if (this._settings.toggleOverview.value) {
-                    Main.overview.toggle();
-                }
+            else if (this._settings.toggleOverview.value) {
+                Main.overview.toggle();
             }
         }
         else {
-            if (workspace) {
-                workspace.activate(global.get_current_time());
-                this.focusMostRecentWindowOnWorkspace(workspace);
-                if (!Main.overview.visible &&
-                    !this.workspaces[index].hasWindows &&
-                    this._settings.toggleOverview.value) {
-                    Main.overview.show();
-                }
+            this.activate(index);
+        }
+    }
+    activate(index) {
+        const workspace = global.workspace_manager.get_workspace_by_index(index);
+        if (workspace) {
+            workspace.activate(global.get_current_time());
+            this.focusMostRecentWindowOnWorkspace(workspace);
+            if (!Main.overview.visible &&
+                !this.workspaces[index].hasWindows &&
+                this._settings.toggleOverview.value) {
+                Main.overview.show();
             }
         }
     }

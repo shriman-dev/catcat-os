@@ -87,7 +87,7 @@ menu-layout='Pop'
 menu-position-alignment=50
 misc-item-icon-size='Default'
 pop-default-view='Library Home'
-pop-folders-data={'Library Home': 'Library Home', 'FileViewers': 'File Viewers', 'Graphics': 'Graphics', 'Docs': 'Docs', 'Net': 'Net', 'Stores': 'Stores', 'Sysmon': 'Sysmon', 'DiskBackup': 'Disk & Backup', 'SysSecurity': 'Sys & Security', 'VMTainer': 'VM-Tainer', 'Utilities': 'Utilities', 'Tweaks': 'Tweaks', 'ProdDevel': 'Prod & Devel', 'Gaming': 'Gaming', 'Tools': 'Tools', 'Optimize': 'Optimize', 'Others': 'Others'}
+pop-folders-data={'Library Home': 'Library Home', 'FileViewers': 'File Viewers', 'Graphics': 'Graphics', 'Docs': 'Docs', 'Net': 'Net', 'Stores': 'Stores', 'Sysmon': 'Sysmon', 'DiskBackup': 'Disk & Backup', 'SysSecurity': 'Sys & Security', 'VMTainer': 'VM-Tainer', 'Utilities': 'Utils', 'Tweaks': 'Tweaks', 'ProdDevel': 'Prod & Devel', 'Gaming': 'Gaming', 'Tools': 'Tools', 'Optimize': 'Optimize', 'Others': 'Others'}
 position-in-panel='Center'
 prefs-visible-page=0
 quicklinks-item-icon-size='Default'
@@ -872,6 +872,7 @@ indicator-style='workspaces-bar'
 position='center'
 position-index=1
 scroll-wheel='workspaces-bar'
+scroll-wheel-debounce=true
 scroll-wheel-horizontal='normal'
 show-empty-workspaces=true
 smart-workspace-names=false
@@ -882,7 +883,7 @@ toggle-overview=true
 enable-activate-workspace-shortcuts=false
 
 [org/gnome/shell/extensions/space-bar/state]
-version=31
+version=32
 
 [org/gnome/shell/extensions/status-area-horizontal-spacing]
 hpadding=1
@@ -912,6 +913,7 @@ show-cpu=true
 show-disk=true
 show-icons=false
 show-net=false
+use-system-accent=false
 
 [org/gnome/shell/extensions/transparent-window-moving]
 window-opacity=230
