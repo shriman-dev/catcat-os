@@ -6,7 +6,7 @@ To rebase an existing atomic Fedora installation to the latest build:
   ```
   rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os:latest
   ```
-  * for Nvdia GPUs
+  for Nvdia GPUs:
   ```
   rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
@@ -18,7 +18,7 @@ To rebase an existing atomic Fedora installation to the latest build:
   ```
   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os:latest
   ```
-  * for Nvdia GPUs
+  for Nvdia GPUs:
   ```
   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
@@ -47,7 +47,7 @@ cosign verify --key cosign.pub ghcr.io/shriman-dev/catcat-os
 sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os.pub" &&
 sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
 ```
-for Nvdia GPUs
+for Nvdia GPUs:
 ```bash
 sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os-nv.pub" &&
 sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os-nv.pub#/etc/pki/containers/catcat-os-nv.pub#" /etc/containers/policy.json

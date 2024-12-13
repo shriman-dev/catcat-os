@@ -19,7 +19,9 @@ sed -i 's/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME="catcat"/' /usr/lib/*release
 sed -i 's/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME="catcat"/' /etc/*release
 sed -i 's/^NAME=.*/NAME="CatCat OS"/' /usr/lib/*release
 sed -i 's/^NAME=.*/NAME="CatCat OS"/' /etc/*release
+sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release || true
 sed -i 's/Bazzite/CatCat OS/' /etc/*release || true
+sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 
 sed -i "s|.*issue_discards =.*|issue_discards = 1|"  /etc/lvm/lvm.conf
 

@@ -1,25 +1,27 @@
 #!/bin/bash
 
-while true
-do
-  SELECTED_GTK_THEME="$( dconf read /org/gnome/desktop/interface/gtk-theme )"
-  PATH_TO_THEME="$( find $HOME/.themes/ -maxdepth 1 -mindepth 1 -type d -iname ${SELECTED_GTK_THEME:1:-1} )"
-
-  # Define the old value of the GTK theme for comparison
-  [[ -z ${PREVIOUS_GTK_TMEME} ]] && export ${PREVIOUS_GTK_TMEME}=""
-
+ltsync() {
   if [ "${SELECTED_GTK_THEME:1:-1}" != "${PREVIOUS_GTK_TMEME}" ]; then
     # Update gtk4/libadwaita configuration if selected GTK theme has GTK4 directory
     if [ -d "${PATH_TO_THEME}/gtk-4.0" ]; then
-      rm -rf $HOME/.config/gtk-4.0
-      cp -Prf "${PATH_TO_THEME}/gtk-4.0" $HOME/.config/
-      # Update PREVIOUS_GTK_TMEME variable with currently selected GTK theme
-      export PREVIOUS_GTK_TMEME="${SELECTED_GTK_THEME:1:-1}"
+      rm -rvf $HOME/.config/gtk-4.0
+      cp -Prvf "${PATH_TO_THEME}/gtk-4.0" $HOME/.config/
     else
       exit 1
     fi
   else
     exit 0
   fi
-  sleep 1s
+}
+
+while true
+do
+  SELECTED_GTK_THEME="$( dconf read /org/gnome/desktop/interface/gtk-theme )"
+  PATH_TO_THEME="$( find $HOME/.themes/ -maxdepth 1 -mindepth 1 -type d -iname ${SELECTED_GTK_THEME:1:-1} )"
+  # Define the old value of the GTK theme for comparison
+  [[ -z ${PREVIOUS_GTK_TMEME} ]] && export PREVIOUS_GTK_TMEME=""
+  (ltsync)
+  # Update PREVIOUS_GTK_TMEME variable with currently selected GTK theme
+  export PREVIOUS_GTK_TMEME="${SELECTED_GTK_THEME:1:-1}"
+  sleep 30s
 done

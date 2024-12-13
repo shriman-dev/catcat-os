@@ -39,6 +39,8 @@ send-software-usage-stats=false
 allowed-failures=5
 banner-message-enable=true
 banner-message-text='Meow'
+enable-fingerprint-authentication=true
+enable-smartcard-authentication=false
 logo=''
 
 [org/gnome/settings-daemon/plugins/color]

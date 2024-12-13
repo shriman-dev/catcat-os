@@ -137,7 +137,6 @@ selection-menu-move-to=true
 [org/nemo/sidebar-panels/tree]
 show-only-directories=false
 
-
 [org/gnome/Ptyxis]
 cursor-blink-mode='on'
 cursor-shape='underline'

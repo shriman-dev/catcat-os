@@ -37,6 +37,7 @@ find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
 [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
+cp -Prfu /etc/skel/.local/share/gnome-shell/extensions/ ~/.local/share/gnome-shell/extensions/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
 
 [[ -d "$HOME/Me" ]] && ! grep "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
@@ -57,8 +58,7 @@ rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures 
 # shell setup
 [ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config/
 
-! grep "~/.shell.d" ~/.bashrc && cat << EOF >> ~/.bashrc
-
+! grep ".shell.d" ~/.bashrc && echo '
 if [ -d ~/.shell.d ]; then
 	for rc in ~/.shell.d/*; do
 		if [ -f "$rc" ]; then
@@ -68,21 +68,20 @@ if [ -d ~/.shell.d ]; then
 fi
 
 unset rc
+' >> ~/.bash_profile
 
-EOF
 
 ! grep "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
 
 # theme flatpak apps
 mkdir -p ~/.local/share/flatpak/overrides
-! grep 'devices=!all' ~/.local/share/flatpak/overrides/global && cat << EOF >> ~/.local/share/flatpak/overrides/global
-[Context]
+! grep 'devices=!all' ~/.local/share/flatpak/overrides/global && echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;
 
 [Environment]
 QT_STYLE_OVERRIDE=kvantum
-EOF
+' > ~/.local/share/flatpak/overrides/global
 
 mkdir -p ~/.local/share/themes
 mkdir -p ~/.local/share/icons

@@ -1,0 +1,411 @@
+modules:
+  - type: script
+    scripts:
+      - cleanup.sh
+      - pre-setup.sh
+
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+      - source: dconf
+        destination: /etc/dconf/db/distro.d/
+      - source: skel
+        destination: /usr/etc/skel/
+
+#  - type: akmods
+#    base: fsync
+#    install:
+#      - v4l2loopback
+
+  - type: rpm-ostree
+    repos:
+      - https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
+      - https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-%OS_VERSION%/atim-starship-fedora-%OS_VERSION%.repo
+      - https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-%OS_VERSION%/zeno-scrcpy-fedora-%OS_VERSION%.repo
+      - https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-%OS_VERSION%/atim-lazygit-fedora-%OS_VERSION%.repo
+      - https://repo.librewolf.net/librewolf.repo
+    install:
+      # security
+      - firejail
+      - firewall-config
+
+      # fish shell setup
+      - https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
+      - fish
+      - bat
+      - eza
+      - starship
+
+      # disk/file man
+      - compsize
+      #- btdu
+      - htop
+      - btop
+      - ncdu
+      - fio
+      #- yazi
+      - fzf
+      - fd-find
+      - ripgrep
+      - zoxide
+      #
+      - dosfstools
+      - exfatprogs
+      - dmraid
+      - zstd
+      - gpart
+      - gparted
+
+      # terminal tools
+      - aria2
+      #- ascii-image-converter
+      - asciinema
+      - brightnessctl
+      - ffmpeg
+      - hwinfo
+      - kpcli
+      - zenity
+      #- keepass-diff
+      - tealdeer
+      - which
+      - wmctrl
+      - ydotool
+
+      # fun terminal tools
+      - asciiquarium
+      - cmatrix
+      - cava
+      - neo
+      - oneko
+      - sl
+      - cbonsai
+      - cowsay
+      - fortune-mod
+      #- pokemonsay-newgenerations
+
+      # dev tools
+      - ptyxis
+      - git
+      - lazygit
+      - micro
+      - neovim
+      - tmux
+      - sassc
+      - zed
+      - codium
+
+      # encryption and backup tools
+      - rsync
+      - rclone
+      - cryfs
+      #- gocryptfs
+      - borgbackup
+      - archivemount
+      - syncthing
+
+      # android tools
+      - android-tools
+      #- droidcam
+      - scrcpy
+
+      # files
+      - nautilus-extensions
+      - nautilus-python
+      - nemo
+      - nemo-emblems
+      - nemo-extensions
+      - nemo-gsconnect
+      - nemo-preview
+      - nemo-python
+      - sushi
+
+      # theming compatibility
+      - libgtop2
+      - libappindicator-gtk3
+      #- gnome-randr
+      - gnome-menus
+      - gnome-themes-extra
+      - gtk-murrine-engine
+      - gtk2-engines
+      - kvantum
+      - qt5ct
+      - qt6ct
+      - gnome-tweaks
+      - dconf-editor
+      - appeditor
+      #- menulibre
+      - awf-gtk2
+      - awf-gtk3
+      - awf-gtk4
+
+      # icons and fonts
+      - rsms-inter-fonts
+      - papirus-icon-theme
+
+      # gnome shell extensions
+      - gnome-shell-extension-gsconnect
+
+      # gaming
+      - antimicrox
+      #- dualsensectl
+      - lutris
+      - goverlay
+      - gamescope
+      - gamemode
+      - mangohud
+      - vkBasalt
+      - fluidsynth
+      # extras
+      #- librewolf
+      - bleachbit
+      #- optimizer
+      - gnome-system-monitor
+      - uresourced
+      - irqbalance
+    remove:
+#     # example: removing firefox (in favor of the flatpak)
+      #- firefox
+      #- firefox-langpacks
+      #- gnome-initial-setup
+      - fastfetch
+      - ibus-libpinyin
+      #- ibus-libzhuyin
+      - ibus-hangul
+      - ibus-m17n
+      - ibus-mozc
+      - ibus-typing-booster
+      - gnome-browser-connector
+      - plocate
+      - gnome-shell-extension-just-perfection
+      - gnome-shell-extension-appindicator
+      - gnome-shell-extension-blur-my-shell
+      - gnome-shell-extension-caffeine
+      - gnome-shell-extension-compiz-alike-magic-lamp-effect
+      - gnome-shell-extension-compiz-windows-effect
+      - openssh-askpass
+
+
+  - type: systemd
+    system:
+      enabled:
+      - fstrim.timer
+      - nix.mount
+      - catcat-system-setup.service
+      - auto-power-profile.service
+      disabled:
+      - cups.service
+      - flatpak-system-update.timer
+      - brew-dir-fix.service
+      - brew-setup.service
+      - brew-update.service
+      - brew-upgrade.service
+      - input-remapper.service
+      - NetworkManager-wait-online.service
+      - systemd-networkd-wait-online.service
+      - tailscaled.service
+      - sshd.service
+      - tracker-miner-fs-3.servicee
+      - tracker-miner-fs-control-3.service
+      - tracker-miner-rss-3.service
+      - tracker-writeback-3.service
+      - tracker-xdg-portal-3.service
+      - dconf-update.service
+      - ublue-update.service
+      masked:
+      - sshd.service
+      - tracker-miner-fs-3.servicee
+      - tracker-miner-fs-control-3.service
+      - tracker-miner-rss-3.service
+      - tracker-writeback-3.service
+      - tracker-xdg-portal-3.service
+    user:
+      enabled:
+      - syncthing.service
+      - catcat-user-setup.service
+      - libadwaita-theme-sync.service
+      disabled:
+      - tracker-miner-fs-3.servicee
+      - tracker-miner-fs-control-3.service
+      - tracker-miner-rss-3.service 
+      - tracker-writeback-3.service
+      - tracker-xdg-portal-3.service
+      masked:
+      - tracker-miner-fs-3.servicee
+      - tracker-miner-fs-control-3.service
+      - tracker-miner-rss-3.service
+      - tracker-writeback-3.service
+      - tracker-xdg-portal-3.service
+
+  - type: default-flatpaks
+    notify: true # Send notification after install/uninstall is finished (true/false)
+    system:
+#      # If no repo information is specified, Flathub will be used by default
+#      # repo-url: https://dl.flathub.org/repo/flathub.flatpakrepo
+#      # repo-name: flathub
+#      # repo-title: "Flathub (system-wide)" # Optional; this sets the remote's user-facing name in graphical frontends like GNOME Software
+      install:
+      # file viewers
+      - org.gnome.Loupe
+      #- org.gnome.eog
+      - org.gnome.Shotwell
+      - com.github.rafostar.Clapper
+      - org.videolan.VLC
+      - org.gnome.Music
+      - app.drey.EarTag
+      - org.gnome.Papers
+      - org.gnome.meld
+      - dev.geopjr.Collision
+      - org.gnome.FileRoller
+      - com.github.qarmin.czkawka
+      - fr.romainvigier.MetadataCleaner
+
+      # graphics/video editors
+      - com.github.PintaProject.Pinta
+      #- org.kde.krita
+      #- org.inkscape.Inkscape
+      - org.gimp.GIMP
+      - com.rawtherapee.RawTherapee
+      - org.upscayl.Upscayl
+      - org.pitivi.Pitivi
+      #- org.shotcut.Shotcut
+
+      # docs
+      #- org.gnome.TextEditor
+      - org.gnome.gedit
+      - org.libreoffice.LibreOffice
+      - org.onlyoffice.desktopeditors
+      - com.toolstack.Folio
+      - com.github.flxzt.rnote
+      - garden.jamie.Morphosis
+      #- com.calibre_ebook.calibre
+
+      # net
+      - io.gitlab.librewolf-community
+      - org.gnome.Epiphany
+      - io.freetubeapp.FreeTube
+      - io.github.giantpinkrobots.varia
+
+      # monitoring
+      - net.nokyan.Resources
+      - org.gnome.Logs
+
+      # disk & backup
+      - org.gnome.baobab
+      - io.github.mpobaschnig.Vaults
+      - org.gnome.World.PikaBackup
+
+      # sys
+      - org.gnome.PowerStats
+      - org.gnome.ColorViewer
+      - org.gnome.Firmware
+      - com.github.tchx84.Flatseal
+      - io.github.giantpinkrobots.flatsweep
+      - io.github.flattool.Warehouse
+
+      # vm and containers
+      - org.gnome.Boxes
+      - io.github.dvlv.boxbuddyrs
+
+      # utilities
+      - org.gnome.Calculator
+      - org.gnome.clocks
+      - org.gnome.Calendar
+      - org.gnome.Snapshot
+      - org.gnome.Weather
+      - org.gnome.SoundRecorder
+      - org.nickvision.cavalier
+      #- io.github.seadve.Kooha
+      - com.dec05eba.gpu_screen_recorder
+      - com.belmoussaoui.Decoder
+      - net.codelogistics.clicker
+      - re.sonny.Junction
+      #- net.sapples.LiveCaptions
+
+      # tweaks
+      - com.mattjakeman.ExtensionManager
+      - org.gnome.Characters
+
+      # gaming
+      #- com.valvesoftware.Steam
+      - com.usebottles.bottles
+      #- net.lutris.Lutris
+      - com.heroicgameslauncher.hgl
+      - org.ryujinx.Ryujinx
+      - com.vysp3r.ProtonPlus
+      - com.github.Matoking.protontricks
+
+      # tools
+      - org.gnome.World.Secrets
+      - org.localsend.localsend_app
+      - com.github.tenderowl.frog
+      # Flatpak runtimes are not supported (like org.winehq.Wine//stable-23.08),
+      # only normal flatpak applications are (like Floorp Lightning web browser in this example).
+      # Installing different branches of the same Flatpak is not supported.
+      remove:
+      - org.mozilla.firefox
+      - io.github.fastrizwaan.WineZGUI
+      - it.mijorus.gearlever
+      - io.github.nokse22.Exhibit
+
+#  - type: gnome-extensions
+#    install:
+      #- 615  # appindicator support
+      #- 3628 # arc menu
+      #- 16   # auto move windows
+      #- 5425 # battery-time
+      #- 4012 # bed time mode
+      #- 1401 # bluetooth quick connect
+      #- 3193 # blur my shell
+      #- 4679 # burn my windows
+      #- 517  # caffeine
+      #- 4839 # Clipboard History
+      #- 3396 # Color Picker
+      #- 3210 # Compiz windows effect
+      #- 4167 # "CHC-E (Custom Hot Corners - Extended)"
+      #- 307  # dash to dock
+      #- 1160 # dash to panel
+      #- 3780 # ddterm
+      #- 4783 # default workspace
+      #- 4648 # desktop cube
+      #- 3539 # downfall
+      #- 7036 # eye on cursor
+      #- 4481 # forge
+      #- 7074 # gamemode
+      #- 2398 # Hide Universal Access
+      #- 36   # lock keys
+      #- 3795 # notification timeout
+      #- 4805 # panel corners
+      #- 5446 # "[QSTweak] Quick Setting Tweaker"
+      #- 5292 # quick touchpad toggle
+      #- 5105 # reboot to uefi
+      #- 7    # removable drive menu
+      #- 2986 # runcat
+      #- 2899 # SettingsCenter
+      #- 355  # Status Area Horizontal Spacing
+      #- 5219 # TopHat
+      #- 5506 # user avatar in qs
+      #- 19   # user themes
+      #- 1460 # Vitals
+      #- 6343 # Window Gestures
+      #- 4788 # workspace switcher manager
+
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - FiraCode
+        - Hack
+        - JetBrainsMono
+        - NerdFontsSymbolsOnly
+      google-fonts:
+        - Roboto
+        - Open Sans
+
+#  - type: bling
+#    install:
+#      - dconf-update-service # a service unit that updates the dconf db on boot
+
+  - type: script
+    scripts:
+      - setup.sh
+

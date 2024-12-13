@@ -87,11 +87,11 @@ menu-layout='Pop'
 menu-position-alignment=50
 misc-item-icon-size='Default'
 pop-default-view='Library Home'
-pop-folders-data={'Library Home': 'Library Home', 'FileViewers': 'File Viewers', 'Graphics': 'Graphics', 'Docs': 'Docs', 'Net': 'Net', 'Stores': 'Stores', 'Sysmon': 'Sysmon', 'DiskBackup': 'Disk & Backup', 'SysSecurity': 'Sys & Security', 'VMTainer': 'VM-Tainer', 'Utilities': 'Utilities', 'Tweaks': 'Tweaks', 'ProdDevel': 'Prod & Devel', 'Gaming': 'Gaming', 'Tools': 'Tools', 'Optimize': 'Optimize', 'Others': 'Others'}
+pop-folders-data={'Library Home': 'Library Home', 'FileViewers': 'File Viewers', 'Graphics': 'Graphics', 'Docs': 'Docs', 'Net': 'Net', 'Stores': 'Stores', 'Sysmon': 'Sysmon', 'DiskBackup': 'Disk & Backup', 'SysSecurity': 'Sys & Security', 'VMTainer': 'VM-Tainer', 'Tweaks': 'Tweaks', 'ProdDevel': 'Prod & Devel', 'Gaming': 'Gaming', 'Tools': 'Tools', 'Optimize': 'Optimize', 'Others': 'Others'}
 position-in-panel='Center'
 prefs-visible-page=0
 quicklinks-item-icon-size='Default'
-recently-installed-apps=['org.mozilla.firefox.desktop', 'com.github.amezin.ddterm.desktop']
+recently-installed-apps=['org.mozilla.firefox.desktop', 'com.github.amezin.ddterm.desktop', 'sqlitebrowser.desktop', 'droidcam.desktop', 'containerized-uwubuntu-synaptic.desktop', 'containerized-uwubuntu-pacman.desktop', 'containerized-aasvg.desktop', 'notfiles.desktop', 'uwubuntu.desktop', 'bazzite-arch.desktop', 'com.github.alex11br.themechanger.desktop']
 right-panel-width=200
 runner-hotkey-open-primary-monitor=false
 search-entry-border-radius=(true, 25)
@@ -264,7 +264,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=4
+indicator-position-max=5
 restore-state=true
 toggle-state=true
 user-enabled=true
@@ -883,7 +883,7 @@ toggle-overview=true
 enable-activate-workspace-shortcuts=false
 
 [org/gnome/shell/extensions/space-bar/state]
-version=31
+version=32
 
 [org/gnome/shell/extensions/status-area-horizontal-spacing]
 hpadding=1
@@ -897,7 +897,7 @@ refresh-interval=1
 [org/gnome/shell/extensions/top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer']
 left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu', 'System_Monitor@bghome.gmail.com']
-right-box-order=['/org/gnome/Shell/Extensions/GSConnect/Device/7ebc0d68_5305_4425_8c22_e798715508db', 'Nothing to say indicator', 'color-picker@tuberry', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
+right-box-order=['/org/gnome/Shell/Extensions/GSConnect/Device/deca5d8b_19f5_4249_b8f0_667aa48eab50', '/org/gnome/Shell/Extensions/GSConnect/Device/7ebc0d68_5305_4425_8c22_e798715508db', 'Nothing to say indicator', 'color-picker@tuberry', 'a11y', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'ddterm', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
 
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'
