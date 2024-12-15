@@ -263,7 +263,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=4
+indicator-position-max=5
 restore-state=true
 toggle-state=true
 user-enabled=true
@@ -617,7 +617,7 @@ menu-configuration='[{"name":"Example Menu","icon":"flypie-symbolic-#46a","short
 
 [org/gnome/shell/extensions/forge]
 css-last-update=uint32 37
-css-updated='1732972388306'
+css-updated='1734281863252'
 dnd-center-layout='tabbed'
 float-always-on-top-enabled=false
 focus-border-toggle=false

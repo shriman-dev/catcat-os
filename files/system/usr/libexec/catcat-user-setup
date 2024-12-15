@@ -5,11 +5,6 @@ if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
 
   # default configs for user home
   cp -PTr --update=none  /etc/skel/ ~/
-  mv ~/.config/dconf ~/.config/dconf.bak
-  for i in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f); 
-  do 
-  dconf load / < $i; 
-  done
 
   # desktop files
   mkdir -p ~/.local/share/applications
@@ -35,7 +30,20 @@ cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
 cp -PTr --update=none  /etc/skel/.var/ ~/.var/
 find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
+if ! dconf read /org/gnome/desktop/app-folders/folder-children | grep -wi 'FileViewers'; then
+  [[ ! -d ~/.config/dconf.bak.og ]] && mv ~/.config/dconf ~/.config/dconf.bak.og
+  mv ~/.config/dconf ~/.config/dconf.bak
+
+  for i in $(find /etc/dconf/db/distro.d -maxdepth 1 -mindepth 1 -type f); 
+  do 
+  dconf load / < $i; 
+  done
+fi
+
 [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+
+[ $(grep 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css | wc -l) -lt 6 ] && cp -Pr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
+
 
 cp -Prfu /etc/skel/.local/share/gnome-shell/extensions/ ~/.local/share/gnome-shell/extensions/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
@@ -72,6 +80,22 @@ unset rc
 
 
 ! grep "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
+
+
+
+# install vscodium extensions
+if ! codium --list-extensions | grep -i 'catppuccin.catppuccin-vsc'; then
+codium --install-extension bierner.color-info
+codium --install-extension jeronimoekerdt.color-picker-universal
+codium --install-extension catppuccin.catppuccin-vsc
+codium --install-extension catppuccin.catppuccin-vsc-icons
+codium --install-extension ms-python.python
+codium --install-extension ms-toolsai.jupyter
+codium --install-extension redhat.vscode-yaml
+codium --install-extension huntertran.auto-markdown-toc
+codium --install-extension zaaack.markdown-editor
+fi 
+
 
 # theme flatpak apps
 mkdir -p ~/.local/share/flatpak/overrides

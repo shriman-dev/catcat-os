@@ -5,25 +5,21 @@ pwd
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-/usr/bin/dconf update
-
+# remove stuff
 find /etc/skel -type f -name ".gitkeep" -delete
 rm -rvf /etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
 
-
+# os naming
 sed -i 's/^ID=.*/ID=catcat/' /usr/lib/*release
-sed -i 's/^ID=.*/ID=catcat/' /etc/*release
 sed -i 's/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME="catcat"/' /usr/lib/*release
-sed -i 's/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME="catcat"/' /etc/*release
 sed -i 's/^NAME=.*/NAME="CatCat OS"/' /usr/lib/*release
-sed -i 's/^NAME=.*/NAME="CatCat OS"/' /etc/*release
-sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release || true
-sed -i 's/Bazzite/CatCat OS/' /etc/*release || true
+sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release
 sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 
-sed -i "s|.*issue_discards =.*|issue_discards = 1|"  /etc/lvm/lvm.conf
+# enable disk discard
+sed -i "s|.*issue_discards =.*|issue_discards = 1|" /usr/etc/lvm/lvm.conf
 
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
@@ -53,6 +49,8 @@ desktop-files
 
 
 themes(){
+plymouth-set-default-theme catppuccin-mocha
+
 mkdir -p /etc/fastfetch/
 cp -Pvrfu /usr/etc/skel/.config/fastfetch/* /etc/fastfetch/
 cp -Pvrfu /usr/etc/skel/.config/Kvantum/* /usr/share/Kvantum/
@@ -86,6 +84,7 @@ tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
 
 /tmp/Lavanda-gtk-theme/install.sh
 
+/usr/bin/dconf update
 }
 themes
 

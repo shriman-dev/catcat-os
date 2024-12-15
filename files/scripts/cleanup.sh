@@ -18,12 +18,8 @@ chmod 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
 chmod 000 /usr/libexec/goa-daemon 
 chmod 000 /usr/libexec/goa-identity-service 
 
-
-
-
 systemctl disable brew-dir-fix.service brew-setup.service brew-update.service \
                   brew-upgrade.service
-
 
 rm -rf /home/linuxbrew
 rm -rf /usr/share/ublue-os/homebrew
@@ -51,6 +47,10 @@ rm -vf /usr/lib/systemd/user/tracker-writeback-3.service
 rm -vf /usr/lib/systemd/user/tracker-xdg-portal-3.service
 
 rm -rvf /etc/dconf/db/distro.d/*
+rm -rvf /usr/share/ublue-os/dconfs
+rm -rvf /usr/share/ublue-os/firstboot
+rm -rvf /usr/share/ublue-os/motd
+
 rm -vf /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf /etc/xdg/autostart/nvidia-settings-load.desktop
 rm -vf /etc/xdg/autostart/org.gnome.Software.desktop

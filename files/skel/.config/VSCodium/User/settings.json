@@ -1,0 +1,14 @@
+{
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+    "catppuccin.accentColor": "peach",
+    "window.menuBarVisibility": "toggle",
+    "editor.fontSize": 15.5,
+    "window.zoomLevel": -1,
+    "workbench.settings.applyToAllProfiles": [
+        "editor.fontFamily"
+    ],
+    "editor.fontFamily": "'FiraCode Nerd Font', 'monospace', monospace",
+    "redhat.telemetry.enabled": false,
+    "editor.unicodeHighlight.nonBasicASCII": false
+}

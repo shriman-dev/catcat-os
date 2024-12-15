@@ -212,6 +212,7 @@ modules:
       - tracker-xdg-portal-3.service
       - dconf-update.service
       - ublue-update.service
+      - ublue-update.timer
       masked:
       - sshd.service
       - tracker-miner-fs-3.servicee
@@ -409,3 +410,4 @@ modules:
     scripts:
       - setup.sh
 
+  - type: initramfs
