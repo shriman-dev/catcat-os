@@ -45,7 +45,7 @@ fi
 [ $(grep 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css | wc -l) -lt 6 ] && cp -Pr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
 
 
-cp -Prfu /etc/skel/.local/share/gnome-shell/extensions/ ~/.local/share/gnome-shell/extensions/
+cp -Prfu /etc/skel/.local/share/gnome-shell/* ~/.local/share/gnome-shell/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
 
 [[ -d "$HOME/Me" ]] && ! grep "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
