@@ -19,7 +19,7 @@ sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release
 sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 
 # enable disk discard
-sed -i "s|.*issue_discards =.*|issue_discards = 1|" /usr/etc/lvm/lvm.conf
+sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
