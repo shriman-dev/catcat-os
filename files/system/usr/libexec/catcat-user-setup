@@ -68,7 +68,6 @@ cp -Prfu /etc/skel/.local/share/gnome-shell/* ~/.local/share/gnome-shell/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
 
 # user dirs setup
-
 ! grep -q "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
 
 ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
@@ -93,9 +92,7 @@ gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
 
 # remove unnecessary directories
 rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
-
 [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
-
 
 # shell setup
 [ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config/
@@ -111,7 +108,6 @@ fi
 
 unset rc
 ' >> ~/.bash_profile
-
 
 ! grep -q "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
 
