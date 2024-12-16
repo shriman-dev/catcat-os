@@ -5,7 +5,7 @@ pwd
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# remove stuff
+# remove stuffs
 find /etc/skel -type f -name ".gitkeep" -delete
 rm -rvf /etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
@@ -33,6 +33,9 @@ systemctl enable fstrim.timer nix.mount catcat-system-setup.service \
 
 
 desktop-files(){
+cp -Pvf /usr/share/applications/syncthing-start.desktop /etc/xdg/autostart/
+
+
 sed -i 's/^Icon=.*/Icon=user-home/' /usr/share/applications/org.gnome.Nautilus.desktop
 sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' /usr/share/applications/org.gnome.Nautilus.desktop
 sed -i 's/^Icon=.*/Icon=fish/' /usr/share/applications/org.gnome.Ptyxis.desktop
