@@ -308,7 +308,7 @@ modules:
       - org.gnome.Boxes
       - io.github.dvlv.boxbuddyrs
 
-      # utilities
+      # utils
       - org.gnome.Calculator
       - org.gnome.clocks
       - org.gnome.Calendar

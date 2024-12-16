@@ -50,6 +50,7 @@ rm -rvf /etc/dconf/db/distro.d/*
 rm -rvf /usr/share/ublue-os/dconfs
 rm -rvf /usr/share/ublue-os/firstboot
 rm -rvf /usr/share/ublue-os/motd
+rm -vf /etc/profile.d/user-motd.sh
 
 rm -vf /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf /etc/xdg/autostart/nvidia-settings-load.desktop
@@ -62,6 +63,7 @@ rm -rvf /usr/etc/skel/*
 rm -rvf /usr/share/glib-2.0/schemas/zz*
 rm -vf /usr/share/fish/vendor_conf.d/nano-default-editor.fish
 rm -vf /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
+rm -vf /etc/profile.d/bazzite-neofetch.sh
 rm -vf /usr/share/fish/functions/fish_greeting.fish
 rm -vf /usr/share/applications/gnome-ssh-askpass.desktop
 rm -vf /usr/share/applications/bazzite-steam-bpm.desktop
