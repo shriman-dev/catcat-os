@@ -11,9 +11,20 @@ replace-x-add() {
 grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
-if [ ! -f '/etc/catcat-os/first-boot' ]; then
+if [[ ! -f /etc/catcat-os/first-boot ]]; then
+  #plymouth-set-default-theme catppuccin-mocha
+  #rpm-ostree initramfs --enable
+
+  hostnamectl set-hostname --static "catcat"
+
+  mkdir -p /etc/catcat-os/
+  echo 'first boot' > /etc/catcat-os/first-boot
+fi
+
+
+if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   mkdir -p /boot/grub_themes
-  cp -rf /usr/share/grub/themes/* /boot/grub_themes
+  cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
   replace-x-add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=3' /etc/default/grub
   replace-x-add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
@@ -22,15 +33,6 @@ if [ ! -f '/etc/catcat-os/first-boot' ]; then
   replace-x-add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
   grub2-mkconfig -o /etc/grub2.cfg
   #grub2-editenv - unset menu_auto_hide
-  #grub2-switch-to-blscfg
-
-  #plymouth-set-default-theme catppuccin-mocha
-  #rpm-ostree initramfs --enable
-
-  hostnamectl set-hostname --static "catcat"
-
-  mkdir -p /etc/catcat-os/
-  echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
 KARGS_TO_ADD=(

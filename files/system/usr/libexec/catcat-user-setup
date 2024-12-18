@@ -7,11 +7,11 @@ FLATPAK_APPS="$(flatpak list --app)"
 if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
 
   # default configs for user home
-  cp -PTr --update=none  /etc/skel/ ~/
-  cp -PTr --update=none  /etc/skel/.config/ ~/.config/
-  cp -PTr --update=none  /etc/skel/.local/ ~/.local/
-  cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
-  cp -PTr --update=none  /etc/skel/.var/ ~/.var/
+  cp -dTr --update=none  /etc/skel/ ~/
+  cp -dTr --update=none  /etc/skel/.config/ ~/.config/
+  cp -dTr --update=none  /etc/skel/.local/ ~/.local/
+  cp -dTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
+  cp -dTr --update=none  /etc/skel/.var/ ~/.var/
   find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
   
   [[ ! -d ~/.config/dconf.bak.og ]] && mv ~/.config/dconf ~/.config/dconf.bak.og
@@ -28,11 +28,11 @@ if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
 fi
 
 # default configs for user home
-cp -PTr --update=none  /etc/skel/ ~/
-cp -PTr --update=none  /etc/skel/.config/ ~/.config/
-cp -PTr --update=none  /etc/skel/.local/ ~/.local/
-cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
-cp -PTr --update=none  /etc/skel/.var/ ~/.var/
+cp -dTr --update=none  /etc/skel/ ~/
+cp -dTr --update=none  /etc/skel/.config/ ~/.config/
+cp -dTr --update=none  /etc/skel/.local/ ~/.local/
+cp -dTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
+cp -dTr --update=none  /etc/skel/.var/ ~/.var/
 
 # gnome shell setup
 DCONF_FOLDERS="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
@@ -46,15 +46,15 @@ if [[ ! "${DCONF_FOLDERS}" =~ 'FileViewers' ]]; then
   done
 fi
 
-[[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -Pr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+[[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -dr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
 
-[ $(grep -c 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css) -lt 6 ] && cp -Pr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
+[ $(grep -c 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css) -lt 6 ] && cp -dr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
 
-cp -Prfu /etc/skel/.local/share/gnome-shell/* ~/.local/share/gnome-shell/
+cp -drfu /etc/skel/.local/share/gnome-shell/* ~/.local/share/gnome-shell/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
 
 # user dirs setup
-! grep -q "$USER/Me/" ~/.config/user-dirs.dirs && cp -Pr /etc/skel/.config/user-dirs.dirs ~/.config/ 
+! grep -q "$USER/Me/" ~/.config/user-dirs.dirs && cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/ 
 
 ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
@@ -82,7 +82,7 @@ rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures 
 find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
 # shell setup
-[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config/
+[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -dr /etc/skel/.config/fish ~/.config/
 
 ! grep -q ".shell.d" ~/.bashrc && echo '
 if [ -d ~/.shell.d ]; then
@@ -116,7 +116,7 @@ mkdir -p ~/.local/share/fonts
 ln -srfT ~/.local/share/icons ~/.icons
 ln -srfT ~/.local/share/themes ~/.themes
 
-for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*}); do cp -Prfu $dir ~/.local/share/themes/; done
+for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*}); do cp -drfu $dir ~/.local/share/themes/; done
 
 # desktop files
 [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
@@ -134,7 +134,7 @@ for I in "${APP_ICON_TO_MODIFY[@]}"; do
 done
 
 # gedit setup
-[[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -Pr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
+[[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -dr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
 
 # vscodium setup
 if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin*; then
