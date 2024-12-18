@@ -133,6 +133,11 @@ for I in "${APP_ICON_TO_MODIFY[@]}"; do
   fi
 done
 
+# enable syncthing
+if ! systemctl --user is-active syncthing.service; then
+  systemctl --user enable --force --now syncthing.service
+fi
+
 # gedit setup
 [[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -dr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
 
