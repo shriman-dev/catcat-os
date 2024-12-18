@@ -7,5 +7,5 @@ curl -Lo /tmp/MControlCenter.tar.gz https://github.com/dmitry-s93/MControlCenter
 mkdir -p /tmp/MControlCenter
 tar -xf /tmp/MControlCenter.tar.gz -C /tmp/MControlCenter --strip-components=1
 
-/tmp/MControlCenter/install
+/tmp/MControlCenter/install.sh
 
