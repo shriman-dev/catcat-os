@@ -12,6 +12,7 @@ if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
   cp -PTr --update=none  /etc/skel/.local/ ~/.local/
   cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
   cp -PTr --update=none  /etc/skel/.var/ ~/.var/
+  find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
   
   [[ ! -d ~/.config/dconf.bak.og ]] && mv ~/.config/dconf ~/.config/dconf.bak.og
   mv ~/.config/dconf ~/.config/dconf.bak
@@ -20,17 +21,6 @@ if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
   do
   dconf load / < $i;
   done
-
-  # install vscodium extensions
-  codium --install-extension bierner.color-info
-  codium --install-extension jeronimoekerdt.color-picker-universal
-  codium --install-extension catppuccin.catppuccin-vsc
-  codium --install-extension catppuccin.catppuccin-vsc-icons
-  codium --install-extension ms-python.python
-  codium --install-extension ms-toolsai.jupyter
-  codium --install-extension redhat.vscode-yaml
-  codium --install-extension huntertran.auto-markdown-toc
-  codium --install-extension zaaack.markdown-editor
 
   mkdir -p ~/.local/share/catcat-os
   echo 'first boot' > ~/.local/share/catcat-os/first-boot
@@ -43,9 +33,6 @@ cp -PTr --update=none  /etc/skel/.config/ ~/.config/
 cp -PTr --update=none  /etc/skel/.local/ ~/.local/
 cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
 cp -PTr --update=none  /etc/skel/.var/ ~/.var/
-
-find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
-
 
 # gnome shell setup
 DCONF_FOLDERS="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
@@ -92,6 +79,7 @@ gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
 # remove unnecessary directories
 rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
 [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
+find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
 # shell setup
 [ $(wc -l < ~/.config/fish/config.fish) -lt 4 ] && cp -Pr /etc/skel/.config/fish ~/.config/
@@ -128,13 +116,24 @@ mkdir -p ~/.local/share/fonts
 ln -srfT ~/.local/share/icons ~/.icons
 ln -srfT ~/.local/share/themes ~/.themes
 
-for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*});
-do
-cp -Prfu $dir ~/.local/share/themes/;
-done
+for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*}); do cp -Prfu $dir ~/.local/share/themes/; done
 
 # gedit setup
 [[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -Pr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
+
+# vscodium setup
+if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin*; then
+  codium --install-extension bierner.color-info
+  codium --install-extension jeronimoekerdt.color-picker-universal
+  codium --install-extension catppuccin.catppuccin-vsc
+  codium --install-extension catppuccin.catppuccin-vsc-icons
+  codium --install-extension ms-python.python
+  codium --install-extension ms-toolsai.jupyter
+  codium --install-extension redhat.vscode-yaml
+  codium --install-extension huntertran.auto-markdown-toc
+  codium --install-extension zaaack.markdown-editor
+fi
+
 
 # desktop files
 [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
@@ -146,7 +145,6 @@ APP_ICON_TO_MODIFY=(
 )
 
 for I in "${APP_ICON_TO_MODIFY[@]}"; do
-echo ${I%% *} ${I#* }
   if [[ ! -f ~/.local/share/applications/${I%% *}.desktop ]]; then
     [[ "${FLATPAK_APPS}" =~ "${I%% *}" ]] && sed "s|^Icon=.*|Icon=${I#* }|" /var/lib/flatpak/exports/share/applications/${I%% *}.desktop > ~/.local/share/applications/${I%% *}.desktop
   fi
