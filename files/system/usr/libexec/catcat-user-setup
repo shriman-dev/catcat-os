@@ -54,7 +54,7 @@ cp -drfu /etc/skel/.local/share/gnome-shell/* ~/.local/share/gnome-shell/
 chmod 440 ~/.local/share/gnome-shell/extension-updates
 
 # user dirs setup
-! grep -q "$USER/Me/" ~/.config/user-dirs.dirs && cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/ 
+! grep -q "$USER/Me/" ~/.config/user-dirs.dirs && cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
 
 ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
