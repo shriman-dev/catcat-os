@@ -1,5 +1,4 @@
-<style-scheme name="Catppuccin Mocha" id="catppuccin_mocha" version="1.0">
-  <author>sacerdos</author>
+<style-scheme name="Catppuccin Mocha" id="catppuccin_mocha" kind="dark">
   <description>Soothing pastel theme for Gedit</description>
 
   <style name="text"	foreground="#cdd6f4" background="#1e1e2e" bold="true" />

@@ -21,6 +21,19 @@ sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 # enable disk discard
 sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
+# set envars
+ENVARS_TO_ADD=(
+  "QT_QPA_PLATFORMTHEME=qt5ct"
+  "QT_QPA_PLATFORM=wayland,xcb"
+  "GNOME_SHELL_SLOWDOWN_FACTOR=0.7"
+  "MICRO_TRUECOLOR=1"
+)
+
+for v in "${ENVARS_TO_ADD[@]}"; do
+  [[ ! $(grep "^$v" /etc/environment) ]] && echo "$v" >> /etc/environment
+done
+
+# remove pip from topgrade config
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
 #fix librewolf/firefox delayed launch issue

@@ -8,31 +8,29 @@ if [[ ! -f ~/.local/share/catcat-os/first-boot ]]; then
 
   # default configs for user home
   cp -PTr --update=none  /etc/skel/ ~/
+  cp -PTr --update=none  /etc/skel/.config/ ~/.config/
+  cp -PTr --update=none  /etc/skel/.local/ ~/.local/
+  cp -PTr --update=none  /etc/skel/.shell.d/ ~/.shell.d/
+  cp -PTr --update=none  /etc/skel/.var/ ~/.var/
+  
+  [[ ! -d ~/.config/dconf.bak.og ]] && mv ~/.config/dconf ~/.config/dconf.bak.og
+  mv ~/.config/dconf ~/.config/dconf.bak
+
+  for i in $(ls -A1d /etc/dconf/db/distro.d/*);
+  do
+  dconf load / < $i;
+  done
 
   # install vscodium extensions
-  if ! codium --list-extensions | grep -i 'catppuccin.catppuccin-vsc'; then
-    codium --install-extension bierner.color-info
-    codium --install-extension jeronimoekerdt.color-picker-universal
-    codium --install-extension catppuccin.catppuccin-vsc
-    codium --install-extension catppuccin.catppuccin-vsc-icons
-    codium --install-extension ms-python.python
-    codium --install-extension ms-toolsai.jupyter
-    codium --install-extension redhat.vscode-yaml
-    codium --install-extension huntertran.auto-markdown-toc
-    codium --install-extension zaaack.markdown-editor
-  fi
-
-
-  # desktop files
-  mkdir -p ~/.local/share/applications
-  [[ "${FLATPAK_APPS}" =~ 'freetube' ]] && sed 's|^Icon=.*|Icon=/usr/share/icons/crafted/yt2.svg|' /var/lib/flatpak/exports/share/applications/io.freetubeapp.FreeTube.desktop > ~/.local/share/applications/io.freetubeapp.FreeTube.desktop
-
-
-  [[ "${FLATPAK_APPS}" =~ 'librewolf' ]] && sed 's|^Icon=.*|Icon=firefox|' /var/lib/flatpak/exports/share/applications/io.gitlab.librewolf-community.desktop > ~/.local/share/applications/io.gitlab.librewolf-community.desktop
-
-
-  [[ "${FLATPAK_APPS}" =~ 'armcord' ]] && sed 's|^Icon=.*|Icon=discord|' /var/lib/flatpak/exports/share/applications/xyz.armcord.ArmCord.desktop > ~/.local/share/applications/xyz.armcord.ArmCord.desktop
-
+  codium --install-extension bierner.color-info
+  codium --install-extension jeronimoekerdt.color-picker-universal
+  codium --install-extension catppuccin.catppuccin-vsc
+  codium --install-extension catppuccin.catppuccin-vsc-icons
+  codium --install-extension ms-python.python
+  codium --install-extension ms-toolsai.jupyter
+  codium --install-extension redhat.vscode-yaml
+  codium --install-extension huntertran.auto-markdown-toc
+  codium --install-extension zaaack.markdown-editor
 
   mkdir -p ~/.local/share/catcat-os
   echo 'first boot' > ~/.local/share/catcat-os/first-boot
@@ -48,15 +46,16 @@ cp -PTr --update=none  /etc/skel/.var/ ~/.var/
 
 find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
 
+
 # gnome shell setup
 DCONF_FOLDERS="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
 if [[ ! "${DCONF_FOLDERS}" =~ 'FileViewers' ]]; then
   [[ ! -d ~/.config/dconf.bak.og ]] && mv ~/.config/dconf ~/.config/dconf.bak.og
   mv ~/.config/dconf ~/.config/dconf.bak
 
-  for i in $(ls -A1d /etc/dconf/db/distro.d/*); 
-  do 
-  dconf load / < $i; 
+  for i in $(ls -A1d /etc/dconf/db/distro.d/*);
+  do
+  dconf load / < $i;
   done
 fi
 
@@ -129,11 +128,29 @@ mkdir -p ~/.local/share/fonts
 ln -srfT ~/.local/share/icons ~/.icons
 ln -srfT ~/.local/share/themes ~/.themes
 
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Catppuccin*' -exec cp -Prfu {} ~/.local/share/themes \;
-find /usr/share/themes/ -maxdepth 1 -mindepth 1 -type d -name '*Lavanda*' -exec cp -Prfu {} ~/.local/share/themes \;
+for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*});
+do
+cp -Prfu $dir ~/.local/share/themes/;
+done
 
+# gedit setup
+[[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -Pr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
+
+# desktop files
 [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
 
+APP_ICON_TO_MODIFY=(
+"io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
+"io.gitlab.librewolf-community firefox"
+"xyz.armcord.ArmCord discord"
+)
+
+for I in "${APP_ICON_TO_MODIFY[@]}"; do
+echo ${I%% *} ${I#* }
+  if [[ ! -f ~/.local/share/applications/${I%% *}.desktop ]]; then
+    [[ "${FLATPAK_APPS}" =~ "${I%% *}" ]] && sed "s|^Icon=.*|Icon=${I#* }|" /var/lib/flatpak/exports/share/applications/${I%% *}.desktop > ~/.local/share/applications/${I%% *}.desktop
+  fi
+done
 
 #gtk-update-icon-cache
 #gtk4-update-icon-cache

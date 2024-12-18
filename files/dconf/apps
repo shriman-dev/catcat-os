@@ -9,7 +9,7 @@ show-lockdown-whitelist=true
 [org/gnome/gnome-system-monitor]
 current-tab='processes'
 disks-interval=30000
-maximized=true
+maximized=false
 network-total-in-bits=false
 process-memory-in-iec=false
 resources-memory-in-iec=false
@@ -137,6 +137,13 @@ selection-menu-move-to=true
 [org/nemo/sidebar-panels/tree]
 show-only-directories=false
 
+[org/nemo/window-state]
+geometry='942x955+102+102'
+maximized=false
+side-pane-view='tree'
+sidebar-bookmark-breakpoint=4
+start-with-menu-bar=false
+start-with-sidebar=true
 
 [org/gnome/Ptyxis]
 cursor-blink-mode='on'

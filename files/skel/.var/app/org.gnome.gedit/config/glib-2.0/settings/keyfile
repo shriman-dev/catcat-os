@@ -1,33 +1,21 @@
 [org/gnome/gedit/plugins]
-active-plugins=['time', 'textsize', 'sort', 'snippets', 'smartspaces', 'sessionsaver', 'quickopen', 'quickhighlight', 'pythonconsole', 'multiedit', 'modelines', 'joinlines', 'git', 'filebrowser', 'drawspaces', 'docinfo', 'colorpicker', 'codecomment', 'bookmarks']
+active-plugins=['textsize', 'spell', 'sort', 'sessionsaver', 'quickhighlight', 'multiedit', 'filebrowser', 'drawspaces', 'docinfo', 'colorpicker', 'codecomment']
 
 [org/gnome/gedit/preferences/editor]
-use-default-font=false
-editor-font='FiraCode Nerd Font 11'
+style-scheme-for-dark-theme-variant='catppuccin_mocha'
 wrap-last-split-mode='word'
-
-
-
-scheme='catppuccin_mocha'
-auto-save=false
-auto-save-interval=1
-display-right-margin=false
-background-pattern='none'
+use-default-font=false
+editor-font='Fira Code 11'
 tabs-size=4
 insert-spaces=true
-display-line-numbers=true
-right-margin-position=80
-wrap-mode='word'
-highlight-current-line=true
-bracket-matching=true
+auto-save=false
+auto-save-interval=1
 
 [org/gnome/gedit/preferences/ui]
+theme-variant='dark'
+statusbar-visible=true
 side-panel-visible=false
 bottom-panel-visible=false
-statusbar-visible=true
 
 [org/gnome/gedit/plugins/drawspaces]
-matrix=[11, 10, 11]
-
-[org/gnome/gedit/plugins/spell]
-highlight-misspelled=true
+matrix=[11, 8, 9]
