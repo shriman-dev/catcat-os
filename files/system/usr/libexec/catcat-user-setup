@@ -118,6 +118,21 @@ ln -srfT ~/.local/share/themes ~/.themes
 
 for dir in $(ls -A1d /usr/share/themes/{*Catppuccin*,*Lavanda*}); do cp -Prfu $dir ~/.local/share/themes/; done
 
+# desktop files
+[[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
+
+APP_ICON_TO_MODIFY=(
+"io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
+"io.gitlab.librewolf-community firefox"
+"xyz.armcord.ArmCord discord"
+)
+
+for I in "${APP_ICON_TO_MODIFY[@]}"; do
+  if [[ ! -f ~/.local/share/applications/${I%% *}.desktop ]]; then
+    [[ "${FLATPAK_APPS}" =~ "${I%% *}" ]] && sed "s|^Icon=.*|Icon=${I#* }|" /var/lib/flatpak/exports/share/applications/${I%% *}.desktop > ~/.local/share/applications/${I%% *}.desktop
+  fi
+done
+
 # gedit setup
 [[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -Pr /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
 
@@ -133,22 +148,6 @@ if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin*; then
   codium --install-extension huntertran.auto-markdown-toc
   codium --install-extension zaaack.markdown-editor
 fi
-
-
-# desktop files
-[[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
-
-APP_ICON_TO_MODIFY=(
-"io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
-"io.gitlab.librewolf-community firefox"
-"xyz.armcord.ArmCord discord"
-)
-
-for I in "${APP_ICON_TO_MODIFY[@]}"; do
-  if [[ ! -f ~/.local/share/applications/${I%% *}.desktop ]]; then
-    [[ "${FLATPAK_APPS}" =~ "${I%% *}" ]] && sed "s|^Icon=.*|Icon=${I#* }|" /var/lib/flatpak/exports/share/applications/${I%% *}.desktop > ~/.local/share/applications/${I%% *}.desktop
-  fi
-done
 
 #gtk-update-icon-cache
 #gtk4-update-icon-cache
