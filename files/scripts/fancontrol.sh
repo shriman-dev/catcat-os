@@ -6,6 +6,6 @@ curl -Lo /tmp/MControlCenterrrr https://github.com/dmitry-s93/MControlCenter/rel
 
 mkdir -p /tmp/MControlCenter
 tar -xf /tmp/MControlCenterrrr -C /tmp/MControlCenter --strip-components=1
-
+cd /tmp/MControlCenter/
 /tmp/MControlCenter/install.sh
-
+cd -
