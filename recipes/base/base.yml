@@ -128,6 +128,7 @@ modules:
       - gnome-themes-extra
       - gtk-murrine-engine
       - gtk2-engines
+      - glib2-devel
       - kvantum
       - qt5ct
       - qt6ct
