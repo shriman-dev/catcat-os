@@ -86,7 +86,7 @@ sed  -i 's/\$base_radius: .*;/\$base_radius: 18px;/g' /tmp/Colloid-gtk-theme/src
 sed  -i 's/\$icon_radius: .*;/\$icon_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
 sed  -i 's/\$window_radius: .*;/\$window_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
 
-sed  -i 's/\$button_radius: .*;/\$button_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/
+sed  -i 's/\$button_radius: .*;/\$button_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/libadwaita/_variables.scss
 
 /tmp/Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
 
