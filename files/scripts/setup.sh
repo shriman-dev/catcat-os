@@ -78,20 +78,23 @@ mkdir -p /tmp/Colloid-gtk-theme
 tar -xf /tmp/colloid-gtk-theme -C /tmp/Colloid-gtk-theme --strip-components=1
 
 cp -dvf ${SCRIPT_DIR}/setup-files/_color-palette-catppuccin.scss /tmp/Colloid-gtk-theme/src/sass
-sed  -i 's/\$window-radius: .*;/\$window-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
-sed  -i 's/\$modal-radius: .*;/\$modal-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
-sed  -i 's/\$corner-radius: .*;/\$corner-radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
 
-sed  -i 's/\$base_radius: .*;/\$base_radius: 12px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
-sed  -i 's/\$icon_radius: .*;/\$icon_radius: 20px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
-sed  -i 's/\$window_radius: .*;/\$window_radius: 16px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$modal-radius: .*;/\$modal-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
+sed  -i 's/\$corner-radius: .*;/\$corner-radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/_variables.scss
 
+sed  -i 's/\$base_radius: .*;/\$base_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$icon_radius: .*;/\$icon_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+sed  -i 's/\$window_radius: .*;/\$window_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/gnome-shell/_variables.scss
+
+sed  -i 's/\$button_radius: .*;/\$button_radius: 18px;/g' /tmp/Colloid-gtk-theme/src/sass/
 
 /tmp/Colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
 
 mkdir -p /usr/share/gnome-shell/theme/
-cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin /usr/share/gnome-shell/theme/
-ln -svf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/gnome-shell/gnome-shell.css /usr/share/gnome-shell/theme/gnome-shell.css
+
+cp -rf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/gnome-shell /usr/share/gnome-shell/theme/Colloid-Orange-Dark-Catppuccin
+ln -svf /usr/share/gnome-shell/theme/Colloid-Orange-Dark-Catppuccin/gnome-shell.css /usr/share/gnome-shell/theme/gnome-shell.css
+
 
 curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
 

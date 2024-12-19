@@ -4,8 +4,8 @@ ltsync() {
   if [ "${SELECTED_GTK_THEME:1:-1}" != "${PREVIOUS_GTK_TMEME}" ]; then
     # Update gtk4/libadwaita configuration if selected GTK theme has GTK4 directory
     if [ -d "${PATH_TO_THEME}/gtk-4.0" ]; then
-      rm -rvf $HOME/.config/gtk-4.0
-      cp -Prvf "${PATH_TO_THEME}/gtk-4.0" $HOME/.config/
+      rm -rf $HOME/.config/gtk-4.0
+      cp -drf "${PATH_TO_THEME}/gtk-4.0" $HOME/.config/
     else
       exit 1
     fi

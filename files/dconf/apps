@@ -138,7 +138,7 @@ selection-menu-move-to=true
 show-only-directories=false
 
 [org/nemo/window-state]
-geometry='942x955+102+102'
+geometry='1896x990+103+103'
 maximized=false
 side-pane-view='tree'
 sidebar-bookmark-breakpoint=4

@@ -263,7 +263,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=5
+indicator-position-max=4
 restore-state=true
 toggle-state=true
 user-enabled=true
@@ -741,6 +741,14 @@ min-width=40
 notification-preferences='osd'
 style='show-hide-capslock'
 
+[org/gnome/shell/extensions/lockscreen-extension]
+background-size-1='cover'
+blur-brightness-1=0.64630200603604326
+blur-radius-1=20
+gradient-direction-1='none'
+primary-color-1='#1e1e2e'
+secondary-color-1='#373754'
+
 [org/gnome/shell/extensions/ncom/github/hermes83/compiz-alike-magic-lamp-effect]
 duration=150.0
 effect='default'
@@ -940,7 +948,7 @@ window-buttons-placement='last'
 window-buttons-theme='catppuccin'
 
 [org/gnome/shell/extensions/user-theme]
-name='Colloid-Orange-Dark-Catppuccin'
+name='Colloid-Yellow-Dark-Catppuccin'
 
 [org/gnome/shell/extensions/venfavapps]
 hide-activities-button=false
