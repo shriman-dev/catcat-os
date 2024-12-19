@@ -17,4 +17,5 @@ modules:
       - fancontrol.sh
     snippets:
       - "rm -rvf /usr/share/color/icc/colord/B156HAN08_4.icm"
+
   - type: signing
