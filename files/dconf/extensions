@@ -767,6 +767,11 @@ swap-axis=true
 icon-visibility='when-recording'
 play-feedback-sounds=true
 
+[org/gnome/shell/extensions/notification-banner-reloaded]
+anchor-horizontal=2
+anchor-vertical=0
+animation-direction=2
+
 [org/gnome/shell/extensions/notification-timeout]
 always-normal=false
 timeout=1000
@@ -948,7 +953,7 @@ window-buttons-placement='last'
 window-buttons-theme='catppuccin'
 
 [org/gnome/shell/extensions/user-theme]
-name='Colloid-Yellow-Dark-Catppuccin'
+name='Colloid-Orange-Dark-Catppuccin'
 
 [org/gnome/shell/extensions/venfavapps]
 hide-activities-button=false
