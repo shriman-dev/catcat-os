@@ -1,7 +1,7 @@
 [Icon Theme]
 Name=Catppuccin-Papirus-Green
 Comment=Papirus icon theme
-Inherits=Papirus,Yaru,gnome,breeze,hicolor
+Inherits=Papirus-Dark,Papirus,Yaru,gnome,breeze,hicolor
 
 Example=folder
 

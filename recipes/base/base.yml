@@ -141,7 +141,7 @@ modules:
 
       # icons and fonts
       - rsms-inter-fonts
-      - papirus-icon-theme
+      #- papirus-icon-theme
 
       # gnome shell extensions
       - gnome-shell-extension-gsconnect

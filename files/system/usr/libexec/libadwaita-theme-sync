@@ -23,5 +23,5 @@ do
   (ltsync)
   # Update PREVIOUS_GTK_TMEME variable with currently selected GTK theme
   export PREVIOUS_GTK_TMEME="${SELECTED_GTK_THEME:1:-1}"
-  sleep 30s
+  sleep 5s
 done

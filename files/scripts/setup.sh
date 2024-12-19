@@ -65,13 +65,17 @@ desktop-files
 
 
 themes(){
+# defaults
+mkdir -p /etc/fastfetch/
+cp -dvrf /usr/etc/skel/.config/fastfetch/* /etc/fastfetch/
+cp -dvrf /usr/etc/skel/.config/Kvantum/* /usr/share/Kvantum/
+cp -dvrf /usr/etc/skel/.config/qt5ct/* /usr/share/qt5ct/
+
+
+# plymouth
 plymouth-set-default-theme catppuccin-mocha
 
-mkdir -p /etc/fastfetch/
-cp -dvrfu /usr/etc/skel/.config/fastfetch/* /etc/fastfetch/
-cp -dvrfu /usr/etc/skel/.config/Kvantum/* /usr/share/Kvantum/
-cp -dvrfu /usr/etc/skel/.config/qt5ct/* /usr/share/qt5ct/
-
+# gtk
 curl -Lo /tmp/colloid-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Colloid-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d'"' -f4 )
 
 mkdir -p /tmp/Colloid-gtk-theme
@@ -101,7 +105,17 @@ curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/v
 mkdir -p /tmp/Lavanda-gtk-theme
 tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
 
-/tmp/Lavanda-gtk-theme/install.sh
+/tmp/Lavanda-gtk-theme/install.sh --color light dark
+
+
+# icons
+curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
+
+mkdir -p /tmp/papirusicon
+tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
+cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
+
+
 
 /usr/bin/dconf update
 }

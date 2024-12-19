@@ -138,7 +138,7 @@ selection-menu-move-to=true
 show-only-directories=false
 
 [org/nemo/window-state]
-geometry='1896x990+103+103'
+geometry='1896x990+102+102'
 maximized=false
 side-pane-view='tree'
 sidebar-bookmark-breakpoint=4
@@ -186,4 +186,4 @@ allow-updates=false
 download-updates=false
 download-updates-notify=false
 first-run=false
-flatpak-purge-timestamp=int64 1732782003
+flatpak-purge-timestamp=int64 1734623829
