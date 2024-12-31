@@ -123,7 +123,7 @@ echo ".login-dialog { background: transparent; }
 
 cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-dark.css
 cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-light.css
-cp       /usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg $workDir/theme/background
+cp -dv   /usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg $workDir/theme/background
 
 sh -c "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <gresources>
@@ -136,6 +136,8 @@ glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
 mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
 cp -drf $workDir/* /usr/share/gnome-shell/
 
+
+cp -drvf /etc/dconf/db/distro.d/{interface,defaults}
 
 # icons
 curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
