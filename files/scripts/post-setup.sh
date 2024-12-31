@@ -120,7 +120,6 @@ echo ".login-dialog { background: transparent; }
   background-size: cover;
 }" >> $workDir/theme/gnome-shell.css
 
-
 cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-dark.css
 cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-light.css
 cp -dv   /usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg $workDir/theme/background
@@ -135,7 +134,6 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
 mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
 cp -drf $workDir/* /usr/share/gnome-shell/
-
 
 cp -drvf /etc/dconf/db/distro.d/{interface,defaults}
 

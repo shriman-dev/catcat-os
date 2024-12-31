@@ -7,6 +7,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # copy system files
 FILESDIR="$(dirname $SCRIPT_DIR)"
+mkdir -p /usr/etc/dconf/db/distro.d/
 cp -drf  ${FILESDIR}/system/* /
 cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
