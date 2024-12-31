@@ -2,15 +2,23 @@
 
 To rebase an existing atomic Fedora installation to the latest build:
   ```
-  sudo bootc switch --enforce-container-sigpolicy ghcr.io/shriman-dev/catcat-os:latest
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os:latest
+  ```
+  ```
+  systemctl reboot
+  ```
+  ```
+  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os:latest
   ```
   For Nvdia GPUs:
   ```
-  sudo bootc switch --enforce-container-sigpolicy ghcr.io/shriman-dev/catcat-os-nv:latest
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
-  Then reboot:
   ```
   systemctl reboot
+  ```
+  ```
+  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
 
 The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified, so you won't get accidentally updated to the next major version.
