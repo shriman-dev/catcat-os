@@ -124,12 +124,14 @@ cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-dark.css
 cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-light.css
 cp -dv   /usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg $workDir/theme/background
 
-sh -c "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <gresources>
   <gresource prefix=\"/org/gnome/shell/theme\">
 $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <file>%P</file>\n')
   </gresource>
-</gresources>' > ${workDir}/theme/${gdmxml}"
+</gresources>" > ${workDir}/theme/${gdmxml}
+
+cat ${workDir}/theme/${gdmxml}
 
 glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
 mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
