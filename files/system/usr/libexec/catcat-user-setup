@@ -84,7 +84,8 @@ userDirsAndFolderIconsSetup &
 
 
 removeUnnecessaryDirectories() {
-  [[ -d ~/Desktop ]] && rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+   dirlist='~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos'
+   for dir in "${dirlist}"; do [[ -d ${dir} ]] && rmdir ${dir}; done
   [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
   [[ -f ~/Me/Desktop/.gitkeep ]] && find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
   [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync

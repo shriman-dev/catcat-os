@@ -151,7 +151,7 @@ cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
 # set defaul icon and theme
 sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 
-cp -drvf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
+cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
 
 /usr/bin/dconf update
 }
