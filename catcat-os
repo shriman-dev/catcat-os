@@ -10,8 +10,7 @@ FROM ghcr.io/ublue-os/bazzite-gnome:${SOURCE_TAG}
 COPY /files /tmp/files
 COPY cosign.pub /etc/pki/containers/catcat-os.pub
 
-RUN mkdir -p /var/lib/alternatives && \
-    /tmp/files/scripts/setup.sh && \
+RUN /tmp/files/scripts/setup.sh && \
     /tmp/files/scripts/fancontrol.sh && \
     ostree container commit
 ## NOTES:

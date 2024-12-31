@@ -37,7 +37,7 @@ name='Disk & Backup'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/SysSecurity]
-apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'org.gnome.Ptyxis.desktop', 'com.github.amezin.ddterm.desktop', 'app.drey.KeyRack.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop']
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'org.gnome.Ptyxis.desktop', 'com.github.amezin.ddterm.desktop', 'org.gnome.Terminal.desktop', 'app.drey.KeyRack.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop']
 name='Sys & Security'
 translate=false
 
@@ -78,6 +78,6 @@ name='Optimize'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Others]
-apps=['oneko.desktop', 'Cmatrix.desktop', 'Asciiquarium.desktop', 'Pipes.desktop', 'Cmatrix_Bold_Rainbow .desktop', 'Cbonsai.desktop', 'com.github.alex11br.themechanger.desktop', 'bazzite-documentation.desktop', 'yelp.desktop', 'discourse.desktop', 'yafti.desktop', 'discover_overlay_configure.desktop', 'system-update.desktop', 'sunshine.desktop']
+apps=['oneko.desktop', 'Cmatrix.desktop', 'Asciiquarium.desktop', 'Pipes.desktop', 'Cmatrix_Bold_Rainbow .desktop', 'Cbonsai.desktop', 'com.github.alex11br.themechanger.desktop', 'bazzite-documentation.desktop', 'yelp.desktop', 'discourse.desktop', 'yafti.desktop', 'discover_overlay_configure.desktop', 'system-update.desktop', 'sunshine.desktop', 'org.gnome.Tour.desktop']
 name='Others'
 translate=false

@@ -8,6 +8,7 @@ $SCRIPT_DIR/cleanup.sh
 
 # copy system files
 FILESDIR="$(dirname $SCRIPT_DIR)"
+mkdir -p /var/lib/alternatives
 mkdir -p /usr/etc/dconf/db/distro.d/
 cp -drf  ${FILESDIR}/system/* /
 cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
