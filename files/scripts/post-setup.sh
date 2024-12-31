@@ -137,7 +137,7 @@ glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
 mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
 cp -drf $workDir/* /usr/share/gnome-shell/
 
-cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /usr/etc/dconf/gdm.d/
+cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/gdm.d/
 
 # icons
 curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
