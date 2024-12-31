@@ -1,0 +1,34 @@
+#!/bin/bash
+
+auto-performance-powersave() {
+echo ${1}
+
+if command -v powerprofilesctl ; then
+[ "${1/powersave/power-saver}" == "$( powerprofilesctl get )" ] || powerprofilesctl set ${1/powersave/power-saver}
+fi
+
+if command -v tuned-adm ; then
+tuned-adm active | grep -i "${1}" || tuned-adm profile ${1/performance/throughput-performance}
+fi
+
+#echo performance | tee /sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference
+scaling_governor='/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+power_policy='/sys/module/pcie_aspm/parameters/policy'
+[ "$1" == "$( cat $scaling_governor | head -n1 )" ] || echo $1 | tee $scaling_governor
+cat $power_policy | grep -o '\['$1'\]' || echo $1 | tee $power_policy
+}
+
+
+
+while true; do
+  if upower -d | grep -iE 'state.*discharging' ; then
+    auto-performance-powersave powersave
+  else
+    auto-performance-powersave performance
+  fi
+
+  sleep 30
+done
+
+
+

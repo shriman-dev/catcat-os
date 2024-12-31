@@ -1,0 +1,7 @@
+[org/gnome/desktop/background]
+color-shading-type='vertical'
+picture-options='zoom'
+picture-uri='file:///usr/share/backgrounds/catcat-os/altos-odyssey-bg.png'
+picture-uri-dark='file:///usr/share/backgrounds/catcat-os/altos-odyssey-bg.png'
+primary-color='#1e1e2e'
+secondary-color='#373754'

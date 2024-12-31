@@ -1,0 +1,191 @@
+#!/bin/bash
+shopt -s extglob
+shopt -s nocasematch
+
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ~/.local/share/flatpak/app/)"
+
+
+if [[ $(id -u) -eq 0 ]]; then
+  echo -e "catcat user setup is ran as root. exiting.\n"
+  exit 1
+fi
+
+
+# default configs for user home
+defaultConfigs() {
+  if ! diff -q /etc/catcat-os/update_sha ~/.local/share/catcat-os/previous_update_sha; then
+    echo "updating default configs"
+    rsync -aK --ignore-existing --exclude='*.gitkeep*' /etc/skel/ ~/
+    rsync -au /etc/skel/.local/share/gnome-shell/extensions ~/.local/share/gnome-shell/
+
+    rm -rf ~/.local/share/themes/{*Catppuccin*,*Lavanda*}
+    cp -drf /usr/share/themes/{*Catppuccin*,*Lavanda*} ~/.local/share/themes/
+    
+
+    mkdir -p ~/.local/share/catcat-os
+    cat /etc/catcat-os/update_sha > ~/.local/share/catcat-os/previous_update_sha
+  fi
+
+}
+defaultConfigs &
+
+
+gnomeShellSetup() {
+  DCONF_FOLDERS="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
+  if [[ ! "${DCONF_FOLDERS}" =~ 'FileViewers' ]]; then
+    [[ ! -d ~/.config/dconf.bak.og ]] && cp -drf ~/.config/dconf ~/.config/dconf.bak.og
+    cp -drf ~/.config/dconf ~/.config/dconf.bak
+
+    for i in $(ls -A1d /etc/dconf/db/distro.d/*);
+    do
+    dconf load / < $i &
+    done
+  fi
+
+  [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -dr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+
+  [[ $(grep -c 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css) -lt 6 ]] && cp -dr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
+
+  # Disable extension update
+  [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -eq 0 ]] && chmod 544 ~/.local/share/gnome-shell/extension-updates
+  # Enable extension updates when there are updates in directory
+  [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 744 ~/.local/share/gnome-shell/extension-updates
+
+}
+gnomeShellSetup &
+
+
+userDirsAndFolderIconsSetup() {
+  if ! grep -q "$USER/Me/" ~/.config/user-dirs.dirs; then
+    cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
+
+    gio set ~/Me           metadata::custom-icon-name "user-home"
+    gio set ~/Me/Backups   metadata::custom-icon-name "folder-backup"
+    gio set ~/Me/Devel     metadata::custom-icon-name "folder-code"
+    gio set ~/Me/Ebooks    metadata::custom-icon-name "folder-books"
+    gio set ~/Me/Games     metadata::custom-icon-name "folder-games"
+    gio set ~/Me/Notes     metadata::custom-icon-name "folder-notes"
+    gio set ~/Me/Scripts   metadata::custom-icon-name "folder-script"
+    gio set ~/Me/Secure    metadata::custom-icon-name "folder-locked"
+    gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
+  fi
+
+  ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
+file://$HOME/Me/Documents Documents
+file://$HOME/Me/Downloads Downloads
+file://$HOME/Me/Pictures Pictures
+file://$HOME/Me/Videos Videos
+file://$HOME/Me/Music Music
+file://$HOME/Me/Notes Notes
+admin:/// /' > ~/.config/gtk-3.0/bookmarks"
+
+}
+userDirsAndFolderIconsSetup &
+
+
+removeUnnecessaryDirectories() {
+  [[ -d ~/Desktop ]] && rmdir ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+  [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
+  [[ -f ~/Me/Desktop/.gitkeep ]] && find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
+  [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync
+}
+removeUnnecessaryDirectories &
+
+
+shellSetup() {
+  [[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ]] && cp -dr /etc/skel/.config/fish ~/.config/
+
+  ! grep -q ".shell.d" ~/.bashrc && echo '
+if [[ -d ~/.shell.d ]]; then
+	for rc in ~/.shell.d/*; do
+		if [[ -f "$rc" ]]; then
+			. "$rc"
+		fi
+	done
+fi
+
+unset rc
+' >> ~/.bash_profile
+
+  ! grep -q "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
+
+}
+shellSetup &
+
+
+themeFlatpakApps() {
+  if [[ ! "$(readlink ~/.themes)"  =~ '.local/share/themes' ]]; then
+    mkdir -p ~/.local/share/flatpak/overrides
+    echo '[Context]
+devices=!all;
+filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;xdg-config/MangoHud:ro;xdg-config/vkBasalt:ro;
+
+[Environment]
+QT_STYLE_OVERRIDE=kvantum
+' > ~/.local/share/flatpak/overrides/global
+
+    mkdir -p ~/.local/share/themes
+    mkdir -p ~/.local/share/icons
+    mkdir -p ~/.local/share/fonts
+
+    [[ -d ~/.themes ]] && cp -drf ~/.themes/* ~/.local/share/themes/ && rm -rf ~/.themes
+    [[ -d ~/.icons ]] && cp -drf ~/.icons/* ~/.local/share/icons/ && rm -rf ~/.icons
+
+    ln -srfT ~/.local/share/icons ~/.icons
+    ln -srfT ~/.local/share/themes ~/.themes
+  fi
+
+}
+themeFlatpakApps &
+
+
+desktopFiles() {
+  [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
+
+  APP_ICON_TO_MODIFY=(
+"io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
+"io.gitlab.librewolf-community firefox"
+"xyz.armcord.ArmCord discord"
+)
+
+  for I in "${APP_ICON_TO_MODIFY[@]}"; do
+    if [[ ! -f ~/.local/share/applications/${I%% *}.desktop ]]; then
+      [[ "${FLATPAK_APPS}" =~ "${I%% *}" ]] && sed "s|^Icon=.*|Icon=${I#* }|" /var/lib/flatpak/exports/share/applications/${I%% *}.desktop > ~/.local/share/applications/${I%% *}.desktop
+    fi
+  done
+
+}
+desktopFiles &
+
+
+appsSetup() {
+  # ptyxis
+  [[ ! -f ~/.local/share/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette ]] && cp -drf /etc/skel/.local/share/org.gnome.Ptyxis ~/.local/share/
+
+  # gedit
+  [[ ! -f ~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml ]] && cp -drf /etc/skel/.var/app/org.gnome.gedit ~/.var/app/
+
+  # vscodium
+  EXTLIST=(
+"bierner.color-info"
+"jeronimoekerdt.color-picker-universal"
+"catppuccin.catppuccin-vsc"
+"catppuccin.catppuccin-vsc-icons"
+"ms-python.python"
+"ericsia.pythonsnippets3pro"
+"ms-toolsai.jupyter"
+"redhat.vscode-yaml"
+"huntertran.auto-markdown-toc"
+"zaaack.markdown-editor"
+)
+
+  ! ls -A1d ~/.vscode-oss/extensions/*atppuccin* && for ext in "${EXTLIST[@]}"; do codium --install-extension ${ext} & done
+
+}
+appsSetup &
+
+
+#gtk-update-icon-cache
+#gtk4-update-icon-cache
+###
+

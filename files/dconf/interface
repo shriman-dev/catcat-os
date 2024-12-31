@@ -1,0 +1,22 @@
+[org/gnome/desktop/interface]
+accent-color='orange'
+clock-format='12h'
+clock-show-date=true
+clock-show-seconds=true
+clock-show-weekday=true
+color-scheme='prefer-dark'
+cursor-size=36
+cursor-theme='Catppuccin-Papirus-Orange'
+document-font-name='Inter 11'
+font-antialiasing='rgba'
+font-name='Inter 11'
+gtk-enable-primary-paste=true
+gtk-theme='Colloid-Orange-Dark-Catppuccin'
+icon-theme='Catppuccin-Papirus-Orange'
+locate-pointer=true
+menubar-detachable=true
+monospace-font-name='FiraCode Nerd Font 11'
+show-battery-percentage=true
+text-scaling-factor=1.1000000000000001
+toolbar-detachable=true
+toolkit-accessibility=false
