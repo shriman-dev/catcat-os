@@ -35,7 +35,7 @@ androidTools='android-tools scrcpy'
 
 files='nautilus-extensions nautilus-python nemo nemo-emblems nemo-extensions nemo-gsconnect nemo-preview nemo-python sushi'
 
-themingCompatibility='gnome-tweaks dconf-editor libgtop2 libappindicator-gtk3 gnome-menus gnome-themes-extra gtk-murrine-engine gtk2-engines glib2-devel kvantum qt5ct qt6ct qt5-qtquickcontrols2 qt5-qtsvg qt6-qtsvg sddm menulibre awf-gtk2 awf-gtk3 awf-gtk4'
+themingCompatibility='gnome-tweaks dconf-editor libgtop2 libappindicator-gtk3 gnome-menus gnome-themes-extra gtk-murrine-engine gtk2-engines glib2-devel kvantum qt5ct qt6ct qt5-qtquickcontrols2 qt5-qtsvg qt6-qtsvg menulibre awf-gtk2 awf-gtk3 awf-gtk4'
 #appeditor sddm
 
 iconsAndFonts='rsms-inter-fonts'
@@ -49,4 +49,4 @@ virtualization='virt-manager libvirt libvirt-client libvirt-client-qemu bridge-u
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance spectacle'
 
-rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$extras" )
+rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )

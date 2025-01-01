@@ -51,7 +51,9 @@ gnomeShellSetup() {
   # Enable extension updates when there are updates in directory
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 744 ~/.local/share/gnome-shell/extension-updates
 
+  # enable syncthing extension if syncthing if running, disable if not running
   systemctl --user is-enabled syncthing.service && gnome-extensions enable syncthing@gnome.2nv2u.com
+  ! systemctl --user is-enabled syncthing.service && gnome-extensions disable syncthing@gnome.2nv2u.com
 
 }
 gnomeShellSetup &
