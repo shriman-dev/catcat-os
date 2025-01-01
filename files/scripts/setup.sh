@@ -4,7 +4,7 @@ set -oue pipefail
 echo -e "\n$0\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-$SCRIPT_DIR/cleanup.sh &
+$SCRIPT_DIR/cleanup.sh
 
 # copy system files
 FILESDIR="$(dirname $SCRIPT_DIR)"
