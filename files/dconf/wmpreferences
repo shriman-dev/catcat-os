@@ -5,6 +5,7 @@ button-layout='appmenu:minimize,close'
 focus-mode='sloppy'
 num-workspaces=5
 titlebar-font='Inter Bold 11'
+workspace-names=@as []
 
 [org/gnome/mutter]
 attach-modal-dialogs=false

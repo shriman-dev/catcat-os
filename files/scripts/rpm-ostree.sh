@@ -45,6 +45,8 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth'
 
-extras='bleachbit gnome-system-monitor uresourced irqbalance'
+virtualization='virt-manager libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
+
+extras='bleachbit gnome-system-monitor uresourced irqbalance spectacle'
 
 rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$extras" )

@@ -10,6 +10,13 @@ pkgs(){
 curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttersnap.sh
 chmod +x /usr/bin/buttersnap.sh
 
+# gocryptfs
+curl -Lo /tmp/gocryptfs.tar.gz $(curl -s -X GET https://api.github.com/repos/rfjakob/gocryptfs/releases/latest | grep -i '"browser_download_url": "[^"]*amd64.tar.gz"' | cut -d '"' -f4)
+mkdir -p /tmp/gocryptfsTarExtract
+tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
+cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
+chmod +x /usr/bin/gocryptfs
+
 # btdu
 curl -Lo /usr/bin/btdu https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64
 chmod +x /usr/bin/btdu

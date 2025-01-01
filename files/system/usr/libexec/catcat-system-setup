@@ -21,6 +21,8 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   U="$(id -un 1000)"
   gpasswd -a $U input
   usermod -a -G users $U # for ydotool
+  useradd -g $U libvirt
+  useradd -g $U libvirt-kvm
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot

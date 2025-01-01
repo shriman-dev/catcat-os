@@ -53,6 +53,7 @@ sys='org.gnome.PowerStats
 org.gnome.ColorViewer
 org.gnome.Firmware
 app.drey.KeyRack
+com.github.wwmm.easyeffects
 com.github.tchx84.Flatseal
 io.github.giantpinkrobots.flatsweep
 io.github.flattool.Warehouse'

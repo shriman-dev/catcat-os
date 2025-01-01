@@ -21,6 +21,11 @@ sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 # enable disk discard
 sed -i "s|issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
+# libvirt setup
+sed -i 's|.*unix_sock_group =.*|unix_sock_group = "libvirt"|' /etc/libvirt/libvirtd.conf
+sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/libvirtd.conf
+
+
 # set envars
 ENVARS_TO_ADD=(
   "QT_QPA_PLATFORMTHEME=qt5ct"
