@@ -76,6 +76,7 @@ fi
 # update gnome/dconf configurations in /etc/dconf/db/distro.d/
 /usr/bin/dconf update &
 
+
 # HOSTNAME FIX
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.

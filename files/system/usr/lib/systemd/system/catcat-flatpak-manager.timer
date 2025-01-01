@@ -1,0 +1,8 @@
+[Unit]
+Description=Timer for catcat-flatpak-manager
+
+[Timer]
+OnBootSec=300
+
+[Install]
+WantedBy=timers.target

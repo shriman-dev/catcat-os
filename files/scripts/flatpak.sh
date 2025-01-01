@@ -25,7 +25,8 @@ graphicsVideoEditors='com.github.PintaProject.Pinta
 org.gimp.GIMP
 com.rawtherapee.RawTherapee
 org.upscayl.Upscayl
-org.pitivi.Pitivi'
+org.pitivi.Pitivi
+org.gnome.gitlab.YaLTeR.Identity'
 
 #- org.gnome.TextEditor
 #- com.calibre_ebook.calibre
@@ -51,6 +52,7 @@ org.gnome.World.PikaBackup'
 sys='org.gnome.PowerStats
 org.gnome.ColorViewer
 org.gnome.Firmware
+app.drey.KeyRack
 com.github.tchx84.Flatseal
 io.github.giantpinkrobots.flatsweep
 io.github.flattool.Warehouse'

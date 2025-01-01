@@ -281,9 +281,13 @@ process-primary-selection=true
 window-width-percentage=23
 
 [org/gnome/shell/extensions/color-picker]
+default-format=uint32 0
+enable-format=true
+enable-notify=true
 enable-systray=true
 menu-size=uint32 8
-notify-style=uint32 0
+notify-sound=uint32 1
+notify-style=uint32 1
 preview-style=uint32 0
 systray-dropper-icon=''
 

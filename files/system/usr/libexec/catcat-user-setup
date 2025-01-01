@@ -51,6 +51,8 @@ gnomeShellSetup() {
   # Enable extension updates when there are updates in directory
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 744 ~/.local/share/gnome-shell/extension-updates
 
+  systemctl --user is-enabled syncthing.service && gnome-extensions enable syncthing@gnome.2nv2u.com
+
 }
 gnomeShellSetup &
 
@@ -77,7 +79,7 @@ file://$HOME/Me/Pictures Pictures
 file://$HOME/Me/Videos Videos
 file://$HOME/Me/Music Music
 file://$HOME/Me/Notes Notes
-admin:/// /' > ~/.config/gtk-3.0/bookmarks"
+admin:/// AdminRoot' > ~/.config/gtk-3.0/bookmarks"
 
 }
 userDirsAndFolderIconsSetup &
@@ -168,7 +170,6 @@ appsSetup() {
 
   # vscodium
   EXTLIST=(
-"bierner.color-info"
 "jeronimoekerdt.color-picker-universal"
 "catppuccin.catppuccin-vsc"
 "catppuccin.catppuccin-vsc-icons"

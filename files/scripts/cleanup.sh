@@ -35,10 +35,13 @@ rm -vf /usr/lib/systemd/user/tracker-miner-rss-3.service
 rm -vf /usr/lib/systemd/user/tracker-writeback-3.service
 rm -vf /usr/lib/systemd/user/tracker-xdg-portal-3.service
 
+
+#rm -rvf /usr/share/ublue-os/firstboot
 rm -rvf /usr/share/ublue-os/dconfs
-rm -rvf /usr/share/ublue-os/firstboot
 rm -rvf /usr/share/ublue-os/motd
-rm -vf /etc/profile.d/user-motd.sh
+rm -vf  /etc/profile.d/user-motd.sh
+rm -vf  /etc/profile.d/askpass.sh
+rm -vf  /etc/profile.d/brew.sh
 rm -rvf /etc/dconf/db/distro.d/*
 
 rm -vf /etc/yum.repos.d/google-chrome.repo
