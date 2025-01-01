@@ -117,7 +117,7 @@ org.freedesktop.Platform.VulkanLayer.OBSVkCapture//23.08
 org.freedesktop.Platform.VulkanLayer.OBSVkCapture//22.08
 org.freedesktop.Platform.VulkanLayer.OBSVkCapture//21.08'
 
-printf "%s\n" $fileViewers $graphicsVideoEditors $docs $net $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools $runtimes > /etc/catcat-os/flatpak-list/install
+printf "%s\n" $fileViewers $graphicsVideoEditors $docs $net $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools $runtimes > /etc/catcat-os/flatpak-list/install &
 
 # runtimes
 #runtimes=(
@@ -136,6 +136,6 @@ echo 'org.mozilla.firefox
 io.github.fastrizwaan.WineZGUI
 it.mijorus.gearlever
 io.github.nokse22.Exhibit
-org.fedoraproject.MediaWriter' > /etc/catcat-os/flatpak-list/remove
+org.fedoraproject.MediaWriter' > /etc/catcat-os/flatpak-list/remove &
 
 

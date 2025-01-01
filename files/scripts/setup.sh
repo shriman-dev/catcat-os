@@ -15,8 +15,8 @@ cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
 cp -drf  ${FILESDIR}/skel     /etc/ &
 
-$SCRIPT_DIR/pre-setup.sh &
-$SCRIPT_DIR/flatpak.sh &
+$SCRIPT_DIR/pre-setup.sh
+$SCRIPT_DIR/flatpak.sh
 $SCRIPT_DIR/rpm-ostree.sh
 $SCRIPT_DIR/systemd.sh
 $SCRIPT_DIR/nerd-fonts.sh
