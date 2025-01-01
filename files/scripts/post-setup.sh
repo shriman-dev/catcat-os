@@ -51,7 +51,7 @@ systemctl enable fstrim.timer nix.mount catcat-system-setup.service \
                  auto-power-profile.service
 
 
-desktop-files(){
+desktop-files() {
 cp -dvf /usr/share/applications/syncthing-start.desktop /etc/xdg/autostart/
 
 
@@ -68,9 +68,7 @@ sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-brows
 }
 desktop-files &
 
-icons(){
-
-# icons
+icons() {
 curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
 
 mkdir -p /tmp/papirusicon
@@ -79,7 +77,7 @@ cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
 }
 icons &
 
-themes(){
+themes() {
 # defaults
 mkdir -p /etc/fastfetch/
 cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/ &
@@ -100,7 +98,7 @@ tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
 
 
 git clone https://github.com/shriman-dev/Colloid-gtk-theme.git /tmp/colloid-gtk-theme
-/tmp/colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless &
+/tmp/colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
 
 
 # gdm theme
@@ -148,7 +146,7 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 cat ${workDir}/theme/${gdmxml}
 
 glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml" && mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource &
-cp -drf $workDir/* /usr/share/gnome-shell/ &
+cp -drf $workDir/* /usr/share/gnome-shell/
 
 
 cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
@@ -160,7 +158,7 @@ cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.
 
 /usr/bin/dconf update
 }
-themes &
+themes
 
 
 shell-exts(){
@@ -172,7 +170,7 @@ cp -drf /etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/e
 #gnome-extensions install /tmp/unite.zip
 echo
 }
-shell-exts &
+shell-exts
 
 
 # last commit sha
