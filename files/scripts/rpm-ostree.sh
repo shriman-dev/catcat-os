@@ -13,7 +13,7 @@ curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -
 
 cd -
 }
-addRepos &
+addRepos
 
 # debloat
 rpm-ostree override remove fastfetch ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass &
