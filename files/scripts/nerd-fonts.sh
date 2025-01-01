@@ -19,12 +19,8 @@ for FONT in "${FONTS[@]}"; do
     FONT=${FONT// /} # remove spaces
     if [ ${#FONT} -gt 0 ]; then
         mkdir -p "${DEST}/${FONT}"
-
         echo "Downloading ${FONT} from ${URL}/${FONT}.tar.xz"
-        curl -fLs --create-dirs "${URL}/${FONT}.tar.xz" -o "/tmp/fonts/${FONT}.tar.xz"
-        echo "Downloaded ${FONT}"
-
-        tar -xf "/tmp/fonts/${FONT}.tar.xz" -C "${DEST}/${FONT}"
+        curl -fLs --create-dirs "${URL}/${FONT}.tar.xz" -o "/tmp/fonts/${FONT}.tar.xz" && tar -xf "/tmp/fonts/${FONT}.tar.xz" -C "${DEST}/${FONT}" &
     fi
 done
 rm -rf /tmp/fonts

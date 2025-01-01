@@ -66,20 +66,29 @@ sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop 
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
 sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
 }
-desktop-files
+desktop-files &
 
+icons(){
 
+# icons
+curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
+
+mkdir -p /tmp/papirusicon
+tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
+cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
+}
+icons &
 
 themes(){
 # defaults
 mkdir -p /etc/fastfetch/
-cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/
-cp -dvrf /etc/skel/.config/Kvantum/* /usr/share/Kvantum/
-cp -dvrf /etc/skel/.config/qt5ct/* /usr/share/qt5ct/
-cp -dvrf /etc/skel/.config/qt6ct/* /usr/share/qt6ct/
+cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/ &
+cp -dvrf /etc/skel/.config/Kvantum/* /usr/share/Kvantum/ &
+cp -dvrf /etc/skel/.config/qt5ct/* /usr/share/qt5ct/ &
+cp -dvrf /etc/skel/.config/qt6ct/* /usr/share/qt6ct/ &
 
 # plymouth
-plymouth-set-default-theme catppuccin-mocha
+plymouth-set-default-theme catppuccin-mocha &
 
 # gtk
 curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
@@ -87,11 +96,11 @@ curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/v
 mkdir -p /tmp/Lavanda-gtk-theme
 tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
 
-/tmp/Lavanda-gtk-theme/install.sh --color light dark
+/tmp/Lavanda-gtk-theme/install.sh --color light dark &
 
 
 git clone https://github.com/shriman-dev/Colloid-gtk-theme.git /tmp/colloid-gtk-theme
-/tmp/colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
+/tmp/colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless &
 
 
 # gdm theme
@@ -138,29 +147,20 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 
 cat ${workDir}/theme/${gdmxml}
 
-glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
-mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
-cp -drf $workDir/* /usr/share/gnome-shell/
+glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml" && mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource &
+cp -drf $workDir/* /usr/share/gnome-shell/ &
 
 
 cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
 
-# icons
-curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
-
-mkdir -p /tmp/papirusicon
-tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
-cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
-
-
 # set defaul icon and theme
 sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 
-cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
+cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/ &
 
 /usr/bin/dconf update
 }
-themes
+themes &
 
 
 shell-exts(){
@@ -172,7 +172,7 @@ cp -drf /etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/e
 #gnome-extensions install /tmp/unite.zip
 echo
 }
-shell-exts
+shell-exts &
 
 
 # last commit sha

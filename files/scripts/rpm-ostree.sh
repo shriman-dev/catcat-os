@@ -3,6 +3,7 @@ set -oue pipefail
 
 echo -e "\n$0\n"
 
+addRepos() {
 cd /etc/yum.repos.d/
 
 curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
@@ -11,15 +12,17 @@ curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm 
 curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -E %fedora)/zeno-scrcpy-fedora-$(rpm -E %fedora).repo
 
 cd -
+}
+addRepos &
 
 # debloat
-rpm-ostree override remove fastfetch ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
+rpm-ostree override remove fastfetch ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass &
 #sunshine
 
 security='firejail firewall-config'
 
 shell='fish bat eza starship'
-rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
+rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm &
 
 diskFileMan='compsize htop btop ncdu fio fzf fd-find ripgrep zoxide dosfstools exfatprogs dmraid zstd gpart gparted'
 
