@@ -1,4 +1,8 @@
 #!/bin/bash
+set -oue pipefail
+
+echo -e "\n$0\n"
+
 mkdir -p /etc/catcat-os/flatpak-list
 
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
