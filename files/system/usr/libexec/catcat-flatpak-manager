@@ -36,7 +36,7 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_upda
   echo "Removing system flatpaks from config list"
   flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
 
-  echo /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
+  cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
 fi
 
 
