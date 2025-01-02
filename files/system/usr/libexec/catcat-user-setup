@@ -88,8 +88,18 @@ userDirsAndFolderIconsSetup &
 
 
 removeUnnecessaryDirectories() {
-   dirlist='~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos'
-   for dir in "${dirlist}"; do [[ -d ${dir} ]] && rmdir ${dir}; done
+   dirlist=(
+'~/Desktop'
+'~/Downloads'
+'~/Templates'
+'~/Public'
+'~/Documents'
+'~/Music'
+'~/Pictures'
+'~/Videos'
+)
+   for dir in "${dirlist[@]}"; do [[ -d ${dir} ]] && rmdir ${dir}; done
+
   [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
   [[ -f ~/Me/Desktop/.gitkeep ]] && find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
   [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync
@@ -145,7 +155,7 @@ themeFlatpakApps &
 
 
 desktopFiles() {
-  [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed '$aNoDisplay=true' /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
+  [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
 
   APP_ICON_TO_MODIFY=(
 "io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"

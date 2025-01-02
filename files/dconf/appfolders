@@ -7,7 +7,7 @@ name='File Viewers'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Creative]
-apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.pitivi.Pitivi.desktop', 'org.upscayl.Upscayl.desktop', 'org.shotcut.Shotcut.desktop', 'org.inkscape.Inkscape.desktop', 'org.gimp.GIMP.desktop', 'com.rawtherapee.RawTherapee.desktop', 'com.github.wwmm.easyeffects.desktop', 'org.libreoffice.LibreOffice.draw.desktop']
+apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.pitivi.Pitivi.desktop', 'org.upscayl.Upscayl.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'org.shotcut.Shotcut.desktop', 'org.inkscape.Inkscape.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.gimp.GIMP.desktop', 'com.github.wwmm.easyeffects.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'fr.handbrake.ghb.desktop']
 name='Creative'
 translate=false
 
@@ -63,7 +63,7 @@ name='Prod & Devel'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Gaming]
-apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'org.ryujinx.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'com.github.Matoking.protontricks.desktop', 'input-remapper-gtk.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop']
+apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'org.ryujinx.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop']
 name='Gaming'
 translate=false
 
