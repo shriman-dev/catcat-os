@@ -17,6 +17,9 @@ screens:
       title: Setting up CatCat OS
       show_terminal: true
       package_manager: yafti.plugin.flatpak
+      package_manager_defaults:
+        user: false
+        system: true
       groups:
 
         View and Manage Files:

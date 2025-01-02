@@ -41,7 +41,7 @@ chmod +x /usr/bin/yazi
 yazi &
 
 
-pkgs(){
+pkgs() {
 # ascii-image-converter
 curl -Lo /tmp/ascii-image-converter.tar.gz https://github.com/TheZoraiz/ascii-image-converter/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz
 
