@@ -50,6 +50,6 @@ gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsyn
 
 virtualization='virt-manager libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
 
-extras='bleachbit gnome-system-monitor uresourced irqbalance spectacle'
+extras='bleachbit gnome-system-monitor uresourced irqbalance'
 
 rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )

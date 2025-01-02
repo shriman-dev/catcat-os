@@ -5,94 +5,47 @@ echo -e "\n$0\n"
 
 mkdir -p /etc/catcat-os/flatpak-list
 
-#flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
-#flatpak remote-modify --system --prio=9 flathub
-
-#- org.gnome.Loupe
 fileViewers='org.gnome.eog
-org.gnome.Shotwell
-com.github.rafostar.Clapper
-org.videolan.VLC
-org.gnome.Music
-app.drey.EarTag
 org.gnome.Papers
-org.gnome.meld
-dev.geopjr.Collision
 org.gnome.FileRoller
-com.github.qarmin.czkawka
-fr.romainvigier.MetadataCleaner'
+com.github.rafostar.Clapper
+com.github.neithern.g4music'
 
-#- org.kde.krita
-#- org.inkscape.Inkscape
-#- org.shotcut.Shotcut
-graphicsVideoEditors='com.github.PintaProject.Pinta
-org.gimp.GIMP
-com.rawtherapee.RawTherapee
-org.upscayl.Upscayl
-org.pitivi.Pitivi
-org.gnome.gitlab.YaLTeR.Identity'
+graphicsVideoEditors='com.github.PintaProject.Pinta'
 
-#- org.gnome.TextEditor
-#- com.calibre_ebook.calibre
-docs='org.gnome.gedit
-org.libreoffice.LibreOffice
-org.onlyoffice.desktopeditors
-com.toolstack.Folio
-com.github.flxzt.rnote
-garden.jamie.Morphosis'
+docs='org.gnome.gedit'
 
-net='io.gitlab.librewolf-community
-org.gnome.Epiphany
-io.freetubeapp.FreeTube
-io.github.giantpinkrobots.varia'
+net='io.gitlab.librewolf-community'
 
 monitoring='net.nokyan.Resources
 org.gnome.Logs'
 
-diskBackup='org.gnome.baobab
-io.github.mpobaschnig.Vaults
-org.gnome.World.PikaBackup'
+diskBackup='org.gnome.baobab'
 
 sys='org.gnome.PowerStats
 org.gnome.ColorViewer
 org.gnome.Firmware
 app.drey.KeyRack
-com.github.wwmm.easyeffects
 com.github.tchx84.Flatseal
 io.github.giantpinkrobots.flatsweep
 io.github.flattool.Warehouse'
 
-vmContainers='org.gnome.Boxes
-io.github.dvlv.boxbuddyrs'
+vmContainers='io.github.dvlv.boxbuddyrs'
 
-#- io.github.seadve.Kooha
-#- net.sapples.LiveCaptions
 utils='org.gnome.Calculator
 org.gnome.clocks
 org.gnome.Calendar
 org.gnome.Snapshot
 org.gnome.Weather
 org.gnome.SoundRecorder
-org.nickvision.cavalier
-com.dec05eba.gpu_screen_recorder
-com.belmoussaoui.Decoder
-net.codelogistics.clicker
-re.sonny.Junction'
+com.dec05eba.gpu_screen_recorder'
 
 tweaks='com.mattjakeman.ExtensionManager
 org.gnome.Characters'
 
-#- com.valvesoftware.Steam
-#- net.lutris.Lutris
-#com.heroicgameslauncher.hgl
-#org.ryujinx.Ryujinx
-gaming='com.usebottles.bottles
-com.vysp3r.ProtonPlus
-com.github.Matoking.protontricks'
+gaming='com.vysp3r.ProtonPlus'
 
-tools='org.gnome.World.Secrets
-org.localsend.localsend_app
-com.github.tenderowl.frog'
+tools='org.gnome.World.Secrets'
 
 
 runtimes='org.kde.KStyle.Kvantum//6.6
@@ -117,7 +70,7 @@ org.freedesktop.Platform.VulkanLayer.OBSVkCapture//23.08
 org.freedesktop.Platform.VulkanLayer.OBSVkCapture//22.08
 org.freedesktop.Platform.VulkanLayer.OBSVkCapture//21.08'
 
-printf "%s\n" $fileViewers $graphicsVideoEditors $docs $net $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools $runtimes > /etc/catcat-os/flatpak-list/install &
+printf "%s\n" $net $fileViewers $graphicsVideoEditors $docs $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools $runtimes > /etc/catcat-os/flatpak-list/install &
 
 # runtimes
 #runtimes=(

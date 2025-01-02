@@ -29,14 +29,13 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_upda
   if check_internet_connection; then
     echo "Installing system flatpaks from config list (requires internet)"
     flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
+    cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
   fi
 
   # Remove flatpaks in list
   REMOVE_LIST=($(cat /etc/catcat-os/flatpak-list/remove))
   echo "Removing system flatpaks from config list"
   flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
-
-  cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
 fi
 
 

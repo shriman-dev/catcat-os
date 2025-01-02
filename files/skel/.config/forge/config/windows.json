@@ -95,6 +95,22 @@
         {
             "wmClass": "re.sonny.Junction",
             "mode": "float"
+        },
+        {
+            "wmClass": "com.github.neithern.g4music",
+            "mode": "float"
+        },
+        {
+            "wmClass": "dev.geopjr.Collision",
+            "mode": "float"
+        },
+        {
+            "wmClass": "it.ublue.Yafti",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Music",
+            "mode": "float"
         }
     ]
 }

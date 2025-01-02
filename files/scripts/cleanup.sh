@@ -36,7 +36,7 @@ rm -vf /usr/lib/systemd/user/tracker-writeback-3.service
 rm -vf /usr/lib/systemd/user/tracker-xdg-portal-3.service
 
 
-#rm -rvf /usr/share/ublue-os/firstboot
+rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
 rm -rvf /usr/share/ublue-os/dconfs
 rm -rvf /usr/share/ublue-os/motd
 rm -vf  /etc/profile.d/user-motd.sh
