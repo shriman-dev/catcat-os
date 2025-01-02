@@ -88,15 +88,15 @@ userDirsAndFolderIconsSetup &
 
 
 removeUnnecessaryDirectories() {
-   dirlist=(
-'~/Desktop'
-'~/Downloads'
-'~/Templates'
-'~/Public'
-'~/Documents'
-'~/Music'
-'~/Pictures'
-'~/Videos'
+  dirlist=(
+~/Desktop
+~/Downloads
+~/Templates
+~/Public
+~/Documents
+~/Music
+~/Pictures
+~/Videos
 )
    for dir in "${dirlist[@]}"; do [[ -d ${dir} ]] && rmdir ${dir}; done
 
