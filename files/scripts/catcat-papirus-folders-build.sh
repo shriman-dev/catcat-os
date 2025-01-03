@@ -30,10 +30,13 @@ find /tmp/Catppuccin-Papirus-Orange -empty -type d -exec rm -rf {} +
 rm /tmp/Catppuccin-Papirus-Orange/icon-theme.cache
 rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/mimetypes
 rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/apps
+rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/devices
+rm -rf /tmp/Catppuccin-Papirus-Orange/16x16/devices
 
 for i in $( grep -rl '#444444' /tmp/Catppuccin-Papirus-Orange/ ); do
     sed -i -e 's|#444444|#cdd6f4|' $i
 done
+
 
 # go-previous.svg
 for i in $( grep -rl 'M 14,7 H 6 L 9.5,3.5 8,2 2,8 8,14 9.5,12.5 6,9 H 14 Z' /tmp/Catppuccin-Papirus-Orange/ ); do
@@ -73,5 +76,10 @@ done
 #go-bottom.svg
 for i in $( grep -rl 'M 7,0 V 7 L 3.5,3.5 2,5 8,11 14,5 12.5,3.5 9,7 V 0 Z' /tmp/Catppuccin-Papirus-Orange/ ); do
     sed -i -e "s|<path.*|$(grep '<path' /usr/share/icons/Adwaita/symbolic/actions/go-bottom-symbolic.svg)|;s|<path|<path style=\"fill:currentColor\" class=\"ColorScheme-Text\"|;/circle/d" $i
+done
+
+
+for i in $( grep -rl '#2e3436' /tmp/Catppuccin-Papirus-Orange/ ); do
+    sed -i -e 's|#2e3436|#cdd6f4|' $i
 done
 

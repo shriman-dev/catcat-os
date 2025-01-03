@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FLATPAK_APPS_TO_UPDATE_SOLEY=(
+  "io.gitlab.librewolf-community"
+  "com.brave.Browser"
+  "org.gnome.Epiphany"
+)
+
+for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
+  /usr/bin/flatpak update --assumeyes --noninteractive "$APP"
+done
+
+# two weeks = 1209600
+# update system if system has not been updated for two weeks
+
+if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )) ]]; then
+  /usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix
+  [[ $(id -u) -eq 0 ]] && /usr/bin/ublue-update
+  [[ $(id -u) -eq 0 ]] && echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
+fi
+

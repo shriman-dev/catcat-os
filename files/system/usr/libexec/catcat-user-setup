@@ -20,7 +20,6 @@ defaultConfigs() {
 
     rm -rf ~/.local/share/themes/{*Catppuccin*,*Lavanda*}
     cp -drf /usr/share/themes/{*Catppuccin*,*Lavanda*} ~/.local/share/themes/
-    
 
     mkdir -p ~/.local/share/catcat-os
     cat /etc/catcat-os/update_sha > ~/.local/share/catcat-os/previous_update_sha
@@ -155,7 +154,10 @@ themeFlatpakApps &
 
 
 desktopFiles() {
+  # prioritize steam flatpak
   [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
+
+  ! inxi -M | grep -qE "System: Micro-Star|System: MSI" && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > ~/.local/share/applications/mcontrolcenter.desktop
 
   APP_ICON_TO_MODIFY=(
 "io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"

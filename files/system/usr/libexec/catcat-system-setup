@@ -79,6 +79,12 @@ fi
 /usr/bin/dconf update &
 
 
+if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then
+  systemctl disable mcontrolcenter.helper.service
+  systemctl --global disable mcontrolcenter.helper.service
+fi
+
+
 # HOSTNAME FIX
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.

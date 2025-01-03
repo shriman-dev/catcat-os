@@ -2,7 +2,7 @@
 Description=Timer for catcat-flatpak-manager
 
 [Timer]
-OnBootSec=300
+OnBootSec=120
 
 [Install]
 WantedBy=timers.target

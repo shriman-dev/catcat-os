@@ -4,6 +4,7 @@ auto-raise=true
 button-layout='appmenu:minimize,close'
 focus-mode='sloppy'
 num-workspaces=5
+theme='Catppuccin-Papirus-Orange'
 titlebar-font='Inter Bold 11'
 workspace-names=@as []
 

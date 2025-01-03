@@ -26,6 +26,15 @@ sed -i 's|.*unix_sock_group =.*|unix_sock_group = "libvirt"|' /etc/libvirt/libvi
 sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/libvirtd.conf
 
 
+# to use catcat-updater
+sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix|' /usr/share/ublue-os/just/10-update.just
+sed -i 's|ExecStart=.*|ExecStart=/usr/libexec/catcat-updater|' /usr/lib/systemd/system/ublue-update.service
+sed -i 's|OnUnitInactiveSec=.*|OnUnitInactiveSec=2h|' /usr/lib/systemd/system/ublue-update.timer
+
+cp -v /usr/lib/systemd/system/ublue-update.service /usr/lib/systemd/user/
+cp -v /usr/lib/systemd/system/ublue-update.timer /usr/lib/systemd/user/
+
+
 # set envars
 ENVARS_TO_ADD=(
   "QT_QPA_PLATFORMTHEME=qt5ct"
