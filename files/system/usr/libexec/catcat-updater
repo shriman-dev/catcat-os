@@ -14,17 +14,21 @@ done
 # update system if system has not been updated for two weeks
 
 if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )) ]]; then
-  /usr/bin/flatpak update --assumeyes --noninteractive
-  /usr/bin/flatpak uninstall --unused
+  (
+    /usr/bin/flatpak update --assumeyes --noninteractive
+    /usr/bin/flatpak uninstall --unused
 
-  [[ ! $(id -u) -eq 0 ]] && command -v nix-env && nix-channel --update && nix-env -b --upgrade
-  [[ ! $(id -u) -eq 0 ]] && command -v nix-env && nix-store --optimise && nix-collect-garbage
+    if [[ ! $(id -u) -eq 0 ]] && command -v nix-env; then
+      nix-channel --update && nix-env -b --upgrade
+      nix-store --optimise && nix-collect-garbage
+    fi
 
-  [[ $(id -u) -eq 0 ]] && /usr/bin/ublue-update
-  rpm-ostree cleanup -b ; ostree prune
-
-  [[ $(id -u) -eq 0 ]] && echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
-
-  notify-desktop "Automatic Bi-Weekly Update is done."
+    if [[ $(id -u) -eq 0 ]]; then
+      /usr/bin/ublue-update &&
+      /usr/bin/rpm-ostree cleanup -bm && /usr/bin/ostree prune &&
+      /usr/bin/fwupdmgr refresh --force && /usr/bin/fwupdmgr update &&
+      echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
+    fi
+  ) && /usr/bin/notify-send "Automatic Bi-Weekly Update is done."
 fi
 

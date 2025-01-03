@@ -27,7 +27,7 @@ sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/li
 
 
 # to use catcat-updater
-sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix|' /usr/share/ublue-os/just/10-update.just
+sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix firmware|' /usr/share/ublue-os/just/10-update.just
 sed -i 's|ExecStart=.*|ExecStart=/usr/libexec/catcat-updater|' /usr/lib/systemd/system/ublue-update.service
 sed -i 's|OnUnitInactiveSec=.*|OnUnitInactiveSec=2h|' /usr/lib/systemd/system/ublue-update.timer
 

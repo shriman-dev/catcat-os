@@ -47,42 +47,8 @@ gaming='com.vysp3r.ProtonPlus'
 
 tools='org.gnome.World.Secrets'
 
+printf "%s\n" $net $fileViewers $graphicsVideoEditors $docs $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools > /etc/catcat-os/flatpak-list/install &
 
-runtimes='org.kde.KStyle.Kvantum//6.6
-org.kde.KStyle.Kvantum//6.5
-org.kde.KStyle.Kvantum//5.15-23.08
-org.kde.KStyle.Kvantum//5.15-22.08
-org.kde.KStyle.Kvantum//5.15-21.08
-org.kde.KStyle.Kvantum//5.15
-org.freedesktop.Platform.VulkanLayer.vkBasalt//24.08
-org.freedesktop.Platform.VulkanLayer.vkBasalt//23.08
-org.freedesktop.Platform.VulkanLayer.vkBasalt//22.08
-org.freedesktop.Platform.VulkanLayer.vkBasalt//21.08
-org.freedesktop.Platform.VulkanLayer.gamescope//24.08
-org.freedesktop.Platform.VulkanLayer.gamescope//23.08
-org.freedesktop.Platform.VulkanLayer.gamescope//22.08
-org.freedesktop.Platform.VulkanLayer.MangoHud//24.08
-org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
-org.freedesktop.Platform.VulkanLayer.MangoHud//22.08
-org.freedesktop.Platform.VulkanLayer.MangoHud//21.08
-org.freedesktop.Platform.VulkanLayer.OBSVkCapture//24.08
-org.freedesktop.Platform.VulkanLayer.OBSVkCapture//23.08
-org.freedesktop.Platform.VulkanLayer.OBSVkCapture//22.08
-org.freedesktop.Platform.VulkanLayer.OBSVkCapture//21.08'
-
-printf "%s\n" $net $fileViewers $graphicsVideoEditors $docs $monitoring $diskBackup $sys $vmContainers $utils $tweaks $gaming $tools $runtimes > /etc/catcat-os/flatpak-list/install &
-
-# runtimes
-#runtimes=(
-#'org.kde.KStyle.Kvantum'
-#'org.freedesktop.Platform.VulkanLayer.vkBasalt'
-#'org.freedesktop.Platform.VulkanLayer.gamescope'
-#'org.freedesktop.Platform.VulkanLayer.MangoHud'
-#'org.freedesktop.Platform.VulkanLayer.OBSVkCapture'
-#)
-#for r in "${runtimes[@]}"; do
-#   flatpak search --columns=application,branch $r | awk '{print $1 "//" $2}' >> /etc/catcat-os/flatpak-list/install
-#done
 
 # remove
 echo 'org.mozilla.firefox

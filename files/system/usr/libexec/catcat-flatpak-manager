@@ -18,11 +18,26 @@ check_internet_connection() {
     return 1
 }
 
+runtimes() {
+  runtimes=(
+'org.kde.KStyle.Kvantum'
+'org.freedesktop.Platform.VulkanLayer.vkBasalt'
+'org.freedesktop.Platform.VulkanLayer.gamescope'
+'org.freedesktop.Platform.VulkanLayer.MangoHud'
+'org.freedesktop.Platform.VulkanLayer.OBSVkCapture'
+)
+  for r in "${runtimes[@]}"; do
+    flatpak search --columns=application,branch $r | awk '{print $1 "//" $2}' >> /etc/catcat-os/flatpak-list/install
+  done
+}
+
 # Install or remove flatpaks if system is updated
 if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
   # Add and set flathub
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
   flatpak remote-modify --system --prio=9 flathub
+
+  runtimes
 
   # Install flatpaks in list
   INSTALL_LIST=($(cat /etc/catcat-os/flatpak-list/install))
