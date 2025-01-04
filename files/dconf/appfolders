@@ -22,7 +22,7 @@ name='Net'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Stores]
-apps=['org.gnome.Software.desktop', 'io.github.flattool.Warehouse.desktop', 'system-update.desktop']
+apps=['org.gnome.Software.desktop', 'io.github.flattool.Warehouse.desktop', 'autostart.desktop', 'system-update.desktop']
 name='Stores'
 translate=false
 

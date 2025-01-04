@@ -1,3 +1,15 @@
+[io/github/jeffshee/hanabi-extension]
+content-fit=0
+enable-nvsl=true
+enable-va=true
+low-battery-threshold=30
+mute=true
+pause-on-battery=2
+pause-on-maximize-or-fullscreen=1
+show-panel-menu=true
+startup-delay=10
+video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'
+
 [com/github/amezin/ddterm]
 allow-hyperlink=true
 background-color='rgb(30,30,46)'
@@ -33,18 +45,6 @@ window-maximize=false
 window-size=0.67238095238095241
 window-skip-taskbar=true
 window-type-hint='normal'
-
-[io/github/jeffshee/hanabi-extension]
-content-fit=0
-enable-nvsl=true
-enable-va=true
-low-battery-threshold=30
-mute=true
-pause-on-battery=2
-pause-on-maximize-or-fullscreen=1
-show-panel-menu=true
-startup-delay=10
-video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'
 
 [org/gnome/shell/extensions/HideItems]
 allindicator=['Stop Screencast', 'Clipboard History Indicator', 'Stop Screen Sharing', 'Dwell Click', 'Accessibility', 'Keyboard', 'eye-on-cursor@djinnalexio.github.io']
@@ -189,7 +189,6 @@ show-running-apps=true
 show-weather-by-clock='LEFT'
 
 [org/gnome/shell/extensions/bedtime-mode]
-bedtime-mode-active=false
 ondemand-button-location='menu'
 
 [org/gnome/shell/extensions/bluetooth-quick-connect]
@@ -269,10 +268,8 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=4
+indicator-position-max=3
 restore-state=true
-toggle-state=true
-user-enabled=true
 
 [org/gnome/shell/extensions/clipboard-history]
 cache-only-favorites=false
@@ -476,7 +473,7 @@ secondarymenu-contains-showdetails=true
 show-favorites=true
 show-favorites-all-monitors=true
 show-running-apps=true
-status-icon-padding=2
+status-icon-padding=3
 stockgs-keep-dash=true
 stockgs-keep-top-panel=false
 stockgs-panelbtn-click-only=true
@@ -493,7 +490,7 @@ trans-use-custom-bg=false
 trans-use-custom-gradient=true
 trans-use-custom-opacity=true
 trans-use-dynamic-opacity=true
-tray-padding=1
+tray-padding=2
 tray-size=0
 window-preview-animation-time=150
 window-preview-custom-icon-size=20
@@ -577,7 +574,6 @@ fallmon=2
 fallrot=45
 falltext=['*', '.', '×', '.', '⊹', '.', '⚹', '.', '✲', '.', '✻', '.', '፨', '.', '.', '.', '∗']
 falltime=5
-feature-enabled=false
 fireworks=false
 flrcolor='rgb(255,165,0)'
 flrdisplay=['★']
@@ -937,7 +933,7 @@ position-in-panel='leftedge'
 refresh-rate='fast'
 show-animations=true
 show-cpu=true
-show-disk=true
+show-disk=false
 show-icons=false
 show-net=false
 use-system-accent=false
@@ -959,7 +955,7 @@ restrict-to-primary-screen=false
 show-appmenu-button=false
 show-desktop-name=false
 show-legacy-tray=false
-show-window-buttons='maximized'
+show-window-buttons='never'
 show-window-title='never'
 use-activities-text=false
 window-buttons-placement='last'
@@ -1031,3 +1027,4 @@ popup-opacity=10
 popup-scale=55
 popup-visibility=1
 vertical=92
+

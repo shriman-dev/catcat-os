@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 set -oue pipefail
@@ -30,12 +31,12 @@ sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/li
 sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix firmware|' /usr/share/ublue-os/just/10-update.just
 sed -i 's|ExecStart=.*|ExecStart=/usr/libexec/catcat-updater|' /usr/lib/systemd/system/ublue-update.service
 sed -i 's|OnUnitInactiveSec=.*|OnUnitInactiveSec=2h|' /usr/lib/systemd/system/ublue-update.timer
-
+ln -sfv /usr/libexec/catcat-updater /usr/bin/
 cp -v /usr/lib/systemd/system/ublue-update.service /usr/lib/systemd/user/
 cp -v /usr/lib/systemd/system/ublue-update.timer /usr/lib/systemd/user/
 
 
-# set envars
+# set envvars
 ENVARS_TO_ADD=(
   "QT_QPA_PLATFORMTHEME=qt5ct"
   "QT_STYLE_OVERRIDE=kvantum"
@@ -56,35 +57,36 @@ sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
 
-systemctl enable fstrim.timer nix.mount catcat-system-setup.service \
-                 auto-power-profile.service
-
-
 desktop-files() {
-cp -dvf /usr/share/applications/syncthing-start.desktop /etc/xdg/autostart/
 
+  sed -i 's|^Name=.*|Name=CatCat OS Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
+  sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
+  ln -sfv /usr/share/ublue-os/firstboot/launcher/autostart.desktop /usr/share/applications/
 
-sed -i 's/^Icon=.*/Icon=user-home/' /usr/share/applications/org.gnome.Nautilus.desktop
-sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' /usr/share/applications/org.gnome.Nautilus.desktop
-sed -i 's/^Icon=.*/Icon=fish/' /usr/share/applications/org.gnome.Ptyxis.desktop
-sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' /usr/share/applications/org.gnome.Settings.desktop
-sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop
-sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' /usr/share/applications/yazi.desktop
+  sed -i 's/^Icon=.*/Icon=user-home/' /usr/share/applications/org.gnome.Nautilus.desktop
+  sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' /usr/share/applications/org.gnome.Nautilus.desktop
+  sed -i 's/^Icon=.*/Icon=fish/' /usr/share/applications/org.gnome.Ptyxis.desktop
+  sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' /usr/share/applications/org.gnome.Settings.desktop
+  sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop
+  sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' /usr/share/applications/yazi.desktop
 
-sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
-sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
-sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
+  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
+  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
+  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
 }
 desktop-files &
 
 icons() {
-curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
+  curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
 
-mkdir -p /tmp/papirusicon
-tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
-cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
+  mkdir -p /tmp/papirusicon
+  tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
+  cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
 }
 icons &
+
+
+
 
 themes() {
 # defaults

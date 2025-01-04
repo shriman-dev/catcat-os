@@ -6,7 +6,7 @@ check_internet_connection() {
     local attempt=1
 
     while (( attempt <= max_attempts )); do
-        if curl --silent --head --fail "https://fedoraproject.org/static/hotspot.txt" > /dev/null; then
+        if curl --silent --head --fail "https://fedoraproject.org" > /dev/null; then
           return 0
         else
           echo "Internet connection is not available. Waiting..."
@@ -40,7 +40,7 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_upda
   runtimes
 
   # Install flatpaks in list
-  INSTALL_LIST=($(cat /etc/catcat-os/flatpak-list/install))
+  INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
   if check_internet_connection; then
     echo "Installing system flatpaks from config list (requires internet)"
     flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
@@ -48,7 +48,7 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_upda
   fi
 
   # Remove flatpaks in list
-  REMOVE_LIST=($(cat /etc/catcat-os/flatpak-list/remove))
+  REMOVE_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/remove ))
   echo "Removing system flatpaks from config list"
   flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
 fi

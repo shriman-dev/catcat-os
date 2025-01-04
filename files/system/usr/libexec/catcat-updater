@@ -14,7 +14,7 @@ done
 # update system if system has not been updated for two weeks
 
 if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )) ]]; then
-  (
+
     /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak uninstall --unused
 
@@ -24,11 +24,14 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )
     fi
 
     if [[ $(id -u) -eq 0 ]]; then
-      /usr/bin/ublue-update &&
-      /usr/bin/rpm-ostree cleanup -bm && /usr/bin/ostree prune &&
-      /usr/bin/fwupdmgr refresh --force && /usr/bin/fwupdmgr update &&
-      echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
+      /usr/bin/fwupdmgr refresh --force && /usr/bin/fwupdmgr update
+      /usr/bin/rpm-ostree upgrade && UPDATE_SUCCESSFUL=1
+      /usr/bin/rpm-ostree cleanup -b ; /usr/bin/ostree prune
     fi
-  ) && /usr/bin/notify-send "Automatic Bi-Weekly Update is done."
+
+    if [[ $UPDATE_SUCCESSFUL -eq 1 ]]; then
+      echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
+      /usr/bin/notify-send "Automatic Bi-Weekly Update is done."
+    fi
 fi
 

@@ -1,7 +1,20 @@
+[org/gnome/desktop/wm/keybindings]
+move-to-workspace-down=['<Control><Shift><Alt>Down']
+move-to-workspace-left=['<Control>Left', '<Super><Shift>Page_Up']
+move-to-workspace-right=['<Control>Right', '<Super><Shift>Page_Down']
+move-to-workspace-up=['<Control><Shift><Alt>Up']
+panel-run-dialog=['<Super>r']
+switch-to-workspace-down=['<Control><Alt>Down']
+switch-to-workspace-left=['<Control>Up', '<Super>Page_Up']
+switch-to-workspace-right=['<Control>Down', '<Super>Page_Down']
+switch-to-workspace-up=['<Control><Alt>Up']
+toggle-fullscreen=['<Control><Super>f']
 
 [org/gnome/shell/keybindings]
 screenshot=['<Control>Print']
 show-screenshot-ui=['<Shift>Print']
+
+
 
 [org/gnome/settings-daemon/plugins/media-keys]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']
@@ -16,5 +29,6 @@ name='logout'
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1]
 binding='<Super>t'
-command='ptyxis'
+command='/usr/bin/ptyxis --new-window'
 name='terminal'
+

@@ -1,0 +1,53 @@
+# fileViewers
+org.gnome.eog
+org.gnome.Papers
+org.gnome.FileRoller
+com.github.rafostar.Clapper
+com.github.neithern.g4music
+
+# graphicsVideoEditors
+com.github.PintaProject.Pinta
+
+# docs
+org.gnome.gedit
+
+# net
+io.gitlab.librewolf-community
+
+# monitoring
+net.nokyan.Resources
+org.gnome.Logs
+
+# diskBackup
+org.gnome.baobab
+
+# sys
+org.gnome.PowerStats
+org.gnome.ColorViewer
+org.gnome.Firmware
+app.drey.KeyRack
+com.github.tchx84.Flatseal
+io.github.giantpinkrobots.flatsweep
+io.github.flattool.Warehouse
+
+# vmContainers
+io.github.dvlv.boxbuddyrs
+
+# utils
+org.gnome.Calculator
+org.gnome.clocks
+org.gnome.Calendar
+org.gnome.Snapshot
+org.gnome.Weather
+org.gnome.SoundRecorder
+com.dec05eba.gpu_screen_recorder
+
+# tweaks
+com.mattjakeman.ExtensionManager
+org.gnome.Characters
+
+# gaming
+com.vysp3r.ProtonPlus
+
+# tools
+org.gnome.World.Secrets

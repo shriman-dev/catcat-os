@@ -61,7 +61,20 @@ gnomeShellSetup &
 userDirsAndFolderIconsSetup() {
   if ! grep -q "$USER/Me/" ~/.config/user-dirs.dirs; then
     cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
+  fi
 
+  if ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks; then
+    sh -c "echo 'file://$HOME/Me Me
+file://$HOME/Me/Documents Documents
+file://$HOME/Me/Downloads Downloads
+file://$HOME/Me/Pictures Pictures
+file://$HOME/Me/Videos Videos
+file://$HOME/Me/Music Music
+file://$HOME/Me/Notes Notes
+admin:/// AdminRoot' > ~/.config/gtk-3.0/bookmarks"
+  fi
+
+  if ! gio info -a metadata ~/Me | grep 'metadata::custom-icon-name: user-home'; then
     gio set ~/Me           metadata::custom-icon-name "user-home"
     gio set ~/Me/Backups   metadata::custom-icon-name "folder-backup"
     gio set ~/Me/Devel     metadata::custom-icon-name "folder-code"
@@ -73,14 +86,6 @@ userDirsAndFolderIconsSetup() {
     gio set ~/Me/Syncthing metadata::custom-icon-name "folder-syncthing"
   fi
 
-  ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks && sh -c "echo 'file://$HOME/Me Me
-file://$HOME/Me/Documents Documents
-file://$HOME/Me/Downloads Downloads
-file://$HOME/Me/Pictures Pictures
-file://$HOME/Me/Videos Videos
-file://$HOME/Me/Music Music
-file://$HOME/Me/Notes Notes
-admin:/// AdminRoot' > ~/.config/gtk-3.0/bookmarks"
 
 }
 userDirsAndFolderIconsSetup &
@@ -194,8 +199,9 @@ appsSetup() {
 "huntertran.auto-markdown-toc"
 "zaaack.markdown-editor"
 )
-
-  ! ls -A1d ~/.vscode-oss/extensions/*atppuccin* && for ext in "${EXTLIST[@]}"; do codium --install-extension ${ext} & done
+  if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin* && ip route | grep -q ''; then
+    for ext in "${EXTLIST[@]}"; do codium --install-extension ${ext} & done
+  fi
 
 }
 appsSetup &

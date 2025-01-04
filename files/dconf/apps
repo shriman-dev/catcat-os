@@ -1,10 +1,53 @@
-[com/github/donadigo/appeditor]
-show-hidden-entries=true
+[org/gnome/software]
+allow-updates=false
+download-updates=false
+download-updates-notify=false
+first-run=false
+flatpak-purge-timestamp=int64 1734623829
 
 [org/fedoraproject/FirewallConfig]
 show-active-bindings=true
 show-ipsets=true
 show-lockdown-whitelist=true
+
+[com/github/donadigo/appeditor]
+show-hidden-entries=true
+
+[org/gnome/Ptyxis]
+cursor-blink-mode='on'
+cursor-shape='underline'
+default-profile-uuid='db8703c64d752ad6daf64e776707763b'
+font-name='FiraCode Nerd Font 11'
+interface-style='system'
+profile-uuids=['80a34f2cafa4b10d8524dd1966ea26f3', 'db8703c64d752ad6daf64e776707763b']
+restore-session=false
+restore-window-size=true
+scrollbar-policy='system'
+use-system-font=true
+
+[org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
+label='default-shell'
+limit-scrollback=false
+login-shell=true
+opacity=1.0
+palette='Catppuccin-Mocha-mine'
+scrollback-lines=2147483647
+
+[org/gnome/Ptyxis/Profiles/db8703c64d752ad6daf64e776707763b]
+custom-command='fish'
+exit-action='close'
+label='fish'
+limit-scrollback=false
+login-shell=true
+opacity=1.0
+palette='Catppuccin-Mocha-mine'
+preserve-container='never'
+preserve-directory='never'
+scrollback-lines=2147483647
+use-custom-command=true
+
+[org/gnome/Ptyxis/Shortcuts]
+zoom-in='<Control>equal'
 
 [org/gnome/gnome-system-monitor]
 current-tab='processes'
@@ -102,6 +145,9 @@ show-hidden-files=true
 show-image-thumbnails='always'
 
 
+[org/nemo/compact-view]
+all-columns-have-same-width=false
+
 [org/nemo/icon-view]
 captions=['size', 'date_modified_with_time', 'permissions']
 
@@ -121,6 +167,7 @@ show-full-path-titles=false
 show-hidden-files=true
 show-home-icon-toolbar=true
 show-image-thumbnails='always'
+show-location-entry=false
 show-reload-icon-toolbar=true
 show-up-icon-toolbar=false
 size-prefixes='base-2'
@@ -143,46 +190,5 @@ side-pane-view='tree'
 sidebar-bookmark-breakpoint=4
 start-with-menu-bar=false
 start-with-sidebar=true
+start-with-toolbar=true
 
-[org/gnome/Ptyxis]
-cursor-blink-mode='on'
-cursor-shape='underline'
-default-profile-uuid='db8703c64d752ad6daf64e776707763b'
-font-name='FiraCode Nerd Font 11'
-interface-style='system'
-profile-uuids=['80a34f2cafa4b10d8524dd1966ea26f3', 'db8703c64d752ad6daf64e776707763b']
-restore-session=false
-restore-window-size=true
-scrollbar-policy='system'
-use-system-font=true
-
-[org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
-label='default-shell'
-limit-scrollback=false
-login-shell=true
-opacity=1.0
-palette='Catppuccin-Mocha-mine'
-scrollback-lines=2147483647
-
-[org/gnome/Ptyxis/Profiles/db8703c64d752ad6daf64e776707763b]
-custom-command='fish'
-exit-action='close'
-label='fish'
-limit-scrollback=false
-login-shell=true
-opacity=1.0
-palette='Catppuccin-Mocha-mine'
-preserve-container='never'
-preserve-directory='never'
-scrollback-lines=2147483647
-use-custom-command=true
-
-[org/gnome/Ptyxis/Shortcuts]
-zoom-in='<Control>equal'
-
-[org/gnome/software]
-allow-updates=false
-download-updates=false
-download-updates-notify=false
-first-run=false
-flatpak-purge-timestamp=int64 1734623829
