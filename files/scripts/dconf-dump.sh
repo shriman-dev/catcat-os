@@ -43,6 +43,7 @@ for path in "${!appPathsWithSed[@]}"; do
 done
 
 
+#/bedtime-mode/,/^$/ { /bedtime-mode-active/d }
 # extensions
 declare -A extensionPathsWithSed=(
     ['/com/github/amezin/ddterm/']=""
@@ -56,8 +57,7 @@ s|right-box-order=\[.* 'syncthingIndicator'|right-box-order=\['Nothing to say in
 /arcmenu/,/^$/ { /recently-installed-apps/d }
 /burn-my-windows/,/^$/ { /active-profile/d }
 /caffeine/,/^$/ { /toggle-state/d; /user-enabled/d }
-/downfall/,/^$/ { /feature-enabled/d }
-/bedtime-mode/,/^$/ { /bedtime-mode-active/d }"
+/downfall/,/^$/ { /feature-enabled/d }"
 )
 
 > $DCONF_DIR/extensions

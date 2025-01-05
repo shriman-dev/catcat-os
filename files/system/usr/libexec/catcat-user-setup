@@ -18,6 +18,8 @@ defaultConfigs() {
     rsync -aK --ignore-existing --exclude='*.gitkeep*' /etc/skel/ ~/
     rsync -au /etc/skel/.local/share/gnome-shell/extensions ~/.local/share/gnome-shell/
 
+    chmod 544 ~/.local/share/gnome-shell/extension-updates
+
     rm -rf ~/.local/share/themes/{*Catppuccin*,*Lavanda*}
     cp -drf /usr/share/themes/{*Catppuccin*,*Lavanda*} ~/.local/share/themes/
 
@@ -48,7 +50,7 @@ gnomeShellSetup() {
   # Disable extension update
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -eq 0 ]] && chmod 544 ~/.local/share/gnome-shell/extension-updates
   # Enable extension updates when there are updates in directory
-  [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 744 ~/.local/share/gnome-shell/extension-updates
+  [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 755 ~/.local/share/gnome-shell/extension-updates
 
   # enable syncthing extension if syncthing if running, disable if not running
   systemctl --user is-enabled syncthing.service && gnome-extensions enable syncthing@gnome.2nv2u.com
@@ -63,7 +65,7 @@ userDirsAndFolderIconsSetup() {
     cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
   fi
 
-  if ! grep -q "$USER/Me/" ~/.config/gtk-3.0/bookmarks; then
+  if ! grep -q "$USER/Me/Notes" ~/.config/gtk-3.0/bookmarks; then
     sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
 file://$HOME/Me/Downloads Downloads
@@ -152,6 +154,8 @@ QT_STYLE_OVERRIDE=kvantum
 
     ln -srfT ~/.local/share/icons ~/.icons
     ln -srfT ~/.local/share/themes ~/.themes
+    
+    [[ $(ls -A1 ~/.config/gtk-4.0 | wc -l) -eq 0 ]] && cp -drf /etc/skel/.config/gtk-4.0 ~/.config/
   fi
 
 }
