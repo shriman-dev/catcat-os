@@ -61,6 +61,7 @@ desktop-files() {
 
   sed -i 's|^Name=.*|Name=CatCat OS Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
   sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
+  sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
   ln -sfv /usr/share/ublue-os/firstboot/launcher/autostart.desktop /usr/share/applications/
 
   sed -i 's/^Icon=.*/Icon=user-home/' /usr/share/applications/org.gnome.Nautilus.desktop
