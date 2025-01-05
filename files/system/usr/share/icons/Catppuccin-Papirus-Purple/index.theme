@@ -1,7 +1,7 @@
 [Icon Theme]
 Name=Catppuccin-Papirus-Purple
 Comment=Papirus icon theme
-Inherits=Catppuccin-Papirus-Orange,Papirus-Dark,Papirus,Yaru,gnome,breeze,hicolor
+Inherits=Catppuccin-Papirus-Orange,Papirus-Dark,Papirus,Adwaita,Yaru,gnome,breeze,hicolor
 
 Example=folder
 
@@ -21,18 +21,7 @@ DialogDefault=48
 DialogSizes=16,22,24,32,48,64
 
 # Directory list
-Directories=16x16/places,16x16@2x/places,22x22/places,22x22@2x/places,24x24/places,24x24@2x/places,32x32/places,32x32@2x/places,48x48/places,48x48@2x/places,64x64/places,64x64@2x/places,96x96/places,128x128/places,symbolic/places
-
-[16x16/places]
-Context=Places
-Size=16
-Type=Fixed
-
-[16x16@2x/places]
-Context=Places
-Size=16
-Scale=2
-Type=Fixed
+Directories=22x22/places,22x22@2x/places,24x24/places,24x24@2x/places,32x32/places,32x32@2x/places,48x48/places,48x48@2x/places,64x64/places,64x64@2x/places,96x96/places,128x128/places
 
 [22x22/places]
 Context=Places
@@ -98,13 +87,6 @@ Type=Fixed
 Context=Places
 Size=128
 MinSize=128
-MaxSize=512
-Type=Scalable
-
-[symbolic/places]
-Context=Places
-Size=16
-MinSize=16
 MaxSize=512
 Type=Scalable
 
