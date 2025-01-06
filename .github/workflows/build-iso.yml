@@ -37,7 +37,7 @@ jobs:
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          tree -d -L 8 /home/runner/work/PipelineMapping
+          tree -d -L 8 /home/runner/work/
 
       - name: Checkout Repo
         uses: actions/checkout@v4
