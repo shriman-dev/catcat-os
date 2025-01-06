@@ -37,7 +37,7 @@ jobs:
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          tree -d -L 8 /github/
+          ls -A1 /github/
 
       - name: Checkout Repo
         uses: actions/checkout@v4
