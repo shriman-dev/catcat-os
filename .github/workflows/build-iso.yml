@@ -37,7 +37,7 @@ jobs:
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          tree -d -L 6 /home/runner/work/catcat-os
+          tree -d -L 6 /home/runner/work/catcat-os/catcat-os
 
       - name: Checkout Repo
         uses: actions/checkout@v4
