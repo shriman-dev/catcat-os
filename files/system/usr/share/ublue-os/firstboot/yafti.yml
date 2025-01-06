@@ -50,7 +50,6 @@ screens:
           - Pitivi - video editor: org.pitivi.Pitivi
           - Shotcut - video editor: org.shotcut.Shotcut
           - HandBrake - convert videos: fr.handbrake.ghb
-          - Easy Effects - tune system audio: com.github.wwmm.easyeffects
 
         Office and Docs:
           description: Office suits and other related apps
@@ -87,6 +86,7 @@ screens:
           - Cavalier - visualize music: org.nickvision.cavalier
           - GPU Screen Recorder: com.dec05eba.gpu_screen_recorder
           - Sound Recorder: org.gnome.SoundRecorder
+          - Easy Effects - tune system audio: com.github.wwmm.easyeffects
           - Decoder - scan QR codes: com.belmoussaoui.Decoder
           - Clicker - automate clicking: net.codelogistics.clicker
           - Frog - extract text from images: com.github.tenderowl.frog

@@ -32,12 +32,12 @@ jobs:
         image_tag: [latest]
 
     steps:
-      - name: Fetch current date
+      - name: Pre build configuration
         shell: bash
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          tree -d -L 8 /home/runner/work/
+          tree -d -L 8 /github/
 
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -60,8 +60,8 @@ jobs:
           enable_flatpak_dependencies: "true"
           flatpak_remote_name: "flathub-system"
           flatpak_remote_url: "https://flathub.org/repo/flathub.flatpakrepo"
-          extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 sysrq_always_enabled=1 pci=noats"
           image_signed: true
+          extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 sysrq_always_enabled=1 pci=noats"
 
       - name: Move ISO to Upload Directory
         id: upload-directory
