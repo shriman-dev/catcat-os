@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image_name: [catcat-os]
+        image_name: ["catcat-os", "catcat-os-nv"]
         major_version: [41]
         image_tag: [latest]
 

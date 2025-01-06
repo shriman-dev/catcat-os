@@ -24,7 +24,7 @@ find /tmp/Catppuccin-Papirus-Orange -type f -wholename '*/places*' -not -wholena
 find /tmp/Catppuccin-Papirus-Orange -type f -wholename '*deeporange*' -exec rm {} +
 find /tmp/Catppuccin-Papirus-Orange -type f -wholename '*paleorange*' -exec rm {} +
 
-find /tmp/Catppuccin-Papirus-Orange  -xtype l -exec rm {} +
+
 find /tmp/Catppuccin-Papirus-Orange -empty -type d -exec rm -rf {} +
 
 rm /tmp/Catppuccin-Papirus-Orange/icon-theme.cache
@@ -32,6 +32,8 @@ rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/mimetypes
 rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/apps
 rm -rf /tmp/Catppuccin-Papirus-Orange/symbolic/devices
 rm -rf /tmp/Catppuccin-Papirus-Orange/16x16/devices
+
+find /tmp/Catppuccin-Papirus-Orange  -xtype l -exec rm {} +
 
 for i in $( grep -rl '#444444' /tmp/Catppuccin-Papirus-Orange/ ); do
     sed -i -e 's|#444444|#cdd6f4|' $i
