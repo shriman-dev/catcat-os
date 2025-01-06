@@ -37,7 +37,8 @@ jobs:
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          ls -A1 /github/
+          mkdir -p /tmp/flatpak_refs
+          curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > /tmp/flatpak_refs/install
 
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -60,6 +61,7 @@ jobs:
           enable_flatpak_dependencies: "true"
           flatpak_remote_name: "flathub-system"
           flatpak_remote_url: "https://flathub.org/repo/flathub.flatpakrepo"
+          flatpak_remote_refs_dir: /tmp/flatpak_refs
           image_signed: true
           extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 sysrq_always_enabled=1 pci=noats"
 
