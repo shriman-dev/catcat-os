@@ -59,7 +59,7 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 
 desktop-files() {
 
-  sed -i 's|^Name=.*|Name=CatCat OS Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
+  sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
   sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop
   cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop /usr/share/applications/
   sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' /usr/share/applications/autostart.desktop

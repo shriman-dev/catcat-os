@@ -18,6 +18,7 @@ defaultConfigs() {
     rsync -aK --ignore-existing --exclude='*.gitkeep*' /etc/skel/ ~/
     rsync -au /etc/skel/.local/share/gnome-shell/extensions ~/.local/share/gnome-shell/
 
+    mkdir -p ~/.local/share/gnome-shell/extension-updates
     chmod 544 ~/.local/share/gnome-shell/extension-updates
 
     rm -rf ~/.local/share/themes/{*Catppuccin*,*Lavanda*}
@@ -66,6 +67,7 @@ userDirsAndFolderIconsSetup() {
   fi
 
   if ! grep -q "$USER/Me/Notes" ~/.config/gtk-3.0/bookmarks; then
+    mkdir -p ~/.config/gtk-3.0
     sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
 file://$HOME/Me/Downloads Downloads
@@ -135,16 +137,17 @@ shellSetup &
 
 
 themeFlatpakApps() {
-  if [[ ! "$(readlink ~/.themes)"  =~ '.local/share/themes' ]]; then
+  if ! grep -q 'devices=!all' ~/.local/share/flatpak/overrides/global; then
     mkdir -p ~/.local/share/flatpak/overrides
     echo '[Context]
 devices=!all;
 filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;xdg-config/MangoHud:ro;xdg-config/vkBasalt:ro;
 
 [Environment]
-QT_STYLE_OVERRIDE=kvantum
-' > ~/.local/share/flatpak/overrides/global
+QT_STYLE_OVERRIDE=kvantum' > ~/.local/share/flatpak/overrides/global
+  fi
 
+  if [[ ! "$(readlink ~/.themes)"  =~ '.local/share/themes' ]]; then
     mkdir -p ~/.local/share/themes
     mkdir -p ~/.local/share/icons
     mkdir -p ~/.local/share/fonts

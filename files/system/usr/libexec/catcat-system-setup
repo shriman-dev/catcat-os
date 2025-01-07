@@ -20,9 +20,6 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   # Permit user 1000
   U="$(id -un 1000)"
   gpasswd -a $U input
-  usermod -a -G users $U # for ydotool
-  useradd -g $U libvirt
-  useradd -g $U libvirt-kvm
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot
@@ -38,7 +35,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   replace-x-add 'GRUB_GFXMODE=' 'GRUB_GFXMODE='$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+') /etc/default/grub
   replace-x-add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
   replace-x-add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
-  grub2-mkconfig -o /etc/grub2.cfg &
+  [[ -d /sys/firmware/efi ]] && grub2-mkconfig -o /etc/grub2-efi.cfg || grub2-mkconfig -o /etc/grub2.cfg
   #grub2-editenv - unset menu_auto_hide
 fi
 
@@ -79,10 +76,18 @@ fi
 /usr/bin/dconf update &
 
 
+
+# configure systemd services
+
 if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then
-  systemctl disable mcontrolcenter.helper.service
+  systemctl disable --force --now mcontrolcenter.helper.service
   systemctl --global disable mcontrolcenter.helper.service
 fi
+
+if ! inxi -M | grep -qE "Type: Laptop"; then
+  systemctl disable --force --now auto-power-profile.service
+fi
+
 
 
 # HOSTNAME FIX

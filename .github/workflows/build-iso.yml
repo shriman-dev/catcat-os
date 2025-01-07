@@ -63,7 +63,7 @@ jobs:
           flatpak_remote_url: "https://flathub.org/repo/flathub.flatpakrepo"
           flatpak_remote_refs_dir: /tmp/flatpak_refs
           image_signed: true
-          extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 sysrq_always_enabled=1 pci=noats"
+          extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1 pci=noats"
 
       - name: Move ISO to Upload Directory
         id: upload-directory
@@ -76,7 +76,7 @@ jobs:
           echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT     
 
       - name: Upload ISO to archive.org
-        uses: RoyalOughtness/internet-archive-upload@v7
+        uses: RoyalOughtness/internet-archive-upload@main
         with:
           access-key: ${{ secrets.IA_ACCESS_KEY }}
           secret-key: ${{ secrets.IA_SECRET_KEY }}
