@@ -10,9 +10,9 @@ echo -e "\n$0\n"
 ###
 
 # disable ibus (causes input lag)
-chmod 000 /usr/bin/ibus
-chmod 000 /usr/bin/ibus-daemon
-chmod 000 /usr/bin/ibus-setup
+#chmod 000 /usr/bin/ibus
+#chmod 000 /usr/bin/ibus-daemon
+#chmod 000 /usr/bin/ibus-setup
 
 chmod 000 /usr/libexec/evolution-source-registry
 chmod 000 /usr/libexec/evolution-addressbook-factory
