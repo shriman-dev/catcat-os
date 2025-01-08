@@ -21,7 +21,7 @@ dconfDump '/org/gnome/settings-daemon/plugins/media-keys/' "" $DCONF_DIR/keybind
 
 # input
 > $DCONF_DIR/input
-dconfDump '/org/gnome/desktop/input-sources/' "" $DCONF_DIR/input
+#dconfDump '/org/gnome/desktop/input-sources/' "" $DCONF_DIR/input
 dconfDump '/org/freedesktop/ibus/engine/typing-booster/' "" $DCONF_DIR/input
 
 # apps

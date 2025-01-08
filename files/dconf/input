@@ -1,7 +1,3 @@
-[org/gnome/desktop/input-sources]
-mru-sources=[('ibus', 'typing-booster'), ('xkb', 'in+eng')]
-sources=[('ibus', 'typing-booster'), ('xkb', 'in+eng')]
-
 [org/freedesktop/ibus/engine/typing-booster]
 addspaceoncommit=true
 autocapitalize=true
