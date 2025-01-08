@@ -66,7 +66,8 @@ userDirsAndFolderIconsSetup() {
     cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
   fi
 
-  if ! grep -q "$USER/Me/Notes" ~/.config/gtk-3.0/bookmarks; then
+  mkdir -p /tmp/$USER/tmp-folder
+  if ! grep -q "$USER/tmp-folder" ~/.config/gtk-3.0/bookmarks; then
     mkdir -p ~/.config/gtk-3.0
     sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
@@ -75,7 +76,8 @@ file://$HOME/Me/Pictures Pictures
 file://$HOME/Me/Videos Videos
 file://$HOME/Me/Music Music
 file://$HOME/Me/Notes Notes
-admin:/// AdminRoot' > ~/.config/gtk-3.0/bookmarks"
+admin:/// AdminRoot
+file:///tmp/$USER/tmp-folder tmp-folder' > ~/.config/gtk-3.0/bookmarks"
   fi
 
   if ! gio info -a metadata ~/Me | grep 'metadata::custom-icon-name: user-home'; then
