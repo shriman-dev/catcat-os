@@ -269,7 +269,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=4
+indicator-position-max=3
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -320,7 +320,7 @@ custom-menu-2=['win-control-submenu', 'minimize-win', 'maximize-win', 'close-win
 custom-tint-color='rgb(255,163,72)'
 panel-menu-enable=false
 show-osd-monitor-indexes=false
-supported-active-extensions=['arcmenu']
+supported-active-extensions=@as []
 win-thumbnail-scale=50
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-1]

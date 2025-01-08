@@ -19,6 +19,11 @@ dconfDump '/org/gnome/mutter/keybindings/' "" $DCONF_DIR/keybindings
 dconfDump '/org/gnome/mutter/wayland/keybindings/' "" $DCONF_DIR/keybindings
 dconfDump '/org/gnome/settings-daemon/plugins/media-keys/' "" $DCONF_DIR/keybindings
 
+# input
+> $DCONF_DIR/input
+dconfDump '/org/gnome/desktop/input-sources/' "" $DCONF_DIR/input
+dconfDump '/org/freedesktop/ibus/engine/typing-booster/' "" $DCONF_DIR/input
+
 # apps
 declare -A appPathsWithSed=(
     ['/com/github/donadigo/appeditor/']="
@@ -107,7 +112,6 @@ done
 
 # defaults
 declare -A defaultPathsWithSed=(
-    ['/org/freedesktop/ibus/engine/typing-booster/']=""
     ['/org/freedesktop/tracker/']="
 /index-recursive-directories=/d"
     ['/org/gnome/desktop/a11y/']=""
