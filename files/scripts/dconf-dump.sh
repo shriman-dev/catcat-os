@@ -107,6 +107,7 @@ done
 
 # defaults
 declare -A defaultPathsWithSed=(
+    ['/org/freedesktop/ibus/engine/typing-booster/']=""
     ['/org/freedesktop/tracker/']="
 /index-recursive-directories=/d"
     ['/org/gnome/desktop/a11y/']=""
