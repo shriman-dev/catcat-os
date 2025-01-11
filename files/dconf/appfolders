@@ -2,7 +2,7 @@
 folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Shotwell.desktop', 'com.github.rafostar.Clapper.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Music.desktop', 'org.gnome.Papers.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
+apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'com.github.rafostar.Clapper.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Music.desktop', 'org.gnome.Papers.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
 name='File Viewers'
 translate=false
 

@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2023 Pedro Sader Azevedo
+# SPDX-FileCopyrightText: 2023 Aleksandr Mezin <mezin.alexander@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [Desktop Entry]
 Type=Application
 Name[de]=ddterm
@@ -19,6 +24,7 @@ Keywords[pl]=shell;prompt;command;commandline;cmd;run;terminal;
 Keywords[pt]=shell;prompt;command;commandline;cmd;run;terminal;
 Keywords[ru]=оболочка;подсказка;команда;командная строка;cmd;запустить;терминал;
 Keywords[zh_CN]=shell;提示;命令;命令行;cmd;运行;终端;
+Keywords[tr]=kabuk;istem;komut;komutsatırı;cmd;çalıştır;uçbirim;
 Keywords=shell;prompt;command;commandline;cmd;run;terminal;
 Comment[de]=Ein Aufklapp-Terminal für die GNOME Shell
 Comment[es]=Otra extensión de terminal desplegable para GNOME Shell

@@ -26,7 +26,7 @@ screens:
           description: Apps for managing files
           default: false
           packages:
-          - Shotwell - photos gallery: org.gnome.Shotwell
+          - Fotema - photos gallery: app.fotema.Fotema
           - VLC - video player: org.videolan.VLC
           - Clapper - video player: com.github.rafostar.Clapper
           - Gapless - music player: com.github.neithern.g4music
@@ -36,8 +36,8 @@ screens:
           - Czkawka - clean duplicate files: com.github.qarmin.czkawka
           - Metadata Cleaner: fr.romainvigier.MetadataCleaner
 
-        Graphics:
-          description: Apps for editing photos and videos
+        Creative:
+          description: Apps for create/edit photos and videos
           default: false
           packages:
           - Pinta: com.github.PintaProject.Pinta
@@ -114,6 +114,7 @@ screens:
         run: grep -q 'nvidia' <<< $(jq -r '."image-flavor"' < /usr/share/ublue-os/image-info.json)
       show_terminal: true
       package_manager: yafti.plugin.run
+      default: false
       packages:
         - Supergfxctl (Laptop Hybrid GPU Switching): ujust enable-supergfxctl
 

@@ -111,6 +111,14 @@
         {
             "wmClass": "org.gnome.Music",
             "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Weather",
+            "mode": "float"
+        },
+        {
+            "wmClass": "net.codelogistics.clicker",
+            "mode": "float"
         }
     ]
 }

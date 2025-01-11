@@ -1,4 +1,5 @@
 [org/gnome/desktop/wm/keybindings]
+activate-window-menu=['<Alt><Super>space']
 move-to-workspace-down=['<Control><Shift><Alt>Down']
 move-to-workspace-left=['<Control>Left', '<Super><Shift>Page_Up']
 move-to-workspace-right=['<Control>Right', '<Super><Shift>Page_Down']
@@ -17,7 +18,7 @@ show-screenshot-ui=['<Shift>Print']
 
 
 [org/gnome/settings-daemon/plugins/media-keys]
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']
 magnifier=['<Control>Insert']
 magnifier-zoom-in=['<Control>Page_Up']
 magnifier-zoom-out=['<Control>Page_Down']
