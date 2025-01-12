@@ -130,9 +130,9 @@ export const TopHatMonitor = GObject.registerClass(class TopHatMonitor extends P
         });
         // System Monitor
         const appSys = Shell.AppSystem.get_default();
-        let app = appSys.lookup_app('org.gnome.SystemMonitor.desktop');
+        let app = appSys.lookup_app('net.nokyan.Resources.desktop');
         if (!app) {
-            app = appSys.lookup_app('gnome-system-monitor.desktop');
+            app = appSys.lookup_app('net.nokyan.Resources.desktop');
         }
         if (app) {
             const button = new St.Button({ style_class: 'button' });

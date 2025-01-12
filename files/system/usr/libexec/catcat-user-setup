@@ -65,7 +65,7 @@ gnomeShellSetup() {
 
   # make vitals and tophat extension to use resources app as default monitor app
   if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
-    vitalsGschemaFile='~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml'
+    vitalsGschemaFile="$HOME/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
     if ! grep -q '/usr/bin/flatpak run net.nokyan.Resources' $vitalsGschemaFile; then
       sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' $vitalsGschemaFile
       glib-compile-schemas $(dirname $vitalsGschemaFile)
@@ -73,8 +73,8 @@ gnomeShellSetup() {
       gnome-extensions enable Vitals@CoreCoding.com
     fi
     
-    topHatMonitorJs='~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js'
-    if grep -q 'net.nokyan.Resources.desktop' $topHatMonitorJs; then
+    topHatMonitorJs="$HOME/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js"
+    if ! grep -q 'net.nokyan.Resources.desktop' $topHatMonitorJs; then
       sed -i 's|org.gnome.SystemMonitor.desktop|net.nokyan.Resources.desktop|;s|gnome-system-monitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
       gnome-extensions disable tophat@fflewddur.github.io
       gnome-extensions enable tophat@fflewddur.github.io
@@ -147,7 +147,7 @@ removeUnnecessaryDirectories() {
 
   [[ ! -f ~/.mozilla/firefox/profiles.ini ]] && rm -rf ~/.mozilla
   [[ -f ~/Me/Desktop/.gitkeep ]] && find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
-  [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync
+  [[ -d ~/Sync ]] && [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync
 }
 removeUnnecessaryDirectories &
 
@@ -207,7 +207,7 @@ desktopFiles() {
   # prioritize steam flatpak
   [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > ~/.local/share/applications/steam.desktop
 
-  ! inxi -M | grep -qE "System: Micro-Star|System: MSI" && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > ~/.local/share/applications/mcontrolcenter.desktop
+  ! inxi -M | grep -qE "System: Micro-Star|System: MSI" && command -v mcontrolcenter && sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > ~/.local/share/applications/mcontrolcenter.desktop
 
   APP_ICON_TO_MODIFY=(
 "io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
