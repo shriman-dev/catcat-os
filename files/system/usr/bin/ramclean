@@ -3,19 +3,14 @@ sync; echo 3 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a
 
 KILLP='gnome-software
 evolution-alarm-notify
-tracker-miner-fs-3
 evolution-source-registry
-gsd-wacom
 evolution-calendar-factory
 evolution-addressbook-factory
+gsd-wacom
 gsd-printer
-qojop
-fwupd
 updatedb
-kdeconnectd
-ibus
-setroubleshootd
-gnome-calendar'
+tracker-miner-fs-3
+setroubleshootd'
 #sssd_kcm
 #gvfsd-http
 #avahi-daemon

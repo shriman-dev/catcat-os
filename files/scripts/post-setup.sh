@@ -8,9 +8,7 @@ echo -e "\n$0\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # remove stuffs
-rm -rvf /etc/skel/.config/autostart
-rm -rvf /etc/skel/.mozilla
-rm -rvf /etc/skel/.config/user-tmpfiles.d
+rm -rvf /etc/skel/.config/autostart /etc/skel/.mozilla /etc/skel/.config/user-tmpfiles.d
 
 # os naming
 sed -i 's/^ID=.*/ID=catcat/' /usr/lib/*release

@@ -10,10 +10,12 @@ bakBefore() {
 }
 
 
-if [[ $(id -u) -eq 0 ]]; then
-  echo -e "catcat user setup is ran as root. exiting.\n"
-  exit 1
-fi
+exitIfRoot() {
+  if [[ $(id -u) -eq 0 ]]; then
+    echo -e "catcat user setup is ran as root. exiting.\n"
+    exit 1
+  fi
+}
 
 
 # default configs for user home
@@ -23,9 +25,6 @@ defaultConfigs() {
     rsync -aK --ignore-existing --exclude='*.gitkeep*' /etc/skel/ ~/
     rsync -au /etc/skel/.local/share/gnome-shell/extensions ~/.local/share/gnome-shell/
 
-    mkdir -p ~/.local/share/gnome-shell/extension-updates
-    chmod 544 ~/.local/share/gnome-shell/extension-updates
-
     rm -rf ~/.local/share/themes/{*Catppuccin*,*Lavanda*}
     cp -drf /usr/share/themes/{*Catppuccin*,*Lavanda*} ~/.local/share/themes/
 
@@ -34,7 +33,6 @@ defaultConfigs() {
   fi
 
 }
-defaultConfigs &
 
 
 gnomeShellSetup() {
@@ -82,6 +80,7 @@ gnomeShellSetup() {
   fi
 
   # Disable extension update
+  mkdir -p ~/.local/share/gnome-shell/extension-updates
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -eq 0 ]] && chmod 544 ~/.local/share/gnome-shell/extension-updates
   # Enable extension updates when there are updates in directory
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -gt 0 ]] && chmod 755 ~/.local/share/gnome-shell/extension-updates
@@ -91,13 +90,12 @@ gnomeShellSetup() {
   ! systemctl --user is-enabled syncthing.service && gnome-extensions disable syncthing@gnome.2nv2u.com
 
 }
-gnomeShellSetup &
 
 
 userDirsAndFolderIconsSetup() {
   if ! grep -q "$USER/Me/" ~/.config/user-dirs.dirs; then
     bakBefore ~/.config/user-dirs.dirs
-    cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
+    cp -drf /etc/skel/.config/user-dirs.dirs ~/.config/
   fi
 
   mkdir -p /tmp/$USER-tmp
@@ -129,7 +127,6 @@ file:///tmp/$USER-tmp tmp-folder' > ~/.config/gtk-3.0/bookmarks"
 
 
 }
-userDirsAndFolderIconsSetup &
 
 
 removeUnnecessaryDirectories() {
@@ -149,28 +146,32 @@ removeUnnecessaryDirectories() {
   [[ -f ~/Me/Desktop/.gitkeep ]] && find ~/Me/ -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
   [[ -d ~/Sync ]] && [[ $(ls -A1 ~/Sync | wc -l) -lt 2 ]] && rm -rf ~/Sync
 }
-removeUnnecessaryDirectories &
+
 
 
 shellSetup() {
   [[ $(wc -l < ~/.config/fish/config.fish) -lt 4 ]] && cp -dr /etc/skel/.config/fish ~/.config/
 
-  ! grep -q ".shell.d" ~/.bashrc && echo '
+  if ! grep -q ".shell.d" ~/.bashrc; then
+    echo '
 if [[ -d ~/.shell.d ]]; then
-	for rc in ~/.shell.d/*; do
-		if [[ -f "$rc" ]]; then
-			. "$rc"
-		fi
-	done
+  for rc in ~/.shell.d/*; do
+    if [[ -f "$rc" ]]; then
+      . "$rc"
+    fi
+  done
 fi
 
 unset rc
 ' >> ~/.bash_profile
+  fi
 
-  ! grep -q "\[ -f ~/.bashrc \]" ~/.bash_profile && echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
+  if ! grep -q "\[ -f ~/.bashrc \]" ~/.bash_profile; then
+    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> ~/.bash_profile
+  fi
 
 }
-shellSetup &
+
 
 
 themeFlatpakApps() {
@@ -200,7 +201,7 @@ QT_STYLE_OVERRIDE=kvantum' > ~/.local/share/flatpak/overrides/global
   fi
 
 }
-themeFlatpakApps &
+
 
 
 desktopFiles() {
@@ -222,7 +223,7 @@ desktopFiles() {
   done
 
 }
-desktopFiles &
+
 
 
 appsSetup() {
@@ -249,7 +250,24 @@ appsSetup() {
   fi
 
 }
-appsSetup &
+
+
+
+main() {
+  exitIfRoot
+
+  defaultConfigs &
+  gnomeShellSetup &
+  userDirsAndFolderIconsSetup &
+  removeUnnecessaryDirectories &
+  shellSetup &
+  themeFlatpakApps &
+  desktopFiles &
+  appsSetup &
+
+#  wait
+}
+main
 
 
 #gtk-update-icon-cache
