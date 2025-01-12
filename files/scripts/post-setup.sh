@@ -109,8 +109,9 @@ tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
 /tmp/Lavanda-gtk-theme/install.sh --color light dark &
 
 
-git clone https://github.com/shriman-dev/Colloid-gtk-theme.git /tmp/colloid-gtk-theme
-/tmp/colloid-gtk-theme/install.sh -t all -c dark --tweaks catppuccin rimless
+git clone https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git /tmp/Catppuccin-Gtk-Theme
+chmod +x /tmp/Catppuccin-Gtk-Theme/install.sh
+/tmp/Catppuccin-Gtk-Theme/install.sh --name 'Catppuccin' --theme all --color dark --tweaks catppuccin rimless
 
 # gdm theme
 gdmResource=/usr/share/gnome-shell/gnome-shell-theme.gresource
@@ -134,7 +135,7 @@ done
 CreateDirs
 ExtractRes
 
-cp -drvf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/gnome-shell/* $workDir/theme/
+cp -drvf /usr/share/themes/Catppuccin-Orange-Dark/gnome-shell/* $workDir/theme/
 
 echo ".login-dialog { background: transparent; }
 #lockDialogGroup {
@@ -165,8 +166,8 @@ cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
 # set defaul icon and theme
 sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 
-cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/ &
-cp -drf /usr/share/themes/Colloid-Orange-Dark-Catppuccin/gtk-4.0 /etc/skel/.config/
+cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/ &
+cp -drf /usr/share/themes/Catppuccin-Orange-Dark/gtk-4.0 /etc/skel/.config/
 
 /usr/bin/dconf update
 }

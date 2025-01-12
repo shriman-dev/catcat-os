@@ -23,14 +23,8 @@
 
 #dashtopanelTaskbar .dash-item-container > StWidget,
 .dashtopanelMainPanel .dash-item-container .show-apps {
-    color: #cdd6f4;
 	margin: 0;
 	padding: 0;
-}
-
-.dashtopanelMainPanel .show-apps {
-    width: 20px;
-    height: 20px;
 }
 
 #dashtopanelScrollview .overview-tile,
@@ -51,7 +45,7 @@
 }
 
 .dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {
-	color: #cdd6f4;
+	color: #FFF;
 }
 
 #dashtopanelTaskbar .dash-item-container .overview-tile:hover,

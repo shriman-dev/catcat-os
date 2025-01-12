@@ -869,8 +869,8 @@ active-workspace-border-width=0
 active-workspace-font-weight='700'
 active-workspace-padding-h=4
 active-workspace-padding-v=2
-active-workspace-text-color='rgb(205,214,244)'
-application-styles='.space-bar {\n  -natural-hpadding: 12px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 0px;\n  background-color: rgba(205,214,244,0);\n  color: rgb(205,214,244);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.69);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.4);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}'
+active-workspace-text-color='rgba(205,214,244,0.84)'
+application-styles='.space-bar {\n  -natural-hpadding: 12px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 0px;\n  background-color: rgba(205,214,244,0);\n  color: rgba(205,214,244,0.84);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.626667);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 0px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(205,214,244,0.4);\n  border-color: rgba(0,0,0,0);\n  font-weight: 700;\n  border-radius: 255px;\n  border-width: 0px;\n  padding: 2px 4px;\n}'
 custom-styles-enabled=false
 custom-styles-failed=false
 empty-workspace-border-radius=255
@@ -884,7 +884,7 @@ inactive-workspace-border-width=0
 inactive-workspace-font-weight='700'
 inactive-workspace-padding-h=4
 inactive-workspace-padding-v=2
-inactive-workspace-text-color='rgba(205,214,244,0.69)'
+inactive-workspace-text-color='rgba(205,214,244,0.626667)'
 workspace-margin=0
 workspaces-bar-padding=12
 
@@ -940,7 +940,7 @@ position-in-panel='leftedge'
 refresh-rate='fast'
 show-animations=true
 show-cpu=true
-show-disk=true
+show-disk=false
 show-fs=false
 show-icons=false
 show-net=false
@@ -970,7 +970,7 @@ window-buttons-placement='last'
 window-buttons-theme='catppuccin'
 
 [org/gnome/shell/extensions/user-theme]
-name='Colloid-Orange-Dark-Catppuccin'
+name='Catppuccin-Orange-Dark'
 
 [org/gnome/shell/extensions/venfavapps]
 hide-activities-button=false

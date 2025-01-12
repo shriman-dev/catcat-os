@@ -4,6 +4,11 @@ shopt -s nocasematch
 
 FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ~/.local/share/flatpak/app/)"
 
+bakBefore() {
+  [[ ! -d $1.bak.og ]] && cp -drf $1 $1.bak.og
+  cp -drf $1 $1.bak
+}
+
 
 if [[ $(id -u) -eq 0 ]]; then
   echo -e "catcat user setup is ran as root. exiting.\n"
@@ -35,8 +40,7 @@ defaultConfigs &
 gnomeShellSetup() {
   DCONF_FOLDERS="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
   if [[ ! "${DCONF_FOLDERS}" =~ 'FileViewers' ]]; then
-    [[ ! -d ~/.config/dconf.bak.og ]] && cp -drf ~/.config/dconf ~/.config/dconf.bak.og
-    cp -drf ~/.config/dconf ~/.config/dconf.bak
+    bakBefore ~/.config/dconf
 
     for i in $(ls -A1d /etc/dconf/db/distro.d/*);
     do
@@ -44,9 +48,24 @@ gnomeShellSetup() {
     done
   fi
 
-  [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]] && cp -dr /etc/skel/.config/burn-my-windows ~/.config/ && dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+  sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' ~/.local/share/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css
 
-  [[ $(grep -c 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css) -lt 6 ]] && cp -dr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
+  if [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]]; then
+    bakBefore ~/.config/burn-my-windows
+    cp -dr /etc/skel/.config/burn-my-windows ~/.config/
+    dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$HOME/.config/burn-my-windows/profiles/1679372508290696.conf'"
+  fi
+
+  if [[ $(grep -c 'border-width: 1px' ~/.config/forge/stylesheet/forge/stylesheet.css) -lt 6 ]]; then
+    bakBefore ~/.config/forge
+    cp -dr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
+  fi
+
+  # make extension vitals to use resources app as default monitor app
+  if ! grep -q '/usr/bin/flatpak run net.nokyan.Resources' ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml; then
+  sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>/usr/bin/flatpak run net.nokyan.Resources</default>|' ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml
+  glib-compile-schemas ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas
+  fi
 
   # Disable extension update
   [[ $(ls -A1 ~/.local/share/gnome-shell/extension-updates | wc -l) -eq 0 ]] && chmod 544 ~/.local/share/gnome-shell/extension-updates
@@ -63,11 +82,13 @@ gnomeShellSetup &
 
 userDirsAndFolderIconsSetup() {
   if ! grep -q "$USER/Me/" ~/.config/user-dirs.dirs; then
+    bakBefore ~/.config/user-dirs.dirs
     cp -dr /etc/skel/.config/user-dirs.dirs ~/.config/
   fi
 
-  mkdir -p /tmp/$USER/tmp-folder
-  if ! grep -q "$USER/tmp-folder" ~/.config/gtk-3.0/bookmarks; then
+  mkdir -p /tmp/$USER-tmp
+  if ! grep -q "admin:/// AdminRoot" ~/.config/gtk-3.0/bookmarks; then
+    bakBefore ~/.config/gtk-3.0/bookmarks
     mkdir -p ~/.config/gtk-3.0
     sh -c "echo 'file://$HOME/Me Me
 file://$HOME/Me/Documents Documents
@@ -77,7 +98,7 @@ file://$HOME/Me/Videos Videos
 file://$HOME/Me/Music Music
 file://$HOME/Me/Notes Notes
 admin:/// AdminRoot
-file:///tmp/$USER/tmp-folder tmp-folder' > ~/.config/gtk-3.0/bookmarks"
+file:///tmp/$USER-tmp tmp-folder' > ~/.config/gtk-3.0/bookmarks"
   fi
 
   if ! gio info -a metadata ~/Me | grep 'metadata::custom-icon-name: user-home'; then
@@ -140,6 +161,7 @@ shellSetup &
 
 themeFlatpakApps() {
   if ! grep -q 'devices=!all' ~/.local/share/flatpak/overrides/global; then
+    bakBefore ~/.local/share/flatpak/overrides/global
     mkdir -p ~/.local/share/flatpak/overrides
     echo '[Context]
 devices=!all;

@@ -11,8 +11,8 @@ for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
 done
 
 # two weeks = 1209600
-# update system if system has not been updated for two weeks
 
+# update if system is two weeks old
 if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )) ]]; then
 
     /usr/bin/flatpak update --assumeyes --noninteractive
