@@ -61,10 +61,15 @@ gnomeShellSetup() {
     cp -dr /etc/skel/.config/forge/stylesheet/forge/stylesheet.css ~/.config/forge/stylesheet/forge/
   fi
 
-  # make extension vitals to use resources app as default monitor app
-  if ! grep -q '/usr/bin/flatpak run net.nokyan.Resources' ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml; then
-  sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>/usr/bin/flatpak run net.nokyan.Resources</default>|' ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml
-  glib-compile-schemas ~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas
+  # make vitals and tophat extension to use resources app as default monitor app
+  if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
+    vitalsGschemaFile='~/.local/share/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml'
+    ! grep -q '/usr/bin/flatpak run net.nokyan.Resources' $vitalsGschemaFile && sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' $vitalsGschemaFile
+    glib-compile-schemas $(dirname $vitalsGschemaFile)
+    
+    topHatMonitorJs='~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js'
+    sed -i 's|org.gnome.SystemMonitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
+    sed -i 's|gnome-system-monitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
   fi
 
   # Disable extension update

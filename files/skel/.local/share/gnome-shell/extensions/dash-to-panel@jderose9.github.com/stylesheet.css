@@ -45,7 +45,7 @@
 }
 
 .dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {
-	color: #FFF;
+	color: none;
 }
 
 #dashtopanelTaskbar .dash-item-container .overview-tile:hover,
