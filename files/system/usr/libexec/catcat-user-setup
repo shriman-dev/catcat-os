@@ -76,6 +76,7 @@ gnomeShellSetup() {
       sed -i 's|org.gnome.SystemMonitor.desktop|net.nokyan.Resources.desktop|;s|gnome-system-monitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
       gnome-extensions disable tophat@fflewddur.github.io
       gnome-extensions enable tophat@fflewddur.github.io
+    fi
   fi
 
   # Disable extension update
