@@ -158,7 +158,7 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 cat ${workDir}/theme/${gdmxml}
 
 glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml" && mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource &
-cp -drf $workDir/* /usr/share/gnome-shell/
+#cp -drf $workDir/* /usr/share/gnome-shell/
 
 
 cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
