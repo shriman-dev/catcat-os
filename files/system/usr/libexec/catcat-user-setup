@@ -49,6 +49,8 @@ gnomeShellSetup() {
   fi
 
   sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' ~/.local/share/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css
+  sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' ~/.local/share/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg
+
 
   if [[ ! -f ~/.config/burn-my-windows/profiles/1679372508290696.conf ]]; then
     bakBefore ~/.config/burn-my-windows
