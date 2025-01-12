@@ -42,7 +42,7 @@ login-shell=true
 opacity=1.0
 palette='Catppuccin-Mocha-mine'
 preserve-container='never'
-preserve-directory='never'
+preserve-directory='safe'
 scrollback-lines=2147483647
 use-custom-command=true
 

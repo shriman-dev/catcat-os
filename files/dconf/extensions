@@ -60,6 +60,9 @@ show-systemindicator=false
 [org/gnome/shell/extensions/activityAppLauncher]
 show-centered=true
 
+[org/gnome/shell/extensions/always-indicator]
+color='rgba(205,214,244,0.626667)'
+
 [org/gnome/shell/extensions/arcmenu]
 apps-show-extra-details=false
 arc-menu-icon=64
@@ -958,7 +961,7 @@ hide-activities-button='never'
 hide-app-menu-icon=true
 hide-window-titlebars='never'
 notifications-position='center'
-reduce-panel-spacing=true
+reduce-panel-spacing=false
 restrict-to-primary-screen=false
 show-appmenu-button=false
 show-desktop-name=false
