@@ -1,8 +1,6 @@
-
-
 #!/bin/bash
 
-auto-performance-powersave() {
+autoPerformancePowersave() {
 echo ${1}
 
 if command -v powerprofilesctl ; then
@@ -24,9 +22,9 @@ cat $power_policy | grep -o '\['$1'\]' || echo $1 | tee $power_policy
 
 while true; do
   if upower -d | grep -iE 'state.*discharging' ; then
-    auto-performance-powersave powersave
+    autoPerformancePowersave powersave
   else
-    auto-performance-powersave performance
+    autoPerformancePowersave performance
   fi
 
   sleep 30
