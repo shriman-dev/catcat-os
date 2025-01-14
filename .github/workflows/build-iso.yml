@@ -43,6 +43,7 @@ jobs:
           mkdir -p /tmp/flatpak_refs
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > /tmp/flatpak_refs/install
           cat /tmp/flatpak_refs/install
+          cp -dvf ${{ github.workspace }}/files/scripts/setup-files/fedora-kinoite.conf /tmp/
 
       - name: Determine Flatpak Dependencies
         id: flatpak_dependencies
@@ -96,7 +97,7 @@ jobs:
           flatpak_remote_url: "https://flathub.org/repo/flathub.flatpakrepo"
           flatpak_remote_refs_dir: /tmp/flatpak_refs
           extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1 pci=noats"
-          additional_templates: /github/workspace/files/scripts/installer_defaults.tpml
+          additional_templates: /github/workspace/files/scripts/setup-files/installer_defaults.tpml
 
       - name: Move ISO to Upload Directory
         id: upload-directory
