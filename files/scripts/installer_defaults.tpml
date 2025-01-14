@@ -1,2 +1,0 @@
-remove etc/anaconda/profile.d/fedora-kinoite.conf
-move /tmp/fedora-kinoite.conf etc/anaconda/profile.d/fedora-kinoite.conf
