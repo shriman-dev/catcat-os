@@ -1,1 +1,2 @@
 runcmd curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/files/scripts/setup-files/fedora-kinoite.conf > etc/anaconda/profile.d/fedora-kinoite.conf
+runcmd cat etc/anaconda/profile.d/fedora-kinoite.conf
