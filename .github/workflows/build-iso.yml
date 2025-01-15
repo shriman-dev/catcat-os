@@ -48,6 +48,7 @@ jobs:
           cat ${{ github.workspace }}/tmp/flatpak_refs/install
           pwd
           ls -A1
+          ls -A1 /github/workspace/
 
       - name: Determine Flatpak Dependencies
         id: flatpak_dependencies
