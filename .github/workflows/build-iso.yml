@@ -46,11 +46,10 @@ jobs:
           pwd
           ls -A1
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          FLATPAK_REFS_DIR=${{ github.workspace }}/flatpak_refs
-          mkdir ${FLATPAK_REFS_DIR}
+          FLATPAK_REFS_DIR=installer/flatpak_refs
+          mkdir -p ${FLATPAK_REFS_DIR}
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${FLATPAK_REFS_DIR}/install
           cat ${FLATPAK_REFS_DIR}/install
-          
           echo "flatpak-refs-dir=${FLATPAK_REFS_DIR}" >> $GITHUB_OUTPUT
 
       - name: Determine Flatpak Dependencies
