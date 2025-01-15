@@ -32,9 +32,6 @@ jobs:
         image_tag: [latest]
 
     steps:
-      name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@v1.3.1
-
       - name: Checkout Repo
         uses: actions/checkout@v4
 
@@ -92,9 +89,12 @@ jobs:
           secure_boot_key_url: "https://github.com/ublue-os/bazzite/raw/main/secure_boot.der"
           enrollment_password: "universalblue"
           iso_name: ${{ matrix.image_name }}_${{ env.TIMESTAMP }}.iso
+          image_signed: true
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
+          flatpak_remote_name: "flathub-system"
+          flatpak_remote_url: "https://flathub.org/repo/flathub.flatpakrepo"
           flatpak_remote_refs_dir: /tmp/flatpak_refs
           extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1 pci=noats"
           additional_templates: /github/workspace/files/scripts/setup-files/installer_defaults.tpml
