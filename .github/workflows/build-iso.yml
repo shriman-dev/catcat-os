@@ -31,7 +31,7 @@ jobs:
         major_version: [41]
         image_tag: [latest]
 
-#    steps:
+    steps:
 #      - name: Free Disk Space (Ubuntu)
 #        uses: jlumbroso/free-disk-space@v1.3.1
 
