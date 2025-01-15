@@ -46,6 +46,8 @@ jobs:
           mkdir -p /tmp/flatpak_refs
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > /tmp/flatpak_refs/install
           cat /tmp/flatpak_refs/install
+          pwd
+          ls -A1
           cp -dvf ${{ github.workspace }}/files/scripts/setup-files/fedora-kinoite.conf /tmp/
 
       - name: Determine Flatpak Dependencies
