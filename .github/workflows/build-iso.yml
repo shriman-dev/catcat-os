@@ -39,16 +39,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Pre build configuration
+        id: pre-build-config
         shell: bash
         run: |
           TIMESTAMP="$(date "+%b-%Y")"
-          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          mkdir -p ${{ github.workspace }}/tmp/flatpak_refs
-          cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${{ github.workspace }}/tmp/flatpak_refs/install
-          cat ${{ github.workspace }}/tmp/flatpak_refs/install
           pwd
           ls -A1
-          ls -A1 /github/workspace/
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+          FLATPAK_REFS_DIR=${{ github.workspace }}/flatpak_refs
+          mkdir ${FLATPAK_REFS_DIR}
+          cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${FLATPAK_REFS_DIR}/install
+          cat ${FLATPAK_REFS_DIR}/install
+          
+          echo "flatpak-refs-dir=${FLATPAK_REFS_DIR}" >> $GITHUB_OUTPUT
 
       - name: Determine Flatpak Dependencies
         id: flatpak_dependencies
@@ -59,7 +62,7 @@ jobs:
           # Make temp space
           TEMP_FLATPAK_INSTALL_DIR=$(mktemp -d -p ${{ github.workspace }} flatpak.XXX)
           # Get list of refs from directory
-          FLATPAK_REFS_DIR='${{ github.workspace }}/tmp/flatpak_refs'
+          FLATPAK_REFS_DIR=${{ steps.pre-build-config.outputs.flatpak-refs-dir }}
           FLATPAK_REFS_DIR_LIST=$(cat ${FLATPAK_REFS_DIR}/* | tr '\n' ' ' )
           # Generate install script
           cat << EOF > ${TEMP_FLATPAK_INSTALL_DIR}/script.sh
@@ -97,9 +100,9 @@ jobs:
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
-          flatpak_remote_refs_dir: ${{ github.workspace }}/tmp/flatpak_refs
+          flatpak_remote_refs_dir: ${{ steps.pre-build-config.outputs.flatpak-refs-dir }}
           extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1 pci=noats"
-          additional_templates: ${{ github.workspace }}/files/scripts/setup-files/installer_defaults.tmpl
+          additional_templates: files/scripts/setup-files/installer_defaults.tmpl
 
       - name: Move ISO to Upload Directory
         id: upload-directory
@@ -109,7 +112,7 @@ jobs:
           mkdir ${ISO_UPLOAD_DIR}
           mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
           mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
-          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT     
+          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
 
       - name: Upload ISO to archive.org
         uses: RoyalOughtness/internet-archive-upload@main
