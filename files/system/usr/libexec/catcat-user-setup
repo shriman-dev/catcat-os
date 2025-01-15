@@ -70,13 +70,13 @@ gnomeShellSetup() {
       gnome-extensions disable Vitals@CoreCoding.com
       gnome-extensions enable Vitals@CoreCoding.com
     fi
-    
-    topHatMonitorJs="$HOME/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js"
-    if ! grep -q 'net.nokyan.Resources.desktop' $topHatMonitorJs; then
-      sed -i 's|org.gnome.SystemMonitor.desktop|net.nokyan.Resources.desktop|;s|gnome-system-monitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
-      gnome-extensions disable tophat@fflewddur.github.io
-      gnome-extensions enable tophat@fflewddur.github.io
-    fi
+
+#    topHatMonitorJs="$HOME/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js"
+#    if ! grep -q 'net.nokyan.Resources.desktop' $topHatMonitorJs; then
+#      sed -i 's|org.gnome.SystemMonitor.desktop|net.nokyan.Resources.desktop|;s|gnome-system-monitor.desktop|net.nokyan.Resources.desktop|' $topHatMonitorJs
+#      gnome-extensions disable tophat@fflewddur.github.io
+#      gnome-extensions enable tophat@fflewddur.github.io
+#    fi
   fi
 
   # Disable extension update
