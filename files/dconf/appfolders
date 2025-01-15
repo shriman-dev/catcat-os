@@ -12,7 +12,7 @@ name='Creative'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Docs]
-apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'com.toolstack.Folio.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.johnfactotum.Foliate.desktop', 'com.github.flxzt.rnote.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop']
+apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.flxzt.rnote.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.johnfactotum.Foliate.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop']
 name='Docs'
 translate=false
 
@@ -53,7 +53,7 @@ translate=false
 
 
 [org/gnome/desktop/app-folders/folders/Tweaks]
-apps=['org.gnome.tweaks.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'com.github.donadigo.appeditor.desktop', 'ca.desrt.dconf-editor.desktop', 'org.gnome.Characters.desktop', 'kvantummanager.desktop', 'qt5ct.desktop', 'qt6ct.desktop', 'menulibre.desktop', 'awf-gtk2.desktop', 'awf-gtk3.desktop', 'awf-gtk4.desktop', 'yad-icon-browser.desktop']
+apps=['org.gnome.tweaks.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'ca.desrt.dconf-editor.desktop', 'org.gnome.Characters.desktop', 'menulibre.desktop', 'io.github.flattool.Ignition.desktop', 'kvantummanager.desktop', 'qt5ct.desktop', 'qt6ct.desktop', 'io.github.realmazharhussain.GdmSettings.desktop', 'containerized-org.gnome.Adwaita1.Demo.desktop', 'awf-gtk2.desktop', 'awf-gtk3.desktop', 'awf-gtk4.desktop', 'yad-icon-browser.desktop']
 name='Tweaks'
 translate=false
 

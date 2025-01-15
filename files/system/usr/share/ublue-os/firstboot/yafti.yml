@@ -57,7 +57,7 @@ screens:
           packages:
           - LibreOffice: org.libreoffice.LibreOffice
           - Onlyoffice: org.onlyoffice.desktopeditors
-          - Folio - note app: com.toolstack.Folio
+          - Iotas - note app: org.gnome.World.Iotas
           - Rnote - hand written notes: com.github.flxzt.rnote
           - Morphosis - convert documents: garden.jamie.Morphosis
 

@@ -4,6 +4,7 @@ FLATPAK_APPS_TO_UPDATE_SOLEY=(
   "io.gitlab.librewolf-community"
   "com.brave.Browser"
   "org.gnome.Epiphany"
+  "org.torproject.torbrowser-launcher"
 )
 
 for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
@@ -11,9 +12,10 @@ for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
 done
 
 # two weeks = 1209600
+# one week = 604800
 
-# update if system is two weeks old
-if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 1209600 )) ]]; then
+# update if system is one weeks old
+if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 604800 )) ]]; then
 
     /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak uninstall --unused
