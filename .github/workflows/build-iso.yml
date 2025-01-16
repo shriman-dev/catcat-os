@@ -111,12 +111,53 @@ jobs:
           mkdir ${ISO_UPLOAD_DIR}
           mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
           mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          tree ${ISO_UPLOAD_DIR}
           echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
 
-      - name: Upload ISO to archive.org
-        uses: RoyalOughtness/internet-archive-upload@main
+
+      - name: Upload ISOs and Checksum to Job Artifacts
+        id: upload
+        uses: actions/upload-artifact@v4
         with:
-          access-key: ${{ secrets.IA_ACCESS_KEY }}
-          secret-key: ${{ secrets.IA_SECRET_KEY }}
-          identifier: ${{ matrix.image_name }}_${{ env.TIMESTAMP }}
-          files: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          name: ${{ matrix.image_name }}-iso
+          path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          if-no-files-found: warn
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+      - name: Make URL Artifact
+        shell: bash
+        id: url
+        run: |
+          echo "|[${{ matrix.image_name }}](${{ env.ARTIFACT-URL }})|" \
+            > url-${upload}-${{ matrix.image_name }}.txt
+          echo "url=${upload}" >> $GITHUB_OUTPUT
+        env:
+          ARTIFACT-URL: ${{ steps.upload.outputs.artifact-url }}
+      - name: Upload ISO URL for Changelogs
+        id: upload-url
+        uses: actions/upload-artifact@v4
+        with:
+          name: url-${{ steps.url.outputs.url }}-${{ matrix.image_name }}
+          path: url-${{ steps.url.outputs.url }}-${{ matrix.image_name }}.txt
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+#  changelogs:
+#    name: ${{ inputs.image_flavor }} Changelogs
+#    uses: ./.github/workflows/changelogs.yml
+#    secrets: inherit
+#    needs: build-iso
+#    with:
+#      target: ${{ needs.build-iso.outputs.url }}
+
+
+#      - name: Upload ISO to archive.org
+#        uses: RoyalOughtness/internet-archive-upload@main
+#        with:
+#          access-key: ${{ secrets.IA_ACCESS_KEY }}
+#          secret-key: ${{ secrets.IA_SECRET_KEY }}
+#          identifier: ${{ matrix.image_name }}_${{ env.TIMESTAMP }}
+#          files: ${{ steps.upload-directory.outputs.iso-upload-dir }}
