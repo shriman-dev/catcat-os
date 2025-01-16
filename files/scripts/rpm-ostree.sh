@@ -49,7 +49,7 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth lm_sensors'
 
-virtualization='virt-manager libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
+virtualization='gnome-boxes virt-manager libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance'
 
