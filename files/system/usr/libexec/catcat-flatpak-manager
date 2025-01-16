@@ -38,13 +38,13 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_upda
   flatpak remote-modify --system --prio=9 flathub
 
   # Install flatpaks in list
-#  INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
-#  if check_internet_connection; then
-#    echo "Installing system flatpaks from config list (requires internet)"
+  INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
+  if check_internet_connection; then
+    echo "Installing system flatpaks from config list (requires internet)"
 #    flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
-#    runtimes
-#    cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
-#  fi
+    runtimes
+    cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
+  fi
 
   # Remove flatpaks in list
   REMOVE_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/remove ))
