@@ -1,5 +1,7 @@
 [org/gnome/desktop/wm/preferences]
+action-double-click-titlebar='toggle-maximize'
 action-middle-click-titlebar='toggle-maximize'
+action-right-click-titlebar='menu'
 auto-raise=true
 button-layout='appmenu:minimize,close'
 focus-mode='sloppy'

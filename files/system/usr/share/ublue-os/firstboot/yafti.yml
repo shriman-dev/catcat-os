@@ -28,6 +28,7 @@ screens:
           packages:
           - Fotema - photos gallery: app.fotema.Fotema
           - VLC - video player: org.videolan.VLC
+          - Showtime - video player: org.gnome.Showtime
           - Clapper - video player: com.github.rafostar.Clapper
           - Gapless - music player: com.github.neithern.g4music
           - EarTag - edit metadata of songs: app.drey.EarTag
