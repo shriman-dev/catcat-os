@@ -150,6 +150,8 @@ jobs:
     name: Create Release
     uses: ./.github/workflows/create-release.yml
     needs: build-iso
+    permissions:
+      contents: write
 
 
 #      - name: Upload ISO to archive.org
