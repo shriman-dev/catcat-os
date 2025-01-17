@@ -79,8 +79,8 @@ jobs:
             ./catcat-os-nv
           build-args: |
             MAJOR_VERSION=${{ steps.get-major-ver.outputs.major_ver }}
-#           Postfix image name with -custom to make it a little more descriptive
-#           Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
+          extra-args: |
+            --squash
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
