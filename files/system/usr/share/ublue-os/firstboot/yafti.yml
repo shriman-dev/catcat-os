@@ -52,13 +52,15 @@ screens:
           - Shotcut - video editor: org.shotcut.Shotcut
           - HandBrake - convert videos: fr.handbrake.ghb
 
-        Office and Docs:
+        Office and Development:
           description: Office suits and other related apps
           default: false
           packages:
           - LibreOffice: org.libreoffice.LibreOffice
           - Onlyoffice: org.onlyoffice.desktopeditors
+          - Zed code editor: dev.zed.Zed
           - Iotas - note app: org.gnome.World.Iotas
+          - Foliate - ebook reader: com.github.johnfactotum.Foliate
           - Rnote - hand written notes: com.github.flxzt.rnote
           - Morphosis - convert documents: garden.jamie.Morphosis
 

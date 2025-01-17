@@ -85,7 +85,7 @@ jobs:
 
       - name: Build ISO
         uses: jasonn3/build-container-installer@v1.2.4
-        id: build
+        id: build-iso
         with:
           arch: x86_64
           image_name: ${{ matrix.image_name }}
@@ -109,11 +109,10 @@ jobs:
         run: |
           ISO_UPLOAD_DIR=${{ github.workspace }}/upload
           mkdir ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }} ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
           tree ${ISO_UPLOAD_DIR}
           echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
-
 
       - name: Upload ISOs and Checksum to Job Artifacts
         id: upload
@@ -131,27 +130,25 @@ jobs:
         id: url
         run: |
           echo "|[${{ matrix.image_name }}](${{ env.ARTIFACT-URL }})|" \
-            > url-${upload}-${{ matrix.image_name }}.txt
-          echo "url=${upload}" >> $GITHUB_OUTPUT
+            > url-${{ matrix.image_name }}.txt
         env:
           ARTIFACT-URL: ${{ steps.upload.outputs.artifact-url }}
-      - name: Upload ISO URL for Changelogs
+
+      - name: Upload ISO URL for Release
         id: upload-url
         uses: actions/upload-artifact@v4
         with:
-          name: url-${{ steps.url.outputs.url }}-${{ matrix.image_name }}
-          path: url-${{ steps.url.outputs.url }}-${{ matrix.image_name }}.txt
+          name: url-${{ matrix.image_name }}
+          path: url-${{ matrix.image_name }}.txt
           if-no-files-found: error
           retention-days: 0
           compression-level: 0
           overwrite: true
-#  changelogs:
-#    name: ${{ inputs.image_flavor }} Changelogs
-#    uses: ./.github/workflows/changelogs.yml
+#  create-release:
+#    name: Create Release ${{ matrix.image_name }}
 #    secrets: inherit
+#    uses: ./.github/workflows/create-release.yml
 #    needs: build-iso
-#    with:
-#      target: ${{ needs.build-iso.outputs.url }}
 
 
 #      - name: Upload ISO to archive.org

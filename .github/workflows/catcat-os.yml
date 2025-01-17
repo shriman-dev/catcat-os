@@ -51,6 +51,8 @@ jobs:
 
           # Have tags for tracking builds during pull request
           SHA_SHORT="${GITHUB_SHA::7}"
+          MAJOR_VER_TAG="$(skopeo inspect docker://ghcr.io/ublue-os/bazzite | jq -r '.Labels["org.opencontainers.image.version"]' | cut -d '.' -f 1
+)"
           COMMIT_TAGS+=("pr-${{ github.event.number }}")
           COMMIT_TAGS+=("${SHA_SHORT}")
 
@@ -60,6 +62,7 @@ jobs:
           done
 
           BUILD_TAGS+=("${TIMESTAMP}")
+          BUILD_TAGS+=("${MAJOR_VER_TAG}")
           BUILD_TAGS+=("latest")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then

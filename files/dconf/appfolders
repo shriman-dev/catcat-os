@@ -2,7 +2,7 @@
 folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
-apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Music.desktop', 'org.gnome.Showtime.desktop', 'org.gnome.Papers.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
+apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Music.desktop', 'org.gnome.Showtime.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
 name='File Viewers'
 translate=false
 
@@ -12,7 +12,7 @@ name='Creative'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Docs]
-apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.flxzt.rnote.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.johnfactotum.Foliate.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop']
+apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.johnfactotum.Foliate.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.flxzt.rnote.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop']
 name='Docs'
 translate=false
 
