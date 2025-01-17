@@ -1,4 +1,4 @@
-name: Build ISO
+name: Build CatCat OS ISO
 
 on:
   schedule:
@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   build-iso:
+    name: Build and Make Release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,11 +32,11 @@ jobs:
         image_tag: [latest]
 
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@v1.3.1
-
       - name: Checkout Repo
         uses: actions/checkout@v4
+
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@v7
 
       - name: Pre build configuration
         id: pre-build-config
@@ -46,7 +47,7 @@ jobs:
           TIMESTAMP="$(date "+%Y%m%d")"
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          echo "major_version=${MAJOR_VERSION}" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           FLATPAK_REFS_DIR=installer/flatpak_refs
           mkdir -p ${FLATPAK_REFS_DIR}
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${FLATPAK_REFS_DIR}/install
@@ -92,7 +93,7 @@ jobs:
           image_name: ${{ matrix.image_name }}
           image_repo: ${{ env.IMAGE_REGISTRY }}
           variant: 'Kinoite'
-          version: ${{ env.major_version }}
+          version: ${{ env.MAJOR_VERSION }}
           image_tag: ${{ matrix.image_tag }}
           secure_boot_key_url: "https://github.com/ublue-os/bazzite/raw/main/secure_boot.der"
           enrollment_password: "universalblue"
