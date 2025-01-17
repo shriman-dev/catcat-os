@@ -187,6 +187,7 @@ audio/vnd.dts=com.github.rafostar.Clapper.desktop
 audio/vnd.dts.hd=com.github.rafostar.Clapper.desktop
 audio/vnd.rn-realaudio=com.github.rafostar.Clapper.desktop
 audio/x-gsm=com.github.rafostar.Clapper.desktop
+application/x-zerosize=org.gnome.gedit.desktop
 
 [Added Associations]
 application/x-shellscript=org.gnome.gedit.desktop;
@@ -346,3 +347,4 @@ audio/vnd.dts=com.github.rafostar.Clapper.desktop;
 audio/vnd.dts.hd=com.github.rafostar.Clapper.desktop;
 audio/vnd.rn-realaudio=com.github.rafostar.Clapper.desktop;
 audio/x-gsm=com.github.rafostar.Clapper.desktop;
+application/x-zerosize=org.gnome.gedit.desktop;

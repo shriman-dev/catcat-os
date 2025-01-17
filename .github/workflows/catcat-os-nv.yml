@@ -14,7 +14,8 @@ on:
   workflow_dispatch:
 
 env:
-  MY_IMAGE_NAME: "${{ github.event.repository.name }}-nv"  # the name of the image produced by this build, matches repo names
+  MY_IMAGE_VARIANT: "-nv"
+  MY_IMAGE_NAME: "${{ github.event.repository.name }}${{ env.MY_IMAGE_VARIANT }}"  # the name of the image produced by this build, matches repo names
   MY_IMAGE_DESC: "Meow"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
@@ -44,6 +45,8 @@ jobs:
         id: generate-tags
         shell: bash
         run: |
+          pwd
+          ls -A1
           # Generate a timestamp for creating an image version history
           TIMESTAMP="$(date +%Y%m%d)"
           COMMIT_TAGS=()
@@ -51,7 +54,7 @@ jobs:
 
           # Have tags for tracking builds during pull request
           SHA_SHORT="${GITHUB_SHA::7}"
-          MAJOR_VER_TAG="$(skopeo inspect docker://ghcr.io/ublue-os/bazzite | jq -r '.Labels["org.opencontainers.image.version"]' | cut -d '.' -f 1)"
+          MAJOR_VER_TAG="$(cat ${{ github.workspace }}/files/major_version)"
           COMMIT_TAGS+=("pr-${{ github.event.number }}")
           COMMIT_TAGS+=("${SHA_SHORT}")
 
@@ -62,6 +65,7 @@ jobs:
 
           BUILD_TAGS+=("${TIMESTAMP}")
           BUILD_TAGS+=("${MAJOR_VER_TAG}")
+          BUILD_TAGS+=("${TIMESTAMP}.${MAJOR_VER_TAG}")
           BUILD_TAGS+=("latest")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -101,7 +105,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./catcat-os-nv
+            ./catcat-os${{ env.MY_IMAGE_VARIANT }}
           # Postfix image name with -custom to make it a little more descriptive
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.MY_IMAGE_NAME }}

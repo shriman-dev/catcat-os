@@ -42,10 +42,12 @@ jobs:
         id: pre-build-config
         shell: bash
         run: |
-          TIMESTAMP="$(date "+%b-%Y")"
           pwd
           ls -A1
+          TIMESTAMP="$(date "+%Y%m%d")"
+          MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           FLATPAK_REFS_DIR=installer/flatpak_refs
           mkdir -p ${FLATPAK_REFS_DIR}
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${FLATPAK_REFS_DIR}/install
@@ -95,7 +97,7 @@ jobs:
           image_tag: ${{ matrix.image_tag }}
           secure_boot_key_url: "https://github.com/ublue-os/bazzite/raw/main/secure_boot.der"
           enrollment_password: "universalblue"
-          iso_name: ${{ matrix.image_name }}_${{ env.TIMESTAMP }}.iso
+          iso_name: ${{ matrix.image_name }}-${{ env.MAJOR_VERSION }}-${{ env.TIMESTAMP }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
