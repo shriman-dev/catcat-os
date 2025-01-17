@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build_push:
-    name: Build and Push Images
+    name: Build and Push Image
     runs-on: ubuntu-latest
     permissions:
       contents: read

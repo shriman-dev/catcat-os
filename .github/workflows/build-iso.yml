@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build-iso:
-    name: Build and Make Release
+    name: Build ISO and Make Release
     runs-on: ubuntu-latest
     permissions:
       contents: read
