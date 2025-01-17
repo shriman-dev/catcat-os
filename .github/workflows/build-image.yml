@@ -84,6 +84,7 @@ jobs:
             ./${{ matrix.image_name }}
           build-args: |
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+            IMAGE_NAME=${{ matrix.image_name }}
           image: ${{ matrix.image_name }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}

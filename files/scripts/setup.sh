@@ -1,5 +1,8 @@
 #!/bin/bash
 set -oue pipefail
+echo =================================================================
+echo ${IMAGE_NAME}
+echo =================================================================
 
 echo -e "\n$0\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
