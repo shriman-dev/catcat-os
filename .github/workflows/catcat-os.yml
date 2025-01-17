@@ -57,8 +57,9 @@ jobs:
           tags: |
             type=raw,value=latest
             type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}
-            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}-{{date 'YYYYMMDD'}}
-            type=raw,value={{date 'YYYYMMDD'}}
+            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD'}}
+            type=raw,value==${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
+            type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
           labels: |
@@ -66,7 +67,7 @@ jobs:
             org.opencontainers.image.description=${{ env.IMAGE_DESC }}
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ steps.get-major-ver.outputs.major_ver }}
+            org.opencontainers.image.version=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD'}}
             containers.bootc=1
           sep-tags: " "
           sep-annotations: " "
@@ -114,7 +115,7 @@ jobs:
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
           extra-args: |
-            --compression-format=zstd --compression-level=20
+            --compression-format=zstd --compression-level=15
 
       # This section is optional and only needs to be enabled if you plan on distributing
       # your project for others to consume. You will need to create a public and private key

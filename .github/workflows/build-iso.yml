@@ -28,7 +28,6 @@ jobs:
       fail-fast: false
       matrix:
         image_name: ["catcat-os", "catcat-os-nv"]
-        major_version: [41]
         image_tag: [latest]
 
     steps:
@@ -47,7 +46,7 @@ jobs:
           TIMESTAMP="$(date "+%Y%m%d")"
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
+          echo "major_version=${MAJOR_VERSION}" >> $GITHUB_ENV
           FLATPAK_REFS_DIR=installer/flatpak_refs
           mkdir -p ${FLATPAK_REFS_DIR}
           cat ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install | sed '/^$/d; /^#/d' > ${FLATPAK_REFS_DIR}/install
@@ -93,7 +92,7 @@ jobs:
           image_name: ${{ matrix.image_name }}
           image_repo: ${{ env.IMAGE_REGISTRY }}
           variant: 'Kinoite'
-          version: ${{ matrix.major_version }}
+          version: ${{ env.major_version }}
           image_tag: ${{ matrix.image_tag }}
           secure_boot_key_url: "https://github.com/ublue-os/bazzite/raw/main/secure_boot.der"
           enrollment_password: "universalblue"
@@ -146,11 +145,11 @@ jobs:
           retention-days: 0
           compression-level: 0
           overwrite: true
-#  create-release:
-#    name: Create Release ${{ matrix.image_name }}
-#    secrets: inherit
-#    uses: ./.github/workflows/create-release.yml
-#    needs: build-iso
+
+  create-release:
+    name: Create Release
+    uses: ./.github/workflows/create-release.yml
+    needs: build-iso
 
 
 #      - name: Upload ISO to archive.org
