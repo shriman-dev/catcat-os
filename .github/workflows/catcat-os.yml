@@ -79,8 +79,8 @@ jobs:
             ./catcat-os-nv
           build-args: |
             MAJOR_VERSION=${{ steps.get-major-ver.outputs.major_ver }}
-          extra-args: |
-            --squash
+#          extra-args: |
+#            --squash
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
