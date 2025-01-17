@@ -1,6 +1,7 @@
 ## MAJOR_VERSION arg must be a version built for the specific image: eg, 39, 40, gts, latest
 RUN export MAJOR_VERSION="$(cat /files/major_version)"
-ARG MAJOR_VERSION
+RUN echo $MAJOR_VERSION
+ARG MAJOR_VERSION="$MAJOR_VERSION"
 
 ## this is a standard Containerfile FROM using the build ARGs above to select the right upstream image
 FROM ghcr.io/ublue-os/bazzite-gnome:${MAJOR_VERSION}

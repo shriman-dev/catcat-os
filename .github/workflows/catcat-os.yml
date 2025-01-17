@@ -64,7 +64,7 @@ jobs:
 
           BUILD_TAGS+=("${TIMESTAMP}")
           BUILD_TAGS+=("${MAJOR_VER_TAG}")
-          BUILD_TAGS+=("${TIMESTAMP}.${MAJOR_VER_TAG}")
+          BUILD_TAGS+=("${TIMESTAMP}-${MAJOR_VER_TAG}")
           BUILD_TAGS+=("latest")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
