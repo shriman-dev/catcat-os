@@ -14,8 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  MY_IMAGE_VARIANT: "-nv"
-  MY_IMAGE_NAME: "${{ github.event.repository.name }}${{ env.MY_IMAGE_VARIANT }}"  # the name of the image produced by this build, matches repo names
+  MY_IMAGE_NAME: "${{ github.event.repository.name }}-nv"  # the name of the image produced by this build, matches repo names
   MY_IMAGE_DESC: "Meow"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
@@ -105,7 +104,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./catcat-os${{ env.MY_IMAGE_VARIANT }}
+            ./catcat-os-nv
           # Postfix image name with -custom to make it a little more descriptive
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.MY_IMAGE_NAME }}
