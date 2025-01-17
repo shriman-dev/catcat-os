@@ -1,5 +1,5 @@
 ---
-name: Release CatCat OS ISO
+name: release iso
 on:  # yamllint disable-line rule:truthy
   workflow_call:
   workflow_dispatch:

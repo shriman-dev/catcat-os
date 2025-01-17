@@ -1,5 +1,5 @@
 ---
-name: Build CatCat OS Images
+name: build images
 on:
   pull_request:
     branches:
@@ -48,7 +48,7 @@ jobs:
           pwd
           ls -A1
           TIMESTAMP="$(date "+%Y%m%d")"
-          MAJOR_VER_TAG="$(cat ${{ github.workspace }}/files/major_version)"
+          MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           cat ${{ github.workspace }}/files/major_version

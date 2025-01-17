@@ -1,4 +1,4 @@
-name: Build CatCat OS ISO
+name: build iso
 
 on:
   schedule:
