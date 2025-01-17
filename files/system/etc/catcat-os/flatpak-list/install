@@ -19,7 +19,6 @@ app/org.gnome.gitlab.YaLTeR.Identity/x86_64/stable
 app/org.upscayl.Upscayl/x86_64/stable
 app/org.pitivi.Pitivi/x86_64/stable
 
-
 # docs
 app/org.onlyoffice.desktopeditors/x86_64/stable
 app/org.gnome.gedit/x86_64/stable
@@ -80,7 +79,6 @@ app/dev.zed.Zed/x86_64/stable
 app/com.usebottles.bottles/x86_64/stable
 app/com.vysp3r.ProtonPlus/x86_64/stable
 app/page.kramo.Cartridges/x86_64/stable
-
 
 # tools
 app/org.gnome.World.Secrets/x86_64/stable
