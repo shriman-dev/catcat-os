@@ -37,12 +37,7 @@ if [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything"
   cp "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 fi
 
-if command -v nvidia-smi &>/dev/null; then
-  IMAGE_NAME="catcat-os-nv"
-else
-  IMAGE_NAME="catcat-os"
-fi
-
+# ${IMAGE_NAME} is exported by build-image.yml file
 jq --arg image_name "${IMAGE_NAME}" \
    '.transports.docker |= 
     { ("ghcr.io/shriman-dev/" + $image_name): [
