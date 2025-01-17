@@ -40,13 +40,16 @@ jobs:
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v7
 
-      - name: Get Major Version
-        id: get-major-ver
+      - name: Pre Build Configuration
+        id: pre-build-config
         shell: bash
         run: |
           pwd
           ls -A1
+          cat ${{ github.workspace }}/files/major_version
+          TIMESTAMP="$(date "+%Y%m%d")"
           MAJOR_VER_TAG="$(cat ${{ github.workspace }}/files/major_version)"
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
           echo "major_ver=${MAJOR_VER_TAG}" >> $GITHUB_OUTPUT
 
       # Build metadata
@@ -56,9 +59,9 @@ jobs:
         with:
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}
-            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD'}}
-            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
+            type=raw,value=${{ steps.pre-build-config.outputs.major_ver }}
+            type=raw,value=${{ steps.pre-build-config.outputs.major_ver }}.{{date 'YYYYMMDD'}}
+            type=raw,value=${{ steps.pre-build-config.outputs.major_ver }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
             type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
@@ -67,7 +70,7 @@ jobs:
             org.opencontainers.image.description=${{ env.IMAGE_DESC }}
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD'}}
+            org.opencontainers.image.version=${{ steps.pre-build-config.outputs.major_ver }}.${{ steps.pre-build-config.outputs.timestamp }}
             containers.bootc=1
           sep-tags: " "
           sep-annotations: " "
@@ -77,11 +80,9 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./catcat-os-nv
+            ./catcat-os
           build-args: |
-            MAJOR_VERSION=${{ steps.get-major-ver.outputs.major_ver }}
-#          extra-args: |
-#            --squash
+            MAJOR_VERSION=${{ steps.pre-build-config.outputs.major_ver }}
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
