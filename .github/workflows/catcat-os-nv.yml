@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
 
 env:
-  MY_IMAGE_NAME: "${{ github.event.repository.name }}-nv"  # the name of the image produced by this build, matches repo names
-  MY_IMAGE_DESC: "Meow"
+  IMAGE_NAME: "${{ github.event.repository.name }}-nv"  # the name of the image produced by this build, matches repo names
+  IMAGE_DESC: "Meow"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
 concurrency:
@@ -64,7 +64,7 @@ jobs:
 
           BUILD_TAGS+=("${TIMESTAMP}")
           BUILD_TAGS+=("${MAJOR_VER_TAG}")
-          BUILD_TAGS+=("${TIMESTAMP}-${MAJOR_VER_TAG}")
+          BUILD_TAGS+=("${MAJOR_VER_TAG}-${TIMESTAMP}")
           BUILD_TAGS+=("latest")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -84,6 +84,7 @@ jobs:
           done
 
           echo "alias_tags=${alias_tags[*]}" >> $GITHUB_OUTPUT
+          echo "major_ver=${MAJOR_VER_TAG}" >> $GITHUB_OUTPUT
 
       # Build metadata
       - name: Image Metadata
@@ -91,12 +92,14 @@ jobs:
         id: meta
         with:
           images: |
-            ${{ env.MY_IMAGE_NAME }}
+            ${{ env.IMAGE_NAME }}
 
           labels: |
             io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/main/README.md
-            org.opencontainers.image.description=${{ env.MY_IMAGE_DESC }}
-            org.opencontainers.image.title=${{ env.MY_IMAGE_NAME }}
+            org.opencontainers.image.description=${{ env.IMAGE_DESC }}
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            org.opencontainers.image.vendor=${{ github.repository_owner }}
+            org.opencontainers.image.version=${{ steps.generate-tags.outputs.major_ver }}
 
       # Build image using Buildah action
       - name: Build Image
@@ -105,9 +108,11 @@ jobs:
         with:
           containerfiles: |
             ./catcat-os-nv
-          # Postfix image name with -custom to make it a little more descriptive
-          # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
-          image: ${{ env.MY_IMAGE_NAME }}
+          build-args: |
+          MAJOR_VERSION=${{ steps.generate-tags.outputs.major_ver }}
+#           Postfix image name with -custom to make it a little more descriptive
+#           Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
+          image: ${{ env.IMAGE_NAME }}
           tags: |
             ${{ steps.generate-tags.outputs.alias_tags }}
           labels: ${{ steps.meta.outputs.labels }}
