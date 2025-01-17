@@ -58,7 +58,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}
             type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD'}}
-            type=raw,value==${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
+            type=raw,value=${{ steps.get-major-ver.outputs.major_ver }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
             type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
