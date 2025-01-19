@@ -36,7 +36,6 @@ jobs:
         run: |
           set -eoux pipefail
           pwd
-          ls -A1
           TIMESTAMP="$(date "+%Y%m%d")"
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           TITLE="CaCat OS ${MAJOR_VERSION} (${TIMESTAMP})"
@@ -46,6 +45,7 @@ jobs:
             cat $artifact >> release.md
           done
           cat release.md
+          ls -A1
           echo "title=${TITLE}" >> $GITHUB_OUTPUT
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
@@ -54,5 +54,5 @@ jobs:
         with:
           name: ${{ steps.prepare-release.outputs.title }}
           tag_name: ${{ steps.prepare-release.outputs.tag }}
-          body_path: ./changelog.md
+          body_path: ./release.md
           make_latest: true
