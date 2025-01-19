@@ -40,7 +40,8 @@ jobs:
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           TITLE="CaCat OS ${MAJOR_VERSION} (${TIMESTAMP})"
           TAG="${MAJOR_VERSION}.${TIMESTAMP}"
-          echo '### ISOs to Download' > release.md
+          echo -e '### ISOs to Download\n' > release.md
+          echo -e '\n| ISO |\n| --- |' >> release.md
           for artifact in $(find url-catcat*); do
             cat $artifact >> release.md
           done
