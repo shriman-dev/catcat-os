@@ -5,8 +5,8 @@ ARG MAJOR_VERSION
 FROM ghcr.io/ublue-os/bazzite-gnome:${MAJOR_VERSION}
 
 ARG IMAGE_NAME
-ENV IMAGE_NAME
-ENV MAJOR_VERSION
+ENV IMAGE_NAME="${IMAGE_NAME}"
+ENV MAJOR_VERSION="${MAJOR_VERSION}"
 
 COPY /files /tmp/files
 COPY cosign.pub /etc/pki/containers/catcat-os.pub
