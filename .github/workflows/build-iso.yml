@@ -2,7 +2,7 @@ name: build iso
 
 on:
   schedule:
-    - cron: "0 0 1 * *" # Build & upload ISO every month
+    - cron: "0 0 * * 0" # Build & release ISOs every week
 
   workflow_dispatch:
     branches:
@@ -103,7 +103,7 @@ jobs:
           enable_flatpak_dependencies: "false"
           flatpak_remote_refs_dir: ${{ steps.pre-build-config.outputs.flatpak-refs-dir }}
           extra_boot_params: "rd.luks=discard rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1 pci=noats"
-#          additional_templates: files/scripts/setup-files/installer_defaults.tmpl
+          additional_templates: files/scripts/setup-files/installer_defaults.tmpl
 
       - name: Move ISO to Upload Directory
         id: upload-directory
@@ -153,12 +153,3 @@ jobs:
     needs: build-iso
     permissions:
       contents: write
-
-
-#      - name: Upload ISO to archive.org
-#        uses: RoyalOughtness/internet-archive-upload@main
-#        with:
-#          access-key: ${{ secrets.IA_ACCESS_KEY }}
-#          secret-key: ${{ secrets.IA_SECRET_KEY }}
-#          identifier: ${{ matrix.image_name }}_${{ env.DATESTAMP }}
-#          files: ${{ steps.upload-directory.outputs.iso-upload-dir }}

@@ -168,6 +168,10 @@ cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/
 cp -drf /usr/share/themes/Catppuccin-Orange-Dark/gtk-4.0 /etc/skel/.config/
 
 /usr/bin/dconf update
+
+tree /etc/dconf/
+mkdir -p /etc/skel/.config/dconf
+cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
 }
 themes
 

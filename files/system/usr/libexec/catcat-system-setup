@@ -31,13 +31,19 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
   replaceXAdd 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=3' /etc/default/grub
-  replaceXAdd 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
-  replaceXAdd 'GRUB_GFXMODE=' 'GRUB_GFXMODE='$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+') /etc/default/grub
+  replaceXAdd 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
   replaceXAdd 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
+  replaceXAdd 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+  #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+  replaceXAdd 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
   replaceXAdd 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
-  [[ -d /sys/firmware/efi ]] && grub2-mkconfig -o /etc/grub2-efi.cfg || grub2-mkconfig -o /etc/grub2.cfg
+  if [[ -d /sys/firmware/efi ]]; then
+    grub2-mkconfig -o /etc/grub2-efi.cfg
+    sed -i --follow-symlinks 's|linux16|linuxefi|;s|initrd16|initrdefi|' /etc/grub2-efi.cfg
+  else
+    grub2-mkconfig -o /etc/grub2.cfg
+  fi
   #grub2-editenv - unset menu_auto_hide
-fi
 
 KARGS_TO_ADD=(
   "rd.luks=discard"
