@@ -11,5 +11,4 @@ COPY /files /tmp/files
 COPY cosign.pub /etc/pki/containers/catcat-os.pub
 
 RUN /tmp/files/scripts/setup.sh && \
-    /tmp/files/scripts/fancontrol.sh && \
     ostree container commit

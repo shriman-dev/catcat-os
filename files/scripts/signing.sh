@@ -50,6 +50,8 @@ jq --arg image_name "${IMAGE_NAME}" \
         }
     ] } + .' "${POLICY_FILE}" > "/tmp/POLICY.tmp"
 
+cat /tmp/POLICY.tmp
+
 mv "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
 echo 'docker:

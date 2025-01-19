@@ -18,6 +18,8 @@ cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
 cp -drf  ${FILESDIR}/skel     /etc/ &
 
+
+[[ $IMAGE_NAME =~ (^| )'catcat-os'($| ) ]] && $SCRIPT_DIR/fancontrol.sh
 $SCRIPT_DIR/pre-setup.sh
 $SCRIPT_DIR/rpm-ostree.sh
 $SCRIPT_DIR/systemd.sh
