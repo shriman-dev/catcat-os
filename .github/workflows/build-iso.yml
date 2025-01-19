@@ -44,9 +44,9 @@ jobs:
         run: |
           pwd
           ls -A1
-          TIMESTAMP="$(date "+%Y%m%d")"
+          DATESTAMP="$(date "+%Y%m%d")"
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
-          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           FLATPAK_REFS_DIR=installer/flatpak_refs
           mkdir -p ${FLATPAK_REFS_DIR}
@@ -97,7 +97,7 @@ jobs:
           image_tag: ${{ matrix.image_tag }}
           secure_boot_key_url: "https://github.com/ublue-os/bazzite/raw/main/secure_boot.der"
           enrollment_password: "universalblue"
-          iso_name: ${{ matrix.image_name }}-${{ env.MAJOR_VERSION }}-${{ env.TIMESTAMP }}.iso
+          iso_name: ${{ matrix.image_name }}-${{ env.MAJOR_VERSION }}-${{ env.DATESTAMP }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
@@ -160,5 +160,5 @@ jobs:
 #        with:
 #          access-key: ${{ secrets.IA_ACCESS_KEY }}
 #          secret-key: ${{ secrets.IA_SECRET_KEY }}
-#          identifier: ${{ matrix.image_name }}_${{ env.TIMESTAMP }}
+#          identifier: ${{ matrix.image_name }}_${{ env.DATESTAMP }}
 #          files: ${{ steps.upload-directory.outputs.iso-upload-dir }}
