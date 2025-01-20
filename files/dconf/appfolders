@@ -58,7 +58,7 @@ name='Tweaks'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/ProdDevel]
-apps=['codium.desktop', 'dev.zed.Zed.desktop', 'io.github.mrvladus.List.desktop', 'se.sjoerd.Graphs.desktop', 'com.logseq.Logseq.desktop', 'nvim.desktop', 'micro.desktop']
+apps=['codium.desktop', 'dev.zed.Zed.desktop', 'se.sjoerd.Graphs.desktop', 'io.github.mrvladus.List.desktop', 'com.logseq.Logseq.desktop', 'nvim.desktop', 'micro.desktop']
 name='Prod & Devel'
 translate=false
 
