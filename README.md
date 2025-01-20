@@ -2,7 +2,7 @@
 
 ## ISO
 
-Download CatCat OS ISOs from latest release [here](https://github.com/shriman-dev/catcat-os/releases/latest).
+Download ISOs from latest release [here](https://github.com/shriman-dev/catcat-os/releases/latest).
 
 Or
 
