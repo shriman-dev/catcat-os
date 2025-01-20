@@ -6,6 +6,7 @@ app/org.gnome.FileRoller/x86_64/stable
 app/org.gnome.Showtime/x86_64/stable
 app/org.videolan.VLC/x86_64/stable
 app/com.github.neithern.g4music/x86_64/stable
+app/org.gnome.Decibels/x86_64/stable
 app/app.drey.EarTag/x86_64/stable
 app/org.gnome.meld/x86_64/stable
 app/dev.geopjr.Collision/x86_64/stable
@@ -74,6 +75,8 @@ app/org.gnome.Characters/x86_64/stable
 
 # prod and devel
 app/dev.zed.Zed/x86_64/stable
+app/io.github.mrvladus.List/x86_64/stable
+app/se.sjoerd.Graphs/x86_64/stable
 
 # gaming
 app/com.usebottles.bottles/x86_64/stable

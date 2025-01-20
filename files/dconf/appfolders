@@ -2,7 +2,7 @@
 folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
-apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Music.desktop', 'org.gnome.Showtime.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop']
+apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Showtime.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.Music.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop']
 name='File Viewers'
 translate=false
 
@@ -47,18 +47,18 @@ name='VM-Tainer'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Utils]
-apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'net.sapples.LiveCaptions.desktop', 'net.codelogistics.clicker.desktop', 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop']
+apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'org.gnome.Characters.desktop', 'net.codelogistics.clicker.desktop', 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop', 'net.sapples.LiveCaptions.desktop']
 name='Utils'
 translate=false
 
 
 [org/gnome/desktop/app-folders/folders/Tweaks]
-apps=['org.gnome.tweaks.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'ca.desrt.dconf-editor.desktop', 'org.gnome.Characters.desktop', 'menulibre.desktop', 'io.github.flattool.Ignition.desktop', 'kvantummanager.desktop', 'qt5ct.desktop', 'qt6ct.desktop', 'io.github.realmazharhussain.GdmSettings.desktop', 'containerized-org.gnome.Adwaita1.Demo.desktop', 'awf-gtk2.desktop', 'awf-gtk3.desktop', 'awf-gtk4.desktop', 'yad-icon-browser.desktop']
+apps=['org.gnome.tweaks.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'ca.desrt.dconf-editor.desktop', 'menulibre.desktop', 'com.github.wwmm.easyeffects.desktop', 'io.github.flattool.Ignition.desktop', 'kvantummanager.desktop', 'qt5ct.desktop', 'qt6ct.desktop', 'io.github.realmazharhussain.GdmSettings.desktop', 'containerized-org.gnome.Adwaita1.Demo.desktop', 'awf-gtk2.desktop', 'awf-gtk3.desktop', 'awf-gtk4.desktop', 'yad-icon-browser.desktop']
 name='Tweaks'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/ProdDevel]
-apps=['codium.desktop', 'dev.zed.Zed.desktop', 'nvim.desktop', 'micro.desktop']
+apps=['codium.desktop', 'dev.zed.Zed.desktop', 'io.github.mrvladus.List.desktop', 'se.sjoerd.Graphs.desktop', 'com.logseq.Logseq.desktop', 'nvim.desktop', 'micro.desktop']
 name='Prod & Devel'
 translate=false
 

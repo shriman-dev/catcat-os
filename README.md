@@ -1,5 +1,15 @@
 # Meow
 
+## ISO
+
+Download CatCat OS ISOs from latest release [here](https://github.com/shriman-dev/catcat-os/releases/latest).
+
+Or
+
+You can generate an ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/).
+
+## Rebase
+
 To rebase an existing atomic Fedora installation to the latest build:
   
   First rebase to the unsigned image, to get the proper signing keys then reboot and rebase to the signed image
@@ -23,11 +33,7 @@ To rebase an existing atomic Fedora installation to the latest build:
   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
 
-The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified, so you won't get accidentally updated to the next major version.
-
-## ISO
-
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+The `latest` tag will automatically point to the latest build.
 
 ## Verification
 

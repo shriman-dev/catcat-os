@@ -15,8 +15,8 @@ done
 # one week = 604800
 
 # update if system is one weeks old
-if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 604800 )) ]]; then
-
+if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
+    /usr/bin/notify-send "Automatic Weekly Update has Started."
     /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak uninstall --unused
 
@@ -25,15 +25,16 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-update) -lt $(( $(date +%s) - 604800 ))
       nix-store --optimise && nix-collect-garbage
     fi
 
-    if [[ $(id -u) -eq 0 ]]; then
-      /usr/bin/fwupdmgr refresh --force && /usr/bin/fwupdmgr update
+    if [[ $(id -u) -eq 0 ]] ; then
+      /usr/bin/fwupdmgr refresh -y --force && /usr/bin/fwupdmgr -y update
+    fi
+
+    if [[ $(id -u) -eq 0 ]] && [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
       /usr/bin/rpm-ostree upgrade && UPDATE_SUCCESSFUL=1
       /usr/bin/rpm-ostree cleanup -b ; /usr/bin/ostree prune
     fi
 
-    if [[ $UPDATE_SUCCESSFUL -eq 1 ]]; then
-      echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-update
-      /usr/bin/notify-send "Automatic Bi-Weekly Update is done."
-    fi
+    echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-auto-update
+    /usr/bin/notify-send "Automatic Weekly Update is done."
 fi
 

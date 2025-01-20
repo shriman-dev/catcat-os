@@ -178,13 +178,23 @@ unset rc
 themeFlatpakApps() {
   if ! grep -q 'devices=!all' ~/.local/share/flatpak/overrides/global; then
     bakBefore ~/.local/share/flatpak/overrides/global
-    mkdir -p ~/.local/share/flatpak/overrides
-    echo '[Context]
-devices=!all;
-filesystems=!host;!host-etc;!host-os;~/.themes:ro;~/.icons:ro;xdg-data/icons:ro;xdg-data/themes:ro;xdg-data/fonts:ro;xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/Kvantum:ro;xdg-config/qt5ct:ro;xdg-config/MangoHud:ro;xdg-config/vkBasalt:ro;
-
-[Environment]
-QT_STYLE_OVERRIDE=kvantum' > ~/.local/share/flatpak/overrides/global
+    flatpak override \
+    --user \
+    --nodevice=all \
+    --nofilesystem=host \
+    --nofilesystem=host-etc \
+    --nofilesystem=host-os \
+    --nofilesystem=home \
+    --filesystem=~/.themes:ro \
+    --filesystem=~/.icons:ro \
+    --filesystem=xdg-data/icons:ro \
+    --filesystem=xdg-data/themes:ro \
+    --filesystem=xdg-data/fonts:ro \
+    --filesystem=xdg-config/gtk-3.0:ro \
+    --filesystem=xdg-config/gtk-4.0:ro \
+    --filesystem=xdg-config/Kvantum:ro \
+    --filesystem=xdg-config/qt5ct:ro \
+    --env=QT_STYLE_OVERRIDE=kvantum
   fi
 
   if [[ ! "$(readlink ~/.themes)"  =~ '.local/share/themes' ]]; then
@@ -215,6 +225,7 @@ desktopFiles() {
 "io.freetubeapp.FreeTube /usr/share/icons/crafted/yt2.svg"
 "io.gitlab.librewolf-community firefox"
 "xyz.armcord.ArmCord discord"
+"com.github.tenderowl.frog com.endlessnetwork.frogsquash"
 )
 
   for I in "${APP_ICON_TO_MODIFY[@]}"; do
