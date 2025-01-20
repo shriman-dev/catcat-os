@@ -10,6 +10,7 @@ app/org.gnome.Decibels/x86_64/stable
 app/app.drey.EarTag/x86_64/stable
 app/org.gnome.meld/x86_64/stable
 app/dev.geopjr.Collision/x86_64/stable
+app/de.leopoldluley.Clapgrep/x86_64/stable
 app/com.github.qarmin.czkawka/x86_64/stable
 app/fr.romainvigier.MetadataCleaner/x86_64/stable
 
@@ -75,8 +76,10 @@ app/org.gnome.Characters/x86_64/stable
 
 # prod and devel
 app/dev.zed.Zed/x86_64/stable
-app/io.github.mrvladus.List/x86_64/stable
 app/se.sjoerd.Graphs/x86_64/stable
+app/io.github.efogdev.mpris-timer/x86_64/stable
+app/io.github.mrvladus.List/x86_64/stable
+app/com.vixalien.sticky/x86_64/stable
 
 # gaming
 app/com.usebottles.bottles/x86_64/stable

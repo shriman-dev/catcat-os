@@ -119,6 +119,14 @@
         {
             "wmClass": "net.codelogistics.clicker",
             "mode": "float"
+        },
+        {
+            "wmClass": "com.vixalien.sticky",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.efogdev.mpris-timer",
+            "mode": "float"
         }
     ]
 }
