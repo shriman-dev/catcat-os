@@ -7,7 +7,7 @@ name='File Viewers'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Creative]
-apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.pitivi.Pitivi.desktop', 'org.upscayl.Upscayl.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'org.shotcut.Shotcut.desktop', 'org.inkscape.Inkscape.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.gimp.GIMP.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'fr.handbrake.ghb.desktop']
+apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.pitivi.Pitivi.desktop', 'org.upscayl.Upscayl.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'io.gitlab.adhami3310.Footage.desktop', 'org.inkscape.Inkscape.desktop', 'com.boxy_svg.BoxySVG.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.shotcut.Shotcut.desktop', 'org.gimp.GIMP.desktop', 'fr.handbrake.ghb.desktop', 'org.libreoffice.LibreOffice.draw.desktop']
 name='Creative'
 translate=false
 
