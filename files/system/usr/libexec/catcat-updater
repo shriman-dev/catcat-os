@@ -20,7 +20,7 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
     /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak uninstall --unused
 
-    if [[ ! $(id -u) -eq 0 ]] && command -v nix-env; then
+    if command -v nix-env; then
       nix-channel --update && nix-env -b --upgrade
       nix-store --optimise && nix-collect-garbage
     fi
