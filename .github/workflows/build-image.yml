@@ -90,18 +90,6 @@ jobs:
             --build-arg IS_NVIDIA=${{ env.IS_NVIDIA }} \
             --tag raw-img .
 
-#        uses: redhat-actions/buildah-build@v2
-#        with:
-#          containerfiles: |
-#            ./${{ matrix.image_name }}
-#          build-args: |
-#            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-#            IMAGE_NAME=${{ matrix.image_name }}
-#          image: ${{ matrix.image_name }}
-#          tags: ${{ steps.metadata.outputs.tags }}
-#          labels: ${{ steps.metadata.outputs.labels }}
-#          oci: false
-
       - name: Remove auxiliary images
         # We are tight on space, need at least 2x for OSTree
         run: |
