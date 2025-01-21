@@ -3,7 +3,7 @@ allow-updates=false
 download-updates=false
 download-updates-notify=false
 first-run=false
-flatpak-purge-timestamp=int64 1734623829
+flatpak-purge-timestamp=int64 1737445091
 
 [org/fedoraproject/FirewallConfig]
 show-active-bindings=true

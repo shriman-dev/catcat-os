@@ -102,7 +102,7 @@ jobs:
         uses: hhd-dev/rechunk@v1.1.2
         with:
           rechunk: 'ghcr.io/hhd-dev/rechunk:stable'
-          ref: "localhost/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
+          ref: "${{ env.DEFAULT_TAG }}"
           prev-ref: "${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           skip_compression: true
           version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
