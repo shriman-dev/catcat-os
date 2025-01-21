@@ -53,6 +53,7 @@ jobs:
           echo "DATESTAMP=$(date "+%Y%m%d")" >> $GITHUB_ENV
           echo "TIMESTAMP=$(TZ="Asia/Kolkata" date "+%H%M%S")" >> $GITHUB_ENV
           echo "AH_DATE=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_ENV
+          echo "CONTAINER_TARGET="${{ matrix.image_name }}" >> $GITHUB_ENV
           if [[ ${{ matrix.image_name }} =~ '-nv' ]]; then
             echo "IS_NVIDIA=-nvidia" >> $GITHUB_ENV
           fi
@@ -85,7 +86,7 @@ jobs:
         id: build_image
         run: |
           sudo buildah build \
-            --target ${{ matrix.image_name }} \
+            --target ${{ env.CONTAINER_TARGET }} \
             --build-arg IMAGE_NAME=${{ matrix.image_name }} \
             --build-arg MAJOR_VERSION=${{ env.MAJOR_VERSION }} \
             --build-arg IS_NVIDIA=${{ env.IS_NVIDIA }} \
