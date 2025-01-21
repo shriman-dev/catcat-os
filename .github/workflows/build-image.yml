@@ -16,7 +16,6 @@ on:
 env:
   IMAGE_DESC: "Meow"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
-  DEFAULT_TAG: "latest"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -39,8 +38,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Maximize build space
-        uses: ublue-os/remove-unwanted-software@v8
+#      - name: Maximize build space
+#        uses: ublue-os/remove-unwanted-software@v8
 
       - name: Pre Build Configuration
         id: pre-build-config
@@ -48,11 +47,12 @@ jobs:
         run: |
           pwd
           ls -A1
-          DATESTAMP="$(date "+%Y%m%d")"
-          MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
+          source ${{ github.workspace }}/files/VAR
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
-          echo "AH_DATE=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_ENV
+          echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
 
       # Build metadata
       - name: Image Metadata
@@ -62,8 +62,8 @@ jobs:
           tags: |
             type=raw,value=${{ env.DEFAULT_TAG }}
             type=raw,value=${{ env.MAJOR_VERSION }}
-            type=raw,value=${{ env.MAJOR_VERSION }}.{{date 'YYYYMMDD'}}
-            type=raw,value=${{ env.MAJOR_VERSION }}.{{date 'YYYYMMDD.HHmmss' tz='Asia/Kolkata'}}
+            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
+            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
             type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
@@ -101,11 +101,11 @@ jobs:
         id: rechunk
         uses: hhd-dev/rechunk@v1.1.2
         with:
-          rechunk: 'ghcr.io/hhd-dev/rechunk:stable'
-          ref: "${{ env.DEFAULT_TAG }}"
+          rechunk: 'ghcr.io/hhd-dev/rechunk:latest'
+          ref: "localhost/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           prev-ref: "${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           skip_compression: true
-          version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
+          version: ${{ env.MAJOR_VERSION }}
           labels: ${{ steps.metadata.outputs.labels }} # Rechunk strips out all the labels during build, this needs to be reapplied here with newline separator
 
       # This is necessary so that the podman socket can find the rechunked image on its storage
