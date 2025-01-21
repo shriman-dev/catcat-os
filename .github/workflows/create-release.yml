@@ -34,9 +34,9 @@ jobs:
         id: prepare-release
         shell: bash
         run: |
-          set -eoux pipefail
+          set -eou pipefail
           pwd
-          source ${{ github.workspace }}/files/VAR
+          source ${{ github.workspace }}/files/VAR.sh
           TITLE="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"
           TAG="${MAJOR_VERSION}.${DATESTAMP}"
           echo -e '### ISOs to Download\n' > release.md
