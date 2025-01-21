@@ -117,9 +117,9 @@ jobs:
           rechunk: 'ghcr.io/hhd-dev/rechunk:latest'
           ref: 'raw-img'
           prev-ref: "${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
-          skip_compression: true
           version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
-          labels: ${{ steps.metadata.outputs.labels }} 
+          labels: ${{ steps.metadata.outputs.labels }}
+#          skip_compression: true
 
       # These `if` statements are so that pull requests for your custom images do not make it publish any packages under your name without you knowing
       # They also check if the runner is on the default branch so that things like the merge queue (if you enable it), are going to work
@@ -140,10 +140,9 @@ jobs:
           attempt_delay: 15000
           command: |
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ghcr.io -u ${{ github.actor }} --password-stdin
-            sudo skopeo copy --dest-compress-format=zstd --dest-compress-level=20 ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:latest
-#            for tag in ${{ steps.metadata.outputs.tags }}; do
-#              sudo skopeo copy --dest-compress-format=zstd --dest-compress-level=20 ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:$tag
-#            done
+            for tag in ${{ steps.metadata.outputs.tags }}; do
+              sudo skopeo copy ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:$tag
+            done
 
       # This section is optional and only needs to be enabled if you plan on distributing
       # your project for others to consume. You will need to create a public and private key
