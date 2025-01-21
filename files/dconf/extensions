@@ -52,6 +52,20 @@ hideiconstate='0'
 nothiddenindicator=['eye-on-cursor@djinnalexio.github.io', 'Dwell Click', 'Stop Screen Sharing', 'Clipboard History Indicator', 'Stop Screencast', ' LockKeysIndicator', 'Removable devices', 'GameMode Status Indicator', 'moto g40 fusion Indicator', 'Gjs_ui_dateMenu_DateMenuButton', 'Gjs_runcat_kolesnikov_se_indicator_RunCatIndicator']
 topbarupdater='0'
 
+[org/gnome/shell/extensions/IndicatorVisibilityTool]
+bluetooth-mode='default'
+camera-mode='default'
+location-mode='default'
+network-mode='default'
+night-light-mode='default'
+remote-access-mode='default'
+rfkill-mode='default'
+system-mode='default'
+thunderbolt-mode='default'
+unsafe-mode='default'
+volume-input-mode='default'
+volume-output-mode='default'
+
 [org/gnome/shell/extensions/SettingsCenter]
 items='Advanced Settings;gnome-tweaks.desktop;0;gnome-tweaks|Desktop Config Editor;dconf-editor.desktop;0;dconf-editor|Gnome Config Editor;gconf-editor.desktop;0;gconf-editor|Session Properties;session-properties.desktop;0;gnome-session-properties|Extensions Preferences;gnome-shell-extension-prefs.desktop;0;gnome-shell-extension-prefs|Passwords and Keys;seahorse.desktop;0;seahorse|NVidia Settings;nvidia-settings.desktop;0;nvidia-settings|Color Picker;gnome-extensions enable color-picker@tuberry;1;|Color Picker Disable;gnome-extensions disable color-picker@tuberry;1;|Notes;gnome-extensions enable notes@maestroschan.fr;0;|Notes disable;gnome-extensions disable notes@maestroschan.fr;0;|Visualizer;gnome-extensions enable visualizer@sound.org;0;|Visualizer disable;gnome-extensions disable visualizer@sound.org;0;|Reading Strip;gnome-extensions enable readingstrip@lupantano.gihthub;0;|Reading Strip disable;gnome-extensions disable readingstrip@lupantano.gihthub;0;|Ddterm;gnome-extensions enable ddterm@amezin.github.com;1;gnome-extensions enable ddterm@amezin.github.com|Disable ddterm;gnome-extensions disable ddterm@amezin.github.com;1;gnome-extensions disable ddterm@amezin.github.com'
 label-menu='S-Center'
@@ -922,6 +936,10 @@ version=32
 
 [org/gnome/shell/extensions/status-area-horizontal-spacing]
 hpadding=1
+
+[org/gnome/shell/extensions/switchfocustype]
+show-notifications=false
+use-sloppy=true
 
 [org/gnome/shell/extensions/syncthing-toggle]
 start-stop-only=false

@@ -17,6 +17,9 @@ sed -i 's/^NAME=.*/NAME="CatCat OS"/' /usr/lib/*release
 sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release
 sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
 
+# Fix issues caused by ID no longer being fedora
+sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
+
 # enable disk discard
 sed -i "s|issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
@@ -35,6 +38,8 @@ cp -v /usr/lib/systemd/system/ublue-update.timer /usr/lib/systemd/user/
 
 
 # set envvars
+# "GJS_DISABLE_JIT=1"
+
 ENVARS_TO_ADD=(
   "QT_QPA_PLATFORMTHEME=qt5ct"
   "QT_STYLE_OVERRIDE=kvantum"
