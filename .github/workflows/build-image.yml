@@ -34,7 +34,6 @@ jobs:
       fail-fast: false
       matrix:
         image_name: ["catcat-os", "catcat-os-nv"]
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
