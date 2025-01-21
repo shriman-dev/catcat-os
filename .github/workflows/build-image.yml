@@ -53,7 +53,9 @@ jobs:
           echo "DATESTAMP=$(date "+%Y%m%d")" >> $GITHUB_ENV
           echo "TIMESTAMP=$(TZ="Asia/Kolkata" date "+%H%M%S")" >> $GITHUB_ENV
           echo "AH_DATE=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_ENV
-          [[ ${{ matrix.image_name }} =~ '-nv' ]] && echo "IS_NVIDIA=-nvidia" >> $GITHUB_ENV
+          if [[ ${{ matrix.image_name }} =~ '-nv' ]]; then
+            echo "IS_NVIDIA=-nvidia" >> $GITHUB_ENV
+          fi
 
       # Build metadata
       - name: Image Metadata
