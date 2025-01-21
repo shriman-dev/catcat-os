@@ -4,7 +4,7 @@ ARG IS_NVIDIA
 ARG IMAGE_NAME
 
 ## this is a standard Containerfile FROM using the build ARGs above to select the right upstream image
-FROM ghcr.io/ublue-os/bazzite-gnome${IS_NVIDIA}:${MAJOR_VERSION} AS ${IMAGE_NAME}
+FROM ghcr.io/ublue-os/bazzite-gnome${IS_NVIDIA}:${MAJOR_VERSION}
 
 ARG IMAGE_NAME
 ARG MAJOR_VERSION
