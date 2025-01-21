@@ -85,7 +85,7 @@ jobs:
         id: build_image
         run: |
           sudo buildah build \
-            --target ${{ matrix.image_name }} \
+            --target ${{ github.event.repository.name }} \
             --build-arg IMAGE_NAME=${{ matrix.image_name }} \
             --build-arg MAJOR_VERSION=${{ env.MAJOR_VERSION }} \
             --build-arg IS_NVIDIA=${{ env.IS_NVIDIA }} \
