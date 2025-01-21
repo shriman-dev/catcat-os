@@ -48,7 +48,6 @@ jobs:
           set -eou pipefail
           pwd
           ls -A1
-          #source ${{ github.workspace }}/files/VAR.sh
           echo "MAJOR_VERSION=41" >> $GITHUB_ENV
           echo "DEFAULT_TAG=latest" >> $GITHUB_ENV
           echo "DATESTAMP=$(date "+%Y%m%d")" >> $GITHUB_ENV
