@@ -34,6 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         image_name: ["catcat-os", "catcat-os-nv"]
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -51,7 +52,6 @@ jobs:
           MAJOR_VERSION="$(cat ${{ github.workspace }}/files/major_version)"
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
-          # This generates a timestamp like what is defined on the ArtifactHub documentation
           echo "AH_DATE=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_ENV
 
       # Build metadata
