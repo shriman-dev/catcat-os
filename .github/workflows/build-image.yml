@@ -97,25 +97,25 @@ jobs:
       # Documentation for Rechunk is provided on their github repository at https://github.com/hhd-dev/rechunk
       # You can enable it by uncommenting the following lines
 
-       - name: Run Rechunker
-         id: rechunk
-         uses: hhd-dev/rechunk@v1.1.2
-         with:
-           rechunk: 'ghcr.io/hhd-dev/rechunk:stable'
-           ref: "localhost/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
-           prev-ref: "${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
-           skip_compression: true
-           version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
-           labels: ${{ steps.metadata.outputs.labels }} # Rechunk strips out all the labels during build, this needs to be reapplied here with newline separator
+      - name: Run Rechunker
+        id: rechunk
+        uses: hhd-dev/rechunk@v1.1.2
+        with:
+          rechunk: 'ghcr.io/hhd-dev/rechunk:stable'
+          ref: "localhost/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
+          prev-ref: "${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
+          skip_compression: true
+          version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
+          labels: ${{ steps.metadata.outputs.labels }} # Rechunk strips out all the labels during build, this needs to be reapplied here with newline separator
 
       # This is necessary so that the podman socket can find the rechunked image on its storage
-       - name: Load in podman and tag
-         run: |
-           IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
-           sudo rm -rf ${{ steps.rechunk.outputs.output }}
-           for tag in ${{ steps.metadata.outputs.tags }}; do
-             podman tag $IMAGE ${{ matrix.image_name }}:$tag
-           done
+      - name: Load in podman and tag
+        run: |
+          IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
+          sudo rm -rf ${{ steps.rechunk.outputs.output }}
+          for tag in ${{ steps.metadata.outputs.tags }}; do
+            podman tag $IMAGE ${{ matrix.image_name }}:$tag
+          done
 
       # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
       # https://github.com/macbre/push-to-ghcr/issues/12
