@@ -48,12 +48,12 @@ jobs:
           set -eou pipefail
           pwd
           ls -A1
-          source ${{ github.workspace }}/files/VAR.sh
-          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
-          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
-          echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
-          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
+          #source ${{ github.workspace }}/files/VAR.sh
+          echo "MAJOR_VERSION=41" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=latest" >> $GITHUB_ENV
+          echo "DATESTAMP=$(date "+%Y%m%d")" >> $GITHUB_ENV
+          echo "TIMESTAMP=$(TZ="Asia/Kolkata" date "+%H%M%S")" >> $GITHUB_ENV
+          echo "AH_DATE=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_ENV
           [[ ${{ matrix.image_name }} == *-nv* ]] && echo "IS_NVIDIA=-nvidia" >> $GITHUB_ENV
 
       # Build metadata

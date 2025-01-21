@@ -45,10 +45,10 @@ jobs:
           pwd
           ls -A1
           source ${{ github.workspace }}/files/VAR.sh
-          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
-          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
+          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
 
       - name: Determine Flatpak Dependencies
         id: flatpak_dependencies
