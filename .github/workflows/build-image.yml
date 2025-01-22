@@ -140,8 +140,9 @@ jobs:
           attempt_delay: 15000
           command: |
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ghcr.io -u ${{ github.actor }} --password-stdin
+            # --dest-compress-format=zstd --dest-compress-level=20
             for tag in ${{ steps.metadata.outputs.tags }}; do
-              sudo skopeo copy --dest-compress-format=zstd --dest-compress-level=20 ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:$tag
+              sudo skopeo copy ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:$tag
             done
 
       # This section is optional and only needs to be enabled if you plan on distributing

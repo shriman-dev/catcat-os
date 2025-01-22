@@ -211,9 +211,9 @@ bedtime-mode-active=false
 ondemand-button-location='menu'
 
 [org/gnome/shell/extensions/bluetooth-quick-connect]
-bluetooth-auto-power-off=false
+bluetooth-auto-power-off=true
 bluetooth-auto-power-off-interval=1200
-bluetooth-auto-power-on=true
+bluetooth-auto-power-on=false
 show-battery-value-on=true
 
 [org/gnome/shell/extensions/blur-my-shell]

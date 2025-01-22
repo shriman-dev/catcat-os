@@ -14,12 +14,16 @@ grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}
 if [[ ! -f /etc/catcat-os/first-boot ]]; then
   #plymouth-set-default-theme catppuccin-mocha
   #rpm-ostree initramfs --enable
+  /usr/bin/dconf update
+  cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
+  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
+  
 
   hostnamectl set-hostname --static "catcat"
 
   # Permit user 1000
   U="$(id -un 1000)"
-  gpasswd -a $U input
+  usermod -a -G input $U
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot
@@ -31,7 +35,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
   replaceXAdd 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=3' /etc/default/grub
-  replaceXAdd 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+#  replaceXAdd 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
   replaceXAdd 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
   replaceXAdd 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
   #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
@@ -39,7 +43,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   replaceXAdd 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
   if [[ -d /sys/firmware/efi ]]; then
     grub2-mkconfig -o /etc/grub2-efi.cfg
-    sed -i --follow-symlinks 's|linux16|linuxefi|;s|initrd16|initrdefi|' /etc/grub2-efi.cfg
+    #sed -i --follow-symlinks 's|linux16|linuxefi|;s|initrd16|initrdefi|' /etc/grub2-efi.cfg
   else
     grub2-mkconfig -o /etc/grub2.cfg
   fi
@@ -80,7 +84,6 @@ fi
 
 # update gnome/dconf configurations in /etc/dconf/db/distro.d/
 /usr/bin/dconf update &
-
 
 
 # configure systemd services
