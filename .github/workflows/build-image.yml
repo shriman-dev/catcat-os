@@ -48,6 +48,7 @@ jobs:
           set -eou pipefail
           pwd
           ls -A1
+          lsblk --all -o +LABEL,FSTYPE
           source ${{ github.workspace }}/files/VAR.sh
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
@@ -121,14 +122,6 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
 #          skip_compression: true
 
-       # This is necessary so that the podman socket can find the rechunked image on its storage
-      - name: Load in podman and tag
-        run: |
-          IMAGE=$(sudo podman pull ${{ steps.rechunk.outputs.ref }})
-          sudo rm -rf ${{ steps.rechunk.outputs.output }}
-          for tag in ${{ steps.metadata.outputs.tags }}; do
-            podman tag $IMAGE ${{ matrix.image_name }}:$tag
-          done
        # These `if` statements are so that pull requests for your custom images do not make it publish any packages under your name without you knowing
        # They also check if the runner is on the default branch so that things like the merge queue (if you enable it), are going to work
 
@@ -149,7 +142,6 @@ jobs:
           attempt_delay: 15000
           command: |
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ghcr.io -u ${{ github.actor }} --password-stdin
-            # --dest-compress-format=zstd --dest-compress-level=20
             for tag in ${{ steps.metadata.outputs.tags }}; do
               sudo skopeo copy ${{ steps.rechunk.outputs.ref }} docker://${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:$tag
             done
@@ -168,22 +160,6 @@ jobs:
           echo "Digest is: $DIGEST"
           echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
 
-      # Sign container
-#      - name: Install Cosign
-#        uses: sigstore/cosign-installer@v3.7.0
-#        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-
-#      - name: Sign container image
-#        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-#        run: |
-#          IMAGE_FULL="${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}"
-#          for tag in ${{ steps.metadata.outputs.tags }}; do
-#            cosign sign -y --key env://COSIGN_PRIVATE_KEY $IMAGE_FULL:$tag
-#          done
-#        env:
-#          TAGS: ${{ steps.digest.outputs.digest }}
-#          COSIGN_EXPERIMENTAL: false
-#          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
       # Sign the image.
       - name: Sign container image
         uses: EyeCantCU/cosign-action/sign@v0.3.0
