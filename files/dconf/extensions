@@ -287,7 +287,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=5
+indicator-position-max=4
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -844,7 +844,7 @@ always-show-input-slider=true
 autohide-profile-switcher=true
 create-balance-slider=false
 create-mixer-sliders=true
-create-profile-switcher=true
+create-profile-switcher=false
 create-sink-mixer=false
 filters=['gnome-shell*']
 ignore-css=true
