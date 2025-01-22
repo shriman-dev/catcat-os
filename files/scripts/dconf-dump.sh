@@ -62,7 +62,8 @@ s|right-box-order=\[.* 'syncthingIndicator'|right-box-order=\['Nothing to say in
 /arcmenu/,/^$/ { /recently-installed-apps/d }
 /burn-my-windows/,/^$/ { /active-profile/d }
 /caffeine/,/^$/ { /toggle-state/d; /user-enabled/d }
-/downfall/,/^$/ { /feature-enabled/d }"
+/downfall/,/^$/ { /feature-enabled/d }
+/Bluetooth-Battery-Meter/,/^$/ { /device-list/d }"
 )
 
 > $DCONF_DIR/extensions

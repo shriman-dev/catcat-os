@@ -100,6 +100,8 @@ night-light-schedule-to=7.0
 [org/gnome/settings-daemon/plugins/housekeeping]
 free-percent-notify=0.10000000000000001
 
+[org/gnome/settings-daemon/plugins/power]
+ambient-enabled=false
 
 [org/gnome/desktop/search-providers]
 disabled=['org.gnome.Software.desktop']

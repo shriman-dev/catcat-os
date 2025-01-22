@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.customize-ibus" path="/org/gnome/shell/extensions/customize-ibus/">
+    <key type="b" name="enable-orientation">
+        <default>false</default>
+        <summary>enable orientation</summary>
+    </key>
+    <key type="b" name="use-custom-font">
+        <default>false</default>
+        <summary>use custom font</summary>
+    </key>
+    <key type="b" name="use-candidate-opacity">
+        <default>false</default>
+        <summary>use custom candidate box opacity</summary>
+    </key>
+    <key type="b" name="use-indicator-opacity">
+        <default>false</default>
+        <summary>use custom indicator box opacity</summary>
+    </key>
+    <key type="b" name="use-custom-bg">
+        <default>false</default>
+        <summary>use custom background</summary>
+    </key>
+    <key type="b" name="use-custom-bg-dark">
+        <default>false</default>
+        <summary>use custom dark background</summary>
+    </key>
+    <key type="b" name="enable-custom-theme">
+        <default>false</default>
+        <summary>enable custom theme</summary>
+    </key>
+    <key type="b" name="enable-custom-theme-dark">
+        <default>false</default>
+        <summary>enable custom theme dark</summary>
+    </key>
+    <key type="b" name="enable-auto-switch">
+        <default>true</default>
+        <summary>enable auto switch</summary>
+    </key>
+    <key type="u" name="candidate-orientation">
+        <range min="0" max="1"/>
+        <default>0</default>
+        <summary>candidate orientation</summary>
+    </key>
+    <key type="s" name="custom-theme">
+        <default>""</default>
+        <summary>custom theme</summary>
+    </key>
+    <key type="s" name="custom-theme-dark">
+        <default>""</default>
+        <summary>custom theme dark</summary>
+    </key>
+    <key type="u" name="unkown-ascii-state">
+        <default>0</default>
+        <range min="0" max="2"/>
+        <summary>input state of a new unknown window</summary>
+    </key>
+    <key type="a{sb}" name="input-mode-list">
+        <default>[]</default>
+        <summary>input mode list</summary>
+    </key>
+    <key type="s" name="ascii-mode">
+        <default>"A#en#英"</default>
+        <summary>ASCII mode</summary>
+    </key>
+    <key type="s" name="custom-font">
+        <default>"Sans 16"</default>
+        <summary>custom font</summary>
+    </key>
+    <key type="s" name="custom-bg">
+        <default>""</default>
+        <summary>custom background</summary>
+    </key>
+    <key type="s" name="custom-bg-dark">
+        <default>""</default>
+        <summary>custom dark background</summary>
+    </key>
+    <key type="u" name="candidate-opacity">
+        <default>255</default>
+        <range min="1" max="255"/>
+        <summary>candidate opacity value</summary>
+    </key>
+    <key type="u" name="indicator-opacity">
+        <default>255</default>
+        <range min="1" max="255"/>
+        <summary>indicator opacity value</summary>
+    </key>
+    <key type="u" name="custom-bg-mode">
+        <default>2</default>
+        <range min="0" max="2"/>
+        <summary>adjustment mode to background</summary>
+    </key>
+    <key type="u" name="custom-bg-dark-mode">
+        <default>2</default>
+        <range min="0" max="2"/>
+        <summary>adjustment mode to dark background</summary>
+    </key>
+    <key type="u" name="custom-bg-repeat-mode">
+        <default>1</default>
+        <range min="0" max="1"/>
+        <summary>adjustment repeat mode to background</summary>
+    </key>
+    <key type="u" name="custom-bg-dark-repeat-mode">
+        <default>1</default>
+        <range min="0" max="1"/>
+        <summary>adjustment repeat mode to dark background</summary>
+    </key>
+    <key type="u" name="input-mode-remember">
+        <default>1</default>
+        <range min="0" max="1"/>
+        <summary>remember window input state</summary>
+    </key>
+    <key type="u" name="candidate-scroll-mode">
+        <default>1</default>
+        <range min="0" max="1"/>
+        <summary>candidate scroll mode</summary>
+    </key>
+    <key type="b" name="menu-ibus-emoji">
+        <default>false</default>
+        <summary>show copy ibus emoji in tray menu</summary>
+    </key>
+    <key type="b" name="menu-extension-preference">
+        <default>true</default>
+        <summary>show extension preference in tray menu</summary>
+    </key>
+    <key type="b" name="menu-ibus-preference">
+        <default>false</default>
+        <summary>show ibus preference in tray menu</summary>
+    </key>
+    <key type="b" name="menu-ibus-version">
+        <default>false</default>
+        <summary>show ibus version in tray menu</summary>
+    </key>
+    <key type="b" name="menu-ibus-restart">
+        <default>false</default>
+        <summary>show restart ibus in tray menu</summary>
+    </key>
+    <key type="b" name="menu-ibus-exit">
+        <default>false</default>
+        <summary>show exit ibus in tray menu</summary>
+    </key>
+    <key type="s" name="ibus-restart-time">
+        <default>""</default>
+        <summary>last ibus manually restart time</summary>
+    </key>
+    <key type="b" name="use-candidate-buttons">
+        <default>true</default>
+        <summary>use candidate box page buttons</summary>
+    </key>
+    <key type="b" name="use-candidate-scroll">
+        <default>false</default>
+        <summary>use candidate box scroll</summary>
+    </key>
+    <key type="b" name="use-input-indicator">
+        <default>true</default>
+        <summary>use input state indicator</summary>
+    </key>
+    <key type="b" name="input-indicator-only-on-toggle">
+        <default>false</default>
+        <summary>use input indicator only on toggle</summary>
+    </key>
+    <key type="b" name="input-indicator-only-use-ascii">
+        <default>false</default>
+        <summary>use input indicator only when using ASCII mode</summary>
+    </key>
+    <key type="b" name="input-indicator-not-on-single-ime">
+        <default>false</default>
+        <summary>not use input indicator when typing with single mode ime</summary>
+    </key>
+    <key type="b" name="input-indicator-use-scroll">
+        <default>false</default>
+        <summary>use input indicator scroll to switch input source</summary>
+    </key>
+    <key type="u" name="input-indicator-animation">
+        <default>3</default>
+        <range min="0" max="3"/>
+        <summary>input state indicator popup animation</summary>
+    </key>
+    <key type="b" name="use-indicator-show-delay">
+        <default>false</default>
+        <summary>enable input indicator show delay</summary>
+    </key>
+    <key type="u" name="input-indicator-show-time">
+        <default>1</default>
+        <range min="1" max="5"/>
+        <summary>input state indicator show time</summary>
+    </key>
+    <key type="b" name="use-indicator-auto-hide">
+        <default>true</default>
+        <summary>enable input indicator auto hide</summary>
+    </key>
+    <key type="u" name="input-indicator-hide-time">
+        <default>1</default>
+        <range min="1" max="5"/>
+        <summary>input state indicator hide time</summary>
+    </key>
+    <key type="b" name="use-popup-animation">
+        <default>false</default>
+        <summary>use popup animation</summary>
+    </key>
+    <key type="u" name="candidate-popup-animation">
+        <default>1</default>
+        <range min="0" max="3"/>
+        <summary>candidate popup animation</summary>
+    </key>
+    <key type="b" name="use-candidate-reposition">
+        <default>false</default>
+        <summary>use candidate reposition by drag</summary>
+    </key>
+    <key type="b" name="fix-ime-list">
+        <default>false</default>
+        <summary>fix IME list</summary>
+    </key>
+    <key type="b" name="use-indicator-left-click">
+        <default>false</default>
+        <summary>use indicator left click</summary>
+    </key>
+    <key type="u" name="indicator-left-click-func">
+        <default>0</default>
+        <range min="0" max="1"/>
+        <summary>indicator left click function</summary>
+    </key>
+    <key type="b" name="input-indicator-right-close">
+        <default>false</default>
+        <summary>use indicator mouse right click to close</summary>
+    </key>
+    <key type="b" name="use-indicator-custom-font">
+        <default>false</default>
+        <summary>use indicator custom font</summary>
+    </key>
+    <key type="s" name="indicator-custom-font">
+        <default>"Sans 16"</default>
+        <summary>indicator custom font</summary>
+    </key>
+    <key type="b" name="use-tray">
+        <default>true</default>
+        <summary>use IBus system tray icon</summary>
+    </key>
+    <key type="b" name="use-tray-click-source-switch">
+        <default>false</default>
+        <summary>use tray mouse click to directly switch source</summary>
+    </key>
+    <key type="u" name="tray-source-switch-click-key">
+        <default>0</default>
+        <range min="0" max="1"/>
+        <summary>tray directly switch source mouse click key</summary>
+    </key>
+    <key type="b" name="use-candidate-box-right-click">
+        <default>false</default>
+        <summary>use candidate popup box right click</summary>
+    </key>
+    <key type="u" name="candidate-box-right-click-func">
+        <default>0</default>
+        <range min="0" max="1"/>
+        <summary>candidate popup box right click function</summary>
+    </key>
+    <key type="b" name="use-candidate-still">
+        <default>false</default>
+        <summary>use candidate popup box not follow caret</summary>
+    </key>
+    <key type="u" name="candidate-still-position">
+        <default>0</default>
+        <range min="0" max="8"/>
+        <summary>candidate popup box position for not follow caret</summary>
+    </key>
+    <key type="u" name="remember-candidate-position">
+        <default>1</default>
+        <range min="0" max="1"/>
+        <summary>remember last session's candidate popup box position</summary>
+    </key>
+    <key type="a{su}" name="candidate-box-position">
+        <default>[]</default>
+        <summary>last remembered candidate box position</summary>
+    </key>
+  </schema>
+</schemalist>

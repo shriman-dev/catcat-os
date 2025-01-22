@@ -41,7 +41,7 @@ cursor-style = underline
 focus-follows-mouse = true
 
 adw-toolbar-style = raised-border
-window-decoration = false
+#window-decoration = false
 
 scrollback-limit = 99999999999999999
 

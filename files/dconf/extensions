@@ -2,11 +2,13 @@
 content-fit=0
 enable-nvsl=true
 enable-va=true
+force-gtk4paintablesink=false
+force-mediafile=false
 low-battery-threshold=30
 mute=true
 pause-on-battery=2
 pause-on-maximize-or-fullscreen=1
-show-panel-menu=true
+show-panel-menu=false
 startup-delay=10
 video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'
 
@@ -46,6 +48,20 @@ window-size=0.75
 window-skip-taskbar=true
 window-type-hint='normal'
 
+[org/gnome/shell/extensions/Bluetooth-Battery-Meter]
+color-10='#ff7800'
+color-100='#15c931'
+color-20='#ff7800'
+color-30='#15c931'
+color-40='#15c931'
+color-50='#15c931'
+color-60='#15c931'
+color-70='#15c931'
+color-80='#15c931'
+color-90='#15c931'
+level-indicator-color=1
+swap-icon-text=false
+
 [org/gnome/shell/extensions/HideItems]
 allindicator=['Stop Screencast', 'Clipboard History Indicator', 'Stop Screen Sharing', 'Dwell Click', 'Accessibility', 'Keyboard', 'eye-on-cursor@djinnalexio.github.io']
 hideiconstate='0'
@@ -76,6 +92,10 @@ show-centered=true
 
 [org/gnome/shell/extensions/always-indicator]
 color='rgba(205,214,244,0.626667)'
+
+[org/gnome/shell/extensions/app_tabs]
+ellipsize-mode=false
+panel-max-width=399
 
 [org/gnome/shell/extensions/arcmenu]
 apps-show-extra-details=false
@@ -124,6 +144,10 @@ show-activities-button=false
 show-category-sub-menus=true
 show-hidden-recent-files=false
 show-search-result-details=true
+
+[org/gnome/shell/extensions/auto-brightness-toggle]
+auto-initial-brightness=false
+show-in-quick-settings=false
 
 [org/gnome/shell/extensions/auto-move-windows]
 application-list=['org.garudalinux.firedragon.desktop:4', 'io.freetubeapp.FreeTube.desktop:4', 'com.valvesoftware.Steam.desktop:2', 'steam.desktop:2', 'io.gitlab.librewolf-community.desktop:4']
@@ -210,10 +234,13 @@ show-weather-by-clock='LEFT'
 bedtime-mode-active=false
 ondemand-button-location='menu'
 
+[org/gnome/shell/extensions/better-end-session-dialog]
+show-suspend-button=true
+
 [org/gnome/shell/extensions/bluetooth-quick-connect]
 bluetooth-auto-power-off=true
 bluetooth-auto-power-off-interval=1200
-bluetooth-auto-power-on=false
+bluetooth-auto-power-on=true
 show-battery-value-on=true
 
 [org/gnome/shell/extensions/blur-my-shell]
@@ -271,10 +298,10 @@ sigma=10
 hide-hibernate-button=true
 hide-hybrid-sleep-button=true
 hide-lock-button=false
-hide-logout-button=false
-hide-restart-button=false
-hide-suspend-button=false
-hide-switch-user-button=false
+hide-logout-button=true
+hide-restart-button=true
+hide-suspend-button=true
+hide-switch-user-button=true
 
 [org/gnome/shell/extensions/burn-my-windows]
 last-extension-version=39
@@ -287,7 +314,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=4
+indicator-position-max=3
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -328,6 +355,10 @@ position='Bottom'
 switcher-background-color=(0.98039215686274506, 0.70196078431372544, 0.52941176470588236)
 switcher-looping-method='Carousel'
 switcher-style='Coverflow'
+
+[org/gnome/shell/extensions/custom-command-toggle]
+numbuttons-setting=5
+togglestate1-setting=false
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/misc]
 action-event-delay=50
@@ -416,6 +447,15 @@ action='bright-up-all'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-6]
 ctrl=true
+
+[org/gnome/shell/extensions/customize-ibus]
+ibus-restart-time='1737549792390'
+input-mode-list={'null': false, 'com.mattjakeman.extensionmanager': true, 'org.gnome.shell.extensions': true, 'org.gnome.ptyxis': true, 'gedit': true, 'ibus-setup': false, 'org.gnome.settings': false, '': true, 'librewolf': true, 'org.gnome.nautilus': true}
+menu-ibus-emoji=false
+menu-ibus-exit=true
+menu-ibus-preference=true
+use-tray=true
+use-tray-click-source-switch=true
 
 [org/gnome/shell/extensions/dash-to-dock]
 always-center-icons=true
@@ -583,10 +623,23 @@ window-parallax=1.0
 
 [org/gnome/shell/extensions/dim-background-windows]
 dimming-enabled=true
+toggle-shortcut=['<Super>g']
 
 [org/gnome/shell/extensions/ding]
 check-x11wayland=true
 show-network-volumes=true
+
+[org/gnome/shell/extensions/dmthemechanger]
+cursor-theme-dark='Catppuccin-Papirus-Orange'
+cursor-theme-light='Catppuccin-Papirus-Orange'
+first-time-install=false
+gtk3-theme-dark='Catppuccin-Orange-Dark'
+gtk3-theme-light='Lavanda-Sea-Light'
+icon-theme-dark='Catppuccin-Papirus-Orange'
+icon-theme-light='Papirus'
+optimize-darklight-switch-transition=true
+shell-theme-dark='Catppuccin-Orange-Dark'
+shell-theme-light='Lavanda-Light'
 
 [org/gnome/shell/extensions/downfall]
 clutteranimmode=0
@@ -644,6 +697,13 @@ tracker-size=128
 
 [org/gnome/shell/extensions/flypie]
 menu-configuration='[{"name":"Example Menu","icon":"flypie-symbolic-#46a","shortcut":"<Primary>space","centered":false,"id":0,"children":[{"name":"Sound","icon":"flypie-multimedia-symbolic-#c86","children":[{"name":"Mute","icon":"flypie-multimedia-mute-symbolic-#853","type":"Shortcut","data":"AudioMute","angle":-1},{"name":"Play / Pause","icon":"flypie-multimedia-playpause-symbolic-#853","type":"Shortcut","data":"AudioPlay","angle":-1},{"name":"Next Title","icon":"flypie-multimedia-next-symbolic-#853","type":"Shortcut","data":"AudioNext","angle":90},{"name":"Previous Title","icon":"flypie-multimedia-previous-symbolic-#853","type":"Shortcut","data":"AudioPrev","angle":270}],"type":"CustomMenu","data":{},"angle":-1},{"name":"Favorites","icon":"flypie-menu-favorites-symbolic-#da3","type":"Favorites","data":{},"angle":-1},{"name":"Next Workspace","icon":"flypie-go-right-symbolic-#6b5","type":"Shortcut","data":{"shortcut":"<Control><Alt>Right"},"angle":-1},{"name":"Maximize Window","icon":"flypie-window-maximize-symbolic-#b68","type":"Shortcut","data":"<Alt>F10","angle":-1},{"name":"Fly-Pie Settings","icon":"flypie-menu-system-symbolic-#3ab","type":"Command","data":"gnome-extensions prefs flypie@schneegans.github.com","angle":-1},{"name":"Close Window","icon":"flypie-window-close-symbolic-#a33","type":"Shortcut","data":"<Alt>F4","angle":-1},{"name":"Previous Workspace","icon":"flypie-go-left-symbolic-#6b5","type":"Shortcut","data":{"shortcut":"<Control><Alt>Left"},"angle":-1},{"name":"Running Apps","icon":"flypie-menu-running-apps-symbolic-#65a","type":"RunningApps","data":{"activeWorkspaceOnly":false,"appGrouping":true,"hoverPeeking":true,"nameRegex":""},"angle":-1}],"type":"CustomMenu","data":{}}]'
+
+[org/gnome/shell/extensions/focus]
+blur-sigma=uint32 50
+focus-opacity=uint32 100
+inactive-opacity=uint32 94
+is-background-blur=false
+special-focus-opacity=uint32 90
 
 [org/gnome/shell/extensions/forge]
 css-last-update=uint32 37
@@ -731,6 +791,7 @@ imkey-6=@as []
 imkey-7=@as []
 imkey-8=@as []
 imkey-9=@as []
+tpkey-0=@as []
 
 [org/gnome/shell/extensions/just-perfection]
 accessibility-menu=false
@@ -763,6 +824,9 @@ shortcuts=['<Ctrl>Space']
 [org/gnome/shell/extensions/libpanel]
 layout=[['gnome@main', 'quick-settings-audio-panel@rayzeq.github.io/main']]
 single-column=false
+
+[org/gnome/shell/extensions/lilypad]
+rightbox-order=['lilypad', 'syncthingIndicator', 'a11y', 'keyboard', 'color_picker', 'Clipboard_History_Indicator', 'eye_on_cursor']
 
 [org/gnome/shell/extensions/lineup]
 indicator-width=40
@@ -838,6 +902,10 @@ debounce=200
 left='workspace'
 right='workspace'
 wrap=false
+
+[org/gnome/shell/extensions/pointer-tracker]
+tracker-active=true
+tracker-shape='cursor'
 
 [org/gnome/shell/extensions/quick-settings-audio-panel]
 always-show-input-slider=true
@@ -952,7 +1020,7 @@ refresh-interval=1
 
 [org/gnome/shell/extensions/top-bar-organizer]
 center-box-order=['ArcMenu', 'Space Bar', 'Spacer', 'dateMenu']
-left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu', 'System_Monitor@bghome.gmail.com', 'activities']
+left-box-order=['runcat-indicator', 'TopHat', 'WeatherOrNot', 'vitalsMenu', 'Resource_Monitor@Ory0n', 'System_Monitor@bghome.gmail.com', 'activities', 'AppTabs', 'favorite-apps@venovar.tr']
 right-box-order=['Nothing to say indicator', 'syncthingIndicator', 'gamemodeshellextension@trsnaqe.com', 'drive-menu', 'screenRecording', 'a11y', 'lockkeys', 'screenSharing', 'dwellClick', 'keyboard', 'color-picker@tuberry', 'ddterm', 'Clipboard History Indicator', 'eye-on-cursor-0', 'uniteWindowControls']
 
 [org/gnome/shell/extensions/tophat]
@@ -1001,6 +1069,7 @@ name='Catppuccin-Orange-Dark'
 
 [org/gnome/shell/extensions/venfavapps]
 hide-activities-button=false
+icon-size=50
 number-of-columns=10
 position-offset=10
 
@@ -1204,4 +1273,25 @@ popup-opacity=10
 popup-scale=55
 popup-visibility=1
 vertical=92
+
+[org/gnome/shell/extensions/workspaces-indicator-by-open-apps]
+apps-all-desaturate=false
+apps-inactive-effect='NOTHING'
+apps-minimized-effect='NOTHING'
+hide-activities-button=true
+indicator-color='rgba(255,255,255,0.53)'
+indicator-hide-empty=true
+indicator-show-active-workspace=false
+indicator-show-focused-app=true
+indicator-show-indexes=false
+indicator-swap-position=true
+indicator-use-custom-names=false
+middle-click-close-app=false
+position-in-panel='CENTER'
+position-index=1
+size-app-icon=26
+spacing-label-left=1
+spacing-label-right=1
+spacing-workspace-left=0
+spacing-workspace-right=0
 
