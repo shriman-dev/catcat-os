@@ -104,10 +104,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           oci: false
 
-      - name: Remove auxiliary images
-        # We are tight on space, need at least 2x for OSTree
-        run: |
-          sudo podman image rm ${{ env.PULL_IMAGE_REGISTRY }}/${{ env.BASE_IMAGE_NAME }}${{ env.NVIDIA_FLAVOR }}:${{ env.MAJOR_VERSION }}
+#      - name: Remove auxiliary images
+#        run: |
+#          sudo podman image rm ${{ env.PULL_IMAGE_REGISTRY }}/${{ env.BASE_IMAGE_NAME }}${{ env.NVIDIA_FLAVOR }}:${{ env.MAJOR_VERSION }}
 
       # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
       # https://github.com/macbre/push-to-ghcr/issues/12
