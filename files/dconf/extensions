@@ -314,7 +314,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=5
+indicator-position-max=3
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]

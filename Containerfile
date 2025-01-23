@@ -1,9 +1,11 @@
 ## MAJOR_VERSION arg must be a version built for the specific image: eg, 39, 40, gts, latest
 ARG MAJOR_VERSION
-ARG IS_NVIDIA
+ARG PULL_IMAGE_REGISTRY
+ARG BASE_IMAGE_NAME
+ARG NVIDIA_FLAVOR
 
 ## this is a standard Containerfile FROM using the build ARGs above to select the right upstream image
-FROM ghcr.io/ublue-os/bazzite-gnome${IS_NVIDIA}:${MAJOR_VERSION} AS catcat-os
+FROM ${PULL_IMAGE_REGISTRY}/${BASE_IMAGE_NAME}${NVIDIA_FLAVOR}:${MAJOR_VERSION} AS catcat-os
 
 ARG IMAGE_NAME
 ARG MAJOR_VERSION
