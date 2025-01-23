@@ -75,14 +75,14 @@ jobs:
           flatpak install --system -y ${FLATPAK_REFS_DIR_LIST}
           ostree refs --repo=\${FLATPAK_SYSTEM_DIR}/repo | grep '^deploy/' | grep -v 'org\.freedesktop\.Platform\.openh264' | sed 's/^deploy\///g' > /output/flatpaks_with_deps
           EOF
-          sudo podman run --rm --privileged --pull=newer --security-opt label=disable \
+          docker run --rm --privileged \
             --entrypoint bash \
             -e FLATPAK_SYSTEM_DIR=/flatpak/flatpak \
             -e FLATPAK_TRIGGERSDIR=/flatpak/triggers \
             --volume ${FLATPAK_REFS_DIR_ABS}:/output \
             --volume ${TEMP_FLATPAK_INSTALL_DIR}:/temp_flatpak_install_dir \
             ${IMAGE_FULL} /temp_flatpak_install_dir/script.sh
-          sudo podman rmi ${IMAGE_FULL}
+          docker rmi ${IMAGE_FULL}
           
           echo "flatpak-refs-dir=${FLATPAK_REFS_DIR}" >> $GITHUB_OUTPUT
 

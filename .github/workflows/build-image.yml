@@ -120,6 +120,7 @@ jobs:
           prev-ref: "${{ steps.registry_case.outputs.lowercase }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
           labels: ${{ steps.metadata.outputs.labels }}
+          max-layers: 50
 #          skip_compression: true
 
        # These `if` statements are so that pull requests for your custom images do not make it publish any packages under your name without you knowing
