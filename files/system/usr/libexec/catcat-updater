@@ -30,7 +30,7 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
     fi
 
     if [[ $(id -u) -eq 0 ]] && [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
-      /usr/bin/rpm-ostree upgrade && UPDATE_SUCCESSFUL=1
+      /usr/bin/bootc upgrade
       /usr/bin/rpm-ostree cleanup -b ; /usr/bin/ostree prune
     fi
 

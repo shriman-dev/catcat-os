@@ -14,23 +14,17 @@ To rebase an existing atomic Fedora installation to the latest build:
   
   First rebase to the unsigned image, to get the proper signing keys then reboot and rebase to the signed image
   ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os:latest
+  sudo bootc switch --enforce-container-sigpolicy ghcr.io/shriman-dev/catcat-os:latest
   ```
   ```
   systemctl reboot
-  ```
-  ```
-  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os:latest
   ```
   For Nvdia GPUs:
   ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/shriman-dev/catcat-os-nv:latest
+  sudo bootc switch --enforce-container-sigpolicy ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
   ```
   systemctl reboot
-  ```
-  ```
-  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/shriman-dev/catcat-os-nv:latest
   ```
 
 The `latest` tag will automatically point to the latest build.
