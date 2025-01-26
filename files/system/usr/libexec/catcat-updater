@@ -34,7 +34,7 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
       /usr/bin/rpm-ostree cleanup -b ; /usr/bin/ostree prune
     fi
 
-    echo $(date "+%a %b %d %H:%M:%S %Y") > /etc/catcat-os/last-auto-update
+    date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update
     /usr/bin/notify-send "Automatic Weekly Update is done."
 fi
 

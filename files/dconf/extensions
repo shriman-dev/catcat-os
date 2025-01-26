@@ -314,7 +314,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=3
+indicator-position-max=4
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -1209,7 +1209,7 @@ wst-position-adjust=0
 battery-slot=1
 fixed-widths=false
 hide-icons=false
-hot-sensors=['__temperature_avg__', '__network-tx_max__', '__network-rx_max__']
+hot-sensors=['__temperature_avg__', '_system_load_1m_', '__network-tx_max__', '__network-rx_max__']
 icon-style=0
 include-static-gpu-info=true
 include-static-info=true

@@ -192,8 +192,3 @@ cp -drf /etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/e
 echo
 }
 shell-exts
-
-
-# last commit sha
-mkdir -p /etc/catcat-os/
-curl -s -X GET https://api.github.com/repos/shriman-dev/catcat-os/commits | jq -r '.[0].sha' > /etc/catcat-os/update_sha

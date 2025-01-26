@@ -1,4 +1,3 @@
----
 name: build images
 on:
   pull_request:
@@ -57,6 +56,7 @@ jobs:
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           if [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]]; then
             echo "NVIDIA_FLAVOR=-nvidia" >> $GITHUB_ENV
           fi
@@ -98,6 +98,7 @@ jobs:
           build-args: |
             IMAGE_NAME=${{ matrix.IMAGE_NAME }}
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+            COMMIT_SHA=${{ env.COMMIT_SHA }}
             PULL_IMAGE_REGISTRY=${{ env.PULL_IMAGE_REGISTRY }}
             BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }}
             NVIDIA_FLAVOR=${{ env.NVIDIA_FLAVOR }}

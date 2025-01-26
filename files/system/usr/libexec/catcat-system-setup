@@ -93,9 +93,9 @@ if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then
   systemctl --global disable mcontrolcenter.helper.service
 fi
 
-if ! inxi -M | grep -qE "Type: Laptop"; then
-  systemctl disable --force --now auto-power-profile.service
-fi
+#if ! inxi -M | grep -qE "Type: Laptop"; then
+#  systemctl disable --force --now auto-power-profile.service
+#fi
 
 
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -oue pipefail
-echo ===============
-echo ${IMAGE_NAME} ${MAJOR_VERSION}
-echo ===============
+echo ${COMMIT_SHA}
+echo ${IMAGE_NAME} ${MAJOR_VERSION} 
+echo ${COMMIT_SHA}
 
 echo -e "\n$0\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -18,8 +18,11 @@ cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
 cp -drf  ${FILESDIR}/skel     /etc/ &
 
+# last commit sha
+mkdir -p /etc/catcat-os/
+echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
 
-[[ $IMAGE_NAME =~ (^| )'catcat-os'($| ) ]] && $SCRIPT_DIR/fancontrol.sh
+[[ $IMAGE_NAME == 'catcat-os' ]] && $SCRIPT_DIR/fancontrol.sh
 $SCRIPT_DIR/pre-setup.sh
 $SCRIPT_DIR/rpm-ostree.sh
 $SCRIPT_DIR/systemd.sh
