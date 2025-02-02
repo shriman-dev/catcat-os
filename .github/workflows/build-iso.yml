@@ -74,9 +74,8 @@ jobs:
           flatpak config --system --set languages "*"
           flatpak remote-add --system flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install --system -y ${FLATPAK_REFS_DIR_LIST}
-          runtimes=($( sed '/^$/d; /^#/d' "${EXTRA_RUNTIMES}" ))
-          for runtime in "${runtimes[@]}"; do
-            flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch $runtime | awk '{print "runtime/" $1 "/x86_64/" $2}')
+          for runtime in $( sed '/^$/d; /^#/d' "${EXTRA_RUNTIMES}" ); do
+            FLATPAK_REFS_DIR_LIST+=$(flatpak search --columns=application,branch $runtime | awk '{print "runtime/" $1 "/x86_64/" $2}')
           done
           ostree refs --repo=\${FLATPAK_SYSTEM_DIR}/repo | grep '^deploy/' | grep -v 'org\.freedesktop\.Platform\.openh264' | sed 's/^deploy\///g' > /output/flatpaks_with_deps
           EOF
