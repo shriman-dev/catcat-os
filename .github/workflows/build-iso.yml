@@ -64,6 +64,7 @@ jobs:
           mkdir -p "${FLATPAK_REFS_DIR}"
           sed '/^$/d; /^#/d' ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install > ${FLATPAK_REFS_DIR_ABS}/install
           FLATPAK_REFS_DIR_LIST=$(cat ${FLATPAK_REFS_DIR_ABS}/* | tr '\n' ' ' )
+          EXTRA_RUNTIMES=${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/runtimes
           # Generate install script
           cat << EOF > ${TEMP_FLATPAK_INSTALL_DIR}/script.sh
           cat /temp_flatpak_install_dir/script.sh
@@ -73,6 +74,10 @@ jobs:
           flatpak config --system --set languages "*"
           flatpak remote-add --system flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install --system -y ${FLATPAK_REFS_DIR_LIST}
+          runtimes=($( sed '/^$/d; /^#/d' "${EXTRA_RUNTIMES}" ))
+          for runtime in "${runtimes[@]}"; do
+            flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch $runtime | awk '{print "runtime/" $1 "/x86_64/" $2}')
+          done
           ostree refs --repo=\${FLATPAK_SYSTEM_DIR}/repo | grep '^deploy/' | grep -v 'org\.freedesktop\.Platform\.openh264' | sed 's/^deploy\///g' > /output/flatpaks_with_deps
           EOF
           podman run --rm --privileged \
