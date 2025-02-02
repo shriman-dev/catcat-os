@@ -5,7 +5,7 @@ notify_all() {
     for SOME_USER in /run/user/*; do
         SOME_USER=$(basename "$SOME_USER")
         sudo -u $(id -u -n "$SOME_USER") \
-            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -a "silverblue-update" "$1"
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -a "CatCat OS Update" "$1"
     done
 }
 
