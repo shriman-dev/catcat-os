@@ -19,5 +19,4 @@ ENV COMMIT_SHA="${COMMIT_SHA}"
 COPY /files /tmp/files
 COPY cosign.pub /etc/pki/containers/catcat-os.pub
 
-RUN /tmp/files/scripts/setup.sh && \
-    ostree container commit
+RUN /tmp/files/scripts/setup.sh && ostree container commit
