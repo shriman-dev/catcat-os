@@ -31,9 +31,11 @@ screens:
           - Showtime - video player: org.gnome.Showtime
           - Clapper - video player: com.github.rafostar.Clapper
           - Gapless - music player: com.github.neithern.g4music
+          - Decibels - music player: org.gnome.Decibels
           - EarTag - edit metadata of songs: app.drey.EarTag
           - Meld - compare files and folder: org.gnome.meld
           - Collision - hash files: dev.geopjr.Collision
+          - Clapgrep - search text in files: de.leopoldluley.Clapgrep
           - Czkawka - clean duplicate files: com.github.qarmin.czkawka
           - Metadata Cleaner: fr.romainvigier.MetadataCleaner
 
@@ -48,6 +50,7 @@ screens:
           - RawTherapee: com.rawtherapee.RawTherapee
           - Identity - compare images and videos: org.gnome.gitlab.YaLTeR.Identity
           - Upscayl - AI image upscaler: org.upscayl.Upscayl
+          - Footage - minimal video editor: io.gitlab.adhami3310.Footage
           - Pitivi - video editor: org.pitivi.Pitivi
           - Shotcut - video editor: org.shotcut.Shotcut
           - HandBrake - convert videos: fr.handbrake.ghb
@@ -58,7 +61,6 @@ screens:
           packages:
           - LibreOffice: org.libreoffice.LibreOffice
           - Onlyoffice: org.onlyoffice.desktopeditors
-          - Zed code editor: dev.zed.Zed
           - Iotas - note app: org.gnome.World.Iotas
           - Foliate - ebook reader: com.github.johnfactotum.Foliate
           - Rnote - hand written notes: com.github.flxzt.rnote
@@ -77,11 +79,22 @@ screens:
           - ArmCord - discord frontend: xyz.armcord.ArmCord
           - Signal messenger: org.signal.Signal
 
+        Productivity and Development:
+          description: Apps for productivity and development
+          default: false
+          packages:
+          - Zed code editor: dev.zed.Zed
+          - Dev Toolbox: me.iepure.devtoolbox
+          - Graphs - visualize data: se.sjoerd.Graphs
+          - Play Timer - pomodoro timer: io.github.efogdev.mpris-timer
+          - Errands - manage your tasks: io.github.mrvladus.List
+          - Sticky Notes: com.vixalien.sticky
+
         Tools and Utilities:
           description: Apps to perform specific tasks and enhance overall experience
           default: false
           packages:
-          - Gnome Boxes - virtualization software: org.gnome.Boxes
+#          - Gnome Boxes - virtualization software: org.gnome.Boxes
           - Vaults - make encrypted folders: io.github.mpobaschnig.Vaults
           - Pika Backup - take timely backups: org.gnome.World.PikaBackup
           - Secrets - offline password manager: org.gnome.World.Secrets

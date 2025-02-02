@@ -39,7 +39,8 @@ declare -A appPathsWithSed=(
 /geometry/d"
     ['/org/gnome/Ptyxis/']="
 /window-size=(/d"
-    ['/org/gnome/software/']=""
+    ['/org/gnome/software/']="
+/flatpak-purge-timestamp/d"
 )
 
 > $DCONF_DIR/apps
@@ -98,9 +99,11 @@ declare -A shellPathsWithSed=(
 /welcome-dialog-last-shown-version/d
 /had-bluetooth-devices-setup/d
 /^app-picker-layout=/s/,[^,]*\.desktop[^,]*>//g
+s|'quick-touchpad-toggle@kramo.hu',||
+s|, 'quick-touchpad-toggle@kramo.hu'||
 s|'color-picker@tuberry',||
-s|'syncthing@gnome.2nv2u.com',||
 s|, 'color-picker@tuberry'||
+s|'syncthing@gnome.2nv2u.com',||
 s|, 'syncthing@gnome.2nv2u.com'||"
     ['/org/gnome/shell/window-switcher/']=""
 )

@@ -35,8 +35,9 @@ curl -Lo /usr/share/applications/yazi.desktop https://raw.githubusercontent.com/
 curl -Lo /usr/share/icons/yazi.png https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/logo.png
 
 unzip /tmp/yazi.zip
-cp -dvf yazi-x86_64-unknown-linux-gnu/yazi /usr/bin/
+cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
 chmod +x /usr/bin/yazi
+chmod +x /usr/bin/ya
 }
 yazi &
 

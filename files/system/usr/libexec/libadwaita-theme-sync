@@ -20,7 +20,6 @@ syncLibadwaitaTheme() {
 while true; do
   selected_gtk_theme=$(dconf read /org/gnome/desktop/interface/gtk-theme | tr -d \')
   theme_path=$(find "$HOME/.themes/" -maxdepth 1 -mindepth 1 -type d -iname "${selected_gtk_theme}")
-
   previous_gtk_theme="${previous_gtk_theme:-}"
 
   syncLibadwaitaTheme "${selected_gtk_theme}" "${previous_gtk_theme}" "${theme_path}"

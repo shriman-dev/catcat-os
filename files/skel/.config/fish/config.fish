@@ -88,6 +88,15 @@ function grubup
     end
 end
 
+function y
+	set tmp (mktemp -t "yazi-cwd.XXXXXX")
+	yazi $argv --cwd-file="$tmp"
+	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+		builtin cd -- "$cwd"
+	end
+	rm -f -- "$tmp"
+end
+
 alias c='clear'
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -113,7 +122,7 @@ alias fcc="fc-cache -fvr --really-force "
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
 alias wget='wget -c '
-#alias psmem='ps aux | awk '{print $6/1024 " MiB\t\t" $11,$12,$13,$14,$15,$16,$17,$18,$19,$20}' | sort -n ; free -hlm'
+alias psmem='procs --sortd UsageMem'
 alias hw='hwinfo --short'
 alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
 alias netproc="sudo netproc  -B -c -v"

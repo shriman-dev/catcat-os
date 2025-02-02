@@ -9,8 +9,6 @@ systemctl -f enable fstrim.timer nix.mount catcat-system-setup.service auto-powe
 systemctl --global -f enable catcat-user-setup.service libadwaita-theme-sync.service ublue-update.service ublue-update.timer &
 
 
-
-
 #gdm.service
 systemctl disable cups.service flatpak-system-update.timer brew-dir-fix.service brew-setup.service brew-update.service brew-upgrade.service input-remapper.service NetworkManager-wait-online.service systemd-networkd-wait-online.service tailscaled.service sshd.service tracker-miner-fs-3.servicee tracker-miner-fs-control-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service dconf-update.service flatpak-add-fedora-repos.service &
 

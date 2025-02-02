@@ -27,7 +27,7 @@ rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/do
 
 diskFileMan='compsize htop btop ncdu fio fzf fd-find ripgrep zoxide dosfstools exfatprogs dmraid zstd gpart gparted'
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi ghostty'
+terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi ghostty poppler wl-clipboard bandwhich hyperfine procs duf'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
@@ -51,6 +51,6 @@ gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsyn
 
 virtualization='gnome-boxes virt-manager libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
 
-extras='bleachbit gnome-system-monitor uresourced irqbalance'
+extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
 
 rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )

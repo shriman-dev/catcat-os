@@ -1025,6 +1025,7 @@ right-box-order=['Nothing to say indicator', 'syncthingIndicator', 'gamemodeshel
 
 [org/gnome/shell/extensions/tophat]
 cpu-display='chart'
+cpu-normalize-proc-use=true
 cpu-show-cores=true
 disk-display='both'
 disk-monitor-mode='activity'
