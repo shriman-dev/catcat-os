@@ -1,5 +1,16 @@
 #!/bin/bash
 
+
+notify_all() {
+    for SOME_USER in /run/user/*; do
+        SOME_USER=$(basename "$SOME_USER")
+        sudo -u $(id -u -n "$SOME_USER") \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -a "silverblue-update" "$1"
+    done
+}
+
+
+
 FLATPAK_APPS_TO_UPDATE_SOLEY=(
   "io.gitlab.librewolf-community"
   "com.brave.Browser"
@@ -16,9 +27,11 @@ done
 
 # update if system is one weeks old
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
-    /usr/bin/notify-send "Automatic Weekly Update has Started."
-    /usr/bin/flatpak update --assumeyes --noninteractive
+    [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update has started."
+    /usr/bin/flatpak repair
+    /usr/bin/flatpak update --assumeyes --noninteractive --appstream
     /usr/bin/flatpak uninstall --unused
+
 
     if command -v nix-env; then
       nix-channel --update && nix-env -b --upgrade
@@ -35,6 +48,6 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
     fi
 
     date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update
-    /usr/bin/notify-send "Automatic Weekly Update is done."
+    [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update is done."
 fi
 
