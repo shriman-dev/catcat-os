@@ -29,6 +29,7 @@ done
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
     [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update has started."
     /usr/bin/flatpak repair
+    /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak update --assumeyes --noninteractive --appstream
     /usr/bin/flatpak uninstall --unused
 
