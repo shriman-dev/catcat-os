@@ -1,10 +1,11 @@
 #!/bin/bash
 set -oue pipefail
+echo -e "\n$0\n"
+
 echo ${COMMIT_SHA}
 echo ${IMAGE_NAME} ${MAJOR_VERSION} 
 echo ${COMMIT_SHA}
 
-echo -e "\n$0\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 $SCRIPT_DIR/cleanup.sh
@@ -23,11 +24,14 @@ mkdir -p /etc/catcat-os/
 echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
 
 [[ $IMAGE_NAME == 'catcat-os' ]] && $SCRIPT_DIR/fancontrol.sh
-$SCRIPT_DIR/pre-setup.sh
+
 $SCRIPT_DIR/rpm-ostree.sh
-$SCRIPT_DIR/systemd.sh
+$SCRIPT_DIR/extra-pkgs.sh
+$SCRIPT_DIR/1st-setup.sh
+$SCRIPT_DIR/2nd-setup-and-fixes.sh
+$SCRIPT_DIR/config-and-theming.sh
 $SCRIPT_DIR/nerd-fonts.sh
-$SCRIPT_DIR/post-setup.sh
+$SCRIPT_DIR/systemd.sh
 $SCRIPT_DIR/initramfs.sh
 $SCRIPT_DIR/signing.sh
 

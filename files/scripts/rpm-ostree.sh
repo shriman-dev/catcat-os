@@ -1,6 +1,5 @@
 #!/bin/bash
-set -oue pipefail
-
+set -oue pipefail 
 echo -e "\n$0\n"
 
 addRepos() {
@@ -20,18 +19,18 @@ addRepos
 rpm-ostree override remove fastfetch gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
 #sunshine
 
-security='firejail firewall-config'
+security='firejail firewall-config usbguard'
 
 shell='fish bat eza starship'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-diskFileMan='compsize htop btop ncdu fio fzf fd-find ripgrep zoxide dosfstools exfatprogs dmraid zstd gpart gparted'
+diskFileMan='compsize htop btop ncdu fio fzf fd-find ripgrep zoxide dosfstools exfatprogs dmraid zstd gpart gparted duf'
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi ghostty poppler wl-clipboard bandwhich hyperfine procs duf'
+terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi poppler wl-clipboard bandwhich hyperfine procs'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
-devTools='ptyxis git lazygit micro neovim tmux sassc codium'
+devTools='ptyxis git lazygit micro neovim tmux zellij sassc codium ghostty'
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
 

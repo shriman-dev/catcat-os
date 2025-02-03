@@ -41,6 +41,9 @@ declare -A appPathsWithSed=(
 /window-size=(/d"
     ['/org/gnome/software/']="
 /flatpak-purge-timestamp/d"
+    ['/org/x/editor/']="
+/\/filebrowser\//,/^$/d
+/caffeine/,/^$/ { /size/d; /state/d }"
 )
 
 > $DCONF_DIR/apps

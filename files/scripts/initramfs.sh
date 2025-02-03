@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
-
 echo -e "\n$0\n"
-
 
 if ! command -v rpm-ostree &> /dev/null || ! command -v bootc &> /dev/null; then
   echo "This module is only compatible with Fedora Atomic images"

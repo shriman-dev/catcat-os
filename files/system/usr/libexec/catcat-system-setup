@@ -63,6 +63,10 @@ KARGS_TO_ADD=(
 # "amdgpu.ppfeaturemask=0xffffffff"
 # "mem_sleep_default=deep"
 
+if command -v nvidia-smi; then
+  KARGS_TO_ADD+=("nvidia-drm.modeset=1")
+fi
+
 for karg in "${KARGS_TO_ADD[@]}"; do
   if [[ ! $KARGS =~ $karg ]]; then
     echo "Adding needed kargs for $karg"

@@ -125,7 +125,7 @@ local function setup(st, opts)
 		[4] = t.untracked and ui.Style(t.untracked) or ui.Style():fg("cyan"),
 		[3] = t.ignored and ui.Style(t.ignored) or ui.Style():fg("white"),
 		[2] = t.deleted and ui.Style(t.deleted) or ui.Style():fg("red"),
-		[1] = t.updated and ui.Style(t.updated) or ui.Style():fg("blue"),
+		[1] = t.updated and ui.Style(t.updated) or ui.Style():fg("green"),
 	}
 	local signs = {
 		[6] = t.modified_sign and t.modified_sign or "󰣕",

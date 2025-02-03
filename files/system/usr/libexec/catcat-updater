@@ -28,10 +28,10 @@ done
 # update if system is one weeks old
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
     [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update has started."
-    /usr/bin/flatpak repair
     /usr/bin/flatpak update --assumeyes --noninteractive
     /usr/bin/flatpak update --assumeyes --noninteractive --appstream
-    /usr/bin/flatpak uninstall --unused
+    /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive
+    /usr/bin/flatpak repair
 
 
     if command -v nix-env; then
@@ -40,12 +40,16 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
     fi
 
     if [[ $(id -u) -eq 0 ]] ; then
-      /usr/bin/fwupdmgr refresh -y --force && /usr/bin/fwupdmgr -y update
+      /usr/bin/fwupdmgr refresh -y --force
+      /usr/bin/fwupdmgr get-updates
+      /usr/bin/fwupdmgr -y update
     fi
 
     if [[ $(id -u) -eq 0 ]] && [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
       /usr/bin/bootc upgrade
-      /usr/bin/rpm-ostree cleanup -b ; /usr/bin/ostree prune
+      /usr/bin/rpm-ostree cleanup -b
+      /usr/bin/ostree prune
+      /usr/bin/systemd-tmpfiles --clean
     fi
 
     date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update

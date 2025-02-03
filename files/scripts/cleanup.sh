@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-
 set -oue pipefail
-
 echo -e "\n$0\n"
 
 #rm -vf /usr/share/pixmaps/fedora*

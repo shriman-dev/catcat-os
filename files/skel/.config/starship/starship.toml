@@ -437,7 +437,7 @@ diverged = "󰡏 ${ahead_count} ${behind_count} " # nf-md-arrow_expand_vertical
 # diverged = "󰯎 ${ahead_count} ${behind_count}" # nf-md-swap_vertical_bold
 # ignore_submodules = true
 #format = "[ ($staged$modified$renamed$untracked$deleted$conflicted$stashed$ahead_behind)]($style)"
-format = " [$staged](green)[$modified](yellow)[$renamed](bringht-cyan)[$untracked](cyan)[$deleted](red)[$conflicted](bringht-red)[$stashed](bringht-yellow)[$ahead_behind](purple)"
+format = " [$staged](green)[$modified](yellow)[$renamed](bringht-cyan)[$untracked](cyan)[$deleted](bright-red)[$conflicted](bringht-red)[$stashed](bringht-yellow)[$ahead_behind](purple)"
 
 [git_state]
 style = "bold"
@@ -455,7 +455,7 @@ disabled = false
 added_style = 'bold'
 deleted_style = 'bold red'
 # only_nonzero_diffs = false
-format = '([󰺪 ](green)[$added](green))([ 󰺨 ](red)[$deleted ](red))' # 󰺪 = nf-md-text_box_plus // 󰺨 = nf-md-text_box_minus
+format = '([󰺪 ](green)[$added](green))([ 󰺨 ](red)[$deleted](red))' # 󰺪 = nf-md-text_box_plus // 󰺨 = nf-md-text_box_minus
 
 
 

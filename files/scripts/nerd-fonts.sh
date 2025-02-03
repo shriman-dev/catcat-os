@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 echo -e "\n$0\n"
 
 FONTS=(

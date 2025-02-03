@@ -9,6 +9,33 @@ show-active-bindings=true
 show-ipsets=true
 show-lockdown-whitelist=true
 
+[org/x/editor/plugins]
+active-plugins=['time', 'textsize', 'spell', 'sort', 'open-uri-context-menu', 'modelines', 'joinlines', 'filebrowser', 'docinfo', 'bracketcompletion']
+
+[org/x/editor/preferences/editor]
+bracket-matching=true
+display-line-numbers=true
+display-right-margin=false
+draw-whitespace=true
+draw-whitespace-leading=true
+draw-whitespace-trailing=true
+highlight-current-line=true
+scheme='catpuccin-mocha'
+
+[org/x/editor/preferences/ui]
+menubar-visible=true
+minimap-visible=false
+side-panel-visible=false
+statusbar-visible=true
+toolbar-visible=false
+
+[org/x/editor/state/window]
+bottom-panel-size=140
+side-panel-active-page=-1970755255
+side-panel-size=200
+size=(531, 471)
+state=87168
+
 [com/github/donadigo/appeditor]
 show-hidden-entries=true
 
