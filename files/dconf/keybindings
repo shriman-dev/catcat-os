@@ -24,12 +24,17 @@ magnifier-zoom-in=['<Control>Page_Up']
 magnifier-zoom-out=['<Control>Page_Down']
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
-binding='<Super>Delete'
-command='gnome-session-quit --logout --no-prompt --force'
-name='logout'
+binding='<Control><Alt>t'
+command='ptyxis --new-window'
+name='Terminal'
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1]
 binding='<Super>t'
 command='/usr/bin/ptyxis --new-window'
 name='terminal'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2]
+binding='<Control><Shift>Escape'
+command='flatpak run io.missioncenter.MissionCenter'
+name='Mission Center'
 

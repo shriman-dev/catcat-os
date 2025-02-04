@@ -82,6 +82,22 @@ unsafe-mode='default'
 volume-input-mode='default'
 volume-output-mode='default'
 
+[org/gnome/shell/extensions/Logo-menu]
+hide-forcequit=true
+hide-icon-shadow=false
+menu-button-extensions-app='com.mattjakeman.ExtensionManager.desktop'
+menu-button-icon-image=0
+menu-button-icon-size=20
+menu-button-software-center='gnome-software'
+menu-button-system-monitor='flatpak run io.missioncenter.MissionCenter'
+menu-button-terminal='ptyxis --new-window'
+show-activities-button=true
+show-boxbuddy=true
+show-gamemode=false
+show-lockscreen=false
+show-power-option=false
+symbolic-icon=false
+
 [org/gnome/shell/extensions/SettingsCenter]
 items='Advanced Settings;gnome-tweaks.desktop;0;gnome-tweaks|Desktop Config Editor;dconf-editor.desktop;0;dconf-editor|Gnome Config Editor;gconf-editor.desktop;0;gconf-editor|Session Properties;session-properties.desktop;0;gnome-session-properties|Extensions Preferences;gnome-shell-extension-prefs.desktop;0;gnome-shell-extension-prefs|Passwords and Keys;seahorse.desktop;0;seahorse|NVidia Settings;nvidia-settings.desktop;0;nvidia-settings|Color Picker;gnome-extensions enable color-picker@tuberry;1;|Color Picker Disable;gnome-extensions disable color-picker@tuberry;1;|Notes;gnome-extensions enable notes@maestroschan.fr;0;|Notes disable;gnome-extensions disable notes@maestroschan.fr;0;|Visualizer;gnome-extensions enable visualizer@sound.org;0;|Visualizer disable;gnome-extensions disable visualizer@sound.org;0;|Reading Strip;gnome-extensions enable readingstrip@lupantano.gihthub;0;|Reading Strip disable;gnome-extensions disable readingstrip@lupantano.gihthub;0;|Ddterm;gnome-extensions enable ddterm@amezin.github.com;1;gnome-extensions enable ddterm@amezin.github.com|Disable ddterm;gnome-extensions disable ddterm@amezin.github.com;1;gnome-extensions disable ddterm@amezin.github.com'
 label-menu='S-Center'
@@ -314,7 +330,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=6
+indicator-position-max=4
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]

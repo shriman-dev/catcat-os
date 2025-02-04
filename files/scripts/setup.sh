@@ -14,10 +14,10 @@ $SCRIPT_DIR/cleanup.sh
 FILESDIR="$(dirname $SCRIPT_DIR)"
 mkdir -p /var/lib/alternatives
 mkdir -p /usr/etc/dconf/db/distro.d/
-cp -drf  ${FILESDIR}/system/* / &
+cp -drf  ${FILESDIR}/system/* /
 cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
-cp -drf  ${FILESDIR}/skel     /etc/ &
+cp -drf  ${FILESDIR}/skel     /etc/
 
 # last commit sha
 mkdir -p /etc/catcat-os/

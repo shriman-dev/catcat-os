@@ -43,27 +43,22 @@ gtkThemes() {
 }
 
 gdmTheme() {
-  gdmResource=/usr/share/gnome-shell/gnome-shell-theme.gresource
+  gdmResource="/usr/share/gnome-shell/gnome-shell-theme.gresource"
   workDir="/tmp/gnome-shell"
-  gdmxml=$(basename "$gdmResource").xml
+  gdmxml="$(basename "$gdmResource").xml"
+  themePath="/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
 
-  # Create Dirs
-  for resource in `gresource list "$gdmResource"`; do
-      resource="${resource#\/org\/gnome\/shell\/}"
-      if [ ! -d "$workDir"/"${resource%/*}" ]; then
-        mkdir -p "$workDir"/"${resource%/*}"
-      fi
+  # Create directories and extract resources from gresource file
+  for resource in $(gresource list "$gdmResource"); do
+    resourcePath="${resource#\/org\/gnome\/shell\/}"
+    mkdir -p "$workDir"/"${resourcePath%/*}"
+    gresource extract "$gdmResource" "$resource" > "$workDir/$resourcePath"
   done
 
-  # Extract Resources
-  for resource in `gresource list "$gdmResource"`; do
-      gresource extract "$gdmResource" "$resource" > "$workDir"/"${resource#\/org\/gnome\/shell\/}"
-  done
+  # Copy custom theme files to working directory
+  cp -drvf "$themePath"/* $workDir/theme/
 
-  # Get custom-default shell theme
-  cp -drvf /usr/share/themes/Catppuccin-Orange-Dark/gnome-shell/* $workDir/theme/
-
- # Set background wallpaper in css
+  # Set background wallpaper and modify CSS for login and lock screen
   echo ".login-dialog { background: transparent; }
 #lockDialogGroup {
   background-image: url('resource:///org/gnome/shell/theme/background');
@@ -72,11 +67,11 @@ gdmTheme() {
 }" >> $workDir/theme/gnome-shell.css
   cp -dv   /usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg $workDir/theme/background
 
-  # Use same css for  light or dark mode
+  # Ensure the same CSS is used for both light and dark modes
   cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-dark.css
   cp -drvf $workDir/theme/gnome-shell.css $workDir/theme/gnome-shell-light.css
 
-  # Declare resources in xml file
+  # Generate gresource XML file for compiling resources
   echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <gresources>
   <gresource prefix=\"/org/gnome/shell/theme\">
@@ -85,8 +80,8 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 </gresources>" > ${workDir}/theme/${gdmxml}
   cat ${workDir}/theme/${gdmxml}
 
-  # Compile all resources to use for gdm theme
-  glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml" &&
+  # Compile all resources and apply them to the gdm theme
+  glib-compile-resources --sourcedir=$workDir/theme/ $workDir/theme/"$gdmxml"
   mv -v $workDir/theme/$(basename "$gdmResource") $gdmResource
 
   # Default settings for gdm
@@ -95,7 +90,7 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 
 defaultConfigs() {
   mkdir -p /etc/fastfetch/
-  cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/ 
+  cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/
   cp -dvrf /etc/skel/.config/Kvantum/* /usr/share/Kvantum/
   cp -dvrf /etc/skel/.config/qt5ct/* /usr/share/qt5ct/
   cp -dvrf /etc/skel/.config/qt6ct/* /usr/share/qt6ct/
@@ -123,9 +118,9 @@ shellExts() {
   echo
 }
 
-desktopFiles &
-icons &
-gtkThemes &
-gdmTheme &
-shellExts &
-defaultConfigs &
+desktopFiles
+icons
+gtkThemes
+gdmTheme
+shellExts
+defaultConfigs

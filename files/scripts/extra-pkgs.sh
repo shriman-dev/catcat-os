@@ -9,7 +9,7 @@ buttersnap() {
 curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttersnap.sh
 chmod +x /usr/bin/buttersnap.sh
 }
-buttersnap &
+buttersnap
 
 
 gocryptfs() {
@@ -19,14 +19,14 @@ tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
 cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
 chmod +x /usr/bin/gocryptfs
 }
-gocryptfs &
+gocryptfs
 
 
 btdu() {
 curl -Lo /usr/bin/btdu https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64
 chmod +x /usr/bin/btdu
 }
-btdu &
+btdu
 
 
 yazi() {
@@ -39,7 +39,7 @@ cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
 chmod +x /usr/bin/yazi
 chmod +x /usr/bin/ya
 }
-yazi &
+yazi
 
 
 pkgs() {
@@ -67,6 +67,6 @@ cp -dvf /tmp/pokemonsay-newgenerations/pokemonthink.sh /usr/bin/
 curl -Lo /usr/share/applications/micro.desktop https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
 
 }
-pkgs &
+pkgs
 
 cd /tmp/files/scripts
