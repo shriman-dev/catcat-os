@@ -122,10 +122,11 @@ alias fcc="fc-cache -fvr --really-force "
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
 alias wget='wget -c '
-alias psmem='procs --sortd UsageMem'
+alias psmem='procs --sortd mem'
+alias pscpu='procs --sortd cpu'
+alias pstree='procs --tree '
 alias hw='hwinfo --short'
 alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
-alias netproc="sudo netproc  -B -c -v"
 alias gedit="flatpak run --branch=stable --arch=x86_64 --command=gedit --file-forwarding org.gnome.gedit"
 
 
@@ -181,9 +182,9 @@ alias nigd="nix-env --delete-generations"
 alias nirb="nix-env --rollback"
 alias nirp="nix-store --verify --check-contents --repair"
 function nix-profiled
-    mkdir -p $HOME/Bkups/nix-profiles
+    mkdir -p $HOME/.local/state/nix/custom-profiles
     set nixpkg $(echo "$argv[2]" | cut -d '.' -f 2-)
-    ls -A1 /nix/var/nix/profiles/ | grep -oq $nixpkg || nix-channel --update && nix-env --profile /nix/var/nix/profiles/$nixpkg $argv[1] $argv[2] && ln -sfv /nix/var/nix/profiles/$nixpkg $HOME/Bkups/nix-profiles
+    ls -A1 /nix/var/nix/profiles/ | grep -oq $nixpkg || nix-channel --update && nix-env --profile /nix/var/nix/profiles/$nixpkg $argv[1] $argv[2] && ln -sfv /nix/var/nix/profiles/$nixpkg $HOME/.local/state/nix/custom-profiles
 end
 
 # apt alias

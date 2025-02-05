@@ -19,8 +19,6 @@ sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup
 sed -i 's|ExecStart=.*|ExecStart=/usr/libexec/catcat-updater|' /usr/lib/systemd/system/ublue-update.service
 sed -i 's|OnUnitInactiveSec=.*|OnUnitInactiveSec=2h|' /usr/lib/systemd/system/ublue-update.timer
 ln -sfv /usr/libexec/catcat-updater /usr/bin/
-cp -v /usr/lib/systemd/system/ublue-update.service /usr/lib/systemd/user/
-cp -v /usr/lib/systemd/system/ublue-update.timer /usr/lib/systemd/user/
 
 # remove pip from topgrade config
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true

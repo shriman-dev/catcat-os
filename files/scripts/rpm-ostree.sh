@@ -21,16 +21,18 @@ rpm-ostree override remove fastfetch gnome-browser-connector plocate gnome-shell
 
 security='firejail firewall-config usbguard'
 
-shell='fish bat eza starship'
+shellSetup='fish bat eza starship fzf fd-find ripgrep zoxide tmux zellij'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-diskFileMan='compsize htop btop ncdu fio fzf fd-find ripgrep zoxide dosfstools exfatprogs dmraid zstd gpart gparted duf'
+monitoringTools='htop btop bandwhich nethogs procs'
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi poppler wl-clipboard bandwhich hyperfine procs'
+diskFileMan='compsize ncdu fio duf dosfstools exfatprogs dmraid zstd gpart gparted'
+
+terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi poppler wl-clipboard hyperfine'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
-devTools='ptyxis git lazygit micro neovim tmux zellij sassc codium ghostty'
+devTools='ptyxis git lazygit micro neovim sassc codium ghostty'
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
 
@@ -52,4 +54,4 @@ virtualization='gnome-boxes virt-manager libvirt libvirt-client libvirt-client-q
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
 
-rpm-ostree install $( echo "$security" "$shell" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )
+rpm-ostree install $( echo "$security" "$shellSetup" "$monitoringTools" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )

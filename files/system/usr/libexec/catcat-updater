@@ -1,14 +1,22 @@
 #!/bin/bash
 
 
-notify_all() {
+
+run_as_all_users() {
     for SOME_USER in /run/user/*; do
         SOME_USER=$(basename "$SOME_USER")
-        sudo -u $(id -u -n "$SOME_USER") \
-            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -a "CatCat OS Update" "$1"
+        sudo -u $(id -u -n "$SOME_USER") "$@"
     done
 }
 
+
+notify_all() {
+    for SOME_USER in /run/user/*; do
+        SOME_USER=$(basename "$SOME_USER")
+        run_as_all_users \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -i '/usr/share/pixmaps/catcat-os-logo.svg' -a "CatCat OS Update" "$1"
+    done
+}
 
 
 FLATPAK_APPS_TO_UPDATE_SOLEY=(
@@ -25,19 +33,30 @@ done
 # two weeks = 1209600
 # one week = 604800
 
+
+update_flatpak() {
+  /usr/bin/flatpak update --assumeyes --noninteractive
+  /usr/bin/flatpak update --assumeyes --noninteractive --appstream
+  /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive
+  /usr/bin/flatpak repair
+}
+
+update_nixpkg() {
+  if command -v nix-env; then
+    nix-channel --update && nix-env -b --upgrade
+    nix-store --optimise && nix-collect-garbage
+  fi
+}
+
+
 # update if system is one weeks old
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
     [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update has started."
-    /usr/bin/flatpak update --assumeyes --noninteractive
-    /usr/bin/flatpak update --assumeyes --noninteractive --appstream
-    /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive
-    /usr/bin/flatpak repair
+    update_flatpak
+    run_as_all_users update_flatpak
 
-
-    if command -v nix-env; then
-      nix-channel --update && nix-env -b --upgrade
-      nix-store --optimise && nix-collect-garbage
-    fi
+    update_nixpkg
+    run_as_all_users update_nixpkg
 
     if [[ $(id -u) -eq 0 ]] ; then
       /usr/bin/fwupdmgr refresh -y --force

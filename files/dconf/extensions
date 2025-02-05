@@ -1241,7 +1241,7 @@ update-time=1
 use-higher-precision=true
 
 [org/gnome/shell/extensions/weatherornot]
-position='left'
+position='right'
 
 [org/gnome/shell/extensions/window-thumbnails]
 create-tmb-shortcut=['<Super>t']
