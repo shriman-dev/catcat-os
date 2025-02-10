@@ -2,7 +2,7 @@
 
 
 
-run_as_all_users() {
+runAsAllUsers() {
     for SOME_USER in /run/user/*; do
         SOME_USER=$(basename "$SOME_USER")
         sudo -u $(id -u -n "$SOME_USER") "$@"
@@ -10,10 +10,10 @@ run_as_all_users() {
 }
 
 
-notify_all() {
+notifyAll() {
     for SOME_USER in /run/user/*; do
         SOME_USER=$(basename "$SOME_USER")
-        run_as_all_users \
+        runAsAllUsers \
             DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -i '/usr/share/pixmaps/catcat-os-logo.svg' -a "CatCat OS Update" "$1"
     done
 }
@@ -34,14 +34,14 @@ done
 # one week = 604800
 
 
-update_flatpak() {
-  /usr/bin/flatpak update --assumeyes --noninteractive
-  /usr/bin/flatpak update --assumeyes --noninteractive --appstream
-  /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive
-  /usr/bin/flatpak repair
+updateFlatpak() {
+  /usr/bin/flatpak update $1 --assumeyes --noninteractive
+  /usr/bin/flatpak update $1 --assumeyes --noninteractive --appstream
+  /usr/bin/flatpak uninstall $1 --unused --assumeyes --noninteractive
+  /usr/bin/flatpak repair $1
 }
 
-update_nixpkg() {
+updateNixpkg() {
   if command -v nix-env; then
     nix-channel --update && nix-env -b --upgrade
     nix-store --optimise && nix-collect-garbage
@@ -51,12 +51,13 @@ update_nixpkg() {
 
 # update if system is one weeks old
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 604800 )) ]]; then
-    [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update has started."
-    update_flatpak
-    run_as_all_users update_flatpak
+    [[ $(id -u) -eq 0 ]] && notifyAll "Automatic weekly update has started."
 
-    update_nixpkg
-    run_as_all_users update_nixpkg
+    updateFlatpak --system
+    runAsAllUsers updateFlatpak --user
+
+    updateNixpkg
+    runAsAllUsers updateNixpkg
 
     if [[ $(id -u) -eq 0 ]] ; then
       /usr/bin/fwupdmgr refresh -y --force
@@ -66,12 +67,12 @@ if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update) -lt $(( $(date +%s) - 6048
 
     if [[ $(id -u) -eq 0 ]] && [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
       /usr/bin/bootc upgrade
-      /usr/bin/rpm-ostree cleanup -b
+      /usr/bin/rpm-ostree cleanup -bm
       /usr/bin/ostree prune
       /usr/bin/systemd-tmpfiles --clean
     fi
 
     date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update
-    [[ $(id -u) -eq 0 ]] && notify_all "Automatic weekly update is done."
+    [[ $(id -u) -eq 0 ]] && notifyAll "Automatic weekly update is done."
 fi
 

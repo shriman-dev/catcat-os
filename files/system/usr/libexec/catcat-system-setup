@@ -23,7 +23,8 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 
   # Permit user 1000
   U="$(id -un 1000)"
-  usermod -a -G input $U
+  usermod -aG input $U
+  usermod -aG libvirt $U
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot

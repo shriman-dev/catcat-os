@@ -2,6 +2,16 @@
 set -oue pipefail
 echo -e "\n$0\n"
 
+# Mac Randomization
+cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
+[device]
+wifi.scan-rand-mac-address=yes
+
+[connection]
+wifi.cloned-mac-address=random
+ethernet.cloned-mac-address=random
+EOF
+
 # Create a xdg autostart file to mute microphone on boot
 cat > /etc/xdg/autostart/mute-mic.desktop << EOF
 [Desktop Entry]
@@ -35,17 +45,6 @@ echo "DumpCore=no" | tee -a /etc/systemd/{system.conf.d,user.conf.d}/60-disable-
 
 rm -vf /etc/dnf/protected.d/sudo.conf
 
-# Mac Randomization
-cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
-[device]
-wifi.scan-rand-mac-address=yes
-
-[connection]
-wifi.cloned-mac-address=random
-ethernet.cloned-mac-address=random
-EOF
-
-
 # CHRONY CONF
 license_url="https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/LICENSE"
 chrony_url="https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf"
@@ -62,4 +61,4 @@ cat /tmp/chrony_conf/LICENSE_temp >> /etc/chrony.conf
 cat /tmp/chrony_conf/chrony.conf >> /etc/chrony.conf
 
 # Update chronyd
-sed -i 's/^OPTIONS=.*$/OPTIONS='"-F 1 -r"'/' /etc/sysconfig/chronyd
+sed -i 's/^OPTIONS=.*$/OPTIONS="-F 1 -r"/' /etc/sysconfig/chronyd

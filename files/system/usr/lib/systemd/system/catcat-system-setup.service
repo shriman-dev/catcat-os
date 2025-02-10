@@ -1,5 +1,5 @@
 [Unit]
-Description=Configure CaCat OS for current system
+Description=Configure CatCat OS for current system
 After=rpm-ostreed.service
 Before=systemd-user-sessions.service bazzite-hardware-setup.service
 

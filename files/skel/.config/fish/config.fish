@@ -122,9 +122,9 @@ alias fcc="fc-cache -fvr --really-force "
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
 alias wget='wget -c '
-alias psmem='procs --sortd mem'
-alias pscpu='procs --sortd cpu'
-alias pstree='procs --tree '
+alias psmem='procs --sortd rss'
+alias pscpu='procs --sortd cpu -w'
+alias pstree='procs --tree'
 alias hw='hwinfo --short'
 alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
 alias gedit="flatpak run --branch=stable --arch=x86_64 --command=gedit --file-forwarding org.gnome.gedit"

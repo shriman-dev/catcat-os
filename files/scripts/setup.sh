@@ -27,8 +27,8 @@ echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
 
 $SCRIPT_DIR/rpm-ostree.sh
 $SCRIPT_DIR/extra-pkgs.sh
-$SCRIPT_DIR/1st-setup.sh
-$SCRIPT_DIR/2nd-setup-and-fixes.sh
+$SCRIPT_DIR/branding.sh
+$SCRIPT_DIR/tweaks-and-fixes.sh
 $SCRIPT_DIR/config-and-theming.sh
 $SCRIPT_DIR/nerd-fonts.sh
 $SCRIPT_DIR/systemd.sh

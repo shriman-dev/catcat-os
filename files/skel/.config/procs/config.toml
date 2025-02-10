@@ -3,14 +3,22 @@ kind = "Pid"
 style = "BrightYellow|Yellow"
 numeric_search = true
 nonnumeric_search = false
-align = "Left"
+align = "Right"
 
 [[columns]]
 kind = "User"
 style = "BrightGreen|Green"
 numeric_search = false
 nonnumeric_search = true
+align = "Center"
+
+[[columns]]
+kind = "Uid"
+style = "BrightGreen|Green"
+numeric_search = true
+nonnumeric_search = false
 align = "Left"
+header = "ID"
 
 [[columns]]
 kind = "Separator"
@@ -20,18 +28,26 @@ nonnumeric_search = false
 align = "Left"
 
 [[columns]]
+kind = "Processor"
+style = "BrightYellow|Yellow"
+numeric_search = true
+nonnumeric_search = false
+align = "Left"
+header = "P+"
+
+[[columns]]
 kind = "UsageCpu"
 style = "ByPercentage"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
-kind = "VmData"
+kind = "VmRss"
 style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 header = "Mem"
 
 [[columns]]
@@ -39,7 +55,7 @@ kind = "UsageMem"
 style = "ByPercentage"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 header = "Mem"
 
 [[columns]]
@@ -65,22 +81,22 @@ nonnumeric_search = false
 align = "Left"
 
 [[columns]]
-kind = "State"
-style = "ByState"
+kind = "CpuTime"
+style = "BrightCyan|Cyan"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
-kind = "Nice"
+kind = "StartTime"
 style = "BrightMagenta|Magenta"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
-kind = "Tty"
-style = "BrightWhite|Black"
+kind = "VmSwap"
+style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
 align = "Left"
@@ -90,21 +106,42 @@ kind = "VmSize"
 style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
-kind = "VmRss"
+kind = "ReadBytes"
 style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
-kind = "VmSwap"
+kind = "WriteBytes"
 style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
-align = "Right"
+align = "Left"
+
+[[columns]]
+kind = "State"
+style = "ByState"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
+kind = "Nice"
+style = "BrightMagenta|Magenta"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
+kind = "Tty"
+style = "BrightWhite|Black"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
 
 [[columns]]
 kind = "TcpPort"
@@ -123,36 +160,8 @@ align = "Left"
 max_width = 20
 
 [[columns]]
-kind = "ReadBytes"
-style = "ByUnit"
-numeric_search = false
-nonnumeric_search = false
-align = "Right"
-
-[[columns]]
-kind = "WriteBytes"
-style = "ByUnit"
-numeric_search = false
-nonnumeric_search = false
-align = "Right"
-
-[[columns]]
 kind = "Slot"
 style = "ByUnit"
-numeric_search = false
-nonnumeric_search = false
-align = "Right"
-
-[[columns]]
-kind = "CpuTime"
-style = "BrightCyan|Cyan"
-numeric_search = false
-nonnumeric_search = false
-align = "Left"
-
-[[columns]]
-kind = "StartTime"
-style = "BrightMagenta|Magenta"
 numeric_search = false
 nonnumeric_search = false
 align = "Left"
@@ -209,7 +218,7 @@ logic = "And"
 
 [display]
 show_self = false
-show_kthreads = false
+show_kthreads = false #true #false
 cut_to_terminal = true
 cut_to_pager = false
 cut_to_pipe = false
@@ -217,12 +226,13 @@ color_mode = "Auto"
 separator = "│"
 ascending = "▲"
 descending = "▼"
-tree_symbols = ["│", "─", "┬", "├", "└"]
+tree_symbols = ["│", "─", "┬", "├", "╰"]
 abbr_sid = true
 
 [sort]
-column = 3
+column = 0
 order = "Descending"
+#order = "Ascending"
 
 [docker]
 path = "unix:///var/run/docker.sock"
