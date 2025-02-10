@@ -23,11 +23,9 @@ fi
 KERNEL_MODULES_PATH="/usr/lib/modules"
 readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 
-find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n"
-
 if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
   if [[ "${QUALIFIED_KERNEL[@]}" =~ 'bazzite' ]]; then
-    echo "WARNING: multiple kernels found. Defaulting to the bazzite kernel"
+    echo "WARNING: multiple kernels found with bazzite kernel. Defaulting to the bazzite kernel"
     QUALIFIED_KERNEL=$(printf "%s\n" "${QUALIFIED_KERNEL[@]}" | grep bazzite)
   else
     echo "ERROR: Bazzite kernel not found to set as default."
