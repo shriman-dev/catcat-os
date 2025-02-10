@@ -23,6 +23,8 @@ fi
 KERNEL_MODULES_PATH="/usr/lib/modules"
 readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 
+find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n"
+
 if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
   echo "ERROR: There are several versions of kernel's initramfs."
   echo "       Please only include 1 kernel in the image to solve this issue."
