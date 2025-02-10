@@ -26,9 +26,15 @@ readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -max
 find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n"
 
 if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
-  echo "ERROR: There are several versions of kernel's initramfs."
-  echo "       Please only include 1 kernel in the image to solve this issue."
-  exit 1
+  if [[ "${QUALIFIED_KERNEL[@]}" =~ 'bazzite' ]]; then
+    echo "WARNING: multiple kernels found. Defaulting to the bazzite kernel"
+    QUALIFIED_KERNEL=$(printf "%s\n" "${QUALIFIED_KERNEL[@]}" | grep bazzite)
+  else
+    echo "ERROR: Bazzite kernel not found to set as default."
+    echo "ERROR: There are several versions of kernel's initramfs."
+    echo "       Please only include 1 kernel in the image to solve this issue."
+    exit 1
+  fi
 fi
 
 INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${QUALIFIED_KERNEL[*]}/initramfs.img"
