@@ -37,9 +37,9 @@ if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
   fi
 fi
 
-INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${QUALIFIED_KERNEL[*]}/initramfs.img"
+INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${QUALIFIED_KERNEL}/initramfs.img"
 
-echo "Starting initramfs regeneration for kernel version: ${QUALIFIED_KERNEL[*]}"
+echo "Starting initramfs regeneration for kernel version: ${QUALIFIED_KERNEL}"
 
-"${DRACUT}" --no-hostonly --kver "${QUALIFIED_KERNEL[*]}" --reproducible -v --add ostree -f "${INITRAMFS_IMAGE}"
+"${DRACUT}" --no-hostonly --kver "${QUALIFIED_KERNEL}" --reproducible -v --add ostree -f "${INITRAMFS_IMAGE}"
 chmod 0600 "${INITRAMFS_IMAGE}"
