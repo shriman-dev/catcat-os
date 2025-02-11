@@ -38,9 +38,7 @@ updateHostfile() {
   echo "----------Hostfile section----------"
   echo ""
 
-  if [[ $(id -u) -eq 0 ]] ; then
-    /usr/bin/hblock -W 9
-  fi
+  sudo /usr/bin/hblock -W 9
 }
 
 updateFirmware() {
@@ -48,11 +46,9 @@ updateFirmware() {
   echo "----------Firmware section----------"
   echo ""
 
-  if [[ $(id -u) -eq 0 ]] ; then
-    /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
-    /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
-    /usr/bin/fwupdmgr -y update
-  fi
+  sudo /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
+  sudo /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
+  sudo /usr/bin/fwupdmgr -y update
 }
 
 updateSystem() {
@@ -60,18 +56,18 @@ updateSystem() {
   echo "----------System section----------"
   echo ""
 
-  /usr/bin/bootc upgrade --quiet
-  /usr/bin/rpm-ostree db diff --changelogs
+  sudo /usr/bin/bootc upgrade --quiet
+  sudo /usr/bin/rpm-ostree db diff --changelogs
 
-  /usr/bin/rpm-ostree cleanup -bm >/dev/null 2>&1
-  /usr/bin/ostree prune >/dev/null 2>&1
-  /usr/bin/systemd-tmpfiles --clean >/dev/null 2>&1
+  sudo /usr/bin/rpm-ostree cleanup -bm >/dev/null 2>&1
+  sudo /usr/bin/ostree prune >/dev/null 2>&1
+  sudo /usr/bin/systemd-tmpfiles --clean >/dev/null 2>&1
 }
 
 if [[ "$1" == "all" ]]; then
-  sudo updateFirmware
-  sudo updateSystem
-  sudo updateHostfile
+  updateFirmware
+  updateSystem
+  updateHostfile
 
   updateFlatpak --system
   runAsAllUsers updateFlatpak --user
@@ -85,8 +81,8 @@ elif [[ "$1" == "extra" ]]; then
   updateNixpkg
   runAsAllUsers updateNixpkg
 
-  updateFirmware
-  updateHostfile
+  [[ $(id -u) -eq 0 ]] && updateFirmware
+  [[ $(id -u) -eq 0 ]] && updateHostfile
 else
-  sudo updateSystem
+  updateSystem
 fi
