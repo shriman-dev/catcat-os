@@ -11,6 +11,7 @@ curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable atim/lazygit
 dnf5 -y copr enable zeno/scrcpy
+dnf5 -y copr enable pesader/hblock
 
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-$(rpm -E %fedora)/atim-starship-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
@@ -25,7 +26,7 @@ addRepos
 rpm-ostree override remove fastfetch gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
 #sunshine
 
-security='firejail firewall-config usbguard'
+security='firejail firewall-config usbguard hblock'
 
 shellSetup='fish bat eza starship fzf fd-find ripgrep zoxide tmux zellij'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm

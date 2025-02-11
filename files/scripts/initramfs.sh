@@ -33,6 +33,8 @@ if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
     echo "       Please only include 1 kernel in the image to solve this issue."
     exit 1
   fi
+else
+  QUALIFIED_KERNEL="${QUALIFIED_KERNEL[0]}"
 fi
 
 INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${QUALIFIED_KERNEL}/initramfs.img"
