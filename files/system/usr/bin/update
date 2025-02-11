@@ -46,9 +46,11 @@ updateFirmware() {
   echo "----------Firmware section----------"
   echo ""
 
-  sudo /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
-  sudo /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
-  sudo /usr/bin/fwupdmgr -y update
+  sudo sh -c '
+    /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
+    /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
+    /usr/bin/fwupdmgr -y update
+  '
 }
 
 updateSystem() {
@@ -56,12 +58,13 @@ updateSystem() {
   echo "----------System section----------"
   echo ""
 
-  sudo /usr/bin/bootc upgrade --quiet
-  sudo /usr/bin/rpm-ostree db diff --changelogs
-
-  sudo /usr/bin/rpm-ostree cleanup -bm >/dev/null 2>&1
-  sudo /usr/bin/ostree prune >/dev/null 2>&1
-  sudo /usr/bin/systemd-tmpfiles --clean >/dev/null 2>&1
+  sudo sh -c '
+    /usr/bin/bootc upgrade --quiet
+    /usr/bin/rpm-ostree db diff --changelogs
+    /usr/bin/rpm-ostree cleanup -bm >/dev/null 2>&1
+    /usr/bin/ostree prune >/dev/null 2>&1
+    /usr/bin/systemd-tmpfiles --clean >/dev/null 2>&1
+  '
 }
 
 if [[ "$1" == "all" ]]; then
