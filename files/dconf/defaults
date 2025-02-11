@@ -102,8 +102,6 @@ free-percent-notify=0.10000000000000001
 
 [org/gnome/settings-daemon/plugins/power]
 ambient-enabled=false
-sleep-inactive-ac-type='nothing'
-sleep-inactive-battery-type='suspend'
 
 [org/gnome/desktop/search-providers]
 disabled=['org.gnome.Software.desktop']

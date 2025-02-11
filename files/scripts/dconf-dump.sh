@@ -102,12 +102,9 @@ declare -A shellPathsWithSed=(
 /welcome-dialog-last-shown-version/d
 /had-bluetooth-devices-setup/d
 /^app-picker-layout=/s/,[^,]*\.desktop[^,]*>//g
-s|'quick-touchpad-toggle@kramo.hu',||
-s|, 'quick-touchpad-toggle@kramo.hu'||
-s|'color-picker@tuberry',||
-s|, 'color-picker@tuberry'||
-s|'syncthing@gnome.2nv2u.com',||
-s|, 'syncthing@gnome.2nv2u.com'||"
+s|'quick-touchpad-toggle@kramo.hu',||;s|, 'quick-touchpad-toggle@kramo.hu'||
+s|'color-picker@tuberry',||;s|, 'color-picker@tuberry'||
+s|'syncthing@gnome.2nv2u.com',||;s|, 'syncthing@gnome.2nv2u.com'||"
     ['/org/gnome/shell/window-switcher/']=""
 )
 
@@ -134,6 +131,8 @@ s|message-text=.*|message-text='Meow'|"
     ['/org/gnome/settings-daemon/']="
 /media-keys/,/^$/d
 /touchscreen/,/^$/d
+/sleep-inactive-ac-type/d
+/sleep-inactive-battery-type/d
 /night-light-enabled/d
 /night-light-temperature/d"
     ['/org/gnome/system/location/']=""

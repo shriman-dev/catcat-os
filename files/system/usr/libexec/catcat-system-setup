@@ -3,6 +3,7 @@
 # GLOBAL
 KARGS=$(rpm-ostree kargs)
 NEEDED_KARGS=()
+U1000="$(id -un 1000)"
 
 # KERNEL ARGUMENTS
 echo "Current kargs: $KARGS"
@@ -22,9 +23,8 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   hostnamectl set-hostname --static "catcat"
 
   # Permit user 1000
-  U="$(id -un 1000)"
-  usermod -aG input $U
-  usermod -aG libvirt $U
+  usermod -aG input $U1000
+  usermod -aG libvirt $U1000
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot
@@ -42,6 +42,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
   replaceXAdd 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
   replaceXAdd 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+
   if [[ -d /sys/firmware/efi ]]; then
     grub2-mkconfig -o /etc/grub2-efi.cfg
     #sed -i --follow-symlinks 's|linux16|linuxefi|;s|initrd16|initrdefi|' /etc/grub2-efi.cfg
@@ -49,6 +50,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
     grub2-mkconfig -o /etc/grub2.cfg
   fi
   #grub2-editenv - unset menu_auto_hide
+fi
 
 KARGS_TO_ADD=(
   "rd.luks=discard"
@@ -88,7 +90,7 @@ else
 fi
 
 # update gnome/dconf configurations in /etc/dconf/db/distro.d/
-/usr/bin/dconf update &
+/usr/bin/dconf update
 
 
 # configure systemd services
@@ -104,7 +106,11 @@ fi
 
 
 
-# HOSTNAME FIX
+# FIXES
+# make needed paths
+mkdir -p /var/lib/alternatives
+mkdir -p /var/log/usbguard
+
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.
 if (( $(hostname | wc -m) > 20 )); then
@@ -117,3 +123,19 @@ if grep -qv "graphical.target" <<< "$(systemctl get-default)"; then
 fi
 
 
+# Usbguard setup
+if [[ ! -f /etc/usbguard/rules.conf ]]; then
+  usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
+  mkdir -p /var/log/usbguard
+  mkdir -p /etc/usbguard
+  chmod 755 /etc/usbguard
+  restorecon -vR /var/log/usbguard
+  sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
+
+  sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
+  sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
+  sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
+  usbguard add-user $U1000
+
+  systemctl is-enabled usbguard.service || systemctl enable --force --now usbguard.service
+fi

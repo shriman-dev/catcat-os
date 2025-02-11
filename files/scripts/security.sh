@@ -2,33 +2,6 @@
 set -oue pipefail
 echo -e "\n$0\n"
 
-# Mac Randomization
-cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
-[device]
-wifi.scan-rand-mac-address=yes
-
-[connection]
-wifi.cloned-mac-address=random
-ethernet.cloned-mac-address=random
-EOF
-
-# Create a xdg autostart file to mute microphone on boot
-cat > /etc/xdg/autostart/mute-mic.desktop << EOF
-[Desktop Entry]
-Type=Application
-Name=Mute Microphone on Login
-Exec=/usr/bin/amixer set Capture nocap
-Icon=utilities-terminal
-EOF
-
-chmod 644 /etc/xdg/autostart/mute-mic.desktop
-
-
-# usbguard
-usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
-sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
-sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
-
 # Disable coredump
 # Add a line to disable core dumps in limits.conf
 echo "* hard core 0" | tee -a /etc/security/limits.conf
@@ -43,7 +16,36 @@ mkdir -p /etc/systemd/{system.conf.d,user.conf.d}
 echo "[Manager]" | tee /etc/systemd/{system.conf.d,user.conf.d}/60-disable-coredump.conf > /dev/null
 echo "DumpCore=no" | tee -a /etc/systemd/{system.conf.d,user.conf.d}/60-disable-coredump.conf > /dev/null
 
-rm -vf /etc/dnf/protected.d/sudo.conf
+# Create a xdg autostart file to mute microphone on boot
+cat > /etc/xdg/autostart/mute-mic.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Mute Microphone on Login
+Exec=/usr/bin/amixer set Capture nocap
+Icon=utilities-terminal
+EOF
+
+chmod 644 /etc/xdg/autostart/mute-mic.desktop
+
+# usbguard
+usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
+sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
+sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
+
+
+# Ad/Malware blocking Hostfile
+/usr/bin/hblock -W 9
+
+
+# Mac Randomization
+cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
+[device]
+wifi.scan-rand-mac-address=yes
+
+[connection]
+wifi.cloned-mac-address=random
+ethernet.cloned-mac-address=random
+EOF
 
 # CHRONY CONF
 license_url="https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/LICENSE"

@@ -253,6 +253,9 @@ ondemand-button-location='menu'
 [org/gnome/shell/extensions/better-end-session-dialog]
 show-suspend-button=true
 
+[org/gnome/shell/extensions/blocker]
+blocker-enabled=true
+
 [org/gnome/shell/extensions/bluetooth-quick-connect]
 bluetooth-auto-power-off=true
 bluetooth-auto-power-off-interval=1200
@@ -330,7 +333,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=3
+indicator-position-max=6
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]

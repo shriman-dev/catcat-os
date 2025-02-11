@@ -1,0 +1,92 @@
+#!/bin/bash
+runAsAllUsers() {
+  for SOME_USER in /run/user/*; do
+    SOME_USER=$(basename "$SOME_USER")
+    sudo -u $(id -u -n "$SOME_USER") "$@"
+  done
+}
+
+
+updateFlatpak() {
+  local scope="--user"
+  [[ $(id -u) -eq 0 ]] && scope="--system"
+
+  echo ""
+  echo "----------Flatpak section----------"
+  echo ""
+
+  /usr/bin/flatpak update $scope --assumeyes --noninteractive --appstream
+  /usr/bin/flatpak update $scope --assumeyes --noninteractive
+  /usr/bin/flatpak uninstall $scope --unused --assumeyes --noninteractive >/dev/null 2>&1
+  /usr/bin/flatpak repair $scope >/dev/null 2>&1
+}
+
+updateNixpkg() {
+  echo ""
+  echo "----------Nixpkg section----------"
+  echo ""
+
+  if command -v nix-env >/dev/null 2>&1; then
+    nix-channel --update && nix-env -b --upgrade
+    nix-store --optimise >/dev/null 2>&1
+    nix-collect-garbage >/dev/null 2>&1
+  fi
+}
+
+updateHostfile() {
+  echo ""
+  echo "----------Hostfile section----------"
+  echo ""
+
+  if [[ $(id -u) -eq 0 ]] ; then
+    /usr/bin/hblock -W 9
+  fi
+}
+
+updateFirmware() {
+  echo ""
+  echo "----------Firmware section----------"
+  echo ""
+
+  if [[ $(id -u) -eq 0 ]] ; then
+    /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
+    /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
+    /usr/bin/fwupdmgr -y update
+  fi
+}
+
+updateSystem() {
+  echo ""
+  echo "----------System section----------"
+  echo ""
+
+  /usr/bin/bootc upgrade --quiet
+  /usr/bin/rpm-ostree db diff --changelogs
+
+  /usr/bin/rpm-ostree cleanup -bm >/dev/null 2>&1
+  /usr/bin/ostree prune >/dev/null 2>&1
+  /usr/bin/systemd-tmpfiles --clean >/dev/null 2>&1
+}
+
+if [[ "$1" == "all" ]]; then
+  sudo updateFirmware
+  sudo updateSystem
+  sudo updateHostfile
+
+  updateFlatpak --system
+  runAsAllUsers updateFlatpak --user
+
+  updateNixpkg
+  runAsAllUsers updateNixpkg
+elif [[ "$1" == "extra" ]]; then
+  updateFlatpak --system
+  runAsAllUsers updateFlatpak --user
+
+  updateNixpkg
+  runAsAllUsers updateNixpkg
+
+  updateFirmware
+  updateHostfile
+else
+  sudo updateSystem
+fi
