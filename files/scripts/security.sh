@@ -29,7 +29,7 @@ chmod 644 /etc/xdg/autostart/mute-mic.desktop
 
 
 # Ad/Malware blocking Hostfile
-/usr/bin/hblock -W 9
+#/usr/bin/hblock
 
 
 # Mac Randomization

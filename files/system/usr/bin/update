@@ -14,7 +14,7 @@ updateFlatpak() {
   [[ $(id -u) -eq 0 ]] && scope="--system"
 
   echo ""
-  echo "----------Flatpak ${scope:2} updates----------"
+  echo "----------Flatpak ${scope:2} update----------"
   echo ""
 
   /usr/bin/flatpak update $scope --assumeyes --noninteractive --appstream
@@ -36,7 +36,7 @@ updateNixpkg() {
 
   if [[ -x "${cmdpath}/nix-env" ]]; then
     echo ""
-    echo "----------Nixpkg $scope updates----------"
+    echo "----------Nixpkg $scope update----------"
     echo ""
 
     ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
@@ -47,15 +47,15 @@ updateNixpkg() {
 
 updateHostfile() {
   echo ""
-  echo "----------Hostfile updates----------"
+  echo "----------Hostfile update----------"
   echo ""
 
-  sudo /usr/bin/hblock -W 9
+  sudo /usr/bin/hblock
 }
 
 updateFirmware() {
   echo ""
-  echo "----------Firmware updates----------"
+  echo "----------Firmware update----------"
   echo ""
 
   sudo sh -c '
@@ -67,7 +67,7 @@ updateFirmware() {
 
 updateSystem() {
   echo ""
-  echo "----------System updates----------"
+  echo "----------System update----------"
   echo ""
 
   sudo sh -c '

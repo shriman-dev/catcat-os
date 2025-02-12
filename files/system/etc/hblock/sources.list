@@ -11,6 +11,8 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/hoster-onl
 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/refs/heads/master/anti-ad-domains.txt
 https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
+https://raw.githubusercontent.com/cbuijs/accomplist/master/malicious-dom/plain.black.domain.list
+https://raw.githubusercontent.com/stamparm/aux/refs/heads/master/maltrail-malware-domains.txt
 https://raw.githubusercontent.com/DandelionSprout/adfilt/refs/heads/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareDomains.txt
 https://blocklistproject.github.io/Lists/ads.txt
 https://blocklistproject.github.io/Lists/malware.txt
@@ -19,3 +21,13 @@ https://blocklistproject.github.io/Lists/piracy.txt
 https://blocklistproject.github.io/Lists/ransomware.txt
 https://blocklistproject.github.io/Lists/tracking.txt
 https://hosts.flossboxin.org.in/files/hosts
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardMobileAds.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardMobileSpyware.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardTracking.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardCNAMEAds.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardCNAMEClickthroughs.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardCNAMEMicrosites.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardCNAME.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/EasyPrivacy3rdParty.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/EasyPrivacySpecific.txt
+https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardDNS.txt
