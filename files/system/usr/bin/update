@@ -1,8 +1,10 @@
 #!/bin/bash
-runAsAllUsers() {
+runAsUsers() {
   for SOME_USER in /run/user/*; do
     SOME_USER=$(basename "$SOME_USER")
-    sudo -u $(id -u -n "$SOME_USER") "$@"
+    if [[ ! "$SOME_USER" == "0" ]]; then
+      sudo -u $(id -u -n "$SOME_USER") bash -c "$(declare -f $@); $@"
+    fi
   done
 }
 
@@ -12,30 +14,40 @@ updateFlatpak() {
   [[ $(id -u) -eq 0 ]] && scope="--system"
 
   echo ""
-  echo "----------Flatpak section----------"
+  echo "----------Flatpak ${scope:2} updates----------"
   echo ""
 
   /usr/bin/flatpak update $scope --assumeyes --noninteractive --appstream
   /usr/bin/flatpak update $scope --assumeyes --noninteractive
   /usr/bin/flatpak uninstall $scope --unused --assumeyes --noninteractive >/dev/null 2>&1
-  /usr/bin/flatpak repair $scope >/dev/null 2>&1
+  echo ""
+  echo "Running flatpak repair"
+  /usr/bin/flatpak repair $scope
 }
 
 updateNixpkg() {
-  echo ""
-  echo "----------Nixpkg section----------"
-  echo ""
+  local scope="user"
+  local cmdpath="$HOME/.local/state/nix/profile/bin"
 
-  if command -v nix-env >/dev/null 2>&1; then
-    nix-channel --update && nix-env -b --upgrade
-    nix-store --optimise >/dev/null 2>&1
-    nix-collect-garbage >/dev/null 2>&1
+  [[ $(id -u) -eq 0 ]] && {
+  scope="global"
+  cmdpath="/nix/var/nix/profiles/default/bin"
+  }
+
+  if [[ -x "${cmdpath}/nix-env" ]]; then
+    echo ""
+    echo "----------Nixpkg $scope updates----------"
+    echo ""
+
+    ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
+    ${cmdpath}/nix-store --optimise >/dev/null 2>&1
+    ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
   fi
 }
 
 updateHostfile() {
   echo ""
-  echo "----------Hostfile section----------"
+  echo "----------Hostfile updates----------"
   echo ""
 
   sudo /usr/bin/hblock -W 9
@@ -43,7 +55,7 @@ updateHostfile() {
 
 updateFirmware() {
   echo ""
-  echo "----------Firmware section----------"
+  echo "----------Firmware updates----------"
   echo ""
 
   sudo sh -c '
@@ -55,7 +67,7 @@ updateFirmware() {
 
 updateSystem() {
   echo ""
-  echo "----------System section----------"
+  echo "----------System updates----------"
   echo ""
 
   sudo sh -c '
@@ -68,21 +80,21 @@ updateSystem() {
 }
 
 if [[ "$1" == "all" ]]; then
-  updateFirmware
   updateSystem
+  updateFirmware
   updateHostfile
 
-  updateFlatpak --system
-  runAsAllUsers updateFlatpak --user
+  updateFlatpak
+  runAsUsers updateFlatpak
 
   updateNixpkg
-  runAsAllUsers updateNixpkg
+  runAsUsers updateNixpkg
 elif [[ "$1" == "extra" ]]; then
-  updateFlatpak --system
-  runAsAllUsers updateFlatpak --user
+  updateFlatpak
+  runAsUsers updateFlatpak
 
   updateNixpkg
-  runAsAllUsers updateNixpkg
+  runAsUsers updateNixpkg
 
   [[ $(id -u) -eq 0 ]] && updateFirmware
   [[ $(id -u) -eq 0 ]] && updateHostfile

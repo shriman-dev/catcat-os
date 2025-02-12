@@ -27,11 +27,6 @@ EOF
 
 chmod 644 /etc/xdg/autostart/mute-mic.desktop
 
-# usbguard
-usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
-sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
-sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
-
 
 # Ad/Malware blocking Hostfile
 /usr/bin/hblock -W 9

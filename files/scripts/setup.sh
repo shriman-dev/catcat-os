@@ -3,7 +3,7 @@ set -oue pipefail
 echo -e "\n$0\n"
 
 echo ${COMMIT_SHA}
-echo ${IMAGE_NAME} ${MAJOR_VERSION} 
+echo ${IMAGE_NAME} ${MAJOR_VERSION}
 echo ${COMMIT_SHA}
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -31,6 +31,7 @@ $SCRIPT_DIR/branding.sh
 $SCRIPT_DIR/tweaks-and-fixes.sh
 $SCRIPT_DIR/config-and-theming.sh
 $SCRIPT_DIR/nerd-fonts.sh
+$SCRIPT_DIR/security.sh
 $SCRIPT_DIR/systemd.sh
 $SCRIPT_DIR/initramfs.sh
 $SCRIPT_DIR/signing.sh
