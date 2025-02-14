@@ -39,7 +39,7 @@ no-resolv
 bind-interfaces
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
 
-#sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist[00-09].conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
+sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist00.conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
 
 # get hblock config
 mkdir -p /etc/hblock
