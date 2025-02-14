@@ -45,7 +45,7 @@ files=(blocklist{00..10}.conf)
 > /etc/NetworkManager/dnsmasq.d/blocklist.conf
 for file in "${files[@]}"; do
   echo $file
-  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
+  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.conf" || true
 done
 
 # get hblock config
