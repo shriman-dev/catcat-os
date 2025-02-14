@@ -35,7 +35,7 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   mkdir -p /boot/grub_themes
   cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
-  replaceXAdd 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=3' /etc/default/grub
+  replaceXAdd 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
 #  replaceXAdd 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
   replaceXAdd 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
   replaceXAdd 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
@@ -124,7 +124,7 @@ fi
 
 
 # Usbguard setup
-if [[ ! -f /etc/usbguard/rules.conf ]]; then
+if [[ ! -d /var/log/usbguard ]]; then
   usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
   mkdir -p /var/log/usbguard
   mkdir -p /etc/usbguard
