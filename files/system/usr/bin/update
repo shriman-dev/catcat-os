@@ -49,8 +49,7 @@ updateHostfile() {
   echo ""
   echo "----------Hostfile update----------"
   echo ""
-
-  sudo /usr/bin/hblock
+  sudo sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist[00-09].conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
 }
 
 updateFirmware() {

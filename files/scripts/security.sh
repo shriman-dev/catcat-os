@@ -28,9 +28,24 @@ EOF
 chmod 644 /etc/xdg/autostart/mute-mic.desktop
 
 
-# Ad/Malware blocking Hostfile
-#/usr/bin/hblock
+# Ad/Malware blocking with dnsmasq using networkmanager
+sh -c "echo '[main]
+dns=dnsmasq' > /etc/NetworkManager/conf.d/00-use-dnsmasq.conf"
 
+sh -c "echo '# defaults
+domain-needed
+bogus-priv
+no-resolv
+bind-interfaces
+addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
+
+sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist[00-09].conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
+
+# get hblock config
+mkdir -p /etc/hblock
+sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/sources.list > /etc/hblock/sources.list"
+sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/deny.list > /etc/hblock/deny.list"
+sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/allow.list > /etc/hblock/allow.list"
 
 # Mac Randomization
 cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
