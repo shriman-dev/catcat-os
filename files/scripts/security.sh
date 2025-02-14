@@ -29,9 +29,11 @@ chmod 644 /etc/xdg/autostart/mute-mic.desktop
 
 
 # Ad/Malware blocking with dnsmasq using networkmanager
+mkdir -p /etc/NetworkManager/conf.d
 sh -c "echo '[main]
 dns=dnsmasq' > /etc/NetworkManager/conf.d/00-use-dnsmasq.conf"
 
+mkdir -p /etc/NetworkManager/dnsmasq.d
 sh -c "echo '# defaults
 domain-needed
 bogus-priv
@@ -39,7 +41,12 @@ no-resolv
 bind-interfaces
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
 
-sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist00.conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
+files=(blocklist{00..10}.conf)
+> /etc/NetworkManager/dnsmasq.d/blocklist.conf
+for file in "${files[@]}"; do
+  echo $file
+  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.conf"
+done
 
 # get hblock config
 mkdir -p /etc/hblock
