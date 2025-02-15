@@ -33,19 +33,21 @@ mkdir -p /etc/NetworkManager/conf.d
 sh -c "echo '[main]
 dns=dnsmasq' > /etc/NetworkManager/conf.d/00-use-dnsmasq.conf"
 
-mkdir -p /etc/NetworkManager/dnsmasq.d
+mkdir -p /etc/NetworkManager/dnsmasq.d/blocklist.d
 sh -c "echo '# defaults
 domain-needed
 bogus-priv
 no-resolv
 bind-interfaces
+conf-dir=/etc/NetworkManager/dnsmasq.d/blocklist.d
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
 
-files=(blocklist{00..03}.conf)
+files=(blocklist{00..99}.conf)
 for file in "${files[@]}"; do
-  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/$file" || true
+  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.d/$file" || true
 done
-ls -A /etc/NetworkManager/dnsmasq.d/
+find /etc/NetworkManager/dnsmasq.d/blocklist.d/ -type f -size 0 -delete
+tree /etc/NetworkManager/dnsmasq.d/
 
 # get hblock config
 mkdir -p /etc/hblock
