@@ -41,7 +41,11 @@ no-resolv
 bind-interfaces
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
 
-sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist[00-03].conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf" || true
+files=(blocklist{00..10}.conf)
+for file in "${files[@]}"; do
+  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/$file" || true
+done
+ls -A /etc/NetworkManager/dnsmasq.d/
 
 # get hblock config
 mkdir -p /etc/hblock
