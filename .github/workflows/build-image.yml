@@ -173,7 +173,7 @@ jobs:
         id: digest
         run: |
           # Get digest for signing
-          DIGEST=$(sudo skopeo inspect --format '{{.Digest}}' $${{ matrix.IMAGE_NAME }})
+          DIGEST=$(sudo skopeo inspect --format '{{.Digest}}' ${{ matrix.IMAGE_NAME }})
           echo "Digest is: $DIGEST"
           echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
 
