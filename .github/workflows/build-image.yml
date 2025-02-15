@@ -178,9 +178,6 @@ jobs:
         run: |
           echo "Digest is $DIGEST"
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
-          for tag in ${{ steps.metadata.outputs.tags }}; do
-            cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}:${tag}
-          done
         env:
           IMAGE_FULL: ${{ steps.registry_case.outputs.lowercase }}/${{ matrix.IMAGE_NAME }}
           DIGEST: ${{ steps.push.outputs.digest }}
