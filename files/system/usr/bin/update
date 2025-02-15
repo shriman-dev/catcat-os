@@ -49,7 +49,11 @@ updateHostfile() {
   echo ""
   echo "----------Hostfile update----------"
   echo ""
-  sudo sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist[00-09].conf > /etc/NetworkManager/dnsmasq.d/blocklist.conf" || true
+  files=(blocklist{00..99}.conf)
+  for file in "${files[@]}"; do
+    sudo sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.d/$file" || true
+  done
+  find /etc/NetworkManager/dnsmasq.d/blocklist.d/ -type f -size 0 -delete
 }
 
 updateFirmware() {
