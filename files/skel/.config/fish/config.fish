@@ -109,9 +109,9 @@ alias vdir='vdir --color=always'
 alias fgrep='fgrep --color=always'
 alias egrep='egrep --color=always'
 alias ls='ls --color=always'
-alias ll='eza -al --color=always --hyperlink --group-directories-first --icons=always -SH --time-style="+%a %b %d %H:%M:%S %Y" -o'
+alias ll='eza -al --color=always --hyperlink --group-directories-first --icons=always -SH --time-style="+%a %b %d %H:%M:%S %Y" -o --git'
 alias la='eza -a --color=always --hyperlink --group-directories-first --icons=always'
-alias lt='eza -aT --color=always --hyperlink --group-directories-first --icons=always'
+alias lt='eza -aT --color=always --hyperlink --group-directories-first --icons=always --git'
 alias l.="eza -a1"
 alias ip="ip -color"
 #alias cat='bat --style header --style snip --style changes --style header' # Replace some more things with better alternatives

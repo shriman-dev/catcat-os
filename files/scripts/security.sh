@@ -27,6 +27,15 @@ EOF
 
 chmod 644 /etc/xdg/autostart/mute-mic.desktop
 
+# Mac Randomization
+cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
+[device]
+wifi.scan-rand-mac-address=yes
+
+[connection]
+wifi.cloned-mac-address=random
+ethernet.cloned-mac-address=random
+EOF
 
 # Ad/Malware blocking with dnsmasq using networkmanager
 mkdir -p /etc/NetworkManager/conf.d
@@ -42,11 +51,9 @@ bind-interfaces
 conf-dir=/etc/NetworkManager/dnsmasq.d/blocklist.d
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
 
-files=(blocklist{00..99}.conf)
-for file in "${files[@]}"; do
-  sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.d/$file" || true
-done
-find /etc/NetworkManager/dnsmasq.d/blocklist.d/ -type f -size 0 -delete
+curl -Lo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
+tar --use-compress-program "zstd -d" -xf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
+
 tree /etc/NetworkManager/dnsmasq.d/
 
 # get hblock config
@@ -54,16 +61,6 @@ mkdir -p /etc/hblock
 sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/sources.list > /etc/hblock/sources.list"
 sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/deny.list > /etc/hblock/deny.list"
 sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/hblock/allow.list > /etc/hblock/allow.list"
-
-# Mac Randomization
-cat > /etc/NetworkManager/conf.d/00-mac-randomization.conf << EOF
-[device]
-wifi.scan-rand-mac-address=yes
-
-[connection]
-wifi.cloned-mac-address=random
-ethernet.cloned-mac-address=random
-EOF
 
 # CHRONY CONF
 license_url="https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/LICENSE"

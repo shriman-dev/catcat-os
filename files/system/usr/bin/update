@@ -47,13 +47,15 @@ updateNixpkg() {
 
 updateHostfile() {
   echo ""
-  echo "----------Hostfile update----------"
+  echo "----------Dnsmasq blocklist update----------"
   echo ""
-  files=(blocklist{00..99}.conf)
-  for file in "${files[@]}"; do
-    sudo sh -c "curl -sf https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/$file > /etc/NetworkManager/dnsmasq.d/blocklist.d/$file" || true
-  done
-  find /etc/NetworkManager/dnsmasq.d/blocklist.d/ -type f -size 0 -delete
+
+  curl -Lo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
+  sudo sh -c '
+    rm /etc/NetworkManager/dnsmasq.d/blocklist.d/*
+    tar --use-compress-program "zstd -d" -xf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
+  '
+
 }
 
 updateFirmware() {
