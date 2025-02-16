@@ -50,11 +50,13 @@ updateHostfile() {
   echo "----------Dnsmasq blocklist update----------"
   echo ""
 
-  curl -Lo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
+  curl -sLo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
   sudo sh -c '
     rm /etc/NetworkManager/dnsmasq.d/blocklist.d/*
-    tar --use-compress-program "zstd -d" -xf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
+    tar --use-compress-program "zstd -d" -xvf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
+    chown -R root:root /etc/NetworkManager/dnsmasq.d/blocklist.d/
   '
+  rm /tmp/dnsmasq.d.tar.zst
 
 }
 

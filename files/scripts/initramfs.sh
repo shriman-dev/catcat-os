@@ -20,6 +20,7 @@ fi
 # Refactor the module to support UKIs once they are starting to be used, if possible.
 # That won't be soon, so this module should work for good period of time
 
+#dnf5 repoquery --installed --queryformat='%{evr}.%{arch}' kernel
 KERNEL_MODULES_PATH="/usr/lib/modules"
 readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 
