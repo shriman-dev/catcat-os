@@ -50,7 +50,6 @@ no-resolv
 bind-interfaces
 conf-dir=/etc/NetworkManager/dnsmasq.d/blocklist.d
 addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
-rm /etc/resolv.conf
 
 curl -Lo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
 tar --use-compress-program "zstd -d" -xvf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1

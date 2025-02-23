@@ -107,6 +107,9 @@ fi
 
 
 # FIXES
+# to use dnsmasq with networkmanager
+[[ -L /etc/resolv.conf ]] && rm /etc/resolv.conf
+
 # make needed paths
 mkdir -p /var/lib/alternatives
 mkdir -p /var/log/usbguard
