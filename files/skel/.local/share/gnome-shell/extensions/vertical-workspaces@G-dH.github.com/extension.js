@@ -3,7 +3,7 @@
  * extension.js
  *
  * @author     GdH <G-dH@github.com>
- * @copyright  2022 - 2024
+ * @copyright  2022 - 2025
  * @license    GPL-3.0
  *
  */
@@ -214,14 +214,13 @@ export default class VShell extends Extension.Extension {
         // workaround for upstream bug - overview always shows workspace 1 instead of the active one after restart
         this._setInitialWsIndex();
 
-        this._resetShellProperties();
+        // this._resetShellProperties();
     }
 
     removeVShell() {
         // Rebasing V-Shell when overview is open causes problems
         // also if Dash to Dock is enabled, disabling V-Shell can result in a broken overview
         this._ensureOverviewIsHidden();
-        this._resetShellProperties();
 
         this._enabled = false;
 
@@ -233,6 +232,8 @@ export default class VShell extends Extension.Extension {
 
         // remove changes mede by VShell modules
         this._updateOverrides(reset);
+
+        this._resetShellProperties();
 
         // switch PageUp/PageDown workspace switcher shortcuts
         this._switchPageShortcuts();
@@ -262,7 +263,6 @@ export default class VShell extends Extension.Extension {
         const dash = controls.layoutManager._dash;
         // Restore default dash background style
         dash._background.set_style('');
-
         dash.translation_x = 0;
         dash.translation_y = 0;
         controls._thumbnailsBox.translation_x = 0;
@@ -270,6 +270,7 @@ export default class VShell extends Extension.Extension {
         controls._searchEntryBin.translation_y = 0;
         controls._workspacesDisplay.scale_x = 1;
         controls.set_child_above_sibling(controls._workspacesDisplay, null);
+        delete controls._dashIsAbove;
 
         // following properties may be reduced if extensions are rebased while the overview is open
         controls._thumbnailsBox.remove_all_transitions();
@@ -277,7 +278,9 @@ export default class VShell extends Extension.Extension {
         controls._thumbnailsBox.scale_y = 1;
         controls._thumbnailsBox.opacity = 255;
 
+        controls._searchEntry.visible = true;
         controls._searchController._searchResults.opacity = 255;
+        Main.layoutManager.panelBox.translationY = 0;
     }
 
     _removeTimeouts() {
@@ -316,8 +319,11 @@ export default class VShell extends Extension.Extension {
     }
 
     _updateConnections() {
-        if (!this._monitorsChangedConId)
-            this._monitorsChangedConId = Main.layoutManager.connect('monitors-changed', () => this._adaptToSystemChange());
+        if (!this._monitorsChangedConId) {
+            this._monitorsChangedConId = Main.layoutManager.connect(
+                'monitors-changed', () => Main.overview._overview.controls._setBackground()
+            );
+        }
 
         if (!this._showingOverviewConId)
             this._showingOverviewConId = Main.overview.connect('showing', this._onShowingOverview.bind(this));
@@ -338,7 +344,6 @@ export default class VShell extends Extension.Extension {
                 } else if (session.currentMode === 'unlock-dialog') {
                     Me.Modules.panelModule.update();
                     Main.layoutManager.panelBox.translation_y = 0;
-                    Main.panel.opacity = 255;
                 }
             });
         }
@@ -472,10 +477,8 @@ export default class VShell extends Extension.Extension {
 
         if (!reset && !Main.layoutManager._startingUp)
             Main.overview._overview.controls.setInitialTranslations();
-        if (this._sessionLockActive) {
+        if (this._sessionLockActive)
             Main.layoutManager.panelBox.translation_y = 0;
-            Main.panel.opacity = 255;
-        }
     }
 
     _onShowingOverview() {
@@ -540,6 +543,7 @@ export default class VShell extends Extension.Extension {
     _updateSettings(settings, key) {
         // update settings cache and option variables
         opt._updateSettings();
+        this._resetShellProperties();
 
         // avoid overload while loading profile - update only once
         // delayed gsettings writes are processed alphabetically

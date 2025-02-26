@@ -44,16 +44,12 @@ require("full-border"):setup {
 	-- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
 	type = ui.Border.ROUNDED,
 }
-require("smart-enter"):setup {
-	open_multi = true,
-}
+
 
 require("folder-rules"):setup()
-
---require("eza-preview"):setup({level = 1,follow_symlinks = true})
 require("git"):setup()
---require("starship"):setup()
 require("archivemount"):setup()
+--require("eza-preview"):setup({level = 1,follow_symlinks = true})
 
 require("yatline"):setup({
 	--theme = my_theme,

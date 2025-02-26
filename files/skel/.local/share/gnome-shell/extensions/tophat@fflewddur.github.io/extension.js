@@ -65,7 +65,7 @@ export default class TopHat extends Extension {
         // Find the temperature sensor for each CPU
         const base = '/sys/class/hwmon/';
         const hwmon = new File(base);
-        hwmon.list().forEach((filename) => {
+        hwmon.listSync().forEach((filename) => {
             const name = new File(`${base}${filename}/name`).readSync();
             if (name === 'coretemp') {
                 // Intel CPUs
@@ -90,8 +90,16 @@ export default class TopHat extends Extension {
                 if (!f.exists()) {
                     inputPath = `${base}${filename}/temp1_input`;
                 }
-                // FIXME: Instead of key=0 here, try to figure out which physical CPU
-                // this monitor represents
+                tempMonitors.set(0, inputPath);
+            }
+            else if (name === 'zenpower') {
+                // AMD CPUs w/ alternate kernel driver
+                // temp1 is Tdie, temp2 is Tctl
+                let inputPath = `${base}${filename}/temp1_input`;
+                const f = new File(inputPath);
+                if (!f.exists()) {
+                    inputPath = `${base}${filename}/temp2_input`;
+                }
                 tempMonitors.set(0, inputPath);
             }
         });

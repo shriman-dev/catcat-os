@@ -5,11 +5,15 @@ import NM from 'gi://NM';
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { File } from './file.js';
 import { NumTopProcs } from './monitor.js';
+import { ONE_GB_IN_B, readFileSystems } from './helpers.js';
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
 Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
-export const SummaryIntervalDefault = 2.5; // in seconds
-export const DetailsInterval = 5; // in seconds
+const SummaryIntervalDefault = 2.5; // in seconds
+const DetailsInterval = 5; // in seconds
+const DetailsIntervalBackground = 60; // in seconds
+const FileSystemInterval = 60; // in seconds
 export const MaxHistoryLen = 50;
+const MillisecondsPerSecond = 1000;
 const SECTOR_SIZE = 512; // in bytes
 const RE_MEM_INFO = /:\s+(\d+)/;
 const RE_NET_DEV = /^\s*(\w+):/;
@@ -18,13 +22,14 @@ const RE_DISK_STATS = /^\s*\d+\s+\d+\s+(\w+)\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\
 const RE_NVME_DEV = /^nvme\d+n\d+$/;
 const RE_BLOCK_DEV = /^[^\d]+$/;
 const RE_CMD = /\/*[^\s]*\/([^\s]*)/;
+const RE_LAUNCHER = /[^\s]*(python\d*|gjs)\b[^/]*(\/.*)$/;
 export const Vitals = GObject.registerClass({
     GTypeName: 'Vitals',
     Properties: {
         uptime: GObject.ParamSpec.int('uptime', 'System uptime', 'System uptime in seconds', GObject.ParamFlags.READWRITE, 0, 0, 0),
         'cpu-usage': GObject.ParamSpec.int('cpu-usage', 'CPU usage', 'Proportion of CPU usage as a value between 0 - 100', GObject.ParamFlags.READWRITE, 0, 100, 0),
         'cpu-model': GObject.ParamSpec.string('cpu-model', 'CPU model', 'CPU model', GObject.ParamFlags.READWRITE, ''),
-        'cpu-freq': GObject.ParamSpec.int('cpu-freq', 'CPU frequency', 'Average CPU frequency across all cores', GObject.ParamFlags.READWRITE, 0, 0, 0),
+        'cpu-freq': GObject.ParamSpec.int('cpu-freq', 'CPU frequency', 'Average CPU frequency across all cores, in GHz', GObject.ParamFlags.READWRITE, 0, 0, 0),
         'cpu-temp': GObject.ParamSpec.int('cpu-temp', 'CPU temperature', 'CPU temperature in degrees Celsius', GObject.ParamFlags.READWRITE, 0, 0, 0),
         'cpu-history': GObject.ParamSpec.string('cpu-history', 'CPU usage history', 'CPU usage history', GObject.ParamFlags.READWRITE, ''),
         'cpu-top-procs': GObject.ParamSpec.string('cpu-top-procs', 'CPU top processes', 'Top CPU-consuming processes', GObject.ParamFlags.READWRITE, ''),
@@ -43,11 +48,13 @@ export const Vitals = GObject.registerClass({
         'net-history': GObject.ParamSpec.string('net-history', 'Network activity history', 'Network activity history', GObject.ParamFlags.READWRITE, ''),
         'disk-read': GObject.ParamSpec.int('disk-read', 'Bytes read from disk', 'Number of bytes recently read from disk', GObject.ParamFlags.READWRITE, 0, 0, 0),
         'disk-wrote': GObject.ParamSpec.int('disk-wrote', 'Bytes written to disk', 'Number of bytes recently written to disk', GObject.ParamFlags.READWRITE, 0, 0, 0),
-        'disk-read-total': GObject.ParamSpec.int('disk-read-total', 'Total bytes read from disk', 'Number of bytes read from disk since system start', GObject.ParamFlags.READWRITE, 0, 0, 0),
-        'disk-wrote-total': GObject.ParamSpec.int('disk-wrote-total', 'Total bytes written to disk', 'Number of bytes written to disk since system start', GObject.ParamFlags.READWRITE, 0, 0, 0),
-        'disk-history': GObject.ParamSpec.string('disk-history', 'Disk activity history', 'Disk activity history', GObject.ParamFlags.READWRITE, ''),
-        'disk-top-procs': GObject.ParamSpec.string('disk-top-procs', 'Disk activity top processes', 'Top processes in terms of disk activity', GObject.ParamFlags.READWRITE, ''),
-        'summary-interval': GObject.ParamSpec.float('summary-interval', 'Refresh interval for the summary loop', 'Refresh interval for the summary loop, in seconds', GObject.ParamFlags.READWRITE, 0, 0, 0),
+        'disk-read-total': GObject.ParamSpec.int('disk-read-total', 'Total bytes read from disk', 'Number of bytes read from disk since system start.', GObject.ParamFlags.READWRITE, 0, 0, 0),
+        'disk-wrote-total': GObject.ParamSpec.int('disk-wrote-total', 'Total bytes written to disk', 'Number of bytes written to disk since system start.', GObject.ParamFlags.READWRITE, 0, 0, 0),
+        'disk-history': GObject.ParamSpec.string('disk-history', 'Disk activity history', 'Disk activity history.', GObject.ParamFlags.READWRITE, ''),
+        'disk-top-procs': GObject.ParamSpec.string('disk-top-procs', 'Disk activity top processes', 'Top processes in terms of disk activity.', GObject.ParamFlags.READWRITE, ''),
+        'fs-usage': GObject.ParamSpec.int('fs-usage', 'Proportion of filesystem that is used', 'Proportion of filesystem that is used.', GObject.ParamFlags.READWRITE, 0, 100, 0),
+        'fs-list': GObject.ParamSpec.string('fs-list', 'Usage of each mounted filesystem', 'Usage of each mounted filesystem.', GObject.ParamFlags.READWRITE, ''),
+        'summary-interval': GObject.ParamSpec.float('summary-interval', 'Refresh interval for the summary loop', 'Refresh interval for the summary loop, in seconds.', GObject.ParamFlags.READWRITE, 0, 0, 0),
     },
 }, class Vitals extends GObject.Object {
     gsettings;
@@ -61,17 +68,25 @@ export const Vitals = GObject.registerClass({
     netActivityHistory = new Array(MaxHistoryLen);
     diskState;
     diskActivityHistory = new Array(MaxHistoryLen);
+    filesystems = new Array();
     props = new Properties();
     summaryLoop = 0;
     detailsLoop = 0;
+    fsLoop = 0;
+    groupRelated;
     showCpu;
     showMem;
     showNet;
     showDisk;
+    showFS;
     netDev;
     netDevs;
+    fsMount;
+    fsToHide;
     settingSignals;
     nm;
+    detailsInterval = DetailsIntervalBackground;
+    detailsNeededCtr = 0;
     constructor(model, gsettings) {
         super();
         this.gsettings = gsettings;
@@ -80,6 +95,12 @@ export const Vitals = GObject.registerClass({
         this.memInfo = new MemInfo();
         this.netState = new NetDevState();
         this.nm = null;
+        for (let i = 0; i < this.cpuUsageHistory.length; i++) {
+            this.cpuUsageHistory[i] = new CpuUsage(model.cores);
+        }
+        for (let i = 0; i < this.memUsageHistory.length; i++) {
+            this.memUsageHistory[i] = new MemUsage();
+        }
         for (let i = 0; i < this.netActivityHistory.length; i++) {
             this.netActivityHistory[i] = new NetActivity();
         }
@@ -95,6 +116,11 @@ export const Vitals = GObject.registerClass({
                 SummaryIntervalDefault * refreshRateModifier(settings);
             this.stop();
             this.start();
+        });
+        this.settingSignals.push(id);
+        this.groupRelated = gsettings.get_boolean('group-procs');
+        id = this.gsettings.connect('changed::group-procs', (settings) => {
+            this.groupRelated = settings.get_boolean('group-procs');
         });
         this.settingSignals.push(id);
         this.showCpu = gsettings.get_boolean('show-cpu');
@@ -117,6 +143,31 @@ export const Vitals = GObject.registerClass({
             this.showDisk = settings.get_boolean('show-disk');
         });
         this.settingSignals.push(id);
+        this.showFS = gsettings.get_boolean('show-fs');
+        id = this.gsettings.connect('changed::show-fs', (settings) => {
+            this.showFS = settings.get_boolean('show-fs');
+            if (this.showFS) {
+                // The filesystem loop has a long refresh interval, so if the user enables this mid-session,
+                // kick this off an immediate refresh to avoid missing data in the UI.
+                this.loadFS();
+            }
+        });
+        this.settingSignals.push(id);
+        this.fsToHide = gsettings
+            .get_string('fs-hide-in-menu')
+            .split(';')
+            .filter((s) => {
+            return s.length > 0;
+        });
+        id = this.gsettings.connect('changed::fs-hide-in-menu', (settings) => {
+            this.fsToHide = settings
+                .get_string('fs-hide-in-menu')
+                .split(';')
+                .filter((s) => {
+                return s.length > 0;
+            });
+            this.readFileSystemUsage();
+        });
         this.netDev = gsettings.get_string('network-device');
         if (this.netDev === _('Automatic')) {
             this.netDev = '';
@@ -126,6 +177,19 @@ export const Vitals = GObject.registerClass({
             if (this.netDev === _('Automatic')) {
                 this.netDev = '';
             }
+            this.readSummaries();
+        });
+        this.settingSignals.push(id);
+        this.fsMount = gsettings.get_string('mount-to-monitor');
+        if (this.fsMount === _('Automatic')) {
+            this.fsMount = '';
+        }
+        id = this.gsettings.connect('changed::mount-to-monitor', (settings) => {
+            this.fsMount = settings.get_string('mount-to-monitor');
+            if (this.fsMount === _('Automatic')) {
+                this.fsMount = '';
+            }
+            this.readFileSystemUsage();
         });
         this.settingSignals.push(id);
         this.netDevs = new Array();
@@ -146,13 +210,19 @@ export const Vitals = GObject.registerClass({
         });
     }
     start() {
+        // Load our baseline immediately
         this.readSummaries();
         this.readDetails();
+        this.readFileSystemUsage();
+        // Regularly update from procfs and friends
         if (this.summaryLoop === 0) {
-            this.summaryLoop = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, this.summary_interval, () => this.readSummaries());
+            this.summaryLoop = GLib.timeout_add(GLib.PRIORITY_LOW, this.summary_interval * MillisecondsPerSecond, () => this.readSummaries());
         }
         if (this.detailsLoop === 0) {
-            this.detailsLoop = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, DetailsInterval, () => this.readDetails());
+            this.detailsLoop = GLib.timeout_add(GLib.PRIORITY_LOW, this.detailsInterval * MillisecondsPerSecond, () => this.readDetails());
+        }
+        if (this.fsLoop === 0) {
+            this.fsLoop = GLib.timeout_add(GLib.PRIORITY_LOW, FileSystemInterval * MillisecondsPerSecond, () => this.readFileSystemUsage());
         }
     }
     stop() {
@@ -164,10 +234,13 @@ export const Vitals = GObject.registerClass({
             GLib.source_remove(this.detailsLoop);
             this.detailsLoop = 0;
         }
+        if (this.fsLoop > 0) {
+            GLib.source_remove(this.fsLoop);
+            this.fsLoop = 0;
+        }
     }
     // readSummaries queries all of the info needed by the topbar widgets
     readSummaries() {
-        // console.time('readSummaries()');
         if (this.showCpu) {
             this.loadStat();
         }
@@ -177,36 +250,76 @@ export const Vitals = GObject.registerClass({
         if (this.showNet) {
             this.loadNetDev();
         }
-        if (this.showDisk) {
+        if (this.showDisk || this.showFS) {
             this.loadDiskstats();
         }
-        // console.timeEnd('readSummaries()');
         return true;
     }
     // readDetails queries the info needed by the monitor menus
     readDetails() {
-        // console.time('readDetails()');
+        const promises = new Array(0);
         if (this.showCpu) {
-            this.loadUptime();
-            this.loadTemps();
-            this.loadFreqs();
-            this.loadStatDetails();
+            promises.push(this.loadUptime());
+            promises.push(this.loadTemps());
+            promises.push(this.loadFreqs());
+            promises.push(this.loadStatDetails());
         }
-        if (this.showCpu || this.showMem || this.showDisk) {
-            this.loadProcessList();
-        }
-        // console.timeEnd('readDetails()');
+        Promise.allSettled(promises).then(async () => {
+            if (this.showCpu || this.showMem || this.showDisk || this.showFS) {
+                await this.loadProcessList();
+                if (this.detailsLoop > 0) {
+                    GLib.source_remove(this.detailsLoop);
+                    this.detailsLoop = GLib.timeout_add(GLib.PRIORITY_LOW, this.detailsInterval * MillisecondsPerSecond, () => this.readDetails());
+                }
+            }
+        });
         return true;
     }
+    // readFileSystemUsage runs the df command to monitor file system use
+    readFileSystemUsage() {
+        if (this.showFS || this.showDisk) {
+            this.loadFS();
+        }
+        return true;
+    }
+    detailsNeededInUI(needed) {
+        // Use a counter so that if the user is moving one menu
+        // to another, we don't interrupt the faster refresh cadence.
+        if (needed) {
+            this.detailsNeededCtr++;
+        }
+        else {
+            this.detailsNeededCtr--;
+        }
+        // If we're switching from background to interactive mode, schedule
+        // a quick refresh to fill the UI with recent data
+        if (needed && this.detailsInterval === DetailsIntervalBackground) {
+            if (this.detailsLoop > 0) {
+                GLib.source_remove(this.detailsLoop);
+                this.detailsLoop = GLib.timeout_add(GLib.PRIORITY_LOW, 1.5 * MillisecondsPerSecond, () => this.readDetails());
+            }
+        }
+        // readDetails() will use this value for it's next refresh interval
+        if (this.detailsNeededCtr > 0) {
+            this.detailsInterval = DetailsInterval;
+        }
+        else {
+            this.detailsInterval = DetailsIntervalBackground;
+        }
+    }
     loadUptime() {
-        const f = new File('/proc/uptime');
-        f.read()
-            .then((line) => {
-            this.uptime = parseInt(line.substring(0, line.indexOf(' ')));
-            // console.log(`[TopHat] uptime = ${this.uptime}`);
-        })
-            .catch((e) => {
-            console.warn(`[TopHat] error in loadUptime(): ${e}`);
+        return new Promise((resolve, reject) => {
+            const f = new File('/proc/uptime');
+            f.read()
+                .then((line) => {
+                this.uptime = parseInt(line.substring(0, line.indexOf(' ')));
+                // console.log(`[TopHat] uptime = ${this.uptime}`);
+                resolve();
+            })
+                .catch((e) => {
+                console.warn(`[TopHat] error in loadUptime(): ${e}`);
+                reject(e);
+            });
         });
     }
     loadStat() {
@@ -221,7 +334,7 @@ export const Vitals = GObject.registerClass({
                     const m = line.match(re);
                     if (m && !m[1]) {
                         // These are aggregate CPU statistics
-                        const usedTime = parseInt(m[2]) + parseInt(m[4]);
+                        const usedTime = parseInt(m[2]) + parseInt(m[3]) + parseInt(m[4]);
                         const idleTime = parseInt(m[5]);
                         this.cpuState.update(usedTime, idleTime);
                         usage.aggregate = this.cpuState.usage();
@@ -229,16 +342,16 @@ export const Vitals = GObject.registerClass({
                     else if (m) {
                         // These are per-core statistics
                         const core = parseInt(m[1]);
-                        const usedTime = parseInt(m[2]) + parseInt(m[4]);
+                        const usedTime = parseInt(m[2]) + parseInt(m[3]) + parseInt(m[4]);
                         const idleTime = parseInt(m[5]);
                         this.cpuState.updateCore(core, usedTime, idleTime);
                         usage.core[core] = this.cpuState.coreUsage(core);
                     }
                 }
-                if (this.cpuUsageHistory.unshift(usage) > MaxHistoryLen) {
-                    this.cpuUsageHistory.pop();
-                }
             });
+            if (this.cpuUsageHistory.unshift(usage) > MaxHistoryLen) {
+                this.cpuUsageHistory.pop();
+            }
             this.cpu_usage = usage.aggregate;
             this.cpu_history = this.hashCpuHistory();
         })
@@ -247,26 +360,30 @@ export const Vitals = GObject.registerClass({
         });
     }
     loadStatDetails() {
-        const f = new File('/proc/stat');
-        f.read()
-            .then((contents) => {
-            const lines = contents.split('\n');
-            for (const line of lines) {
-                if (line.startsWith('cpu')) {
-                    const re = /^cpu(\d*)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
-                    const m = line.match(re);
-                    if (m && !m[1]) {
-                        // These are aggregate CPU statistics
-                        const usedTime = parseInt(m[2]) + parseInt(m[4]);
-                        const idleTime = parseInt(m[5]);
-                        this.cpuState.updateDetails(usedTime + idleTime);
-                        break;
+        return new Promise((resolve, reject) => {
+            const f = new File('/proc/stat');
+            f.read()
+                .then((contents) => {
+                const lines = contents.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('cpu')) {
+                        const re = /^cpu(\d*)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
+                        const m = line.match(re);
+                        if (m && !m[1]) {
+                            // These are aggregate CPU statistics
+                            const usedTime = parseInt(m[2]) + parseInt(m[3]) + parseInt(m[4]);
+                            const idleTime = parseInt(m[5]);
+                            this.cpuState.updateDetails(usedTime + idleTime);
+                            break;
+                        }
                     }
                 }
-            }
-        })
-            .catch((e) => {
-            console.warn(`[TopHat] error in loadStatDetails(): ${e}`);
+                resolve();
+            })
+                .catch((e) => {
+                console.warn(`[TopHat] error in loadStatDetails(): ${e}`);
+                reject(e);
+            });
         });
     }
     loadMeminfo() {
@@ -290,19 +407,28 @@ export const Vitals = GObject.registerClass({
                 }
             });
             usage.usedMem =
-                (this.memInfo.total - this.memInfo.available) / this.memInfo.total;
+                Math.round(((this.memInfo.total - this.memInfo.available) /
+                    this.memInfo.total) *
+                    100) / 100;
             usage.usedSwap =
-                (this.memInfo.swapTotal - this.memInfo.swapAvailable) /
-                    this.memInfo.swapTotal;
+                Math.round(((this.memInfo.swapTotal - this.memInfo.swapAvailable) /
+                    this.memInfo.swapTotal) *
+                    100) / 100;
             if (this.memUsageHistory.unshift(usage) > MaxHistoryLen) {
                 this.memUsageHistory.pop();
             }
             this.ram_usage = usage.usedMem;
-            this.ram_size = this.memInfo.total * 1024;
-            this.ram_size_free = this.memInfo.available * 1024;
+            this.ram_size =
+                (Math.round((this.memInfo.total * 1024) / ONE_GB_IN_B) * 10) / 10;
+            this.ram_size_free =
+                Math.round(((this.memInfo.available * 1024) / ONE_GB_IN_B) * 10) /
+                    10;
             this.swap_usage = usage.usedSwap;
-            this.swap_size = this.memInfo.swapTotal * 1024;
-            this.swap_size_free = this.memInfo.swapAvailable * 1024;
+            this.swap_size =
+                Math.round(((this.memInfo.swapTotal * 1024) / ONE_GB_IN_B) * 10) /
+                    10;
+            this.swap_size_free =
+                Math.round(((this.memInfo.swapAvailable * 1024) / ONE_GB_IN_B) * 10) / 10;
             this.mem_history = this.hashMemHistory();
         })
             .catch((e) => {
@@ -395,50 +521,65 @@ export const Vitals = GObject.registerClass({
         });
     }
     loadTemps() {
-        this.cpuModel.tempMonitors.forEach((file, i) => {
-            const f = new File(file);
-            f.read()
-                .then((contents) => {
-                this.cpuState.temps[i] = parseInt(contents);
-                if (i === 0) {
-                    this.cpu_temp = this.cpuState.temps[i];
-                }
-            })
-                .catch((e) => {
-                console.warn(`[TopHat] error in loadTemp(): ${e}`);
+        return new Promise((resolve, reject) => {
+            if (this.cpuModel.tempMonitors.size === 0) {
+                resolve();
+                return;
+            }
+            this.cpuModel.tempMonitors.forEach((file, i) => {
+                const f = new File(file);
+                f.read()
+                    .then((contents) => {
+                    this.cpuState.temps[i] = parseInt(contents);
+                    if (i === 0) {
+                        this.cpu_temp = Math.round(this.cpuState.temps[i] / 1000);
+                    }
+                    resolve();
+                })
+                    .catch((e) => {
+                    console.warn(`[TopHat] error in loadTemp(): ${e}`);
+                    reject(e);
+                });
             });
         });
     }
     loadFreqs() {
-        const f = new File('/proc/cpuinfo');
-        f.read()
-            .then((contents) => {
-            const blocks = contents.split('\n\n');
-            let freq = 0;
-            for (const block of blocks) {
-                const m = block.match(/cpu MHz\s*:\s*(\d+)/);
-                if (m) {
-                    freq += parseInt(m[1]);
+        return new Promise((resolve, reject) => {
+            const f = new File('/proc/cpuinfo');
+            f.read()
+                .then((contents) => {
+                const blocks = contents.split('\n\n');
+                let freq = 0;
+                for (const block of blocks) {
+                    const m = block.match(/cpu MHz\s*:\s*(\d+)/);
+                    if (m) {
+                        freq += parseInt(m[1]);
+                    }
                 }
-            }
-            this.cpu_freq = freq / this.cpuModel.cores;
-        })
-            .catch((e) => {
-            console.warn(`[TopHat] error in loadFreqs(): ${e}`);
+                this.cpu_freq = Math.round(freq / this.cpuModel.cores / 100) / 10;
+                resolve();
+            })
+                .catch((e) => {
+                console.warn(`[TopHat] error in loadFreqs(): ${e}`);
+                reject(e);
+            });
         });
     }
     async loadProcessList() {
+        // This method needs to ensure it doesn't overwhelm the OS
         const curProcs = new Map();
         const directory = Gio.File.new_for_path('/proc/');
         try {
+            // console.time('ls procfs');
             const iter = await directory
-                .enumerate_children_async(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, GLib.PRIORITY_DEFAULT, null)
+                .enumerate_children_async(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, GLib.PRIORITY_LOW, null)
                 .catch((e) => {
                 console.error(`Error enumerating children in loadProcessList(): ${e}`);
             });
+            const psFiles = [];
             while (iter) {
                 const fileInfos = await iter
-                    .next_files_async(10, GLib.PRIORITY_DEFAULT, null)
+                    .next_files_async(10, GLib.PRIORITY_LOW, null)
                     .catch((e) => {
                     console.error(`Error calling next_files_async() in loadProcessList(): ${e}`);
                 });
@@ -457,28 +598,65 @@ export const Vitals = GObject.registerClass({
                         name[0] == '7' ||
                         name[0] == '8' ||
                         name[0] == '9') {
-                        const p = await this.loadProcessStat(name);
-                        curProcs.set(p.id, p);
-                        p.setTotalTime(this.cpuState.totalTimeDetails -
-                            this.cpuState.totalTimeDetailsPrev);
-                        this.loadCmdForProcess(p);
-                        if (this.showMem) {
-                            await this.loadSmapsRollupForProcess(p);
-                        }
-                        if (this.showDisk) {
-                            await this.loadIoForProcess(p);
-                        }
+                        psFiles.push(name);
                     }
                 }
             }
+            // console.timeEnd('ls procfs');
+            // console.time('reading process details');
+            let promises = [];
+            let i = 0;
+            for (const name of psFiles) {
+                promises.push(this.readProcFiles(name, curProcs));
+                if (i >= 5) {
+                    await Promise.allSettled(promises);
+                    // sleep for 1 ms
+                    await new Promise((r) => setTimeout(r, 1));
+                    promises = [];
+                    i = 0;
+                }
+                else {
+                    i++;
+                }
+            }
+            await Promise.allSettled(promises);
             this.procs = curProcs;
+            // console.timeEnd('reading process details');
+            // console.time('hashing procs');
             this.cpu_top_procs = this.hashTopCpuProcs();
             this.mem_top_procs = this.hashTopMemProcs();
             this.disk_top_procs = this.hashTopDiskProcs();
+            // console.timeEnd('hashing procs');
         }
         catch (e) {
             console.error(`[TopHat] Error in loadProcessList(): ${e}`);
         }
+    }
+    async readProcFiles(name, curProcs) {
+        return new Promise((resolve) => {
+            this.loadProcessStat(name)
+                .then((p) => {
+                // console.log('loadProcessStat()');
+                curProcs.set(p.id, p);
+                p.setTotalTime(this.cpuState.totalTimeDetails -
+                    this.cpuState.totalTimeDetailsPrev);
+                const actions = [];
+                actions.push(this.loadCmdForProcess(p));
+                if (this.showMem) {
+                    actions.push(this.loadSmapsRollupForProcess(p));
+                }
+                if (this.showDisk || this.showFS) {
+                    actions.push(this.loadIoForProcess(p));
+                }
+                Promise.allSettled(actions).then(() => {
+                    resolve();
+                });
+            })
+                .catch(() => {
+                // We expect to be unable to read many of these
+                resolve();
+            });
+        });
     }
     hashTopCpuProcs() {
         let toHash = '';
@@ -514,7 +692,7 @@ export const Vitals = GObject.registerClass({
         return cs.get_string();
     }
     async loadProcessStat(name) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const f = new File('/proc/' + name + '/stat');
             f.read()
                 .then((contents) => {
@@ -526,8 +704,9 @@ export const Vitals = GObject.registerClass({
                 p.parseStat(contents);
                 resolve(p);
             })
-                .catch(() => {
+                .catch((e) => {
                 // We expect to be unable to read many of these
+                reject(e);
             });
         });
     }
@@ -560,16 +739,48 @@ export const Vitals = GObject.registerClass({
         });
     }
     loadCmdForProcess(p) {
-        if (p.cmdLoaded) {
-            return;
-        }
-        const f = new File('/proc/' + p.id + '/cmdline');
-        f.read()
-            .then((contents) => {
-            p.parseCmd(contents);
-        })
-            .catch(() => {
-            // We expect to be unable to read many of these
+        return new Promise((resolve) => {
+            if (p.cmdLoaded) {
+                resolve();
+                return;
+            }
+            const f = new File('/proc/' + p.id + '/cmdline');
+            f.read()
+                .then((contents) => {
+                p.parseCmd(contents);
+                resolve();
+            })
+                .catch(() => {
+                // We expect to be unable to read many of these
+                resolve();
+            });
+        });
+    }
+    loadFS() {
+        // console.time('loadFS()');
+        readFileSystems().then((fileSystems) => {
+            this.filesystems = fileSystems.filter((fs) => !this.fsToHide.includes(fs.mount));
+            if (!this.fsMount) {
+                // Default to /home if it exists, / otherwise
+                this.fsMount = '/';
+                let hasHome = false;
+                for (const v of this.filesystems) {
+                    if (v.mount === '/home') {
+                        hasHome = true;
+                    }
+                }
+                if (hasHome) {
+                    this.fsMount = '/home';
+                }
+                this.gsettings.set_string('mount-to-monitor', this.fsMount);
+            }
+            for (const fs of this.filesystems) {
+                if (this.fsMount === fs.mount) {
+                    this.fs_usage = fs.usage();
+                }
+            }
+            this.fs_list = this.hashFilesystems();
+            // console.timeEnd('loadFS()');
         });
     }
     updateNetDevices(client) {
@@ -584,26 +795,46 @@ export const Vitals = GObject.registerClass({
     }
     getTopCpuProcs(n) {
         let top = Array.from(this.procs.values());
+        if (this.groupRelated) {
+            top = groupRelatedProcs(top);
+        }
         top = top.sort((x, y) => {
             return x.cpuUsage() - y.cpuUsage();
         });
-        top = top.reverse().slice(0, n);
+        top = top
+            .filter((p) => {
+            return p.cpuUsage();
+        })
+            .reverse()
+            .slice(0, n);
         return top;
     }
     getTopMemProcs(n) {
         let top = Array.from(this.procs.values());
+        if (this.groupRelated) {
+            top = groupRelatedProcs(top);
+        }
         top = top.sort((x, y) => {
             return x.memUsage() - y.memUsage();
         });
+        // No need to filter this list; every proc always uses some memory
         top = top.reverse().slice(0, n);
         return top;
     }
     getTopDiskProcs(n) {
         let top = Array.from(this.procs.values());
+        if (this.groupRelated) {
+            top = groupRelatedProcs(top);
+        }
         top = top.sort((x, y) => {
             return (x.diskReads() + x.diskWrites() - (y.diskReads() + y.diskWrites()));
         });
-        top = top.reverse().slice(0, n);
+        top = top
+            .reverse()
+            .slice(0, n)
+            .filter((p) => {
+            return p.diskReads() + p.diskWrites();
+        });
         return top;
     }
     getCpuCoreUsage() {
@@ -613,55 +844,97 @@ export const Vitals = GObject.registerClass({
         }
         return usage;
     }
+    getCpuHistory() {
+        return this.cpuUsageHistory;
+    }
+    getMemHistory() {
+        return this.memUsageHistory;
+    }
     getNetActivity() {
         return this.netActivityHistory;
     }
     getDiskActivity() {
         return this.diskActivityHistory;
     }
+    getFilesystems() {
+        return this.filesystems;
+    }
     hashCpuHistory() {
+        // console.time('hashCpuHistory');
         let toHash = '';
         for (const u of this.cpuUsageHistory) {
             if (u) {
-                toHash += u.aggregate.toFixed(3);
+                toHash += (u.aggregate * 100).toFixed(0);
             }
         }
         const cs = GLib.Checksum.new(GLib.ChecksumType.MD5);
         cs.update(toHash);
-        return cs.get_string();
+        // console.log(`cpu toHash: ${toHash}`);
+        const hash = cs.get_string();
+        // console.timeEnd('hashCpuHistory');
+        return hash;
     }
     hashMemHistory() {
+        // console.time('hashMemHistory');
         let toHash = '';
         for (const u of this.memUsageHistory) {
             if (u) {
-                toHash += u.usedMem.toFixed(3);
+                toHash += (u.usedMem * 100).toFixed(0);
             }
         }
         const cs = GLib.Checksum.new(GLib.ChecksumType.MD5);
         cs.update(toHash);
-        return cs.get_string();
+        // console.log(`mem toHash: ${toHash}`);
+        const hash = cs.get_string();
+        // console.timeEnd('hashMemHistory');
+        return hash;
     }
     hashNetHistory() {
+        // console.time('hashNetHistory');
         let toHash = '';
         for (const u of this.netActivityHistory) {
             if (u) {
-                toHash += `${u.bytesRecv.toFixed(0)};${u.bytesSent.toFixed(0)};`;
+                // TODO: divide these vals by 1000 to avoid non-visible updates?
+                toHash += `${u.bytesRecv.toFixed(0)}${u.bytesSent.toFixed(0)}`;
             }
         }
         const cs = GLib.Checksum.new(GLib.ChecksumType.MD5);
         cs.update(toHash);
-        return cs.get_string();
+        // console.log(`net toHash: ${toHash}`);
+        const hash = cs.get_string();
+        // console.timeEnd('hashNetHistory');
+        return hash;
     }
     hashDiskHistory() {
+        // console.time('hashDiskHistory');
         let toHash = '';
         for (const u of this.diskActivityHistory) {
             if (u) {
-                toHash += `${u.bytesRead.toFixed(0)};${u.bytesWritten.toFixed(0)};`;
+                // TODO: divide these vals by 1000 to avoid non-visible updates?
+                toHash += `${u.bytesRead.toFixed(0)}${u.bytesWritten.toFixed(0)}`;
             }
         }
         const cs = GLib.Checksum.new(GLib.ChecksumType.MD5);
         cs.update(toHash);
-        return cs.get_string();
+        // console.log(`disk toHash: ${toHash}`);
+        const hash = cs.get_string();
+        // console.timeEnd('hashDiskHistory');
+        return hash;
+    }
+    hashFilesystems() {
+        // console.time('hashFS');
+        let toHash = '';
+        for (const fs of this.filesystems) {
+            if (fs) {
+                toHash += `${fs.mount}${fs.usage()}`;
+            }
+        }
+        const cs = GLib.Checksum.new(GLib.ChecksumType.MD5);
+        cs.update(toHash);
+        // console.log(`fs toHash: ${toHash}`);
+        const hash = cs.get_string();
+        // console.timeEnd('hashFS');
+        return hash;
     }
     // Properties
     get cpu_usage() {
@@ -907,6 +1180,26 @@ export const Vitals = GObject.registerClass({
         this.props.disk_top_procs = v;
         this.notify('disk-top-procs');
     }
+    get fs_usage() {
+        return this.props.fs_usage;
+    }
+    set fs_usage(v) {
+        if (this.fs_usage === v) {
+            return;
+        }
+        this.props.fs_usage = v;
+        this.notify('fs-usage');
+    }
+    get fs_list() {
+        return this.props.fs_list;
+    }
+    set fs_list(v) {
+        if (this.fs_list === v) {
+            return;
+        }
+        this.props.fs_list = v;
+        this.notify('fs-list');
+    }
     get uptime() {
         return this.props.uptime;
     }
@@ -960,6 +1253,8 @@ class Properties {
     disk_wrote_total = 0;
     disk_history = '';
     disk_top_procs = '';
+    fs_usage = 0;
+    fs_list = '';
     summary_interval = 0;
 }
 class CpuState {
@@ -1018,12 +1313,13 @@ class CpuState {
     usage() {
         const usedTimeDelta = this.usedTime - this.usedTimePrev;
         const idleTimeDelta = this.idleTime - this.idleTimePrev;
-        return usedTimeDelta / (usedTimeDelta + idleTimeDelta);
+        return (Math.round((usedTimeDelta / (usedTimeDelta + idleTimeDelta)) * 1000) /
+            1000);
     }
     coreUsage(core) {
         const usedTimeDelta = this.coreUsedTime[core] - this.coreUsedTimePrev[core];
         const idleTimeDelta = this.coreIdleTime[core] - this.coreIdleTimePrev[core];
-        return usedTimeDelta / (usedTimeDelta + idleTimeDelta);
+        return (Math.round((usedTimeDelta / (usedTimeDelta + idleTimeDelta)) * 100) / 100);
     }
     totalTime() {
         return (this.usedTime - this.usedTimePrev + (this.idleTime - this.idleTimePrev));
@@ -1038,6 +1334,9 @@ class CpuUsage {
         for (let i = 0; i < cores; i++) {
             this.core[i] = 0;
         }
+    }
+    val() {
+        return this.aggregate;
     }
     toString() {
         let s = `aggregate: ${this.aggregate.toFixed(2)}`;
@@ -1068,6 +1367,9 @@ class MemInfo {
 class MemUsage {
     usedMem = 0;
     usedSwap = 0;
+    val() {
+        return this.usedMem;
+    }
     toString() {
         return `Memory usage: ${this.usedMem.toFixed(2)} Swap usage: ${this.usedSwap.toFixed(2)}`;
     }
@@ -1077,11 +1379,22 @@ class NetDevState {
     bytesRecvPrev = -1;
     bytesSent = -1;
     bytesSentPrev = -1;
-    update(bytesRecv, bytesSent) {
+    ts = 0; // timestamp in seconds
+    tsPrev = 0;
+    update(bytesRecv, bytesSent, now = 0) {
+        if (!now) {
+            now = Date.now();
+        }
+        if (now <= this.ts) {
+            // This update was processed too slowly and is out of date
+            return;
+        }
         this.bytesRecvPrev = this.bytesRecv;
         this.bytesRecv = bytesRecv;
         this.bytesSentPrev = this.bytesSent;
         this.bytesSent = bytesSent;
+        this.tsPrev = this.ts;
+        this.ts = now;
     }
     // recvActivity returns the number of bytes received per second
     // during the most recent interval
@@ -1089,7 +1402,12 @@ class NetDevState {
         if (this.bytesRecvPrev < 0) {
             return 0;
         }
-        return (this.bytesRecv - this.bytesRecvPrev) / SummaryIntervalDefault;
+        if (this.ts <= this.tsPrev) {
+            console.warn('recvActivity times are reversed!');
+        }
+        const retval = Math.round((this.bytesRecv - this.bytesRecvPrev) / ((this.ts - this.tsPrev) / 1000));
+        // console.log(`returning recvActivity: ${retval}`);
+        return retval;
     }
     // sentActivity return the number of bytes sent per second
     // during the most recent interval
@@ -1097,11 +1415,15 @@ class NetDevState {
         if (this.bytesSentPrev < 0) {
             return 0;
         }
-        return (this.bytesSent - this.bytesSentPrev) / SummaryIntervalDefault;
+        if (this.ts <= this.tsPrev) {
+            console.warn('sentActivity times are reversed!');
+        }
+        const retval = Math.round((this.bytesSent - this.bytesSentPrev) / ((this.ts - this.tsPrev) / 1000));
+        // console.log(`returning sentActivity: ${retval}`);
+        return retval;
     }
 }
 class NetActivity {
-    // TODO(fflewddur): Add a field for the duration of this measurement
     bytesRecv = 0;
     bytesSent = 0;
     val() {
@@ -1116,11 +1438,22 @@ class DiskState {
     bytesReadPrev = -1;
     bytesWritten = -1;
     bytesWrittenPrev = -1;
-    update(bytesRead, bytesWritten) {
+    ts = 0; // timestamp in seconds
+    tsPrev = 0;
+    update(bytesRead, bytesWritten, now = 0) {
+        if (!now) {
+            now = Date.now();
+        }
+        if (now <= this.ts) {
+            // This update was processed too slowly and is out of date
+            return;
+        }
         this.bytesReadPrev = this.bytesRead;
         this.bytesRead = bytesRead;
         this.bytesWrittenPrev = this.bytesWritten;
         this.bytesWritten = bytesWritten;
+        this.tsPrev = this.ts;
+        this.ts = now;
     }
     // readActivity returns the number of bytes read per second
     // during the most recent interval
@@ -1128,7 +1461,12 @@ class DiskState {
         if (this.bytesReadPrev < 0) {
             return 0;
         }
-        return (this.bytesRead - this.bytesReadPrev) / SummaryIntervalDefault;
+        if (this.ts <= this.tsPrev) {
+            console.warn('readActivity times are reversed!');
+        }
+        const retval = Math.round((this.bytesRead - this.bytesReadPrev) / ((this.ts - this.tsPrev) / 1000));
+        // console.log(`returning readActivity: ${retval}`);
+        return retval;
     }
     // writeActivity return the number of bytes written per second
     // during the most recent interval
@@ -1136,11 +1474,16 @@ class DiskState {
         if (this.bytesWrittenPrev < 0) {
             return 0;
         }
-        return (this.bytesWritten - this.bytesWrittenPrev) / SummaryIntervalDefault;
+        if (this.ts <= this.tsPrev) {
+            console.warn('writeActivity times are reversed!');
+        }
+        const retval = Math.round((this.bytesWritten - this.bytesWrittenPrev) /
+            ((this.ts - this.tsPrev) / 1000));
+        // console.log(`returning writeActivity: ${retval}`);
+        return retval;
     }
 }
 class DiskActivity {
-    // TODO(fflewddur): Add a field for the duration of this measurement
     bytesRead = 0;
     bytesWritten = 0;
     val() {
@@ -1152,37 +1495,40 @@ class DiskActivity {
 }
 class Process {
     id = '';
+    iterationCpu = 0; // Number of times we've loaded CPU activity for this process
+    iterationIo = 0; // Number of times we've loaded IO activity for this process
     cmd = '';
     cmdLoaded = false;
     utime = 0;
     stime = 0;
     pss = 0;
-    cpu = -1;
-    cpuPrev = -1;
+    cpu = 0;
+    cpuPrev = 0;
     cpuTotal = 0;
-    diskRead = -1;
-    diskWrite = -1;
-    diskReadPrev = -1;
-    diskWritePrev = -1;
+    diskRead = 0;
+    diskWrite = 0;
+    diskReadPrev = 0;
+    diskWritePrev = 0;
+    count = 1;
     cpuUsage() {
-        if (this.cpuPrev < 0) {
-            return 0;
-        }
+        // if (this.cpuPrev < 0) {
+        // return 0;
+        // }
         return (this.cpu - this.cpuPrev) / this.cpuTotal;
     }
     memUsage() {
         return this.pss;
     }
     diskReads() {
-        if (this.diskReadPrev < 0) {
-            return 0;
-        }
+        // if (this.diskReadPrev < 0) {
+        //   return 0;
+        // }
         return (this.diskRead - this.diskReadPrev) / DetailsInterval;
     }
     diskWrites() {
-        if (this.diskWritePrev < 0) {
-            return 0;
-        }
+        // if (this.diskWritePrev < 0) {
+        //   return 0;
+        // }
         return (this.diskWrite - this.diskWritePrev) / DetailsInterval;
     }
     setTotalTime(t) {
@@ -1225,15 +1571,33 @@ class Process {
         if (content) {
             this.cmd = content;
             // If this is an absolute cmd path, remove the path
-            if (content[0] === '/') {
-                const m = content.match(RE_CMD);
+            if (content[0] === '/' || content[0] === '.') {
+                let m = content.match(RE_CMD);
                 if (m) {
-                    // console.log(`parsing '${content}' to '${m[1]}'`);
-                    this.cmd = m[1];
+                    const cmd = m[1];
+                    m = content.match(RE_LAUNCHER);
+                    if (m && m[2]) {
+                        this.parseCmd(m[2]);
+                    }
+                    else {
+                        this.cmd = cmd;
+                    }
                 }
             }
             this.cmdLoaded = true;
         }
+    }
+    groupWith(other) {
+        this.utime += other.utime;
+        this.stime += other.stime;
+        this.pss += other.pss;
+        this.cpu += other.cpu;
+        this.cpuPrev += other.cpuPrev;
+        this.diskRead += other.diskRead;
+        this.diskReadPrev += other.diskReadPrev;
+        this.diskWrite += other.diskWrite;
+        this.diskWritePrev += other.diskWritePrev;
+        this.count += other.count;
     }
 }
 function readKb(line) {
@@ -1256,4 +1620,30 @@ function refreshRateModifier(settings) {
             break;
     }
     return modifier;
+}
+// Take an array of processes and aggregate their statistics by their 'cmd' property
+function groupRelatedProcs(top) {
+    const grouped = new Map();
+    for (const v of top) {
+        let p = grouped.get(v.cmd);
+        if (p) {
+            p.groupWith(v);
+        }
+        else {
+            p = new Process();
+            p.cmd = v.cmd;
+            p.cmdLoaded = v.cmdLoaded;
+            p.cpu = v.cpu;
+            p.cpuPrev = v.cpuPrev;
+            p.cpuTotal = v.cpuTotal;
+            p.diskRead = v.diskRead;
+            p.diskReadPrev = v.diskReadPrev;
+            p.diskWrite = v.diskWrite;
+            p.diskWritePrev = v.diskWritePrev;
+            p.pss = v.pss;
+        }
+        grouped.set(p.cmd, p);
+    }
+    top = Array.from(grouped.values());
+    return top;
 }

@@ -257,8 +257,10 @@ appsSetup() {
 "huntertran.auto-markdown-toc"
 "zaaack.markdown-editor"
 )
-  if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin* && ip route | grep -q ''; then
-    for ext in "${EXTLIST[@]}"; do codium --install-extension ${ext} & done
+
+  mkdir -p ~/.vscode-oss/extensions
+  if ! ls -A1d ~/.vscode-oss/extensions/*atppuccin*; then
+    cp -drf /etc/skel/.vscode-oss/extensions/* ~/.vscode-oss/extensions/
   fi
 
 }

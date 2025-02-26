@@ -14,10 +14,11 @@
   "shell-version": [
     "45",
     "46",
-    "47"
+    "47",
+    "48"
   ],
   "url": "https://github.com/G-dH/vertical-workspaces",
   "uuid": "vertical-workspaces@G-dH.github.com",
-  "version": 75,
-  "version-name": "47.4"
+  "version": 80,
+  "version-name": "48.2"
 }

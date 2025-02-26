@@ -10,14 +10,15 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with TopHat. If not, see <https://www.gnu.org/licenses/>.
-import Gdk from 'gi://Gdk';
-import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
 import NM from 'gi://NM';
 import { ExtensionPreferences, gettext as _, } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+import { readFileSystems } from './helpers.js';
 const GnomeMajorVer = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
 export default class TopHatPrefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -28,7 +29,7 @@ export default class TopHatPrefs extends ExtensionPreferences {
             window.add(this.buildMemPage());
             window.add(this.buildDiskPage());
             window.add(this.buildNetPage());
-            window.set_default_size(750, 410);
+            window.set_default_size(750, 475);
             resolve();
         });
     }
@@ -75,6 +76,10 @@ export default class TopHatPrefs extends ExtensionPreferences {
         this.addColorRow(_('Meter color'), 'meter-fg-color', group, control);
         // Show icons
         this.addActionRow(_('Show icons beside monitors'), 'show-icons', group);
+        // Show action buttons in menus
+        this.addActionRow(_('Show action buttons in menus'), 'show-menu-actions', group);
+        // Group top processes by name
+        this.addActionRow(_('Group top processes by command'), 'group-procs', group);
         return page;
     }
     buildCpuPage() {
@@ -94,6 +99,8 @@ export default class TopHatPrefs extends ExtensionPreferences {
         this.addComboRow(_('Show as'), choices, 'cpu-display', group);
         // Show each core
         this.addActionRow(_('Show each core'), 'cpu-show-cores', group);
+        // Sort cores by usage
+        this.addActionRow(_('Sort cores by usage'), 'cpu-sort-cores', group);
         // Normalize process CPU usage
         this.addActionRow(_('Normalize per-process CPU usage by CPU cores'), 'cpu-normalize-proc-use', group);
         return page;
@@ -120,10 +127,83 @@ export default class TopHatPrefs extends ExtensionPreferences {
             title: _('Disk'),
             iconName: 'disk-icon-symbolic',
         });
-        const group = new Adw.PreferencesGroup({ title: _('Disk') });
+        let group = new Adw.PreferencesGroup({ title: _('Disk activity') });
         page.add(group);
         // Enable
         this.addActionRow(_('Show the disk activity monitor'), 'show-disk', group);
+        group = new Adw.PreferencesGroup({ title: _('Filesystem usage') });
+        page.add(group);
+        // Enable
+        this.addActionRow(_('Show the filesystem monitor'), 'show-fs', group);
+        // Visualization
+        const choices = new Gtk.StringList();
+        choices.append(_('Usage meter'));
+        choices.append(_('Numeric value'));
+        choices.append(_('Both meter and value'));
+        this.addComboRow(_('Show as'), choices, 'fs-display', group);
+        // Filesystem mount to monitor in the topbar
+        const fsMountChoices = new Gtk.StringList();
+        const monitorMountRow = this.addComboRow(_('Filesystem to monitor in topbar'), fsMountChoices, 'mount-to-monitor', group, false);
+        // Filesystem mounts to monitor in the menu
+        const row = new Adw.ExpanderRow({
+            title: _('Filesystems to show in menu'),
+        });
+        group.add(row);
+        // Find available filesystems and add them to our widgets
+        readFileSystems()
+            .then((filesystems) => {
+            const settings = this.getSettings();
+            const toHide = settings
+                .get_string('fs-hide-in-menu')
+                .split(';')
+                .filter((s) => {
+                return s.length > 0;
+            });
+            const mountToMonitor = settings.get_string('mount-to-monitor');
+            fsMountChoices.append(_('Automatic'));
+            let i = 1;
+            for (const fs of filesystems) {
+                fsMountChoices.append(fs.mount);
+                if (mountToMonitor === fs.mount) {
+                    monitorMountRow.set_selected(i);
+                }
+                const fsRow = new Adw.ActionRow({ title: fs.mount });
+                const toggle = new Gtk.Switch({
+                    active: !toHide.includes(fs.mount),
+                    valign: Gtk.Align.CENTER,
+                });
+                //@ts-expect-error does not exist
+                toggle.fs = fs.mount;
+                toggle.connect('notify::active', (w) => {
+                    const toHide = settings
+                        .get_string('fs-hide-in-menu')
+                        .split(';')
+                        .filter((s) => {
+                        return s.length > 0;
+                    });
+                    if (w.get_active() && toHide.includes(w.fs)) {
+                        const i = toHide.indexOf(w.fs);
+                        if (i > -1) {
+                            toHide.splice(i, 1);
+                        }
+                    }
+                    else if (!w.get_active() && !toHide.includes(w.fs)) {
+                        toHide.push(w.fs);
+                    }
+                    settings.set_string('fs-hide-in-menu', toHide
+                        .filter((s) => {
+                        return s.length > 0;
+                    })
+                        .join(';'));
+                });
+                fsRow.add_suffix(toggle);
+                row.add_row(fsRow);
+                i++;
+            }
+        })
+            .catch((err) => {
+            console.error(`[TopHat] Error building filesystem preference page: ${err}`);
+        });
         return page;
     }
     buildNetPage() {
@@ -230,5 +310,6 @@ export default class TopHatPrefs extends ExtensionPreferences {
             }
         });
         group.add(row);
+        return row;
     }
 }

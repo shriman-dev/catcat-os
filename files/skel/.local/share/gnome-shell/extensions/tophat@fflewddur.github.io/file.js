@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TopHat. If not, see <https://www.gnu.org/licenses/>.
 import Gio from 'gi://Gio';
+Gio._promisify(Gio.File.prototype, 'load_contents_async');
 const decoder = new TextDecoder('utf-8');
 export class File {
     file;
@@ -35,15 +36,16 @@ export class File {
             try {
                 this.file.load_contents_async(null, (file, res) => {
                     try {
-                        let bytes = file?.load_contents_finish(res)[1];
+                        const bytes = file?.load_contents_finish(res)[1];
                         if (!bytes) {
                             reject('count not load file');
                             return;
                         }
-                        // Sometimes the null terminator appears before bytes.length
-                        const end = bytes.indexOf(0);
-                        if (end >= 0) {
-                            bytes = bytes.slice(0, end);
+                        // Replace null separators with spaces (e.g., to read proc_pid_cmdline)
+                        for (let i = 0; i < bytes.length; i++) {
+                            if (bytes[i] === 0) {
+                                bytes[i] = 0x20;
+                            }
                         }
                         const contents = decoder.decode(bytes).trim();
                         resolve(contents);
@@ -81,7 +83,7 @@ export class File {
         }
         return contents;
     }
-    list() {
+    listSync() {
         const children = new Array();
         const iter = this.file.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
         while (true) {

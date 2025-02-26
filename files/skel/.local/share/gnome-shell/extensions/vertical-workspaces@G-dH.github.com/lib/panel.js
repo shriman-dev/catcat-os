@@ -3,7 +3,7 @@
  * panel.js
  *
  * @author     GdH <G-dH@github.com>
- * @copyright  2022 - 2024
+ * @copyright  2022 - 2025
  * @license    GPL-3.0
  *
  */
@@ -29,8 +29,6 @@ export const PanelModule = class {
         this.moduleEnabled = false;
         this._overrides = null;
 
-        this._showingOverviewConId = 0;
-        this._hidingOverviewConId = 0;
         this._styleChangedConId = 0;
     }
 
@@ -66,43 +64,21 @@ export const PanelModule = class {
         if (!this._overrides)
             this._overrides = new Me.Util.Overrides();
 
-        const panelBox = Main.layoutManager.panelBox;
-
         this._setPanelPosition();
         this._updateStyleChangedConnection();
 
         if (!opt.PANEL_MODE) {
-            this._updateOverviewConnection(true);
             this._reparentPanel(false);
-            panelBox.translation_y = 0;
-            Main.panel.opacity = 255;
-            this._setPanelStructs(true);
+            this._showPanel(); // panelBox.translation_y = 0;
         } else if (opt.PANEL_OVERVIEW_ONLY) {
-            if (opt.SHOW_WS_PREVIEW_BG) {
-                this._reparentPanel(true);
-                if (opt.OVERVIEW_MODE2) {
-                    // in OM2 if the panel has been moved to the overviewGroup move panel above all
-                    Main.layoutManager.overviewGroup.set_child_above_sibling(panelBox, null);
-                    this._updateOverviewConnection();
-                } else {
-                    this._updateOverviewConnection(true);
-                }
-                this._showPanel(true);
-            } else {
-                // if ws preview bg is disabled, panel can stay in uiGroup
-                this._reparentPanel(false);
-                this._showPanel(false);
-                this._updateOverviewConnection();
-            }
-            // _connectPanel();
-        } else if (opt.PANEL_DISABLED) {
-            this._updateOverviewConnection(true);
-            this._reparentPanel(false);
             this._showPanel(false);
-            // _connectPanel();
+        } else if (opt.PANEL_DISABLED) {
+            this._showPanel(false);
         }
+
         this._setPanelStructs(!opt.PANEL_MODE);
         Main.layoutManager._updateHotCorners();
+        Main.overview._overview.controls.layoutManager._updateWorkAreaBox();
 
         this._overrides.addOverride('ActivitiesButton', Main.panel.statusArea.activities, ActivitiesButton);
 
@@ -112,14 +88,12 @@ export const PanelModule = class {
     _disableModule() {
         const reset = true;
         this._setPanelPosition(reset);
-        this._updateOverviewConnection(reset);
         this._reparentPanel(false);
-
         this._updateStyleChangedConnection(reset);
 
         const panelBox = Main.layoutManager.panelBox;
+        panelBox.scale_y = 1;
         panelBox.translation_y = 0;
-        Main.panel.opacity = 255;
         this._setPanelStructs(true);
         if (this._overrides)
             this._overrides.removeAll();
@@ -147,51 +121,28 @@ export const PanelModule = class {
             }
         } else if (!this._styleChangedConId) {
             this._styleChangedConId = Main.panel.connect('style-changed', () => {
-                if (opt.PANEL_OVERVIEW_ONLY && !opt.OVERVIEW_MODE2)
-                    Main.panel.add_style_pseudo_class('overview');
-                else if (opt.OVERVIEW_MODE2)
-                    Main.panel.remove_style_pseudo_class('overview');
+                this._updateStyle();
             });
         }
     }
 
-    _updateOverviewConnection(reset = false) {
-        if (reset) {
-            if (this._hidingOverviewConId) {
-                Main.overview.disconnect(this._hidingOverviewConId);
-                this._hidingOverviewConId = 0;
-            }
-            if (this._showingOverviewConId) {
-                Main.overview.disconnect(this._showingOverviewConId);
-                this._showingOverviewConId = 0;
-            }
-        } else {
-            if (!this._hidingOverviewConId) {
-                this._hidingOverviewConId = Main.overview.connect('hiding', () => {
-                    if (!opt.SHOW_WS_PREVIEW_BG || opt.OVERVIEW_MODE2)
-                        this._showPanel(false);
-                });
-            }
-            if (!this._showingOverviewConId) {
-                this._showingOverviewConId = Main.overview.connect('showing', () => {
-                    if (Main.layoutManager._startingUp)
-                        return;
-                    if (!opt.SHOW_WS_PREVIEW_BG || opt.OVERVIEW_MODE2 || Main.layoutManager.panelBox.translation_y)
-                        this._showPanel(true);
-                });
-            }
-        }
+    _updateStyle() {
+        if (opt.OVERVIEW_MODE2 || !opt.PANEL_OVERVIEW_STYLE)
+            Main.panel.remove_style_pseudo_class('overview');
+        else if (opt.PANEL_OVERVIEW_ONLY && !opt.OVERVIEW_MODE2)
+            Main.panel.add_style_pseudo_class('overview');
     }
 
     _reparentPanel(reparent = false) {
-        const panel = Main.layoutManager.panelBox;
-        if (reparent && panel.get_parent() === Main.layoutManager.uiGroup && !Main.sessionMode.isLocked) {
-            Main.layoutManager.uiGroup.remove_child(panel);
-            Main.layoutManager.overviewGroup.add_child(panel);
-        } else if ((!reparent || Main.sessionMode.isLocked) && panel.get_parent() === Main.layoutManager.overviewGroup) {
-            Main.layoutManager.overviewGroup.remove_child(panel);
-            // return the panel at default position, panel shouldn't cover objects that should be above
-            Main.layoutManager.uiGroup.insert_child_at_index(panel, 4);
+        const panelBox = Main.layoutManager.panelBox;
+        const controlsManager = Main.overview._overview.controls;
+        if (reparent && panelBox.get_parent() !== controlsManager && !Main.sessionMode.isLocked) {
+            Main.layoutManager.uiGroup.remove_child(panelBox);
+            controlsManager.add_child(panelBox);
+        } else if ((!reparent || Main.sessionMode.isLocked) && panelBox.get_parent() === controlsManager) {
+            controlsManager.remove_child(panelBox);
+            // return the panel at default position, panelshouldn't cover objects that should be above
+            Main.layoutManager.uiGroup.insert_child_at_index(panelBox, 4);
         }
     }
 
@@ -211,26 +162,44 @@ export const PanelModule = class {
     }
 
     _showPanel(show = true) {
-        if (show) {
-            Main.panel.opacity = 255;
-            Main.layoutManager.panelBox.ease({
-                duration: ANIMATION_TIME,
-                translation_y: 0,
-                onComplete: () => {
-                    this._setPanelStructs(!opt.PANEL_MODE);
-                },
-            });
-        } else if (!Main.layoutManager._startingUp) {
-            const panelHeight = Main.panel.height;
-            Main.layoutManager.panelBox.ease({
-                duration: ANIMATION_TIME,
-                translation_y: opt.PANEL_POSITION_TOP ? -panelHeight + 1 : panelHeight - 1,
-                onComplete: () => {
-                    Main.panel.opacity = 0;
-                    this._setPanelStructs(!opt.PANEL_MODE);
-                },
-            });
+        if (Main.layoutManager._startingUp && !opt.PANEL_MODE)
+            return;
+
+        const panelBox = Main.layoutManager.panelBox;
+        const panelHeight = Main.panel.height;
+        const overviewGroup = Main.layoutManager.overviewGroup;
+
+        if (panelBox.get_parent() === overviewGroup) {
+            if (opt.OVERVIEW_MODE2)
+                overviewGroup.set_child_above_sibling(panelBox, null);
+            else
+                overviewGroup.set_child_below_sibling(panelBox, Main.overview._overview);
         }
+
+        panelBox.scale_y = 1;
+        let translation_y = 0;
+
+        if (show) {
+            if (!opt.PANEL_MODE) {
+                // Ensure that panel is not hidden before it's animated
+                panelBox.translation_y = opt.PANEL_POSITION_TOP ? -panelHeight : panelHeight;
+                this._reparentPanel(false);
+            }
+        } else if (!Main.layoutManager.overviewGroup.visible || opt.PANEL_DISABLED) {
+            translation_y = opt.PANEL_POSITION_TOP ? -panelHeight : panelHeight;
+        }
+
+        panelBox.ease({
+            duration: Main.layoutManager._startingUp ? 0 : ANIMATION_TIME,
+            translation_y,
+            onComplete: () => {
+                this._reparentPanel(opt.PANEL_OVERVIEW_ONLY);
+                panelBox.scale_y = opt.PANEL_DISABLED ? 0 : 1;
+                if (opt.PANEL_OVERVIEW_ONLY && opt.SHOW_WS_PREVIEW_BG)
+                    panelBox.translation_y = 0;
+                this._setPanelStructs(!opt.PANEL_MODE);
+            },
+        });
     }
 };
 

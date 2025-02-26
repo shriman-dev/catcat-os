@@ -13,16 +13,14 @@ keymap = [
 	{ on = "<C-z>",        run = "suspend",            desc = "Suspend the process" },
 
 	# Hopping
-	{ on = "k",            run = "plugin arrow --args=-1", desc = "Move cursor up" },
-	{ on = "j",            run = "plugin arrow --args=1",  desc = "Move cursor down" },
-	{ on = "<Up>",         run = "plugin arrow --args=-1", desc = "Move cursor up" },
-	{ on = "<Down>",       run = "plugin arrow --args=1",  desc = "Move cursor down" },
+	{ on = "k",            run = "plugin arrow -1", desc = "Move cursor up" },
+	{ on = "j",            run = "plugin arrow 1",  desc = "Move cursor down" },
+	{ on = "<Up>",         run = "plugin arrow -1", desc = "Move cursor up" },
+	{ on = "<Down>",       run = "plugin arrow 1",  desc = "Move cursor down" },
 	{ on = "<S-PageUp>",   run = "arrow -50%",  desc = "Move cursor up half page" },
 	{ on = "<S-PageDown>", run = "arrow 50%",   desc = "Move cursor down half page" },
 	{ on = "<PageUp>",     run = "arrow -100%", desc = "Move cursor up one page" },
 	{ on = "<PageDown>",   run = "arrow 100%",  desc = "Move cursor down one page" },
-	{ on = [ "g", "g" ],   run = "arrow -99999999", desc = "Move cursor to the top" },
-	{ on = [ "g", "b" ],            run = "arrow 99999999",  desc = "Move cursor to the bottom" },
 
 	# Navigation
 	{ on = "h",            run = "leave",   desc = "Go back to the parent directory" },
@@ -33,14 +31,11 @@ keymap = [
 	{ on = "L",            run = "forward", desc = "Go forward to the next directory" },
 
 	# Toggle Views
-	{ on = ["<Space>", "<Space>"],  run = "plugin toggle-view --args=preview",        desc = "Toggle on/off preview" },
-	{ on = ["<Space>", "p"],        run = "plugin toggle-view --args=parent",         desc = "Toggle on/off parent view" },
-	{ on = ["<Space>", "c"],        run = "plugin toggle-view --args=current",        desc = "Toggle on/off current view" },
-	{ on = ["<Space>", "m"],        run = "plugin max-preview",                       desc = "Maximize or restore preview" },
+	{ on = ["<Space>", "<Space>"],  run = "plugin toggle-pane min-preview",           desc = "Toggle on/off preview" },
+	{ on = ["<Space>", "p"],        run = "plugin toggle-pane min-parent",            desc = "Toggle on/off parent view" },
+	{ on = ["<Space>", "c"],        run = "plugin toggle-pane min-current",           desc = "Toggle on/off current view" },
+	{ on = ["<Space>", "m"],        run = "plugin toggle-pane max-preview",           desc = "Maximize or restore preview" },
 	{ on = ["<Space>", "s"],        run = "shell 'sushi \"$@\"'",                     desc = "Show quick preview with gnome sushi" },
-	{ on = ["<Space>", "t"],        run = "plugin eza-preview --args='--toggle_tree_view'",                       desc = "Toggle tree/list in preview" },
-	{ on = ["<Space>", "="],        run = "plugin eza-preview --args='--inc-level'",  desc = "Increment tree level" },
-	{ on = ["<Space>", "-"],        run = "plugin eza-preview --args='--dec-level'",  desc = "Decrement tree level" },
 
 	# Selection
 	{ on = "<C-a>",                 run = "toggle_all",             desc = "Invert selection of all files" },
@@ -91,11 +86,11 @@ keymap = [
 
 	{ on = ["o", ":"],      run = "shell --block --interactive",                         desc = "Run a command (block until finishes)" },
 	{ on = ["o", "w"],      run = "tasks_show",                                          desc = "Show task manager" },
-	{ on = ["o", "M"],      run = "plugin archivemount --args=mount",                    desc = "Mount selected archive" },
+	{ on = ["o", "M"],      run = "plugin archivemount mount",                    desc = "Mount selected archive" },
 
 	{ on = ["o", "~"],      run = "help",                                                desc = "Open help" },
 	{ on = ["o", "<Tab>"],  run = "spot",                                                desc = "Spot hovered file" },
-	{ on = ["o", "U"],      run = "plugin archivemount --args=unmount",                  desc = "Unmount and save changes to original archive" },
+	{ on = ["o", "U"],      run = "plugin archivemount unmount",                  desc = "Unmount and save changes to original archive" },
 
 	{ on = "<Enter>",   run = "open",                                                desc = "Open files" },
 	{ on = "<S-Enter>", run = "open --interactive",                                  desc = "Open files interactively" },
@@ -409,49 +404,6 @@ keymap = [
 	{ on = "f",      run = "filter", desc = "Apply a filter for the help items" },
 ]
 
-
-
-
-#[[manager.prepend_keymap]]
-#on  = "k"
-#run = "plugin arrow --args=-1"
-#desc = "Move cursor up"
-
-#[[manager.prepend_keymap]]
-#on  = "j"
-#run = "plugin arrow --args=1"
-#desc = "Move cursor down"
-
-#[[manager.prepend_keymap]]
-#on  = "<Up>"
-#run = "plugin arrow --args=-1"
-#desc = "Move cursor up"
-
-#[[manager.prepend_keymap]]
-#on  = "<Down>"
-#run = "plugin arrow --args=1"
-#desc = "Move cursor down"
-
-#[[manager.prepend_keymap]]
-#on   = "p"
-#run  = "plugin smart-paste"
-#desc = "Paste into the hovered directory or CWD"
-
-#[[manager.prepend_keymap]]
-#on   = "t"
-#run  = "plugin smart-tab"
-#desc = "Create a tab and enter the hovered directory"
-
-#[[manager.prepend_keymap]]
-#on   = [ "c", "m" ]
-#run  = "plugin chmod"
-#desc = "Chmod on selected files"
-
-#[[manager.prepend_keymap]]
-#on   = [ "<A-a>" ]
-#run  = "plugin hide-preview"
-#desc = "Hide or show preview"
-
 [[manager.append_keymap]]
 on = [ "g", "r" ]
 run = '''
@@ -466,43 +418,6 @@ desc = "Smart filter"
 
 #[[manager.prepend_keymap]]
 #on   = "2"
-#run  = "plugin smart-switch --args=1"
+#run  = "plugin smart-switch 1"
 #desc = "Switch or create tab 2"
-
-#[[manager.prepend_keymap]]
-#on   = "l"
-#run  = "plugin smart-enter"
-#desc = "Enter the child directory, or open the file"
-
-#[[manager.prepend_keymap]]
-#on   = "<Right>"
-#run  = "plugin smart-enter"
-#desc = "Enter the child directory, or open the file"
-
-#[[manager.prepend_keymap]]
-#on = [ "<Space>", "1" ]
-#run = "plugin toggle-view --args=parent"
-#desc = "Toggle on/off parent view"
-
-#[[manager.prepend_keymap]]
-#on = [ "<Space>", "2" ]
-#run = "plugin toggle-view --args=current"
-#desc = "Toggle on/off current view"
-
-#[[manager.prepend_keymap]]
-#on = [ "<Space>", "3" ]
-#run = "plugin toggle-view --args=preview"
-#desc = "Toggle on/off preview"
-
-#[[manager.prepend_keymap]]
-#on   = ["<Space>", "<Space>"]
-#run  = "plugin max-preview"
-#desc = "Maximize or restore preview"
-
-#[[manager.prepend_keymap]]
-#on = ["<Space>", "s"]
-#run = '''
-#  shell 'sushi "$@"'
-#'''
-#desc = "Show  quick preview with gnome sushi"
 

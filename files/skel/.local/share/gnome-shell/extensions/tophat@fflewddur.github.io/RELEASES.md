@@ -3,6 +3,40 @@
 All notable changes to [TopHat] are listed in this file. The format is loosely
 based on [Keep a Changelog].
 
+## TopHat 21 - February 23, 2025
+
+- Added support for GNOME 48
+- Added a tooltip to display long command names
+- Added option to group top processes by command
+- Added option to disable sorting CPU meter by usage (from [SoMuchForSubtlety](https://github.com/SoMuchForSubtlety))
+- Improved process identification
+- Fixed CPU usage calculation for nice'd processes
+- Fixed center-aligned labels in the top bar
+
+## TopHat 20 - January 28, 2025
+
+- Added capacity visualizations to the memory and disk monitor menus
+- Added a load visualization to the CPU monitor menu
+- Added support for zenpower temperature sensors
+- Improved legibility when using light themes
+- Improved performance while TopHat is in the background
+- Fixed a file description leak when reading disk usage
+- Adjusted visual appearance
+
+## TopHat 19 - January 12, 2025
+
+- Fixed desktop stuttering on some systems
+- Improved performance
+- Improved filesystem detection
+- Added option to hide filesystems on the disk menu
+- Added option to hide menu actions
+
+## TopHat 18 - December 30, 2024
+
+- Restored the file system usage monitor
+- Improved performance when reading procfs
+- Fixed a display problem with history charts
+
 ## TopHat 17 - December 8, 2024
 
 - Fixed potential resource leaks

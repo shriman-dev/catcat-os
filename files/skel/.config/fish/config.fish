@@ -4,7 +4,7 @@ set fish_greeting
 set VIRTUAL_ENV_DISABLE_PROMPT "1"
 
 # PATHS
-set -g paths_to_add "/usr/games" "$HOME/bin" "$HOME/.local/bin" "$HOME/.local/bin2" "$HOME/.local/podman/bin" "$HOME/Android/platform-tools" "$HOME/Android/cmdline-tools/bin"
+set -g paths_to_add "/usr/games" "$HOME/bin" "$HOME/.local/bin" "$HOME/.local/bin2" "$HOME/.local/podman/bin" "$HOME/.cargo/bin" "$HOME/Android/platform-tools" "$HOME/Android/cmdline-tools/bin"
 
 for path in $paths_to_add
   if not contains -- $path $PATH
@@ -13,8 +13,8 @@ for path in $paths_to_add
 end
 
 ## Set vars
-set -x QT_QPA_PLATFORMTHEME "qt5ct"
-set -x QT_QPA_PLATFORM "xcb"
+#set -x QT_QPA_PLATFORMTHEME "qt5ct"
+#set -x QT_QPA_PLATFORM "xcb"
 set -x MICRO_TRUECOLOR 1
 set -x NIXPKGS_ALLOW_UNFREE 1
 set -x ni "$HOME/.local/state/nix/profiles/profile/bin"
@@ -109,9 +109,9 @@ alias vdir='vdir --color=always'
 alias fgrep='fgrep --color=always'
 alias egrep='egrep --color=always'
 alias ls='ls --color=always'
-alias ll='eza -al --color=always --hyperlink --group-directories-first --icons=always -SH --time-style="+%a %b %d %H:%M:%S %Y" -o --git'
+alias ll='eza -alob -SH --git --color=always --hyperlink --group-directories-first --icons=always --time-style="+%a %b %d %H:%M:%S %Y"'
 alias la='eza -a --color=always --hyperlink --group-directories-first --icons=always'
-alias lt='eza -aT --color=always --hyperlink --group-directories-first --icons=always --git'
+alias lt='eza -aT --git --color=always --hyperlink --group-directories-first --icons=always'
 alias l.="eza -a1"
 alias ip="ip -color"
 #alias cat='bat --style header --style snip --style changes --style header' # Replace some more things with better alternatives

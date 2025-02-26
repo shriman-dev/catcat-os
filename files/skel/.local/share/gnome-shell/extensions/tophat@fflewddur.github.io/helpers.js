@@ -1,6 +1,16 @@
 // Copyright (C) 2024 Todd Kulesza <todd@dropline.net>
-import * as Config from 'resource:///org/gnome/shell/misc/config.js';
-export const GnomeMajorVer = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
+// This file is part of TopHat.
+// TopHat is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// TopHat is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with TopHat. If not, see <https://www.gnu.org/licenses/>.
+import Gio from 'gi://Gio';
 export var DisplayType;
 (function (DisplayType) {
     DisplayType[DisplayType["Chart"] = 0] = "Chart";
@@ -9,10 +19,16 @@ export var DisplayType;
 })(DisplayType || (DisplayType = {}));
 const ONE_MB_IN_B = 1000000;
 const TEN_MB_IN_B = 10000000;
-const ONE_GB_IN_B = 1000000000;
+export const ONE_GB_IN_B = 1000000000;
 const TEN_GB_IN_B = 10000000000;
 const ONE_TB_IN_B = 1000000000000;
 const TEN_TB_IN_B = 10000000000000;
+const RE_DF_IS_DISK = /^\s*\/dev\/(\S+)(.*)$/;
+const RE_DF_DISK_USAGE = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+%)\s+(.*)$/;
+export function GBytesToHumanString(gb) {
+    return bytesToHumanString(gb * ONE_GB_IN_B);
+}
+Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');
 /**
  * Convert a number of bytes to a more logical human-readable string (e.g., 1024 -> 1 K).
  *
@@ -87,4 +103,66 @@ export function getDisplayTypeSetting(settings, key) {
             break;
     }
     return t;
+}
+export class FSUsage {
+    dev;
+    cap;
+    used;
+    mount;
+    constructor(dev = '', cap = 0, used = 0, mount = '') {
+        this.dev = dev;
+        this.cap = cap;
+        this.used = used;
+        this.mount = mount;
+    }
+    usage() {
+        return Math.round((this.used / this.cap) * 100);
+    }
+}
+export async function readFileSystems() {
+    return new Promise((resolve, reject) => {
+        const fileSystems = new Map();
+        try {
+            const proc = Gio.Subprocess.new(['df', '-P'], Gio.SubprocessFlags.STDOUT_PIPE);
+            proc.communicate_utf8_async(null, null).then(([stdout]) => {
+                if (proc.get_successful()) {
+                    const output = stdout;
+                    const lines = output.split('\n');
+                    for (const line of lines) {
+                        const m = line.match(RE_DF_IS_DISK);
+                        if (m) {
+                            const details = m[2].match(RE_DF_DISK_USAGE);
+                            if (details) {
+                                const dev = m[1];
+                                const cap = parseInt(details[1]) * 1024;
+                                const used = parseInt(details[2]) * 1024;
+                                const mount = details[5];
+                                let fileSystem = new FSUsage(dev, cap, used, mount);
+                                if (fileSystems.has(dev)) {
+                                    const old = fileSystems.get(dev);
+                                    if (old && old.mount.length < mount.length) {
+                                        // Only report one mount per device; use the shortest file path
+                                        fileSystem = old;
+                                    }
+                                }
+                                fileSystems.set(dev, fileSystem);
+                            }
+                        }
+                    }
+                    resolve(Array.from(fileSystems.values()));
+                    return;
+                }
+                else {
+                    console.warn('[TopHat] Could not run df -P: ');
+                    reject('Could not run df -P');
+                    return;
+                }
+            });
+        }
+        catch (e) {
+            console.warn('[TopHat] Could not run df -P: ' + e);
+            reject('Could not run df -P');
+            return;
+        }
+    });
 }

@@ -27,7 +27,9 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
     menuNetUpTotal;
     menuNetDownTotal;
     usageUnit;
+    nmClient;
     connectivity;
+    connectivitySig = 0;
     constructor(metadata, gsettings) {
         super('Net Monitor', metadata, gsettings);
         const gicon = Gio.icon_new_for_string(`${this.metadata.path}/icons/hicolor/scalable/actions/net-icon-symbolic.svg`);
@@ -86,11 +88,12 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
             client.check_connectivity_async(null, (client, result) => {
                 this.updateConnectivity(client, result);
             });
-            client.connect('notify::connectivity', () => {
+            this.connectivitySig = client.connect('notify::connectivity', () => {
                 client.check_connectivity_async(null, (client, result) => {
                     this.updateConnectivity(client, result);
                 });
             });
+            this.nmClient = client;
         });
     }
     updateConnectivity(client, result) {
@@ -161,6 +164,7 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
     bindVitals(vitals) {
         super.bindVitals(vitals);
         let id = vitals.connect('notify::net-sent', () => {
+            // console.log(`net-sent: ${vitals.net_sent}`);
             if (this.connectivity === NM.ConnectivityState.NONE) {
                 return;
             }
@@ -170,6 +174,7 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::net-recv', () => {
+            // console.log(`net-recv: ${vitals.net_recv}`);
             if (this.connectivity === NM.ConnectivityState.NONE) {
                 return;
             }
@@ -179,16 +184,22 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::net-sent-total', () => {
+            // console.log(`net-sent-total: ${vitals.net_sent_total}`);
             const s = bytesToHumanString(vitals.net_sent_total);
             this.menuNetUpTotal.text = s;
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::net-recv-total', () => {
+            // console.log(`net-recv-total: ${vitals.net_recv_total}`);
             const s = bytesToHumanString(vitals.net_recv_total);
             this.menuNetDownTotal.text = s;
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::net-history', () => {
+            if (!this.historyChart) {
+                console.warn('[TopHat] Network history chart does not exist');
+                return;
+            }
             const history = vitals.getNetActivity();
             let max = 0;
             for (const na of history) {
@@ -204,11 +215,20 @@ export const NetMonitor = GObject.registerClass(class NetMonitor extends TopHatM
             }
             max = roundMax(max);
             const maxLabel = bytesToHumanString(max, this.usageUnit) + '/s';
-            this.historyChart?.setYLabelBottom(maxLabel);
-            this.historyChart?.setYLabelMiddle('0');
-            this.historyChart?.setYLabelTop(maxLabel);
-            this.historyChart?.updateAlt(history, max);
+            this.historyChart.setYLabelBottom(maxLabel);
+            this.historyChart.setYLabelMiddle('0');
+            this.historyChart.setYLabelTop(maxLabel);
+            this.historyChart.updateAlt(history, max);
         });
         this.vitalsSignals.push(id);
+    }
+    destroy() {
+        // console.log('NetMonitor.destroy()');
+        if (this.connectivitySig > 0) {
+            this.nmClient?.disconnect(this.connectivitySig);
+            this.connectivitySig = 0;
+        }
+        this.nmClient = undefined;
+        super.destroy();
     }
 });

@@ -8,10 +8,11 @@
   "shell-version": [
     "45",
     "46",
-    "47"
+    "47",
+    "48"
   ],
   "url": "https://github.com/somepaulo/gnome-shell-extension-weather-or-not",
   "uuid": "weatherornot@somepaulo.github.io",
-  "version": 17,
-  "version-name": "47.2"
+  "version": 18,
+  "version-name": "48"
 }

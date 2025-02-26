@@ -1,5 +1,0 @@
-[plugin]
-deps = [{ use = "AnirudhG07/rich-preview", rev = "6752254" }]
-
-[flavor]
-deps = []

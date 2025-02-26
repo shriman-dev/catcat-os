@@ -1,48 +1,34 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Gvc from 'gi://Gvc';
 import St from 'gi://St';
+import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { Ornament, PopupMenuItem } from 'resource:///org/gnome/shell/ui/popupMenu.js';
-import { QuickMenuToggle, QuickSlider } from 'resource:///org/gnome/shell/ui/quickSettings.js';
+import { Ornament, PopupBaseMenuItem, PopupImageMenuItem, PopupMenuItem, PopupMenuSection } from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import { QuickMenuToggle, QuickSlider, QuickToggle } from 'resource:///org/gnome/shell/ui/quickSettings.js';
 import * as Volume from 'resource:///org/gnome/shell/ui/status/volume.js';
-export function waitProperty(object, name) {
-    if (!waitProperty.idle_ids) {
-        waitProperty.idle_ids = [];
-    }
-    return new Promise((resolve, _reject) => {
-        // very ugly hack
-        const id_pointer = {};
-        const id = GLib.idle_add(GLib.PRIORITY_DEFAULT, waitPropertyLoop.bind(this, resolve, id_pointer));
-        id_pointer.id = id;
-        waitProperty.idle_ids.push(id);
-    });
-    function waitPropertyLoop(resolve, pointer) {
-        if (object[name]) {
-            const index = waitProperty.idle_ids.indexOf(pointer.id);
-            if (index !== -1) {
-                waitProperty.idle_ids.splice(index, 1);
-            }
-            resolve(object[name]);
-            return GLib.SOURCE_REMOVE;
-        }
-        return GLib.SOURCE_CONTINUE;
-    }
-}
+import { get_pactl_path, spawn, wait_property } from "./utils.js";
 const { MixerSinkInput, MixerSink } = Gvc;
 // `_volumeOutput` is set in an async function, so we need to ensure that it's currently defined
-const OutputStreamSlider = (await waitProperty(Main.panel.statusArea.quickSettings, '_volumeOutput'))._output.constructor;
+const OutputStreamSlider = (await wait_property(Main.panel.statusArea.quickSettings, "_volumeOutput"))._output.constructor;
 const StreamSlider = Object.getPrototypeOf(OutputStreamSlider);
 export class SinkMixer {
+    panel;
+    _sliders;
+    _sliders_ordered;
+    _filter_mode;
+    _filters;
+    _mixer_control;
+    _sa_event_id;
+    _sr_event_id;
     constructor(panel, index, filter_mode, filters) {
         this.panel = panel;
         // Empty actor used to know where to place sliders
         const placeholder = new Clutter.Actor({ visible: false });
         panel._grid.insert_child_at_index(placeholder, index);
-        this._sliders = {};
+        this._sliders = new Map();
         this._sliders_ordered = [placeholder];
         this._filter_mode = filter_mode;
         this._filters = filters.map(f => new RegExp(f));
@@ -54,7 +40,7 @@ export class SinkMixer {
         }
     }
     _stream_added(control, id) {
-        if (id in this._sliders)
+        if (this._sliders.has(id))
             return;
         const stream = control.lookup_stream_id(id);
         if (stream.is_event_stream || !(stream instanceof MixerSink)) {
@@ -71,21 +57,22 @@ export class SinkMixer {
         if (!matched && this._filter_mode === 'whitelist')
             return;
         const slider = new SinkVolumeSlider(this._mixer_control, stream);
-        this._sliders[id] = slider;
+        this._sliders.set(id, slider);
         this.panel.addItem(slider, 2);
         this.panel._grid.set_child_above_sibling(slider, this._sliders_ordered.at(-1));
         this._sliders_ordered.push(slider);
     }
     _stream_removed(_control, id) {
-        if (!(id in this._sliders))
+        if (!this._sliders.has(id))
             return;
-        this.panel.removeItem(this._sliders[id]);
-        this._sliders_ordered.splice(this._sliders_ordered.indexOf(this._sliders[id]), 1);
-        this._sliders[id].destroy();
-        delete this._sliders[id];
+        const slider = this._sliders.get(id);
+        this.panel.removeItem(slider);
+        this._sliders_ordered.splice(this._sliders_ordered.indexOf(slider), 1);
+        slider.destroy();
+        this._sliders.delete(id);
     }
     destroy() {
-        for (const slider of Object.values(this._sliders)) {
+        for (const slider of this._sliders.values()) {
             this.panel.removeItem(slider);
             slider.destroy();
         }
@@ -98,6 +85,9 @@ export class SinkMixer {
 }
 ;
 const SinkVolumeSlider = GObject.registerClass(class SinkVolumeSlider extends StreamSlider {
+    _hasHeadphones;
+    _setup_timeout;
+    _name_binding;
     constructor(control, stream) {
         super(control);
         this._icons = [
@@ -163,17 +153,20 @@ const SinkVolumeSlider = GObject.registerClass(class SinkVolumeSlider extends St
     }
 });
 export const BalanceSlider = GObject.registerClass(class BalanceSlider extends QuickSlider {
+    stream;
+    _pactl_path;
+    _pactl_path_changed_id;
+    _sliderChangedId;
+    _control;
+    _default_sink_changed_signal;
+    _volumeCancellable;
     constructor(settings) {
         super();
-        const updatePactl = () => {
-            this._pactl_path = GLib.find_program_in_path(settings.get_string("pactl-path"));
-            if (this._pactl_path == null) {
-                this._pactl_path = GLib.find_program_in_path('pactl');
-            }
-        };
-        this._pactl_path_changed_id = settings.connect("changed::pactl-path", () => updatePactl());
+        this._pactl_path_changed_id = settings.connect("changed::pactl-path", () => {
+            this._pactl_path = get_pactl_path(settings)[0];
+        });
         this.connect("destroy", () => settings.disconnect(this._pactl_path_changed_id));
-        updatePactl();
+        this._pactl_path = get_pactl_path(settings)[0];
         this._sliderChangedId = this.slider.connect('notify::value', () => this._sliderChanged());
         this.slider.connect('drag-end', () => {
             this._notifyVolumeChange();
@@ -213,28 +206,17 @@ export const BalanceSlider = GObject.registerClass(class BalanceSlider extends Q
             return;
         this.stream = stream;
         // this command doesn't have a json output :(
-        const [, , , stdout,] = GLib.spawn_async_with_pipes(null, [this._pactl_path, "get-sink-volume", stream.name], null, GLib.SpawnFlags.SEARCH_PATH, null);
-        const stdout_reader = new Gio.DataInputStream({
-            base_stream: new GioUnix.InputStream({ fd: stdout })
-        });
-        const readline_callback = (_, result) => {
-            const [stdout, length] = stdout_reader.read_upto_finish(result);
+        spawn([this._pactl_path, "get-sink-volume", stream.name]).then(stdout => {
             // let's hope this regex don't break
             const balance_index = stdout.search(/balance (-?\d+.\d+)/);
-            if (balance_index === -1) {
-                if (length > 0) {
-                    stdout_reader.read_upto_async("", 0, 0, null, readline_callback);
-                }
-            }
-            else {
+            if (balance_index !== -1) {
                 const balance_str = stdout.substring(balance_index + 8).trim();
                 const balance = parseFloat(balance_str);
                 this.slider.block_signal_handler(this._sliderChangedId);
                 this.slider.value = (balance + 1.) / 2.;
                 this.slider.unblock_signal_handler(this._sliderChangedId);
             }
-        };
-        stdout_reader.read_upto_async("", 0, 0, null, readline_callback);
+        });
     }
     _sliderChanged() {
         const balance = this.slider.value * 2. - 1.;
@@ -253,7 +235,7 @@ export const BalanceSlider = GObject.registerClass(class BalanceSlider extends Q
     _notifyVolumeChange() {
         if (this._volumeCancellable)
             this._volumeCancellable.cancel();
-        this._volumeCancellable = null;
+        this._volumeCancellable = undefined;
         if (this.stream.state === Gvc.MixerStreamState.RUNNING)
             return; // feedback not necessary while playing
         this._volumeCancellable = new Gio.Cancellable();
@@ -265,6 +247,12 @@ export const BalanceSlider = GObject.registerClass(class BalanceSlider extends Q
     }
 });
 export const AudioProfileSwitcher = GObject.registerClass(class AudioProfileSwitcher extends QuickMenuToggle {
+    _settings;
+    _mixer_control;
+    _profileItems;
+    _device;
+    _active_output_update_signal;
+    _autohide_changed_signal;
     constructor(settings) {
         super();
         this.title = "Audio profile";
@@ -327,18 +315,24 @@ export const AudioProfileSwitcher = GObject.registerClass(class AudioProfileSwit
         this._settings.disconnect(this._autohide_changed_signal);
     }
 });
-export class ApplicationsMixer {
-    constructor(panel, index, filter_mode, filters, settings) {
-        this.panel = panel;
-        // Empty actor used to know where to place sliders
-        const placeholder = new Clutter.Actor({ visible: false });
-        panel._grid.insert_child_at_index(placeholder, index);
-        this._sliders = {};
-        this._sliders_ordered = [placeholder];
-        this._filter_mode = filter_mode;
-        this._filters = filters.map(f => new RegExp(f));
+class ApplicationsMixerManager {
+    _settings;
+    _mixer_control;
+    _sliders;
+    _filter_mode;
+    _filters;
+    _sa_event_id;
+    _sr_event_id;
+    on_slider_added;
+    on_slider_removed;
+    constructor(settings, filter_mode, filters, on_slider_added, on_slider_removed) {
         this._settings = settings;
         this._mixer_control = Volume.getMixerControl();
+        this.on_slider_added = on_slider_added;
+        this.on_slider_removed = on_slider_removed;
+        this._sliders = new Map();
+        this._filter_mode = filter_mode;
+        this._filters = filters.map(f => new RegExp(f));
         this._sa_event_id = this._mixer_control.connect("stream-added", this._stream_added.bind(this));
         this._sr_event_id = this._mixer_control.connect("stream-removed", this._stream_removed.bind(this));
         for (const stream of this._mixer_control.get_streams()) {
@@ -346,7 +340,7 @@ export class ApplicationsMixer {
         }
     }
     _stream_added(control, id) {
-        if (id in this._sliders)
+        if (this._sliders.has(id))
             return;
         const stream = control.lookup_stream_id(id);
         if (stream.is_event_stream || !(stream instanceof MixerSinkInput)) {
@@ -363,44 +357,124 @@ export class ApplicationsMixer {
         if (!matched && this._filter_mode === 'whitelist')
             return;
         const slider = new ApplicationVolumeSlider(this._mixer_control, stream, this._settings);
-        this._sliders[id] = slider;
-        this.panel.addItem(slider, 2);
-        this.panel._grid.set_child_above_sibling(slider, this._sliders_ordered.at(-1));
-        this._sliders_ordered.push(slider);
+        this._sliders.set(id, slider);
+        this.on_slider_added(slider);
     }
     _stream_removed(_control, id) {
-        if (!(id in this._sliders))
+        const slider = this._sliders.get(id);
+        if (slider === undefined)
             return;
-        this.panel.removeItem(this._sliders[id]);
-        this._sliders_ordered.splice(this._sliders_ordered.indexOf(this._sliders[id]), 1);
-        this._sliders[id].destroy();
-        delete this._sliders[id];
+        this.on_slider_removed(slider);
+        this._sliders.delete(id);
+        slider.destroy();
+    }
+    get sliders() {
+        return this._sliders.values();
     }
     destroy() {
-        for (const slider of Object.values(this._sliders)) {
-            this.panel.removeItem(slider);
+        for (const slider of this._sliders.values()) {
             slider.destroy();
         }
-        this._sliders = null;
-        this._sliders_ordered[0].destroy();
-        this._sliders_ordered = null;
+        this._sliders.clear();
         this._mixer_control.disconnect(this._sa_event_id);
         this._mixer_control.disconnect(this._sr_event_id);
     }
 }
+export class ApplicationsMixer {
+    panel;
+    _slider_manager;
+    _sliders_ordered;
+    constructor(panel, index, filter_mode, filters, settings) {
+        this.panel = panel;
+        // Empty actor used to know where to place sliders
+        const placeholder = new Clutter.Actor({ visible: false });
+        panel._grid.insert_child_at_index(placeholder, index);
+        this._sliders_ordered = [placeholder];
+        this._slider_manager = new ApplicationsMixerManager(settings, filter_mode, filters, this._slider_added.bind(this), this._slider_removed.bind(this));
+    }
+    _slider_added(slider) {
+        this.panel.addItem(slider, 2);
+        this.panel._grid.set_child_above_sibling(slider, this._sliders_ordered.at(-1));
+        this._sliders_ordered.push(slider);
+    }
+    _slider_removed(slider) {
+        this.panel.removeItem(slider);
+        this._sliders_ordered.splice(this._sliders_ordered.indexOf(slider), 1);
+    }
+    destroy() {
+        for (const slider of this._slider_manager.sliders) {
+            this.panel.removeItem(slider);
+        }
+        this._slider_manager.destroy();
+        this._sliders_ordered[0].destroy();
+        this._sliders_ordered = null;
+    }
+}
 ;
+// Note: lot of code taken from https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/status/backgroundApps.js?ref_type=heads#L137
+export const ApplicationsMixerToggle = GObject.registerClass(class ApplicationsMixerToggle extends QuickToggle {
+    _slider_manager;
+    _slidersSection;
+    _mosc_signal;
+    _sm_updated_signal;
+    constructor(settings, filter_mode, filters) {
+        super({
+            visible: false, hasMenu: true,
+            // The background apps toggle looks like a flat menu, but doesn't
+            // have a separate menu button. Fake it with an arrow icon.
+            iconName: "go-next-symbolic",
+            title: "Applications emitting sound"
+        });
+        this.add_style_class_name("background-apps-quick-toggle");
+        this._box.set_child_above_sibling(this._icon, null);
+        this.menu.setHeader("audio-volume-high-symbolic", _("Applications volumes"));
+        this._slidersSection = new PopupMenuSection();
+        this.menu.addMenuItem(this._slidersSection);
+        this.connect("popup-menu", () => this.menu.open(false));
+        this._mosc_signal = this.menu.connect("open-state-changed", () => this._syncVisibility());
+        this._sm_updated_signal = Main.sessionMode.connect("updated", () => this._syncVisibility());
+        this._slider_manager = new ApplicationsMixerManager(settings, filter_mode, filters, this._slider_added.bind(this), this._slider_removed.bind(this));
+    }
+    _syncVisibility() {
+        const { isLocked } = Main.sessionMode;
+        const nSliders = this._slidersSection.numMenuItems;
+        // We cannot hide the quick toggle while the menu is open, otherwise
+        // the menu position goes bogus. We can't show it in locked sessions
+        // either
+        this.visible = !isLocked && (this.menu.isOpen || nSliders > 0);
+    }
+    _slider_added(slider) {
+        let slider_item = new ApplicationVolumeSliderItem(slider);
+        slider._item = slider_item;
+        this._slidersSection.addMenuItem(slider_item);
+        this._syncVisibility();
+    }
+    _slider_removed(slider) {
+        this._slidersSection.box.remove_child(slider._item);
+        this._slidersSection.disconnect_object(slider._item);
+        this._syncVisibility();
+    }
+    vfunc_clicked() {
+        this.menu.open(true);
+    }
+    destroy() {
+        this._slider_manager.destroy();
+        this.menu.disconnect(this._mosc_signal);
+        Main.sessionMode.disconnect(this._sm_updated_signal);
+        super.destroy();
+    }
+});
 const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSlider extends StreamSlider {
+    _pactl_path;
+    _pactl_path_changed_id;
     constructor(control, stream, settings) {
         super(control);
         this.menu.setHeader('audio-headphones-symbolic', _('Output Device'));
-        const updatePactl = () => {
-            this._pactl_path = GLib.find_program_in_path(settings.get_string("pactl-path"));
-            if (this._pactl_path == null) {
-                this._pactl_path = GLib.find_program_in_path('pactl');
-            }
-        };
-        updatePactl();
-        settings.connect("changed::pactl-path", () => updatePactl());
+        this._pactl_path_changed_id = settings.connect("changed::pactl-path", () => {
+            this._pactl_path = get_pactl_path(settings)[0];
+        });
+        this.connect("destroy", () => settings.disconnect(this._pactl_path_changed_id));
+        this._pactl_path = get_pactl_path(settings)[0];
         if (this._pactl_path) {
             this._control.connectObject('output-added', (_control, id) => this._addDevice(id), 'output-removed', (_control, id) => this._removeDevice(id), 'active-output-update', (_control, _id) => this._checkUsedSink(), this);
             // unfortunatly we don't have any signal to know that the active device changed
@@ -438,7 +512,7 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         this._menuButton.y_expand = false;
         const label = new St.Label({ natural_width: 0 });
         label.style_class = "QSAP-application-volume-slider-label";
-        stream.bind_property_full('description', label, 'text', GObject.BindingFlags.SYNC_CREATE, (_binding, _value) => {
+        stream.bind_property_full('description', label, 'text', GObject.BindingFlags.SYNC_CREATE, (_binding, _from, _to) => {
             return [true, this._get_label_text(stream)];
         }, null);
         vbox.add_child(label);
@@ -449,14 +523,8 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         return name === null ? description : `${name} - ${description}`;
     }
     _checkUsedSink() {
-        const [, , , stdout,] = GLib.spawn_async_with_pipes(null, [this._pactl_path, "-f", "json", "list", "sink-inputs"], null, GLib.SpawnFlags.SEARCH_PATH, null);
-        const stdout_reader = new Gio.DataInputStream({
-            base_stream: new GioUnix.InputStream({ fd: stdout })
-        });
-        const readline_callback = (_, result) => {
-            // the command's result is one line, so we can stop here
-            let [stdout,] = stdout_reader.read_upto_finish(result);
-            stdout = JSON.parse(stdout);
+        spawn([this._pactl_path, "-f", "json", "list", "sink-inputs"]).then(stdout_str => {
+            const stdout = JSON.parse(stdout_str);
             for (const sink_input of stdout) {
                 if (sink_input.index === this.stream.index) {
                     const sink_id = this._control.lookup_device_from_stream(this._control.get_sinks().find(s => s.index === sink_input.sink))?.get_id();
@@ -465,8 +533,28 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
                     }
                 }
             }
-        };
-        stdout_reader.read_upto_async("", 0, 0, null, readline_callback);
+        });
+    }
+    _addDevice(id) {
+        if (this._deviceItems.has(id))
+            return;
+        const device = this._lookupDevice(id);
+        if (!device)
+            return;
+        const item = new PopupImageMenuItem("", device.get_gicon());
+        // using the text from the output switcher of the master slider to allow compatibility with extensions
+        // that changes it (like Quick Settings Audio Device Renamer)
+        Main.panel.statusArea.quickSettings._volumeOutput._output._deviceItems.get(device.get_id()).label.bind_property('text', item.label, 'text', GObject.BindingFlags.SYNC_CREATE);
+        item.connect('activate', () => {
+            const dev = this._lookupDevice(id);
+            if (dev)
+                this._activateDevice(dev);
+            else
+                console.warn(`Trying to activate invalid device ${id}`);
+        });
+        this._deviceSection.addMenuItem(item);
+        this._deviceItems.set(id, item);
+        this._sync();
     }
     _lookupDevice(id) {
         return this._control.lookup_output_id(id);
@@ -474,5 +562,15 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
     _activateDevice(device) {
         GLib.spawn_command_line_async(`${this._pactl_path} move-sink-input ${this.stream.index} ${this._control.lookup_stream_id(device.stream_id).index}`);
         this._setActiveDevice(device.get_id());
+    }
+});
+const ApplicationVolumeSliderItem = GObject.registerClass(class ApplicationVolumeSliderItem extends PopupBaseMenuItem {
+    constructor(slider) {
+        super();
+        slider.x_expand = true;
+        // since it uses a quick settings menu it will be broken if opened in
+        // another menu
+        slider._menuButton.get_parent().remove_child(slider._menuButton);
+        this.add_child(slider);
     }
 });

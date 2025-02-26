@@ -3,7 +3,7 @@
  * workspacesView.js
  *
  * @author     GdH <G-dH@github.com>
- * @copyright  2022 - 2024
+ * @copyright  2022 - 2025
  * @license    GPL-3.0
  *
  */
@@ -135,6 +135,10 @@ const WorkspacesViewCommon = {
         if (!workspace)
             return 0;
 
+        const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
+        if (opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE)
+            return opt.WORKSPACE_MIN_SPACING * scaleFactor;
+
         let availableSpace;
         let workspaceSize;
         if (vertical) {
@@ -146,7 +150,6 @@ const WorkspacesViewCommon = {
         }
 
         const spacing = (availableSpace - workspaceSize * 0.4) * (1 - fitMode);
-        const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
         return Math.clamp(spacing,
             opt.WORKSPACE_MIN_SPACING * scaleFactor,
             opt.WORKSPACE_MAX_SPACING * scaleFactor);
@@ -159,7 +162,6 @@ const WorkspacesViewCommon = {
 
     // normal view 0, spread windows 1
     _getWorkspaceModeForOverviewState(state) {
-
         switch (state) {
         case ControlsState.HIDDEN:
             return 0;
@@ -204,14 +206,16 @@ const WorkspacesViewCommon = {
             const distanceToCurrentWorkspace = Math.abs(distance);
 
             const scaleProgress = 1 - Math.clamp(distanceToCurrentWorkspace, 0, 1);
-            // const scale = Util.lerp(0.94, 1, scaleProgress);
-            // w.set_scale(scale, scale);
+            if (!opt.OVERVIEW_MODE2 || opt.WORKSPACE_MODE) {
+                const scale = Util.lerp(0.94, 1, scaleProgress);
+                w.set_scale(scale, scale);
+            }
 
             // if we disable workspaces that we can't or don't need to see, transition animations will be noticeably smoother
             // only the current ws needs to be visible during overview transition animations
             //                        and only current and adjacent ws when switching ws
-            w.visible =
-                (this._animating && wsScrollProgress && distanceToCurrentWorkspace <= (opt.NUMBER_OF_VISIBLE_NEIGHBORS + 1)) ||
+            w.visible = opt.WS_ANIMATION_ALL ||
+                ((this._animating && wsScrollProgress && distanceToCurrentWorkspace <= (opt.NUMBER_OF_VISIBLE_NEIGHBORS + 1)) ||
                 scaleProgress === 1 ||
                 (opt.WORKSPACE_MAX_SPACING >= opt.WS_MAX_SPACING_OFF_SCREEN &&
                     distanceToCurrentWorkspace <= opt.NUMBER_OF_VISIBLE_NEIGHBORS &&
@@ -222,7 +226,7 @@ const WorkspacesViewCommon = {
                 (distanceToCurrentWorkspace <= opt.NUMBER_OF_VISIBLE_NEIGHBORS &&
                     currentState <= ControlsState.WINDOW_PICKER &&
                     (initialState < ControlsState.APP_GRID && finalState < ControlsState.APP_GRID)
-                );
+                ));
 
             // after transition from APP_GRID to WINDOW_PICKER state,
             // adjacent workspaces are hidden and we need them to show up
@@ -293,7 +297,7 @@ const SecondaryMonitorDisplayCommon = {
 
 const SecondaryMonitorDisplayVertical = {
     _getThumbnailParamsForState(state) {
-
+        const spacing = opt.SPACING;
         let opacity, scale, translationX;
         switch (state) {
         case ControlsState.HIDDEN:
@@ -301,7 +305,7 @@ const SecondaryMonitorDisplayVertical = {
             scale = 1;
             translationX = 0;
             if (!Main.layoutManager._startingUp && (!opt.SHOW_WS_PREVIEW_BG || opt.OVERVIEW_MODE2))
-                translationX = this._thumbnails.width * (opt.SEC_WS_TMB_LEFT ? -1 : 1);
+                translationX = (this._thumbnails.width + spacing) * (opt.SEC_WS_TMB_LEFT ? -1 : 1);
 
             break;
         case ControlsState.WINDOW_PICKER:
@@ -527,8 +531,7 @@ const SecondaryMonitorDisplayVertical = {
 
 const SecondaryMonitorDisplayHorizontal = {
     _getThumbnailParamsForState(state) {
-        // const { ControlsState } = OverviewControls;
-
+        const spacing = opt.SPACING;
         let opacity, scale, translationY;
         switch (state) {
         case ControlsState.HIDDEN:
@@ -536,7 +539,7 @@ const SecondaryMonitorDisplayHorizontal = {
             scale = 1;
             translationY = 0;
             if (!Main.layoutManager._startingUp && (!opt.SHOW_WS_PREVIEW_BG || opt.OVERVIEW_MODE2))
-                translationY = this._thumbnails.height * (opt.SEC_WS_TMB_TOP ? -1 : 1);
+                translationY = (this._thumbnails.height + spacing) * (opt.SEC_WS_TMB_TOP ? -1 : 1);
 
             break;
         case ControlsState.WINDOW_PICKER:
@@ -928,9 +931,13 @@ const WorkspacesDisplayCommon = {
         case Clutter.KEY_Tab:
             if (Main.overview.searchController.searchActive) {
                 Main.overview.searchEntry.grab_key_focus();
-            } else if (!opt.WORKSPACE_MODE && state === 1) {
-                // spread windows in OVERVIEW_MODE
+            } else if (!opt.WORKSPACE_MODE && state <= 1) {
                 if (opt.OVERVIEW_MODE2)
+                    Main.overview._overview.controls._updateSearchStyle(true);
+                // spread windows in OVERVIEW_MODE
+                if (state < 1)
+                    opt.WORKSPACE_MODE = 1;
+                else if (opt.OVERVIEW_MODE2)
                     Me.Util.exposeWindowsWithOverviewTransition();
                 else
                     Me.Util.exposeWindows();

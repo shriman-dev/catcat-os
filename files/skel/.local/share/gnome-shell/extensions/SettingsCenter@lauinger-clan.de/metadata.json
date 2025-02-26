@@ -10,10 +10,11 @@
   "original-author": "Xes, l300lvl",
   "settings-schema": "org.gnome.shell.extensions.SettingsCenter",
   "shell-version": [
-    "47"
+    "47",
+    "48"
   ],
   "url": "https://github.com/ChrisLauinger77/gnome-shell-extension-SettingsCenter",
   "uuid": "SettingsCenter@lauinger-clan.de",
-  "version": 32,
-  "version-name": "47.1"
+  "version": 40,
+  "version-name": "48.0"
 }

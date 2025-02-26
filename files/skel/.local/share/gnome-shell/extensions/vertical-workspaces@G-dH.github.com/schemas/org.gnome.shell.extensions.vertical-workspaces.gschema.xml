@@ -262,6 +262,9 @@
     <key type="i" name="panel-position">
       <default>0</default>
     </key>
+    <key type="i" name="panel-overview-style">
+      <default>1</default>
+    </key>
     <key type="i" name="window-attention-mode">
       <default>0</default>
     </key>
@@ -564,7 +567,7 @@
         'dashBgRadius': '0',
         'dashBgGS3Style': 'false',
         'runningDotStyle': '1',
-        'showWsSwitcherBg': 'false',
+        'showWsSwitcherBg': 'true',
         'showWsPreviewBg': 'true',
         'wsPreviewBgRadius': '30',
         'showBgInOverview': 'true',
@@ -575,7 +578,7 @@
         'smoothBlurTransitions': 'false',
         'appGridAnimation': '4',
         'searchViewAnimation': '0',
-        'workspaceAnimation': '1',
+        'workspaceAnimation': '2',
         'animationSpeedFactor': '100',
         'winPreviewIconSize': '1',
         'winTitlePosition': '0',

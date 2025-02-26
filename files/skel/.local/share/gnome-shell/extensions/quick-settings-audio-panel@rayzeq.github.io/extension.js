@@ -14,15 +14,20 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Gvc from 'gi://Gvc';
 import St from 'gi://St';
-import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { gettext as _, Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { MediaSection } from 'resource:///org/gnome/shell/ui/mpris.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { QuickSettingsMenu } from 'resource:///org/gnome/shell/ui/quickSettings.js';
+import * as Volume from 'resource:///org/gnome/shell/ui/status/volume.js';
 import { LibPanel, Panel } from './libs/libpanel/main.js';
-import { ApplicationsMixer, AudioProfileSwitcher, BalanceSlider, SinkMixer, waitProperty } from './libs/widgets.js';
+import { update_settings } from './libs/preferences.js';
+import { cleanup_idle_ids, get_pactl_path, wait_property } from './libs/utils.js';
+import { ApplicationsMixer, ApplicationsMixerToggle, AudioProfileSwitcher, BalanceSlider, SinkMixer } from './libs/widgets.js';
 const DateMenu = Main.panel.statusArea.dateMenu;
 const QuickSettings = Main.panel.statusArea.quickSettings;
 const CalendarMessageList = DateMenu._messageList;
@@ -31,14 +36,16 @@ const SystemItem = QuickSettings._system._systemItem;
 // _volumeOutput is always defined here because `./libs/widgets.js` wait on it
 const OutputVolumeSlider = QuickSettings._volumeOutput._output;
 export default class QSAP extends Extension {
+    settings;
     async enable() {
-        this.InputVolumeIndicator = await waitProperty(QuickSettings, '_volumeInput');
+        this.InputVolumeIndicator = await wait_property(QuickSettings, '_volumeInput');
         this.InputVolumeSlider = this.InputVolumeIndicator._input;
         this.settings = this.getSettings();
-        this._scasis_callback = this.settings.connect('changed::always-show-input-slider', () => this._set_always_show_input(this.settings.get_boolean('always-show-input-slider')));
-        this.settings.emit('changed::always-show-input-slider', 'always-show-input-slider');
-        this._scscd_callback = this.settings.connect('changed::show-current-device', () => {
-            if (this.settings.get_boolean('show-current-device')) {
+        update_settings(this.settings);
+        this._scasis_callback = this.settings.connect('changed::always-show-input-volume-slider', () => this._set_always_show_input(this.settings.get_boolean('always-show-input-volume-slider')));
+        this.settings.emit('changed::always-show-input-volume-slider', 'always-show-input-volume-slider');
+        this._scscd_callback = this.settings.connect('changed::master-volume-sliders-show-current-device', () => {
+            if (this.settings.get_boolean('master-volume-sliders-show-current-device')) {
                 this._patch_show_current_device(OutputVolumeSlider);
                 this._patch_show_current_device(this.InputVolumeSlider);
             }
@@ -47,7 +54,16 @@ export default class QSAP extends Extension {
                 this._unpatch_show_current_device(this.InputVolumeSlider);
             }
         });
-        this.settings.emit('changed::show-current-device', 'show-current-device');
+        this.settings.emit('changed::master-volume-sliders-show-current-device', 'master-volume-sliders-show-current-device');
+        this._scabaortd_callback = this.settings.connect('changed::add-button-applications-output-reset-to-default', () => {
+            if (this.settings.get_boolean('add-button-applications-output-reset-to-default')) {
+                this._add_reset_applications_output();
+            }
+            else {
+                this._remove_reset_applications_output();
+            }
+        });
+        this.settings.emit('changed::add-button-applications-output-reset-to-default', 'add-button-applications-output-reset-to-default');
         this._master_volumes = [];
         this._sc_callback = this.settings.connect('changed', (_, name) => {
             if (name !== "autohide-profile-switcher") {
@@ -60,39 +76,34 @@ export default class QSAP extends Extension {
         this.settings.disconnect(this._scscd_callback);
         this._unpatch_show_current_device(OutputVolumeSlider);
         this._unpatch_show_current_device(this.InputVolumeSlider);
+        this.settings.disconnect(this._scabaortd_callback);
+        this._remove_reset_applications_output();
         this.settings.disconnect(this._scasis_callback);
         this.settings.disconnect(this._sc_callback);
-        for (const id of waitProperty.idle_ids) {
-            GLib.Source.remove(id);
-        }
-        waitProperty.idle_ids = null;
+        cleanup_idle_ids();
         this._set_always_show_input(false);
         this._cleanup_panel();
         this.settings = null;
     }
     _refresh_panel() {
         this._cleanup_panel();
-        const move_master_volume = this.settings.get_boolean('move-master-volume');
-        const media_control_action = this.settings.get_string('media-control');
-        const create_mixer_sliders = this.settings.get_boolean('create-mixer-sliders');
-        const create_sink_mixer = this.settings.get_boolean('create-sink-mixer');
-        const remove_output_slider = this.settings.get_boolean('remove-output-slider');
+        const panel_type = this.settings.get_string("panel-type");
+        const merged_panel_position = this.settings.get_string("merged-panel-position");
+        const remove_output_volume_slider = this.settings.get_boolean("remove-output-volume-slider");
+        const move_output_volume_slider = this.settings.get_boolean('move-output-volume-slider');
+        const move_input_volume_slider = this.settings.get_boolean('move-input-volume-slider');
+        const create_mpris_controllers = this.settings.get_boolean("create-mpris-controllers");
+        const create_applications_volume_sliders = this.settings.get_boolean('create-applications-volume-sliders');
+        const create_perdevice_volume_sliders = this.settings.get_boolean('create-perdevice-volume-sliders');
         const create_balance_slider = this.settings.get_boolean('create-balance-slider');
         const create_profile_switcher = this.settings.get_boolean('create-profile-switcher');
-        const separate_indicator = this.settings.get_boolean('separate-indicator');
-        const merge_panel = this.settings.get_boolean('merge-panel') && !separate_indicator;
-        const panel_position = this.settings.get_string("panel-position");
-        const widgets_ordering = this.settings.get_strv('ordering');
-        const filter_mode = this.settings.get_string('filter-mode');
-        const filters = this.settings.get_strv('filters');
-        const sink_filter_mode = this.settings.get_string('sink-filter-mode');
-        const sink_filters = this.settings.get_strv('sink-filters');
-        if (move_master_volume || media_control_action !== 'none' || create_mixer_sliders || create_sink_mixer || remove_output_slider || create_balance_slider || create_profile_switcher) {
-            if (!(separate_indicator || merge_panel))
+        const widgets_order = this.settings.get_strv('widgets-order');
+        if (move_output_volume_slider || move_input_volume_slider || create_mpris_controllers || create_applications_volume_sliders || create_perdevice_volume_sliders || remove_output_volume_slider || create_balance_slider || create_profile_switcher) {
+            if (panel_type === "independent-panel")
                 LibPanel.enable();
             this._panel = LibPanel.main_panel;
             let index = -1;
-            if (separate_indicator) {
+            if (panel_type === "separate-indicator") {
                 this._indicator = new PanelMenu.Button(0.0, "Audio panel", true);
                 this._indicator.add_child(new St.Icon({ style_class: 'system-status-icon', icon_name: 'audio-x-generic-symbolic' }));
                 this._panel = new QuickSettingsMenu(this._indicator, 2);
@@ -126,7 +137,7 @@ export default class QSAP extends Extension {
                 this._indicator.setMenu(this._panel);
                 Main.panel.addToStatusArea(this.uuid, this._indicator);
             }
-            else if (!merge_panel) {
+            else if (panel_type === "independent-panel") {
                 this._panel = new Panel('main');
                 // Since the panel contains no element that have a minimal width (like QuickToggle)
                 // we need to force it to take the same with as a normal panel
@@ -136,28 +147,28 @@ export default class QSAP extends Extension {
                 }));
                 LibPanel.addPanel(this._panel);
             }
-            if (merge_panel && panel_position === 'top') {
-                widgets_ordering.reverse();
+            if (panel_type === "merged-panel" && merged_panel_position === 'top') {
+                widgets_order.reverse();
                 index = this._panel.getItems().indexOf(SystemItem) + 2;
             }
-            for (const widget of widgets_ordering) {
-                if (widget === 'volume-output' && move_master_volume) {
+            for (const widget of widgets_order) {
+                if (widget === 'output-volume-slider' && move_output_volume_slider) {
                     this._move_slider(index, OutputVolumeSlider);
                 }
-                else if (widget === 'volume-input' && move_master_volume) {
+                else if (widget === 'input-volume-slider' && move_input_volume_slider) {
                     this._move_slider(index, this.InputVolumeSlider);
                 }
-                else if (widget === 'media' && media_control_action === 'move') {
+                else if (widget === 'mpris-controllers' && create_mpris_controllers && this.settings.get_boolean("mpris-controllers-are-moved")) {
                     this._move_media_controls(index);
                 }
-                else if (widget === 'media' && media_control_action === 'duplicate') {
+                else if (widget === 'mpris-controllers' && create_mpris_controllers && !this.settings.get_boolean("mpris-controllers-are-moved")) {
                     this._create_media_controls(index);
                 }
-                else if (widget === 'mixer' && create_mixer_sliders) {
-                    this._create_app_mixer(index, filter_mode, filters);
+                else if (widget === 'applications-volume-sliders' && create_applications_volume_sliders) {
+                    this._create_app_mixer(index, this.settings.get_boolean("group-applications-volume-sliders"), this.settings.get_string("applications-volume-sliders-filter-mode"), this.settings.get_strv("applications-volume-sliders-filters"));
                 }
-                else if (widget === "sink-mixer" && create_sink_mixer) {
-                    this._create_sink_mixer(index, sink_filter_mode, sink_filters);
+                else if (widget === "perdevice-volume-sliders" && create_perdevice_volume_sliders) {
+                    this._create_sink_mixer(index, this.settings.get_string("perdevice-volume-sliders-filter-mode"), this.settings.get_strv("perdevice-volume-sliders-filters"));
                 }
                 else if (widget === "balance-slider" && create_balance_slider) {
                     this._create_balance_slider(index);
@@ -166,7 +177,7 @@ export default class QSAP extends Extension {
                     this._create_profile_switcher(index);
                 }
             }
-            if (remove_output_slider) {
+            if (remove_output_volume_slider) {
                 OutputVolumeSlider.visible = false;
             }
         }
@@ -192,6 +203,11 @@ export default class QSAP extends Extension {
         if (this._applications_mixer) {
             this._applications_mixer.destroy();
             this._applications_mixer = null;
+        }
+        if (this._applications_mixer_combined) {
+            this._panel.removeItem(this._applications_mixer_combined);
+            this._applications_mixer_combined.destroy();
+            this._applications_mixer_combined = null;
         }
         if (this._media_section) {
             this._panel.removeItem(this._media_section);
@@ -249,8 +265,15 @@ export default class QSAP extends Extension {
         this._panel.addItem(this._media_section, 2);
         this._panel._grid.set_child_at_index(this._media_section, index);
     }
-    _create_app_mixer(index, filter_mode, filters) {
-        this._applications_mixer = new ApplicationsMixer(this._panel, index, filter_mode, filters, this.settings);
+    _create_app_mixer(index, type, filter_mode, filters) {
+        if (type === "combined") {
+            this._applications_mixer_combined = new ApplicationsMixerToggle(this.settings, filter_mode, filters);
+            this._panel.addItem(this._applications_mixer_combined, 2);
+            this._panel._grid.set_child_at_index(this._applications_mixer_combined, index);
+        }
+        else {
+            this._applications_mixer = new ApplicationsMixer(this._panel, index, filter_mode, filters, this.settings);
+        }
     }
     _create_sink_mixer(index, filter_mode, filters) {
         this._sink_mixer = new SinkMixer(this._panel, index, filter_mode, filters);
@@ -375,5 +398,27 @@ export default class QSAP extends Extension {
         delete slider._iconButton._qsap_y_expand;
         delete slider._iconButton._qsap_y_align;
         delete slider._menuButton._qsap_y_expand;
+    }
+    _add_reset_applications_output() {
+        this._action_application_reset_output = OutputVolumeSlider.menu.addAction(_("Reset all applications to default output"), () => {
+            const control = Volume.getMixerControl();
+            for (const stream of control.get_streams()) {
+                if (stream.is_event_stream || !(stream instanceof Gvc.MixerSinkInput)) {
+                    continue;
+                }
+                GLib.spawn_command_line_async(`${get_pactl_path(this.settings)[0]} move-sink-input ${stream.index} @DEFAULT_SINK@`);
+            }
+            if (this._applications_mixer) {
+                for (const slider of this._applications_mixer._slider_manager._sliders.values()) {
+                    slider._checkUsedSink();
+                }
+            }
+        });
+    }
+    _remove_reset_applications_output() {
+        if (this._action_application_reset_output) {
+            this._action_application_reset_output.destroy();
+        }
+        delete this._action_application_reset_output;
     }
 }

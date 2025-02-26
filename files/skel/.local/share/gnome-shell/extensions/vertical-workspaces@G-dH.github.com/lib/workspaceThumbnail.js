@@ -183,6 +183,9 @@ const WorkspaceThumbnailCommon = {
                     return GLib.SOURCE_REMOVE;
                 });
             });
+
+            if (opt.SHOW_WST_LABELS_ON_HOVER)
+                this._wsLabel.opacity = 0;
         }
 
         if (opt.CLOSE_WS_BUTTON_MODE) {
@@ -230,9 +233,6 @@ const WorkspaceThumbnailCommon = {
             this._lastCloseClickTime = 0;
         }
 
-        if (opt.SHOW_WST_LABELS_ON_HOVER)
-            this._wsLabel.opacity = 0;
-
         this.connect('enter-event', () => {
             if (opt.CLOSE_WS_BUTTON_MODE && (!Meta.prefs_get_dynamic_workspaces() || (Meta.prefs_get_dynamic_workspaces() && global.workspace_manager.get_n_workspaces() - 1 !== this.metaWorkspace.index())))
                 this._closeButton.opacity = 200;
@@ -268,7 +268,7 @@ const WorkspaceThumbnailCommon = {
 
             // full brightness of the thumbnail bg draws unnecessary attention
             // there is a grey bg under the wallpaper
-            this._bgManager.backgroundActor.opacity = 220;
+            // this._bgManager.backgroundActor.opacity = 220;
         }
 
         this.connect('destroy', () => {

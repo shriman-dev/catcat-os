@@ -12,7 +12,7 @@ name='Creative'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Docs]
-apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.johnfactotum.Foliate.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.flxzt.rnote.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop']
+apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.johnfactotum.Foliate.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.flxzt.rnote.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.x.editor.desktop']
 name='Docs'
 translate=false
 

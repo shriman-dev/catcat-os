@@ -194,8 +194,7 @@ export default class VShell extends ExtensionPreferences {
                 _('Adjusts the position of the dash on the axis given by the orientation of the workspaces'),
                 dashPositionScale,
                 'dashPositionAdjust',
-                null,
-                'dashModule'
+                null
             )
         );
 
@@ -882,7 +881,7 @@ export default class VShell extends ExtensionPreferences {
 
         const maxSearchResultsAdjustment = new Gtk.Adjustment({
             upper: 50,
-            lower: 5,
+            lower: 1,
             step_increment: 1,
             page_increment: 5,
         });
@@ -917,6 +916,24 @@ export default class VShell extends ExtensionPreferences {
             )
         );
 
+        optionList.push(
+            itemFactory.getRowWidget(
+                _('Panel')
+            )
+        );
+
+        optionList.push(
+            itemFactory.getRowWidget(
+                _('Overview Panel Style'),
+                _('Panel background style in overview'),
+                itemFactory.newDropDown(),
+                'panelOverviewStyle',
+                [
+                    [_('Same as Desktop'), 0],
+                    [_('Transparent (Default)'), 1],
+                ]
+            )
+        );
 
         optionList.push(
             itemFactory.getRowWidget(
@@ -998,15 +1015,6 @@ export default class VShell extends ExtensionPreferences {
                 _('Sets the amount of background blur in the app grid and search results views'),
                 bgAppBlurScale,
                 'appGridBgBlurSigma'
-            )
-        );
-
-        optionList.push(
-            itemFactory.getRowWidget(
-                _('Smooth Blur Transitions'),
-                _('Allows for smoother blur transitions, but can affect the overall smoothness of overview animations on weak hardware'),
-                itemFactory.newSwitch(),
-                'smoothBlurTransitions'
             )
         );
 
@@ -1458,12 +1466,13 @@ export default class VShell extends ExtensionPreferences {
         optionList.push(
             itemFactory.getRowWidget(
                 _('Workspace Preview Animation'),
-                _('When entering / leaving the App Grid / Search view, the workspace preview can animate to/from workspace thumbnail.'),
+                _('When entering or leaving the App Grid, the workspace preview can animate to/from workspace thumbnails'),
                 itemFactory.newDropDown(),
                 'workspaceAnimation',
                 [
                     [_('Disable'), 0],
-                    [_('Enable'), 1],
+                    [_('Active Workspace Only'), 1],
+                    [_('All Workspaces'), 2],
                 ]
             )
         );

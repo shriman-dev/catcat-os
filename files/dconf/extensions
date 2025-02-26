@@ -28,6 +28,7 @@ custom-font='FiraCode Nerd Font 11'
 detect-urls-http=false
 force-x11-gdk-backend=false
 foreground-color='rgb(205,214,244)'
+hide-animation-duration=0.050000000000000003
 hide-when-focus-lost=true
 hide-window-on-esc=true
 highlight-background-color='#000000'
@@ -40,11 +41,13 @@ panel-icon-type='toggle-and-menu-button'
 scrollback-lines=1000000000
 scrollback-unlimited=false
 shortcut-font-scale-increase=['<Control>equal']
+show-animation='linear'
+show-animation-duration=0.050000000000000003
 theme-variant='dark'
 use-system-font=true
 use-theme-colors=false
 window-maximize=false
-window-size=0.75
+window-size=0.70095238095238099
 window-skip-taskbar=true
 window-type-hint='normal'
 
@@ -324,16 +327,17 @@ hide-switch-user-button=true
 
 [org/gnome/shell/extensions/burn-my-windows]
 last-extension-version=39
-last-prefs-version=41
-prefs-open-count=7
+last-prefs-version=45
+prefs-open-count=10
 preview-effect=''
+show-support-dialog=false
 
 [org/gnome/shell/extensions/caffeine]
 countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=2
+indicator-position-max=5
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -508,10 +512,13 @@ show-trash=false
 transparency-mode='FIXED'
 
 [org/gnome/shell/extensions/dash-to-panel]
-animate-appicon-hover=false
+animate-appicon-hover=true
 animate-appicon-hover-animation-convexity={'RIPPLE': 2.0, 'PLANK': 1.0, 'SIMPLE': 0.0}
 animate-appicon-hover-animation-extent={'RIPPLE': 4, 'PLANK': 4, 'SIMPLE': 1}
+animate-appicon-hover-animation-rotation={'SIMPLE': 0, 'RIPPLE': 10, 'PLANK': 0}
+animate-appicon-hover-animation-travel={'SIMPLE': 0.0, 'RIPPLE': 0.40000000000000002, 'PLANK': 0.0}
 animate-appicon-hover-animation-type='SIMPLE'
+animate-appicon-hover-animation-zoom={'SIMPLE': 1.1000000000000001, 'RIPPLE': 1.25, 'PLANK': 2.0}
 appicon-margin=0
 appicon-padding=1
 available-monitors=[0]
@@ -928,21 +935,34 @@ tracker-shape='cursor'
 
 [org/gnome/shell/extensions/quick-settings-audio-panel]
 always-show-input-slider=true
+always-show-input-volume-slider=true
+applications-volume-sliders-filters=['gnome-shell*']
 autohide-profile-switcher=true
+create-applications-volume-sliders=true
 create-balance-slider=false
 create-mixer-sliders=true
+create-mpris-controllers=true
+create-perdevice-volume-sliders=false
 create-profile-switcher=false
 create-sink-mixer=false
 filters=['gnome-shell*']
 ignore-css=true
+master-volume-sliders-show-current-device=false
 media-control='duplicate'
 merge-panel=false
+merged-panel-position='top'
+move-input-volume-slider=false
 move-master-volume=false
+move-output-volume-slider=false
+mpris-controllers-are-moved=false
 ordering=['sink-mixer', 'volume-output', 'volume-input', 'balance-slider', 'mixer', 'profile-switcher', 'media']
 panel-position='top'
 remove-output-slider=false
+remove-output-volume-slider=false
 separate-indicator=false
 show-current-device=false
+version=2
+widgets-order=['perdevice-volume-sliders', 'output-volume-slider', 'input-volume-slider', 'balance-slider', 'applications-volume-sliders', 'profile-switcher', 'mpris-controllers']
 
 [org/gnome/shell/extensions/quick-settings-avatar]
 avatar-nobackground=true
@@ -953,17 +973,31 @@ avatar-username=false
 
 [org/gnome/shell/extensions/quick-settings-tweaks]
 add-unsafe-quick-toggle-enabled=false
+datemenu-disable-menu=false
 datemenu-fix-weather-widget=true
+datemenu-hide-left-box=false
+datemenu-hide-media-control=false
+datemenu-hide-notifications=false
 datemenu-remove-media-control=false
 datemenu-remove-notifications=false
 input-always-show=false
 input-show-selected=false
 list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":false},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":null,"visible":false},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":false},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":false},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"FeatureMenuToggle","title":"Tiling","visible":true},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false}]'
+media-compact=true
+media-contorl-opacity=50
 media-control-enabled=false
-notifications-enabled=false
+media-enabled=true
+media-progress-handle-radius=0
+media-progress-style='default'
+notifications-enabled=true
 output-show-selected=false
+system-indicator-screen-recording-indicator-use-accent=true
+system-indicator-screen-sharing-indicator-use-accent=true
+system-items-layout-hide=false
 volume-mixer-enabled=false
 volume-mixer-position='bottom'
+weather-enabled=false
+weather-remove-shadow=true
 
 [org/gnome/shell/extensions/runcat]
 displaying-items='character-and-percentage'
@@ -1050,7 +1084,7 @@ disk-display='both'
 disk-monitor-mode='activity'
 mem-display='numeric'
 meter-fg-color='rgb(205,214,244)'
-mount-to-monitor='/'
+mount-to-monitor='Automatic'
 position-in-panel='leftedge'
 refresh-rate='fast'
 show-animations=true

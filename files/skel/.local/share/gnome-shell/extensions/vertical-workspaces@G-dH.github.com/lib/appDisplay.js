@@ -3,7 +3,7 @@
  * appDisplay.js
  *
  * @author     GdH <G-dH@github.com>
- * @copyright  2022 - 2024
+ * @copyright  2022 - 2025
  * @license    GPL-3.0
  *
  */
@@ -71,6 +71,12 @@ export const AppDisplayModule = class {
         this._appGridLayoutConId =  0;
         this._origAppViewItemAcceptDrop =  null;
         this._updateFolderIcons =  0;
+
+        // By default appDisplay.name (which can be used to address styling) is not set
+        // In GS 46+ we need to adapt the appDisplay style even if the appDisplay module is disabled,
+        // to allow the use of wallpaper in the overview
+        if (shellVersion46)
+            Main.overview._overview.controls._appDisplay.name = 'app-display';
     }
 
     cleanGlobals() {
@@ -78,6 +84,7 @@ export const AppDisplayModule = class {
         opt = null;
         _ = null;
         _appDisplay = null;
+        Main.overview._overview.controls._appDisplay.name = null;
     }
 
     update(reset) {
@@ -111,7 +118,6 @@ export const AppDisplayModule = class {
 
         this._applyOverrides();
         this._updateAppDisplay();
-        _appDisplay.add_style_class_name('app-display-46');
 
         console.debug('  AppDisplayModule - Activated');
     }
@@ -126,8 +132,6 @@ export const AppDisplayModule = class {
         const reset = true;
         this._updateAppDisplay(reset);
         this._restoreOverviewGroup();
-
-        _appDisplay.remove_style_class_name('app-display-46');
 
         console.debug('  AppDisplayModule - Disabled');
     }
@@ -240,9 +244,8 @@ export const AppDisplayModule = class {
 
     _updateLayout(settings, key) {
         // Reset the app grid only if the user layout has been completely removed
-        if (!settings.get_value(key).deep_unpack().length) {
+        if (!settings.get_value(key).deep_unpack().length)
             this._repopulateAppDisplay();
-        }
     }
 
     _repopulateAppDisplay(reset = false, callback) {
@@ -339,9 +342,8 @@ export const AppDisplayModule = class {
 function _getViewFromIcon(icon) {
     icon = icon._sourceItem ? icon._sourceItem : icon;
     for (let parent = icon.get_parent(); parent; parent = parent.get_parent()) {
-        if (parent instanceof AppDisplay.AppDisplay || parent instanceof AppDisplay.FolderView) {
+        if (parent instanceof AppDisplay.AppDisplay || parent instanceof AppDisplay.FolderView)
             return parent;
-        }
     }
     return null;
 }
@@ -370,7 +372,7 @@ const AppDisplayCommon = {
         this._appInfoList = Shell.AppSystem.get_default().get_installed().filter(appInfo => {
             try {
                 appInfo.get_id(); // catch invalid file encodings
-            } catch (e) {
+            } catch {
                 return false;
             }
 
@@ -573,10 +575,10 @@ const BaseAppViewCommon = {
         const overrides = new Me.Util.Overrides();
         if (opt.ORIENTATION) {
             overrides.addOverride('FolderGridLayoutVertical', this._appGridLayout, BaseAppViewGridLayoutVertical);
-            this._pageIndicators.set_style('margin-right: 12px;');
+            this._pageIndicators.set_style('margin-right: 22px;');
         } else {
             overrides.addOverride('FolderGridLayoutHorizontal', this._appGridLayout, BaseAppViewGridLayoutHorizontal);
-            this._pageIndicators.set_style('margin-bottom: 12px;');
+            this._pageIndicators.set_style('margin-bottom: 22px;');
         }
     },
 
@@ -589,9 +591,15 @@ const BaseAppViewCommon = {
         this._swipeTracker.orientation = orientation;
         this._swipeTracker._reset();
 
-        this._adjustment = vertical
-            ? this._scrollView.get_vscroll_bar().adjustment
-            : this._scrollView.get_hscroll_bar().adjustment;
+        if (this._scrollView.get_vadjustment) {
+            this._adjustment = vertical
+                ? this._scrollView.get_vadjustment()
+                : this._scrollView.get_hadjustment();
+        } else {
+            this._adjustment = vertical
+                ? this._scrollView.get_vscroll_bar().adjustment
+                : this._scrollView.get_hscroll_bar().adjustment;
+        }
 
         this._prevPageArrow.pivot_point = new Graphene.Point({ x: 0.5, y: 0.5 });
         this._prevPageArrow.rotation_angle_z = vertical ? 90 : 0;
@@ -600,8 +608,14 @@ const BaseAppViewCommon = {
         this._nextPageArrow.rotation_angle_z = vertical ? 90 : 0;
 
         const pageIndicators = this._pageIndicators;
-        pageIndicators.vertical = vertical;
-        this._box.vertical = !vertical;
+        if (pageIndicators.orientation !== undefined) { // since GNOME 48
+            pageIndicators.orientation = orientation;
+            this._box.orientation = orientation;
+        } else {
+            pageIndicators.vertical = vertical;
+            this._box.vertical = !vertical;
+        }
+
         pageIndicators.x_expand = !vertical;
         pageIndicators.y_align = vertical ? Clutter.ActorAlign.CENTER : Clutter.ActorAlign.START;
         pageIndicators.x_align = vertical ? Clutter.ActorAlign.START : Clutter.ActorAlign.CENTER;
@@ -668,9 +682,8 @@ const BaseAppViewCommon = {
                 position = index % itemsPerPage;
             }
 
-            if (currentPage !== page || currentPosition !== position) {
+            if (currentPage !== page || currentPosition !== position)
                 this._moveItem(icon, page, position);
-            }
         });
 
         this._grid.layoutManager._skipRelocateSurplusItems = false;
@@ -730,9 +743,9 @@ const BaseAppViewCommon = {
 
             // Sort by usage
             if ((opt.APP_GRID_USAGE && thisIsAppDisplay) ||
-                (opt.APP_FOLDER_USAGE && thisIsFolder)) {
+                (opt.APP_FOLDER_USAGE && thisIsFolder))
                 newApps.sort((a, b) => Shell.AppUsage.get_default().compare(a.app?.id, b.app?.id));
-            }
+
 
             // Sort favorites first
             if (!opt.APP_GRID_EXCLUDE_FAVORITES && opt.APP_GRID_DASH_FIRST) {
@@ -749,9 +762,9 @@ const BaseAppViewCommon = {
             }
 
             // Sort running first
-            if (!opt.APP_GRID_EXCLUDE_RUNNING && opt.APP_GRID_DASH_FIRST) {
+            if (!opt.APP_GRID_EXCLUDE_RUNNING && opt.APP_GRID_DASH_FIRST)
                 newApps.sort((a, b) => a.app?.get_state() !== Shell.AppState.RUNNING && b.app?.get_state() === Shell.AppState.RUNNING);
-            }
+
 
             // Sort folders first
             if (thisIsAppDisplay && opt.APP_GRID_FOLDERS_FIRST)
@@ -1090,10 +1103,6 @@ const AppGridCommon = {
 const FolderIcon = {
     after__init() {
         this.button_mask = St.ButtonMask.ONE | St.ButtonMask.TWO | St.ButtonMask.THREE;
-        if (shellVersion46)
-            this.add_style_class_name('app-folder-46');
-        else
-            this.add_style_class_name('app-folder-45');
     },
 
     open() {
@@ -1335,7 +1344,7 @@ const FolderGrid = GObject.registerClass({
         Math.round(Math.min(...this._view._pageIndicators.get_size()));// / scaleFactor);// ~28;
         padding.left = opt.ORIENTATION ? pageIndicatorSize : 0;
         padding.right = 0;
-        padding.top = opt.ORIENTATION ? 0 : pageIndicatorSize;
+        padding.top = 0;
         padding.bottom = 0;
         this.layoutManager.pagePadding = padding;
     }
@@ -1373,6 +1382,7 @@ const AppFolderDialog = {
         this.child.add_action(clickAction);
         // Redundant, added just because of extensions.gnome.org rules
         this.connect('destroy', this._removePopdownTimeout.bind(this));
+        this._viewBox.add_style_class_name('app-folder-dialog-translucent');
     },
 
     after__addFolderNameEntry() {

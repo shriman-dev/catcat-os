@@ -120,6 +120,7 @@ export const Options = class Options {
             searchWindowsIconScroll: ['int', 'search-windows-icon-scroll'],
             panelVisibility: ['int', 'panel-visibility'],
             panelPosition: ['int', 'panel-position'],
+            panelOverviewStyle: ['int', 'panel-overview-style'],
             windowAttentionMode: ['int', 'window-attention-mode'],
             wsSwPopupHPosition: ['int', 'ws-sw-popup-h-position'],
             wsSwPopupVPosition: ['int', 'ws-sw-popup-v-position'],
@@ -418,7 +419,7 @@ export const Options = class Options {
         this.SEARCH_VIEW_SCALE = this.get('searchViewScale') / 100;
         this.SEARCH_MAX_ROWS = this.get('searchMaxResultsRows');
         this.SEARCH_FUZZY = this.get('searchFuzzy');
-        this.SEARCH_DELAY = 0;
+        this.SEARCH_DELAY = this.SEARCH_VIEW_ANIMATION ? 100 : 0;
         this.SEARCH_APP_GRID_MODE = this.get('searchAppGridMode') && this.get('appDisplayModule');
 
         this.APP_GRID_ALLOW_INCOMPLETE_PAGES = this.get('appGridIncompletePages');
@@ -476,6 +477,7 @@ export const Options = class Options {
         this.PANEL_MODE = this.get('panelVisibility');
         this.PANEL_DISABLED = this.PANEL_MODE === 2;
         this.PANEL_OVERVIEW_ONLY = this.PANEL_MODE === 1;
+        this.PANEL_OVERVIEW_STYLE = this.get('panelOverviewStyle');
 
         this.WINDOW_ATTENTION_MODE = this.get('windowAttentionMode');
         this.WINDOW_ATTENTION_DISABLE_NOTIFICATIONS = this.WINDOW_ATTENTION_MODE === 1;
@@ -486,6 +488,8 @@ export const Options = class Options {
         this.WS_SW_POPUP_MODE = this.get('wsSwPopupMode');
 
         this.WS_ANIMATION = this.get('workspaceAnimation');
+        this.WS_ANIMATION_SINGLE = this.WS_ANIMATION === 1;
+        this.WS_ANIMATION_ALL = this.WS_ANIMATION === 2;
         this.WS_WRAPAROUND = this.get('wsSwitcherWraparound');
         this.WS_IGNORE_LAST = this.get('wsSwitcherIgnoreLast');
         this.WS_SWITCHER_CURRENT_MONITOR = this.get('wsSwitcherMode') === 1;
@@ -536,6 +540,7 @@ export const Options = class Options {
 
         this.DELAY_STARTUP = this.get('delayStartup');
         this.DELAY_OVERVIEW_ANIMATION = true;
+        this.DELAY_PER_WINDOW = 5;
     }
 
     _getAnimationDirection() {

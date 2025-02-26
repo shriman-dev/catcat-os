@@ -3,7 +3,7 @@
  * workspacesAnimation.js
  *
  * @author     GdH <G-dH@github.com>
- * @copyright  2022 - 2024
+ * @copyright  2022 - 2025
  * @license    GPL-3.0
  *
  */
@@ -140,9 +140,11 @@ export const WorkspaceAnimationModule = class {
         } else {
             getter = {
                 get() {
-                    const spacing = 0; // 100 * St.ThemeContext.get_for_stage(global.stage).scale_factor;
+                    const primaryMonitor = this._monitor.index === Main.layoutManager.primaryIndex;
+                    // Height needs to be compensated even if panel is hidden
+                    const spacing = opt.WORKSPACE_MIN_SPACING * St.ThemeContext.get_for_stage(global.stage).scale_factor;
                     if (global.workspace_manager.layout_rows === -1)
-                        return this._monitor.height + spacing + (opt.PANEL_MODE ? Main.panel.height : 0); // compensation for hidden panel
+                        return this._monitor.height + spacing + (primaryMonitor ? Main.panel.height : 0);
                     else
                         return this._monitor.width + spacing;
                 },

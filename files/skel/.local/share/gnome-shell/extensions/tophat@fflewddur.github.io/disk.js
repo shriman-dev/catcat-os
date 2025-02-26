@@ -10,15 +10,38 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with TopHat. If not, see <https://www.gnu.org/licenses/>.
-import GObject from 'gi://GObject';
-import Gio from 'gi://Gio';
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
 import St from 'gi://St';
 import { gettext as _, } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { TopHatMonitor, MeterNoVal, NumTopProcs, TopProc } from './monitor.js';
-import { bytesToHumanString, roundMax } from './helpers.js';
+import { CapacityBar } from './capacity.js';
+import { bytesToHumanString, DisplayType, getDisplayTypeSetting, roundMax, } from './helpers.js';
 import { HistoryChart, HistoryStyle } from './history.js';
+import { Orientation } from './meter.js';
+import { TopHatMonitor, MeterNoVal, NumTopProcs, TopProc } from './monitor.js';
+class FSWidgets {
+    mount;
+    usage;
+    size;
+    capacity;
+    constructor(mount) {
+        this.mount = new St.Label({
+            text: mount,
+            style_class: 'menu-label',
+        });
+        this.usage = new St.Label({
+            style_class: 'menu-value',
+            x_expand: true,
+        });
+        this.capacity = new CapacityBar();
+        this.size = new St.Label({
+            style_class: 'menu-details align-right menu-section-end',
+        });
+    }
+}
 export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHatMonitor {
+    usage;
     valueRead;
     valueWrite;
     menuDiskWrites;
@@ -26,10 +49,21 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
     menuDiskWritesTotal;
     menuDiskReadsTotal;
     topProcs;
+    menuFSDetails;
+    menuFS = new Map();
     constructor(metadata, gsettings) {
         super('Disk Monitor', metadata, gsettings);
         const gicon = Gio.icon_new_for_string(`${this.metadata.path}/icons/hicolor/scalable/actions/disk-icon-symbolic.svg`);
         this.icon.set_gicon(gicon);
+        this.usage = new St.Label({
+            text: MeterNoVal,
+            style_class: 'tophat-panel-usage',
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this.add_child(this.usage);
+        this.meter.setNumBars(1);
+        this.meter.setOrientation(Orientation.Vertical);
+        this.add_child(this.meter);
         const vbox = new St.BoxLayout({ vertical: true });
         vbox.connect('notify::vertical', (obj) => {
             obj.vertical = true;
@@ -60,10 +94,37 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
         for (let i = 0; i < NumTopProcs; i++) {
             this.topProcs[i] = new TopProc();
         }
-        this.gsettings.bind('show-disk', this, 'visible', Gio.SettingsBindFlags.GET);
+        this.updateVisibility(gsettings);
+        this.gsettings.connect('changed::show-disk', (settings) => {
+            this.updateVisibility(settings);
+        });
+        this.gsettings.connect('changed::show-fs', (settings) => {
+            this.updateVisibility(settings);
+        });
+        this.gsettings.connect('changed::fs-display', (settings) => {
+            this.updateVisibility(settings);
+        });
+        this.gsettings.connect('changed::mount-to-monitor', () => {
+            this.vitals?.readFileSystemUsage();
+        });
         this.buildMenu();
         this.addMenuButtons();
         this.updateColor();
+    }
+    updateVisibility(settings) {
+        const showDisk = settings.get_boolean('show-disk');
+        const showFS = settings.get_boolean('show-fs');
+        const displayType = getDisplayTypeSetting(settings, 'fs-display');
+        this.valueRead.visible = showDisk;
+        this.valueWrite.visible = showDisk;
+        this.usage.visible =
+            showFS &&
+                (displayType === DisplayType.Both ||
+                    displayType === DisplayType.Numeric);
+        this.meter.visible =
+            showFS &&
+                (displayType === DisplayType.Both || displayType === DisplayType.Chart);
+        this.visible = showDisk || showFS;
     }
     buildMenu() {
         this.menuNumCols = 3;
@@ -127,6 +188,7 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
         for (let i = 0; i < NumTopProcs; i++) {
             this.topProcs[i].cmd.set_style_class_name('menu-cmd-name');
             this.addMenuRow(this.topProcs[i].cmd, 0, 1, 1);
+            this.topProcs[i].setTooltip();
             this.topProcs[i].in.set_style_class_name('menu-cmd-activity');
             this.addMenuRow(this.topProcs[i].in, 1, 1, 1);
             this.topProcs[i].out.set_style_class_name('menu-cmd-activity');
@@ -135,6 +197,18 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
             }
             this.addMenuRow(this.topProcs[i].out, 2, 1, 1);
         }
+        label = new St.Label({
+            text: _('Filesystem usage'),
+            style_class: 'menu-header',
+        });
+        this.addMenuRow(label, 0, 3, 1);
+        const grid = new St.Widget({
+            layout_manager: new Clutter.GridLayout({
+                orientation: Clutter.Orientation.VERTICAL,
+            }),
+        });
+        this.menuFSDetails = grid.layout_manager;
+        this.addMenuRow(grid, 0, 3, 1);
     }
     bindVitals(vitals) {
         super.bindVitals(vitals);
@@ -161,8 +235,12 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::disk-history', () => {
+            if (!this.historyChart) {
+                console.warn('[TopHat] Disk activity history chart does not exist');
+                return;
+            }
             const history = vitals.getDiskActivity();
-            let max = 0.001; // A very small value to prevent division by 0
+            let max = 0;
             for (const da of history) {
                 if (!da) {
                     break;
@@ -185,10 +263,14 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
         id = vitals.connect('notify::disk-top-procs', () => {
             const procs = vitals.getTopDiskProcs(NumTopProcs);
             for (let i = 0; i < NumTopProcs; i++) {
-                const w = procs[i].diskWrites();
-                const r = procs[i].diskReads();
-                if (w > 0 || r > 0) {
+                if (procs[i]) {
+                    const w = procs[i].diskWrites();
+                    const r = procs[i].diskReads();
                     this.topProcs[i].cmd.text = procs[i].cmd;
+                    this.topProcs[i].setCmd(procs[i].cmd);
+                    if (procs[i].count > 1) {
+                        this.topProcs[i].setCmd(this.topProcs[i].cmd.text + ` (x${procs[i].count})`);
+                    }
                     this.topProcs[i].in.text = bytesToHumanString(w) + '/s';
                     this.topProcs[i].out.text = bytesToHumanString(r) + '/s';
                 }
@@ -200,5 +282,90 @@ export const DiskMonitor = GObject.registerClass(class DiskMonitor extends TopHa
             }
         });
         this.vitalsSignals.push(id);
+        id = vitals.connect('notify::fs-usage', () => {
+            // console.log(`updated fs-usage: ${vitals.fs_usage}`);
+            this.meter.setBarSizes([vitals.fs_usage / 100]);
+            const s = `${vitals.fs_usage.toFixed(0)}%`;
+            this.usage.text = s;
+        });
+        this.vitalsSignals.push(id);
+        id = vitals.connect('notify::fs-list', () => {
+            if (!this.menuFSDetails || !this.menuFS) {
+                return;
+            }
+            const list = vitals.getFilesystems();
+            const mountPoints = new Array(0);
+            let row = 0;
+            for (const fs of list) {
+                let newRow = true;
+                mountPoints.push(fs.mount);
+                let widgets = this.menuFS.get(fs.mount);
+                if (!widgets) {
+                    widgets = new FSWidgets(fs.mount);
+                    this.menuFS.set(fs.mount, widgets);
+                    // this.menuFSDetails.insert_row(row);
+                }
+                else {
+                    if (this.menuFSDetails.get_child_at(0, row) === widgets.mount) {
+                        // The widgets are staying in the same place; leave them alone
+                        newRow = false;
+                    }
+                    else {
+                        // Remove existing widgets for this row
+                        removeActor(widgets.mount);
+                        removeActor(widgets.usage);
+                        removeActor(widgets.capacity);
+                        removeActor(widgets.size);
+                    }
+                }
+                if (newRow) {
+                    this.menuFSDetails.attach(widgets.mount, 0, row, 1, 1);
+                    this.menuFSDetails.attach(widgets.usage, 1, row, 1, 1);
+                    row++;
+                    this.menuFSDetails.attach(widgets.capacity, 0, row, 2, 1);
+                    row++;
+                    this.menuFSDetails.attach(widgets.size, 0, row, 2, 1);
+                    row++;
+                }
+                else {
+                    row += 3;
+                }
+                widgets.usage.text = `${fs.usage()}%`;
+                widgets.capacity.setUsage(fs.usage() / 100);
+                widgets.capacity.setColor(this.color);
+                widgets.size.text = _(`${bytesToHumanString(fs.cap - fs.used)} available of ${bytesToHumanString(fs.cap)}`);
+            }
+            // Remove rows for filesystems that we're no longer monitoring
+            for (const mountPoint of this.menuFS.keys()) {
+                if (!mountPoints.includes(mountPoint)) {
+                    const widgets = this.menuFS.get(mountPoint);
+                    if (widgets) {
+                        widgets.mount.destroy();
+                        widgets.usage.destroy();
+                        widgets.capacity.destroy();
+                        widgets.size.destroy();
+                    }
+                    this.menuFS.delete(mountPoint);
+                }
+            }
+        });
+        this.vitalsSignals.push(id);
+    }
+    updateColor() {
+        const [color, useAccent] = super.updateColor();
+        this.color = color;
+        if (this.menuFS) {
+            for (const widgets of this.menuFS.values()) {
+                widgets.capacity.setColor(color);
+            }
+        }
+        return [color, useAccent];
     }
 });
+function removeActor(actor) {
+    if (!actor) {
+        return;
+    }
+    const p = actor.get_parent();
+    p?.remove_child(actor);
+}

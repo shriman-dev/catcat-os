@@ -19,15 +19,18 @@ import { TopHatMonitor, MeterNoVal, NumTopProcs, TopProc } from './monitor.js';
 import { Orientation } from './meter.js';
 import { HistoryChart } from './history.js';
 import { DisplayType, getDisplayTypeSetting } from './helpers.js';
+import { CapacityBar } from './capacity.js';
 export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatMonitor {
     usage;
     menuCpuUsage;
+    menuCpuCap;
     menuCpuModel;
     menuCpuFreq;
     menuCpuTemp;
     menuUptime;
     topProcs;
     showCores;
+    sortCores;
     normalizeProcUsage;
     displayType;
     constructor(metadata, gsettings) {
@@ -36,7 +39,7 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         this.icon.set_gicon(gicon);
         this.usage = new St.Label({
             text: MeterNoVal,
-            style_class: 'tophat-panel-usage',
+            style_class: 'tophat-panel-usage tophat-panel-usage-wider',
             y_align: Clutter.ActorAlign.CENTER,
         });
         this.add_child(this.usage);
@@ -44,6 +47,7 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         this.meter.setOrientation(Orientation.Vertical);
         this.add_child(this.meter);
         this.menuCpuUsage = new St.Label();
+        this.menuCpuCap = new CapacityBar();
         this.menuCpuModel = new St.Label();
         this.menuCpuFreq = new St.Label();
         this.menuCpuTemp = new St.Label();
@@ -60,6 +64,10 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
             if (!this.showCores) {
                 this.meter.setNumBars(1);
             }
+        });
+        this.sortCores = this.gsettings.get_boolean('cpu-sort-cores');
+        this.gsettings.connect('changed::cpu-sort-cores', (settings) => {
+            this.sortCores = settings.get_boolean('cpu-sort-cores');
         });
         this.normalizeProcUsage = this.gsettings.get_boolean('cpu-normalize-proc-use');
         this.gsettings.connect('changed::cpu-normalize-proc-use', (settings) => {
@@ -103,8 +111,10 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         });
         this.addMenuRow(label, 0, 1, 1);
         this.menuCpuUsage.text = MeterNoVal;
-        this.menuCpuUsage.add_style_class_name('menu-value menu-section-end');
+        this.menuCpuUsage.add_style_class_name('menu-value');
         this.addMenuRow(this.menuCpuUsage, 1, 1, 1);
+        this.menuCpuCap.add_style_class_name('menu-section-end');
+        this.addMenuRow(this.menuCpuCap, 0, 2, 1);
         // TODO: if we have multiple sockets, create a section for each
         this.menuCpuModel.text = _(`model ${MeterNoVal}`);
         this.menuCpuModel.add_style_class_name('menu-label menu-details');
@@ -137,6 +147,7 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         for (let i = 0; i < NumTopProcs; i++) {
             this.topProcs[i].cmd.set_style_class_name('menu-cmd-name');
             this.addMenuRow(this.topProcs[i].cmd, 0, 1, 1);
+            this.topProcs[i].setTooltip();
             this.topProcs[i].usage.set_style_class_name('menu-cmd-usage');
             if (i === NumTopProcs - 1) {
                 this.topProcs[i].usage.add_style_class_name('menu-section-end');
@@ -155,15 +166,21 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
     bindVitals(vitals) {
         super.bindVitals(vitals);
         let id = vitals.connect('notify::cpu-usage', () => {
+            // console.log(`cpu-usage: ${vitals.cpu_usage}`);
             const percent = vitals.cpu_usage * 100;
             const s = percent.toFixed(0) + '%';
             this.usage.text = s;
             this.menuCpuUsage.text = s;
+            this.menuCpuCap.setUsage(percent / 100);
             if (this.showCores) {
                 if (this.meter.getNumBars() === 1) {
                     this.meter.setNumBars(vitals.getCpuCoreUsage().length);
                 }
-                this.meter.setBarSizes(vitals.getCpuCoreUsage().sort((a, b) => b - a));
+                let usage = vitals.getCpuCoreUsage();
+                if (this.sortCores) {
+                    usage = usage.sort((a, b) => b - a);
+                }
+                this.meter.setBarSizes(usage);
             }
             else {
                 if (this.meter.getNumBars() !== 1) {
@@ -174,25 +191,29 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::cpu-model', () => {
+            // console.log(`cpu-model: ${vitals.cpu_model}`);
             const s = vitals.cpu_model;
             this.menuCpuModel.text = s;
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::cpu-freq', () => {
-            const s = (vitals.cpu_freq / 1000).toFixed(1) + ' GHz';
+            // console.log(`cpu-freq: ${vitals.cpu_freq}`);
+            const s = vitals.cpu_freq.toFixed(1) + ' GHz';
             this.menuCpuFreq.text = s;
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::cpu-temp', () => {
-            const s = (vitals.cpu_temp / 1000).toFixed(0) + ' °C';
+            // console.log(`cpu-temp: ${vitals.cpu_temp}`);
+            const s = vitals.cpu_temp.toFixed(0) + ' °C';
             this.menuCpuTemp.text = s;
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::cpu-top-procs', () => {
             const procs = vitals.getTopCpuProcs(NumTopProcs);
+            // console.log(`cpu-top-procs: ${procs}`);
             for (let i = 0; i < NumTopProcs; i++) {
-                let cpu = procs[i].cpuUsage();
-                if (cpu > 0) {
+                if (procs[i]) {
+                    let cpu = procs[i].cpuUsage();
                     if (!this.normalizeProcUsage) {
                         cpu *= vitals.cpuModel.cores;
                     }
@@ -202,17 +223,20 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
                     else {
                         this.topProcs[i].usage.text = '< 1%';
                     }
-                    this.topProcs[i].cmd.text = procs[i].cmd;
+                    this.topProcs[i].setCmd(procs[i].cmd);
+                    if (procs[i].count > 1) {
+                        this.topProcs[i].setCmd(this.topProcs[i].cmd.text + ` (x${procs[i].count})`);
+                    }
                 }
                 else {
-                    this.topProcs[i].cmd.text = '';
+                    this.topProcs[i].setCmd('');
                     this.topProcs[i].usage.text = '';
                 }
             }
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::cpu-history', () => {
-            this.historyChart?.update(vitals.cpu_usage);
+            this.historyChart?.update(vitals.getCpuHistory());
         });
         this.vitalsSignals.push(id);
         id = vitals.connect('notify::uptime', () => {
@@ -235,5 +259,10 @@ export const CpuMonitor = GObject.registerClass(class CpuMonitor extends TopHatM
         }
         parts.push(ngettext('%d minute', '%d minutes', mins).format(mins));
         return parts.join(' ');
+    }
+    updateColor() {
+        const [color, useAccent] = super.updateColor();
+        this.menuCpuCap?.setColor(color);
+        return [color, useAccent];
     }
 });

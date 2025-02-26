@@ -95,6 +95,25 @@ defaultConfigs() {
   cp -dvrf /etc/skel/.config/qt5ct/* /usr/share/qt5ct/
   cp -dvrf /etc/skel/.config/qt6ct/* /usr/share/qt6ct/
 
+
+  # install extensions for vscodium
+  mkdir -p /etc/skel/.vscode-oss/extensions
+  EXTLIST=(
+"jeronimoekerdt.color-picker-universal"
+"catppuccin.catppuccin-vsc"
+"catppuccin.catppuccin-vsc-icons"
+"ms-python.python"
+"ericsia.pythonsnippets3pro"
+"ms-toolsai.jupyter"
+"redhat.vscode-yaml"
+"huntertran.auto-markdown-toc"
+"zaaack.markdown-editor"
+)
+  for ext in "${EXTLIST[@]}"; do
+    codium --extensions-dir /etc/skel/.vscode-oss/extensions --install-extension ${ext}
+  done
+
+
   # set defaul icon and theme
   sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 

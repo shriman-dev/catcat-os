@@ -10,12 +10,13 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with TopHat. If not, see <https://www.gnu.org/licenses/>.
-import GObject from 'gi://GObject';
-import Cogl from 'gi://Cogl';
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
+import GObject from 'gi://GObject';
 import St from 'gi://St';
 import { adjustAnimationTime } from 'resource:///org/gnome/shell/misc/animationUtils.js';
-export const AnimationDuration = 300;
+export const AnimationDuration = 250;
+export const AnimationEasing = Clutter.AnimationMode.LINEAR;
 export var Orientation;
 (function (Orientation) {
     Orientation[Orientation["Horizontal"] = 0] = "Horizontal";
@@ -23,8 +24,9 @@ export var Orientation;
 })(Orientation || (Orientation = {}));
 export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.BoxLayout {
     bars;
+    barUsage;
     orientation;
-    scaleFactor;
+    scaleFactor = 1;
     color;
     barWidth; // in pixels
     constructor() {
@@ -35,7 +37,10 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
             name: 'TopHatMeter',
         });
         this.bars = new Array(0);
+        this.barUsage = new Array(0);
         this.orientation = Orientation.Horizontal;
+        this.color = new Cogl.Color();
+        this.barWidth = 8;
         const themeContext = St.ThemeContext.get_for_stage(global.get_stage());
         this.scaleFactor = themeContext.get_scale_factor();
         themeContext.connect('notify::scale-factor', (obj) => {
@@ -45,8 +50,12 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
                 b.set_width(this.barWidth);
             }
         });
-        this.color = new Cogl.Color();
-        this.barWidth = 8;
+        // themeContext.connect('changed', (source: St.ThemeContext) => {
+        //   console.log('themeContext changed');
+        // });
+        this.connect('notify::height', () => {
+            this.setBarSizes(this.barUsage);
+        });
     }
     getNumBars() {
         return this.bars.length;
@@ -57,18 +66,20 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
             b.destroy();
         }
         this.bars = new Array(n);
+        this.barUsage = new Array(n);
         this.barWidth = this.computeBarWidth(n);
         for (let i = 0; i < n; i++) {
             this.bars[i] = new St.Widget({
                 y_align: Clutter.ActorAlign.END,
                 y_expand: false,
-                style_class: 'meter-bar',
                 width: this.barWidth,
                 height: 1 * this.scaleFactor,
-                background_color: this.color,
+                style_class: 'meter-bar',
                 name: 'TopHatMeterBar',
             });
+            setBarColor(this.bars[i], this.color);
             this.add_child(this.bars[i]);
+            this.barUsage[i] = 0;
         }
     }
     computeBarWidth(n, wasVertical = false) {
@@ -108,16 +119,14 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
         const meterHeight = this.get_height();
         const duration = adjustAnimationTime(AnimationDuration);
         for (let i = 0; i < n.length; i++) {
-            const height = Math.max(Math.ceil(meterHeight * n[i]), 0.01);
+            const height = Math.ceil(meterHeight * n[i]);
             const curHeight = this.bars[i].height;
-            if (height === curHeight) {
-                continue;
-            }
+            const delta = Math.abs(height - curHeight);
             this.bars[i].remove_transition('scaleHeight');
-            if (duration > 0) {
+            if (duration > 0 && delta > 1) {
                 const t = Clutter.PropertyTransition.new_for_actor(this.bars[i], 'height');
+                t.set_progress_mode(AnimationEasing);
                 t.set_duration(duration);
-                t.set_from(curHeight);
                 t.set_to(height);
                 t.set_remove_on_complete(true);
                 this.bars[i].add_transition('scaleHeight', t);
@@ -126,6 +135,8 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
             else {
                 this.bars[i].set_height(height);
             }
+            // cache this in case we need to re-scale the meter
+            this.barUsage[i] = n[i];
         }
     }
     setColor(c) {
@@ -148,7 +159,7 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
         }
         this.color = color;
         for (const bar of this.bars) {
-            bar.set_background_color(this.color);
+            setBarColor(bar, this.color);
         }
     }
     reorient() {
@@ -163,14 +174,8 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
             b.set_width(this.barWidth);
         }
         for (let i = 0; i < this.bars.length; i++) {
-            let style = '';
-            if (i === this.bars.length - 1) {
-                style += 'margin:0;';
-            }
-            else {
-                style += 'margin:0 1px 0 0;';
-            }
-            this.bars[i].set_style(style);
+            this.bars[i].remove_style_class_name('meter-bar');
+            this.bars[i].set_style_class_name('meter-bar');
         }
     }
     destroy() {
@@ -181,3 +186,9 @@ export const TopHatMeter = GObject.registerClass(class TopHatMeter extends St.Bo
         super.destroy();
     }
 });
+function setBarColor(bar, color) {
+    let style = bar.get_style() || '';
+    style = style.replaceAll(/background-color:[^;]*;\s*/g, '');
+    style += `background-color: rgb(${color.red}, ${color.green}, ${color.blue});`;
+    bar.set_style(style);
+}

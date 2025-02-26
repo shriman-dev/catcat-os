@@ -21,6 +21,7 @@ page](https://extensions.gnome.org/extension/5219/tophat/).
 - GNOME 45 or newer (older releases of TopHat are available for GNOME 3.32 -
   44 in the legacy branch at https://github.com/fflewddur/tophat/tree/legacy)
 - A modestly recent release of the Linux kernel (anything >= 5.0 should work)
+- NetworkManager (to monitor network devices)
 
 ### Compatibility
 
@@ -52,7 +53,21 @@ utilities first.
    command `unzip [path-to-tophat.zip] -d
 ~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io`
 4. Log out of your computer and log back in (or restart your system).
-5. Enable TopHat in the `gnome-extensions-app`.
+5. Enable TopHat with the command `gnome-extensions enable tophat@fflewddur.github.io`.
+
+## Settings
+
+All of TopHat's settings are displayed in its preferences window, and this is the recommended approach for modifying them. If, however, you need to work with these from the command like, you can use the `gsettings` tools to read and modify them. To view all available settings and their current values, use the command:
+
+```
+gsettings --schemadir ~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/schemas list-recursively org.gnome.shell.extensions.tophat
+```
+
+Settings can be adjusted with the command:
+
+```
+gsettings --schemadir ~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/schemas set org.gnome.shell.extensions.tophat [key] [value]
+```
 
 ## Contributing
 
@@ -75,13 +90,18 @@ ESLint and Prettier extensions to automatically run these tools for you.
 
 ### Useful development commands
 
-To view logs for GNOME Shell: `journalctl -f /usr/bin/gnome-shell`
+To view logs for GNOME Shell:
 
-To view logs for extension preferences: `journalctl -f /usr/bin/gjs`
+    journalctl -f /usr/bin/gnome-shell
 
-To simulate heavy system load, use the `stress-ng` tool, e.g. `stress-ng
---timeout 10s --cpu 8` or `stress-ng --vm-bytes 80% --vm-populate -t 30 -vm
-4`.
+To view logs for extension preferences:
+
+    journalctl -f /usr/bin/gjs
+
+To simulate heavy system load, use the `stress-ng` tool, e.g.:
+
+    stress-ng --timeout 10s --cpu 8
+    stress-ng --vm-bytes 80% --vm-populate -t 30 -vm 4
 
 To test the development version:
 
@@ -112,7 +132,7 @@ The authors of each original work are:
 
 icons/cpu.svg: [jai](https://thenounproject.com/jairam.182/)  
 icons/disk.svg: [guntur cahya](https://thenounproject.com/gunturcahya05/)  
-icons/logo.svg: [Sergey Krivoy](https://thenounproject.com/krivoydesigner/)
+icons/logo.svg: [Sergey Krivoy](https://thenounproject.com/krivoydesigner/)  
 icons/mem.svg: [Loudoun Design
 Co.](https://thenonproject.com/LoudounDesignCo/)  
 icons/net.svg: [Pixel Bazaar](https://thenounproject.com/pixelbazaar/)
