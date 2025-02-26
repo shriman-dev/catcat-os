@@ -98,6 +98,7 @@ defaultConfigs() {
 
   # install extensions for vscodium
   mkdir -p /etc/skel/.vscode-oss/extensions
+  mkdir -p /tmp/vscodiumdata
   EXTLIST=(
 "jeronimoekerdt.color-picker-universal"
 "catppuccin.catppuccin-vsc"
@@ -110,7 +111,7 @@ defaultConfigs() {
 "zaaack.markdown-editor"
 )
   for ext in "${EXTLIST[@]}"; do
-    codium --extensions-dir /etc/skel/.vscode-oss/extensions --install-extension ${ext}
+    codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir /etc/skel/.vscode-oss/extensions --install-extension ${ext}
   done
 
 
