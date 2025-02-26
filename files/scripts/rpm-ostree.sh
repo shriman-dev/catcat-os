@@ -31,7 +31,7 @@ security='firejail firewall-config usbguard hblock'
 shellSetup='fish bat eza starship fzf fd-find ripgrep zoxide tmux zellij'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-monitoringTools='htop btop bandwhich nethogs procs'
+monitoringTools='htop btop bandwhich nethogs procs wireshark'
 
 diskFileMan='compsize ncdu fio duf dosfstools exfatprogs dmraid zstd gpart gparted'
 
