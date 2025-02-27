@@ -4,6 +4,7 @@ FLATPAK_APPS_TO_UPDATE_SOLEY=(
   "io.gitlab.librewolf-community"
   "com.brave.Browser"
   "org.gnome.Epiphany"
+  "org.garudalinux.firedragon"
   "org.torproject.torbrowser-launcher"
 )
 
@@ -27,7 +28,7 @@ notifyAll() {
 if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update.log) -lt $(( $(date +%s) - 604800 )) ]]; then
   notifyAll "Automatic weekly update has started."
 
-  date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update
+  date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
 
   /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
 

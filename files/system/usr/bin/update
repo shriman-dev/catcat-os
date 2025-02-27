@@ -47,7 +47,7 @@ updateNixpkg() {
 
 updateHostfile() {
   echo ""
-  echo "----------Dnsmasq blocklist update----------"
+  echo "----------DNS blocklist update----------"
   echo ""
 
   curl -sLo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
