@@ -89,8 +89,15 @@ else
   echo "No karg changes needed"
 fi
 
-# update gnome/dconf configurations in /etc/dconf/db/distro.d/
-/usr/bin/dconf update
+
+if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
+  /usr/bin/dconf update
+
+  rm -rf /etc/NetworkManager/dnsmasq.d/blocklist.d/*
+  cp -drf /usr/etc/NetworkManager/dnsmasq.d/blocklist.d/* /etc/NetworkManager/dnsmasq.d/blocklist.d/
+
+  cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
+fi
 
 
 # configure systemd services
@@ -112,7 +119,6 @@ fi
 
 # make needed paths
 mkdir -p /var/lib/alternatives
-mkdir -p /var/log/usbguard
 
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.
@@ -127,18 +133,18 @@ fi
 
 
 # Usbguard setup
-if [[ ! -d /var/log/usbguard ]]; then
-  usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
-  mkdir -p /var/log/usbguard
-  mkdir -p /etc/usbguard
-  chmod 755 /etc/usbguard
-  restorecon -vR /var/log/usbguard
-  sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
+#if [[ ! -d /var/log/usbguard ]]; then
+#  usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
+#  mkdir -p /var/log/usbguard
+#  mkdir -p /etc/usbguard
+#  chmod 755 /etc/usbguard
+#  restorecon -vR /var/log/usbguard
+#  sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
 
-  sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
-  sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
-  sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
-  usbguard add-user $U1000
+#  sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
+#  sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
+#  sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
+#  usbguard add-user $U1000
 
-  systemctl is-enabled usbguard.service || systemctl enable --force --now usbguard.service
-fi
+#  systemctl enable --force --now usbguard.service
+#fi

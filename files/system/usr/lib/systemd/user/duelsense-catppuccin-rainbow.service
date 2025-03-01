@@ -1,0 +1,12 @@
+[Unit]
+Description=everyFewSeconds
+DefaultDependencies=no
+Before=default.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/duelsense-catppuccin-rainbow
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
