@@ -1,6 +1,4 @@
 #!/bin/bash
-dualsensectl microphone off
-dualsensectl player-leds 0
 
 interpolate() {
     start=($1) end=($2) step=$3 steps=$4
@@ -25,18 +23,24 @@ colors=(
     "180 190 254" # Lavender
 )
 
-if grep -i 'dualsense' /proc/bus/input/devices; then
+while true; do
+    if grep -i 'dualsense' /proc/bus/input/devices; then
+        dualsensectl microphone off
+        dualsensectl player-leds 0
 
-  while true; do
-      for (( i=0; i<${#colors[@]}; i++ )); do
-          next=$(( (i + 1) % ${#colors[@]} ))
-          for step in {0..10}; do
-              interpolate=$(interpolate "${colors[i]}" "${colors[next]}" $step 10)
-              echo -e "\033[48;2;${interpolate// /;}m                         \033[0m"
-              dualsensectl lightbar ${interpolate} 150
-              sleep 0.3
-          done
-      done
-  done
-
-fi
+        for (( i=0; i<${#colors[@]}; i++ )); do
+            next=$(( (i + 1) % ${#colors[@]} ))
+            for step in {0..10}; do
+                if ! grep -iq 'dualsense' /proc/bus/input/devices; then
+                    break 2
+                fi
+                interpolate=$(interpolate "${colors[i]}" "${colors[next]}" $step 10)
+                echo -e "\033[48;2;${interpolate// /;}m                     \033[0m"
+                dualsensectl lightbar ${interpolate} 150
+                sleep 0.3
+            done
+        done
+    else
+        sleep 5
+    fi
+done
