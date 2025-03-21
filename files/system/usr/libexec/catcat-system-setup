@@ -93,8 +93,15 @@ fi
 if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   /usr/bin/dconf update
 
-  rm -rf /etc/NetworkManager/dnsmasq.d/blocklist.d/*
-  cp -drf /usr/etc/NetworkManager/dnsmasq.d/blocklist.d/* /etc/NetworkManager/dnsmasq.d/blocklist.d/
+  # system clean up
+  /usr/bin/podman image prune -af
+  /usr/bin/podman volume prune -f
+  /usr/bin/systemd-tmpfiles --clean
+
+  rm /etc/dnscrypt-proxy/blocked-names.txt
+  tar --use-compress-program "zstd -d" -xvf "/usr/share/dnscrypt-proxy/domains-without-subdomains.tar.zst" -C /tmp/
+  cp -df /tmp/domains-without-subdomains /etc/dnscrypt-proxy/blocked-names.txt
+  rm /tmp/domains-without-subdomains
 
   cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
 fi
@@ -116,9 +123,11 @@ fi
 # FIXES
 # to use dnsmasq with networkmanager
 [[ -L /etc/resolv.conf ]] && rm /etc/resolv.conf
+chattr +i /etc/resolv.conf
 
 # make needed paths
-mkdir -p /var/lib/alternatives
+mkdir -p /var/lib/alternatives /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy
+
 
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.

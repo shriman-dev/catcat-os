@@ -337,7 +337,7 @@ countdown-timer=0
 duration-timer=3
 indicator-position=0
 indicator-position-index=0
-indicator-position-max=5
+indicator-position-max=4
 restore-state=true
 
 [org/gnome/shell/extensions/clipboard-history]
@@ -1082,15 +1082,16 @@ cpu-normalize-proc-use=true
 cpu-show-cores=true
 disk-display='both'
 disk-monitor-mode='activity'
+fs-display='chart'
 mem-display='numeric'
 meter-fg-color='rgb(205,214,244)'
-mount-to-monitor='Automatic'
+mount-to-monitor='/'
 position-in-panel='leftedge'
 refresh-rate='fast'
 show-animations=true
 show-cpu=true
 show-disk=false
-show-fs=false
+show-fs=true
 show-icons=false
 show-net=false
 use-system-accent=false

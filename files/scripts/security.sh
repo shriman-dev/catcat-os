@@ -37,24 +37,17 @@ wifi.cloned-mac-address=random
 ethernet.cloned-mac-address=random
 EOF
 
-# Ad/Malware blocking with dnsmasq using networkmanager
-mkdir -p /etc/NetworkManager/conf.d
-sh -c "echo '[main]
-dns=dnsmasq' > /etc/NetworkManager/conf.d/00-use-dnsmasq.conf"
+# Ad/Malware blocking with dnscrypt-proxy
+curl -Lo /tmp/dnscrypt-proxy.tar.gz $(curl -s -X GET https://api.github.com/repos/DNSCrypt/dnscrypt-proxy/releases/latest | grep -i '"browser_download_url": "[^"]*linux_x86_64-.*.tar.gz"' | cut -d '"' -f4)
+mkdir -p /tmp/dnscrypt-proxyTarExtract
+tar -xf /tmp/dnscrypt-proxy.tar.gz -C /tmp/dnscrypt-proxyTarExtract
+cp -dvf /tmp/dnscrypt-proxyTarExtract/linux-x86_64/dnscrypt-proxy /usr/bin/
+chmod +x /usr/bin/dnscrypt-proxy
 
-mkdir -p /etc/NetworkManager/dnsmasq.d/blocklist.d
-sh -c "echo '# defaults
-domain-needed
-bogus-priv
-no-resolv
-bind-interfaces
-conf-dir=/etc/NetworkManager/dnsmasq.d/blocklist.d
-addn-hosts=/etc/hosts' > /etc/NetworkManager/dnsmasq.d/00-defaults.conf"
+mkdir -p /usr/share/dnscrypt-proxy
+curl -Lo /usr/share/dnscrypt-proxy/domains-without-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains-without-subdomains.tar.zst
 
-curl -Lo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
-tar --use-compress-program "zstd -d" -xvf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
 
-tree /etc/NetworkManager/dnsmasq.d/
 
 # get hblock config
 mkdir -p /etc/hblock

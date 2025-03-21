@@ -27,6 +27,7 @@ rpm-ostree override remove fastfetch gnome-browser-connector plocate gnome-shell
 #sunshine
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier hblock'
+#curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | cut -d '"' -f4
 
 shellSetup='fish bat eza starship fzf fd-find ripgrep zoxide tmux zellij'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm

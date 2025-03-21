@@ -3,7 +3,7 @@ set -oue pipefail
 echo -e "\n$0\n"
 
 #sddm.service
-systemctl -f enable fstrim.timer nix.mount libvirtd.service auto-power-profile.service catcat-system-setup.service catcat-flatpak-manager.timer catcat-os-update.timer
+systemctl -f enable fstrim.timer nix.mount libvirtd.service auto-power-profile.service catcat-system-setup.service catcat-flatpak-manager.timer catcat-os-update.timer dnscrypt-proxy.service
 
 systemctl --global -f enable catcat-user-setup.service libadwaita-theme-sync.service duelsense-catppuccin-rainbow.service
 

@@ -45,18 +45,20 @@ updateNixpkg() {
   fi
 }
 
-updateHostfile() {
+updateDNSBlocklist() {
   echo ""
   echo "----------DNS blocklist update----------"
   echo ""
 
-  curl -sLo /tmp/dnsmasq.d.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d.tar.zst
+  
+  curl -sLo /tmp/domains-without-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains-without-subdomains.tar.zst
+
   sudo sh -c '
-    rm /etc/NetworkManager/dnsmasq.d/blocklist.d/*
-    tar --use-compress-program "zstd -d" -xvf "/tmp/dnsmasq.d.tar.zst" -C /etc/NetworkManager/dnsmasq.d/blocklist.d/ --strip-components=1
-    chown -R root:root /etc/NetworkManager/dnsmasq.d/blocklist.d/
+    rm /etc/dnscrypt-proxy/blocked-names.txt
+    tar --use-compress-program "zstd -d" -xvf "/tmp/domains-without-subdomains.tar.zst" -C /tmp/
+    cp -df /tmp/domains-without-subdomains /etc/dnscrypt-proxy/blocked-names.txt
   '
-  rm /tmp/dnsmasq.d.tar.zst
+  rm /tmp/domains-without-subdomains
 
 }
 
@@ -89,7 +91,7 @@ updateSystem() {
 if [[ "$1" == "all" ]]; then
   updateSystem
   updateFirmware
-  updateHostfile
+  updateDNSBlocklist
 
   updateFlatpak
   runAsUsers updateFlatpak
@@ -104,7 +106,7 @@ elif [[ "$1" == "extra" ]]; then
   runAsUsers updateNixpkg
 
   [[ $(id -u) -eq 0 ]] && updateFirmware
-  [[ $(id -u) -eq 0 ]] && updateHostfile
+  [[ $(id -u) -eq 0 ]] && updateDNSBlocklist
 else
   updateSystem
 fi
