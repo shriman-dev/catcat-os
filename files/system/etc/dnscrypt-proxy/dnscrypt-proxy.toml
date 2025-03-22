@@ -29,8 +29,7 @@
 ##
 ## Remove the leading # first to enable this; lines starting with # are ignored.
 
-# server_names = ['scaleway-fr', 'google', 'yandex', 'cloudflare']
-
+server_names = ['NextDNS-ultralow', 'Quad9', 'AdGuard', 'MullvadDNS-base', 'ControlD-p2']
 
 ## List of local addresses and ports to listen to. Can be IPv4 and/or IPv6.
 ## Example with both IPv4 and IPv6:
@@ -39,7 +38,7 @@
 ## To listen to all IPv4 addresses, use `listen_addresses = ['0.0.0.0:53']`
 ## To listen to all IPv4+IPv6 addresses, use `listen_addresses = ['[::]:53']`
 
-listen_addresses = ['0.0.0.0:53']
+listen_addresses = ['127.0.0.1:53', '[::1]:53']
 
 
 ## Maximum number of simultaneous client connections to accept
@@ -64,10 +63,10 @@ ipv4_servers = true
 ipv6_servers = false
 
 # Use servers implementing the DNSCrypt protocol
-dnscrypt_servers = false
+dnscrypt_servers = true
 
 # Use servers implementing the DNS-over-HTTPS protocol
-doh_servers = false
+doh_servers = true
 
 # Use servers implementing the Oblivious DoH protocol
 odoh_servers = false
@@ -76,7 +75,7 @@ odoh_servers = false
 ## Require servers defined by remote sources to satisfy specific properties
 
 # Server must support DNS security extensions (DNSSEC)
-require_dnssec = false
+require_dnssec = true
 
 # Server must not log user queries (declarative)
 require_nolog = true
@@ -144,14 +143,14 @@ keepalive = 30
 ## Using the `hinfo` option means that some responses will be lies.
 ## Unfortunately, the `hinfo` option appears to be required for Android 8+
 
-# blocked_query_response = 'refused'
+#blocked_query_response = 'a:0.0.0.0,aaaa:::'
 
 
 ## Load-balancing strategy: 'p2' (default), 'ph', 'p<n>', 'first' or 'random'
 ## Randomly choose 1 of the fastest 2, half, n, 1 or all live servers by latency.
 ## The response quality still depends on the server itself.
 
-# lb_strategy = 'p2'
+lb_strategy = 'first'
 
 ## Set to `true` to constantly try to estimate the latency of all the resolvers
 ## and adjust the load-balancing parameters accordingly, or to `false` to disable.
@@ -395,7 +394,7 @@ reject_ttl = 10
 ##
 ## See the `example-cloaking-rules.txt` file for an example
 
-# cloaking_rules = 'cloaking-rules.txt'
+cloaking_rules = '/etc/dnscrypt-proxy/cloaking-rules.txt'
 
 ## TTL used when serving entries in cloaking-rules.txt
 
@@ -449,7 +448,7 @@ cache_neg_max_ttl = 600
 ## check for connectivity and captive portals, along with hard-coded
 ## IP addresses to return.
 
-# map_file = 'example-captive-portals.txt'
+map_file = '/etc/dnscrypt-proxy/captive-portals.txt'
 
 
 
@@ -502,7 +501,7 @@ file = '/var/log/dnscrypt-proxy/query.log'
 
 ## Query log format (currently supported: tsv and ltsv)
 
-format = 'ltsv'
+format = 'tsv'
 
 
 ## Do not log these query types, to reduce verbosity. Keep empty to log everything.
@@ -528,7 +527,7 @@ file = '/var/log/dnscrypt-proxy/nx.log'
 
 ## Query log format (currently supported: tsv and ltsv)
 
-format = 'ltsv'
+format = 'tsv'
 
 
 
@@ -563,7 +562,7 @@ log_file = '/var/log/dnscrypt-proxy/blocked-names.log'
 
 ## Optional log format: tsv or ltsv (default: tsv)
 
-log_format = 'ltsv'
+log_format = 'tsv'
 
 
 
@@ -591,7 +590,7 @@ log_file = '/var/log/dnscrypt-proxy/blocked-ips.log'
 
 ## Optional log format: tsv or ltsv (default: tsv)
 
-log_format = 'ltsv'
+log_format = 'tsv'
 
 
 
@@ -619,7 +618,7 @@ log_file = '/var/log/dnscrypt-proxy/allowed-names.log'
 
 ## Optional log format: tsv or ltsv (default: tsv)
 
-log_format = 'ltsv'
+log_format = 'tsv'
 
 
 
@@ -646,7 +645,7 @@ log_file = '/var/log/dnscrypt-proxy/allowed-ips.log'
 
 ## Optional log format: tsv or ltsv (default: tsv)
 
-# log_format = 'tsv'
+log_format = 'tsv'
 
 
 
@@ -905,5 +904,19 @@ skip_incompatible = false
 
 [static]
 
-  # [static.myserver]
-  #   stamp = 'sdns://AQcAAAAAAAAAAAAQMi5kbnNjcnlwdC1jZXJ0Lg'
+#  [static.'NextDNS-ultralow']
+#  stamp = 'sdns://AgcAAAAAAAAAACCaOjT3J965vKUQA9nOnDn48n3ZxSQpAcK6saROY1oCGQ5kbnMubmV4dGRucy5pbw8vZG5zY3J5cHQtcHJveHk'
+
+  [static.'Quad9']
+  stamp = 'sdns://AQMAAAAAAAAADTkuOS45LjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA'
+
+#  [static.'AdGuard']
+#  stamp = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20'
+
+#  [static.'MullvadDNS-base']
+#  stamp = 'sdns://AgMAAAAAAAAACzE5NC4yNDIuMi40ABRiYXNlLmRucy5tdWxsdmFkLm5ldAovZG5zLXF1ZXJ5'
+
+#  [static.'ControlD-p2']
+#  stamp = 'sdns://AgcAAAAAAAAACjc2Ljc2LjIuMTEAFGZyZWVkbnMuY29udHJvbGQuY29tAy9wMg'
+
+

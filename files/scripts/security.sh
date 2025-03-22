@@ -44,6 +44,9 @@ tar -xf /tmp/dnscrypt-proxy.tar.gz -C /tmp/dnscrypt-proxyTarExtract
 cp -dvf /tmp/dnscrypt-proxyTarExtract/linux-x86_64/dnscrypt-proxy /usr/bin/
 chmod +x /usr/bin/dnscrypt-proxy
 
+systemctl -f enable dnscrypt-proxy.service
+systemctl disable systemd-resolved.service
+
 mkdir -p /usr/share/dnscrypt-proxy
 curl -Lo /usr/share/dnscrypt-proxy/domains-without-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains-without-subdomains.tar.zst
 

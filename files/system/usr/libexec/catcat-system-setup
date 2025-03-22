@@ -121,13 +121,17 @@ fi
 
 
 # FIXES
-# to use dnsmasq with networkmanager
-[[ -L /etc/resolv.conf ]] && rm /etc/resolv.conf
-chattr +i /etc/resolv.conf
+# to use dnscrypt-proxy
+if systemctl is-enabled dnscrypt-proxy.service && [[ ! -f /etc/resolv.conf.bak ]]; then
+  rm /etc/resolv.conf
+  sh -c "echo 'nameserver 127.0.0.1
+nameserver ::1
+options edns0' > /etc/resolv.conf"
+  chattr +i /etc/resolv.conf
+fi
 
 # make needed paths
 mkdir -p /var/lib/alternatives /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy
-
 
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.
@@ -139,7 +143,6 @@ fi
 if grep -qv "graphical.target" <<< "$(systemctl get-default)"; then
   systemctl set-default graphical.target
 fi
-
 
 # Usbguard setup
 #if [[ ! -d /var/log/usbguard ]]; then
