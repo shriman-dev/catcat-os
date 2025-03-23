@@ -122,8 +122,9 @@ fi
 
 # FIXES
 # to use dnscrypt-proxy
-if systemctl is-enabled dnscrypt-proxy.service && [[ ! -f /etc/resolv.conf.bak ]]; then
-  rm /etc/resolv.conf
+if systemctl is-enabled dnscrypt-proxy.service && grep 'nameserver 127.0.0.1' /etc/resolv.conf; then
+  chattr -i /etc/resolv.conf
+  mv /etc/resolv.conf /etc/resolv.conf.bak
   sh -c "echo 'nameserver 127.0.0.1
 nameserver ::1
 options edns0' > /etc/resolv.conf"

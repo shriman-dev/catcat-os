@@ -717,14 +717,14 @@ log_format = 'tsv'
 #    refresh_delay = 73
 #    prefix = ''
 
-#  ### Anonymized DNS relays
+  ### Anonymized DNS relays
 
-#  [sources.relays]
-#    urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/relays.md', 'https://download.dnscrypt.info/resolvers-list/v3/relays.md']
-#    cache_file = 'relays.md'
-#    minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
-#    refresh_delay = 73
-#    prefix = ''
+  [sources.relays]
+    urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/relays.md', 'https://download.dnscrypt.info/resolvers-list/v3/relays.md']
+    cache_file = 'relays.md'
+    minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+    refresh_delay = 73
+    prefix = ''
 
   ### ODoH (Oblivious DoH) servers and relays
 
@@ -841,15 +841,14 @@ fragments_blocked = ['cisco', 'cisco-ipv6', 'cisco-familyshield', 'cisco-familys
 ## select (relay,server) pairs that work well and fit your own criteria (close by or
 ## in different countries, operated by different entities, on distinct ISPs...)
 
-# routes = [
-#    { server_name='example-server-1', via=['anon-example-1', 'anon-example-2'] },
-#    { server_name='example-server-2', via=['sdns://gRIxMzcuNzQuMjIzLjIzNDo0NDM'] }
-# ]
+#routes = [
+#   { server_name='*', via=['dnscry.pt-anon-*'] }
+#]
 
 
 ## Skip resolvers incompatible with anonymization instead of using them directly
 
-skip_incompatible = false
+skip_incompatible = true
 
 
 ## If public server certificates for a non-conformant server cannot be
