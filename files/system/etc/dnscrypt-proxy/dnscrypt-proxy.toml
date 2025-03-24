@@ -29,7 +29,8 @@
 ##
 ## Remove the leading # first to enable this; lines starting with # are ignored.
 
-server_names = ['NextDNS-ultralow', 'Quad9', 'AdGuard', 'MullvadDNS-base', 'ControlD-p2']
+server_names = ['quad9-dnscrypt-ip4-filter-pri', 'quad9-dnscrypt-ip6-filter-pri']
+#['nextdns-ultralow', 'adguard-dns', 'controld-block-malware-ad', 'mullvad-base-doh']
 
 ## List of local addresses and ports to listen to. Can be IPv4 and/or IPv6.
 ## Example with both IPv4 and IPv6:
@@ -60,13 +61,13 @@ max_clients = 250
 ipv4_servers = true
 
 # Use servers reachable over IPv6 -- Do not enable if you don't have IPv6 connectivity
-ipv6_servers = false
+ipv6_servers = true
 
 # Use servers implementing the DNSCrypt protocol
 dnscrypt_servers = true
 
 # Use servers implementing the DNS-over-HTTPS protocol
-doh_servers = true
+doh_servers = false
 
 # Use servers implementing the Oblivious DoH protocol
 odoh_servers = false
@@ -81,7 +82,7 @@ require_dnssec = true
 require_nolog = true
 
 # Server must not enforce its own blocklist (for parental control, ads blocking...)
-require_nofilter = true
+require_nofilter = false
 
 # Server names to avoid even if they match all criteria
 disabled_server_names = []
@@ -161,7 +162,7 @@ lb_strategy = 'first'
 
 ## Log level (0-6, default: 2 - 0 is very verbose, 6 only contains fatal errors)
 
-log_level = 2
+log_level = 1
 
 
 ## Log file for the application, as an alternative to sending logs to
@@ -267,7 +268,7 @@ cert_refresh_delay = 240
 ## not be sent there. If you're using DNSCrypt or Anonymized DNS and your
 ## lists are up to date, these resolvers will not even be used.
 
-bootstrap_resolvers = ['9.9.9.11:53', '2620:fe::fe:11']
+bootstrap_resolvers = ['9.9.9.9:53', '[2620:fe::fe]:53']
 
 
 ## When internal DNS resolution is required, for example to retrieve
@@ -506,7 +507,7 @@ format = 'tsv'
 
 ## Do not log these query types, to reduce verbosity. Keep empty to log everything.
 
-# ignored_qtypes = ['DNSKEY', 'NS']
+ignored_qtypes = ['DNSKEY', 'NS']
 
 
 
@@ -710,12 +711,12 @@ log_format = 'tsv'
 
   ### An example of a remote source from https://github.com/DNSCrypt/dnscrypt-resolvers
 
-#  [sources.public-resolvers]
-#    urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md', 'https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md']
-#    cache_file = 'public-resolvers.md'
-#    minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
-#    refresh_delay = 73
-#    prefix = ''
+  [sources.public-resolvers]
+    urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md', 'https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md']
+    cache_file = 'public-resolvers.md'
+    minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+    refresh_delay = 73
+    prefix = ''
 
   ### Anonymized DNS relays
 
@@ -728,18 +729,18 @@ log_format = 'tsv'
 
   ### ODoH (Oblivious DoH) servers and relays
 
-  # [sources.odoh-servers]
-  #   urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-servers.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-servers.md']
-  #   cache_file = 'odoh-servers.md'
-  #   minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
-  #   refresh_delay = 73
-  #   prefix = ''
-  # [sources.odoh-relays]
-  #   urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-relays.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-relays.md']
-  #   cache_file = 'odoh-relays.md'
-  #   minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
-  #   refresh_delay = 73
-  #   prefix = ''
+#   [sources.odoh-servers]
+#     urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-servers.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-servers.md']
+#     cache_file = 'odoh-servers.md'
+#     minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+#     refresh_delay = 73
+#     prefix = ''
+#   [sources.odoh-relays]
+#     urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-relays.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-relays.md']
+#     cache_file = 'odoh-relays.md'
+#     minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+#     refresh_delay = 73
+#     prefix = ''
 
   ### Quad9
 
@@ -842,9 +843,9 @@ fragments_blocked = ['cisco', 'cisco-ipv6', 'cisco-familyshield', 'cisco-familys
 ## in different countries, operated by different entities, on distinct ISPs...)
 
 #routes = [
-#   { server_name='*', via=['dnscry.pt-anon-*'] }
+#  { server_name = 'quad9-dnscrypt-ip4-filter-pri', via=['anon-cs-fr'] }
+#  { server_name = 'quad9-dnscrypt-ip6-filter-ecs-pri', via=['anon-cs-fr'] }
 #]
-
 
 ## Skip resolvers incompatible with anonymization instead of using them directly
 
@@ -903,19 +904,6 @@ skip_incompatible = true
 
 [static]
 
-#  [static.'NextDNS-ultralow']
-#  stamp = 'sdns://AgcAAAAAAAAAACCaOjT3J965vKUQA9nOnDn48n3ZxSQpAcK6saROY1oCGQ5kbnMubmV4dGRucy5pbw8vZG5zY3J5cHQtcHJveHk'
 
-  [static.'Quad9']
-  stamp = 'sdns://AQMAAAAAAAAADTkuOS45LjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA'
-
-#  [static.'AdGuard']
-#  stamp = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20'
-
-#  [static.'MullvadDNS-base']
-#  stamp = 'sdns://AgMAAAAAAAAACzE5NC4yNDIuMi40ABRiYXNlLmRucy5tdWxsdmFkLm5ldAovZG5zLXF1ZXJ5'
-
-#  [static.'ControlD-p2']
-#  stamp = 'sdns://AgcAAAAAAAAACjc2Ljc2LjIuMTEAFGZyZWVkbnMuY29udHJvbGQuY29tAy9wMg'
 
 
