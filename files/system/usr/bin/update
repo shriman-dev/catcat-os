@@ -50,15 +50,14 @@ updateDNSBlocklist() {
   echo "----------DNS blocklist update----------"
   echo ""
 
-  
-  curl -sLo /tmp/domains-without-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains-without-subdomains.tar.zst
+  curl -sLo /tmp/domains-filtered-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains.d/domains-filtered-subdomains.tar.zst
 
   sudo sh -c '
     rm /etc/dnscrypt-proxy/blocked-names.txt
-    tar --use-compress-program "zstd -d" -xvf "/tmp/domains-without-subdomains.tar.zst" -C /tmp/
-    cp -df /tmp/domains-without-subdomains /etc/dnscrypt-proxy/blocked-names.txt
+    tar --use-compress-program "zstd -d" -xvf "/tmp/domains-filtered-subdomains.tar.zst" -C /tmp/
+    cp -df /tmp/domains-filtered-subdomains.txt /etc/dnscrypt-proxy/blocked-names.txt
   '
-  rm /tmp/domains-without-subdomains
+  rm /tmp/domains-filtered-subdomains.txt
 
 }
 
