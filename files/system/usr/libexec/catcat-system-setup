@@ -122,7 +122,7 @@ fi
 
 # FIXES
 # to use dnscrypt-proxy
-ln -sf /etc/resolv.conf.dnscrypt /etc/resolv.conf
+systemctl is-enabled dnscrypt-proxy.service && ln -sf /etc/resolv.conf.dnscrypt /etc/resolv.conf
 
 #if systemctl is-enabled dnscrypt-proxy.service; then
 #  chattr -i /etc/resolv.conf
