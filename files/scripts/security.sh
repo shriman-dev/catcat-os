@@ -48,7 +48,8 @@ systemctl -f enable dnscrypt-proxy.service
 systemctl disable systemd-resolved.service
 
 mkdir -p /usr/share/dnscrypt-proxy
-curl -Lo /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains.d/domains-filtered-subdomains.tar.zst
+curl -Lo /tmp/domains-filtered-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains.d/domains-filtered-subdomains.tar.zst
+split -dC 5M /tmp/domains-filtered-subdomains.tar.zst /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst
 
 
 

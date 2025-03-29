@@ -99,7 +99,7 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   /usr/bin/systemd-tmpfiles --clean
 
   rm /etc/dnscrypt-proxy/blocked-names.txt
-  tar --use-compress-program "zstd -d" -xvf "/usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst" -C /tmp/
+  cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/ --zstd -xvf -
   cp -df /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/blocked-names.txt
   rm /tmp/domains-without-subdomains*
 
