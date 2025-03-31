@@ -56,8 +56,8 @@ updateDNSBlocklist() {
     rm /etc/dnscrypt-proxy/blocked-names.txt
     tar --use-compress-program "zstd -d" -xvf "/tmp/domains-filtered-subdomains.tar.zst" -C /tmp/
     cp -df /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/blocked-names.txt
+    rm /tmp/domains-filtered-subdomains*
   '
-  rm /tmp/domains-filtered-subdomains*
 
 }
 
