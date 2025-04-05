@@ -54,6 +54,7 @@ alias fcc="fc-cache -fvr --really-force "
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
 alias wget='wget -c '
+alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias psmem='procs --sortd rss'
 alias pscpu='procs --sortd cpu'
 alias pstree='procs --tree'

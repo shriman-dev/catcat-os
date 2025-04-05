@@ -1,16 +1,23 @@
 [[columns]]
+kind = "StartTime"
+style = "BrightMagenta|Magenta"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
 kind = "Pid"
 style = "BrightYellow|Yellow"
 numeric_search = true
 nonnumeric_search = false
-align = "Right"
+align = "Left"
 
 [[columns]]
 kind = "User"
 style = "BrightGreen|Green"
 numeric_search = false
 nonnumeric_search = true
-align = "Center"
+align = "Left"
 
 [[columns]]
 kind = "Uid"
@@ -59,6 +66,13 @@ align = "Left"
 header = "Mem"
 
 [[columns]]
+kind = "VmSwap"
+style = "ByUnit"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
 kind = "Separator"
 style = "White|BrightBlack"
 numeric_search = false
@@ -81,22 +95,15 @@ nonnumeric_search = false
 align = "Left"
 
 [[columns]]
+kind = "Command"
+style = "BrightWhite|Black"
+numeric_search = false
+nonnumeric_search = true
+align = "Left"
+
+[[columns]]
 kind = "CpuTime"
 style = "BrightCyan|Cyan"
-numeric_search = false
-nonnumeric_search = false
-align = "Left"
-
-[[columns]]
-kind = "StartTime"
-style = "BrightMagenta|Magenta"
-numeric_search = false
-nonnumeric_search = false
-align = "Left"
-
-[[columns]]
-kind = "VmSwap"
-style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
 align = "Left"
@@ -169,13 +176,6 @@ align = "Left"
 [[columns]]
 kind = "Docker"
 style = "BrightGreen|Green"
-numeric_search = false
-nonnumeric_search = true
-align = "Left"
-
-[[columns]]
-kind = "Command"
-style = "BrightWhite|Black"
 numeric_search = false
 nonnumeric_search = true
 align = "Left"
