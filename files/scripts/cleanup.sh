@@ -52,9 +52,10 @@ rm -rvf /etc/skel/*
 rm -rvf /usr/etc/skel/*
 
 rm -rvf /usr/share/glib-2.0/schemas/zz*
+rm -vf /etc/profile.d/bazzite-neofetch.sh
+rm -vf /usr/share/fish/vendor_conf.d/brew.fish
 rm -vf /usr/share/fish/vendor_conf.d/nano-default-editor.fish
 rm -vf /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
-rm -vf /etc/profile.d/bazzite-neofetch.sh
 rm -vf /usr/share/fish/functions/fish_greeting.fish
 rm -vf /usr/share/applications/gnome-ssh-askpass.desktop
 rm -vf /usr/share/applications/bazzite-steam-bpm.desktop

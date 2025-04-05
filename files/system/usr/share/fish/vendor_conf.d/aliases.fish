@@ -1,79 +1,10 @@
-
-# Hide welcome message
-set fish_greeting
-set VIRTUAL_ENV_DISABLE_PROMPT "1"
-
-# PATHS
-set -g paths_to_add "/usr/games" "$HOME/bin" "$HOME/.local/bin" "$HOME/.local/bin2" "$HOME/.local/podman/bin" "$HOME/.cargo/bin" "$HOME/Android/platform-tools" "$HOME/Android/cmdline-tools/bin"
-
-for path in $paths_to_add
-  if not contains -- $path $PATH
-    set -g PATH "$path:$PATH"
-  end
-end
-
-## Set vars
-#set -x QT_QPA_PLATFORMTHEME "qt5ct"
-#set -x QT_QPA_PLATFORM "xcb"
-set -x MICRO_TRUECOLOR 1
-set -x NIXPKGS_ALLOW_UNFREE 1
-set -x ni "$HOME/.local/state/nix/profiles/profile/bin"
-
-# Set var for android home
-if test -d $HOME/.local/share/waydroid/data/media/0
-  set -x ANH "$HOME/.local/share/waydroid/data/media/0"
-else
-  set -x ANH "/storage/emulated/0"
-end
-
-# Set manpage colors
-set -x MANROFFOPT "-c"
-set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-
-# Set settings for https://github.com/franciscolourenco/done
-set -U __done_min_cmd_duration 10000
-set -U __done_notification_urgency_level low
-
-# python ta-lib
-set -x TA_INCLUDE_PATH "$HOME/.local/state/nix/profiles/profile/include"
-set -x TA_LIBRARY_PATH "$HOME/.local/state/nix/profiles/profile/lib"
-
-## Environment setup
-# Apply .profile: use this to put fish compatible .profile stuff in
-
-if test -f $HOME/.fish_profile
-  source $HOME/.fish_profile
-end
-
-# Replace user home path in history with $HOME variable
-sed -i -e "s|'/var/home/$USER\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"/var/home/$USER"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"/var/home/$USER"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1
-sed -i -e "s|'$HOME\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"$HOME"'\([^"]*\)"|"$HOME\1"|g' -e 's|'"$HOME"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1
-
-## Run fastfetch if session is interactive
-if status --is-interactive && type -q fastfetch
-  test -f /usr/bin/fastfetch && /usr/bin/fastfetch || fastfetch
-end
-
-## Starship prompt
-if not test -f $HOME/.config/starship.toml
-  set -x STARSHIP_CONFIG '/etc/starship/starship.toml'
-end
-
-function starship_transient_rprompt_func
-  starship module time
-end
-#function starship_transient_prompt_func
-#  starship module status
-#end
-
-if status --is-interactive
-  command -vq starship && source ("starship" init fish --print-full-init | psub) && enable_transience
-end
-
-# Set up fzf key bindings
-fzf --fish | source
-
+test -f $HOME/.config/fish/conf.d/aliases.fish && status filename | grep -q 'vendor_conf.d' && exit 0
 ## Useful aliases
+# Fish command history
+function history
+    builtin history --show-time='%F %T '
+end
+
 # Common use
 function grubup
     if command -v update-grub
@@ -103,7 +34,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
-alias killall='pkill -KILL -fe'
+alias killit='pkill -KILL -fe'
 alias grep='grep --color=always'
 alias dir='dir --color=always'
 alias vdir='vdir --color=always'
@@ -233,69 +164,3 @@ alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacma
 alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
 alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
 alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
-
-
-
-## Advanced command-not-found hook
-#source /usr/share/doc/find-the-command/ftc.fish
-
-
-## Functions
-# Functions needed for !! and !$ https://github.com/oh-my-fish/plugin-bang-bang
-function __history_previous_command
-  switch (commandline -t)
-  case "!"
-    commandline -t $history[1]; commandline -f repaint
-  case "*"
-    commandline -i !
-  end
-end
-
-function __history_previous_command_arguments
-  switch (commandline -t)
-  case "!"
-    commandline -t ""
-    commandline -f history-token-search-backward
-  case "*"
-    commandline -i '$'
-  end
-end
-
-if [ "$fish_key_bindings" = fish_vi_key_bindings ];
-  bind -Minsert ! __history_previous_command
-  bind -Minsert '$' __history_previous_command_arguments
-else
-  bind ! __history_previous_command
-  bind '$' __history_previous_command_arguments
-end
-
-# Fish command history
-function history
-    builtin history --show-time='%F %T '
-end
-
-function backup --argument filename
-    cp $filename $filename.bak
-end
-
-# Copy DIR1 DIR2
-function copy
-    set count (count $argv | tr -d \n)
-    if test "$count" = 2; and test -d "$argv[1]"
-	set from (echo $argv[1] | trim-right /)
-	set to (echo $argv[2])
-        command cp -r $from $to
-    else
-        command cp $argv
-    end
-end
-
-if test -f "$HOME/.local/anaconda3/etc/fish/conf.d/conda.fish"
-    source "$HOME/.local/anaconda3/etc/fish/conf.d/conda.fish"
-    command -vq conda && conda deactivate
-end
-
-if test -f "$HOME/.local/miniconda3/etc/fish/conf.d/conda.fish"
-    source "$HOME/.local/miniconda3/etc/fish/conf.d/conda.fish"
-    command -vq conda && conda deactivate
-end

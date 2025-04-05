@@ -89,13 +89,6 @@ $(find ${workDir}/theme/ -type f -not -wholename '*.gresource*' -printf '    <fi
 }
 
 defaultConfigs() {
-  mkdir -p /etc/fastfetch/
-  cp -dvrf /etc/skel/.config/fastfetch/* /etc/fastfetch/
-  cp -dvrf /etc/skel/.config/Kvantum/* /usr/share/Kvantum/
-  cp -dvrf /etc/skel/.config/qt5ct/* /usr/share/qt5ct/
-  cp -dvrf /etc/skel/.config/qt6ct/* /usr/share/qt6ct/
-
-
   # install extensions for vscodium
   mkdir -p /etc/skel/.vscode-oss/extensions
   mkdir -p /tmp/vscodiumdata
