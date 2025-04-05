@@ -3,9 +3,6 @@ test -f $HOME/.config/fish/conf.d/envar.fish && status filename | grep -q 'vendo
 set fish_greeting
 set VIRTUAL_ENV_DISABLE_PROMPT "1"
 
-#set -x QT_QPA_PLATFORMTHEME "qt5ct"
-#set -x QT_QPA_PLATFORM "xcb"
-#set -x MICRO_TRUECOLOR 1
 set -gx NIXPKGS_ALLOW_UNFREE 1
 set -gx ni "$HOME/.local/state/nix/profiles/profile/bin"
 
