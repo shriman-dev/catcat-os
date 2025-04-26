@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Icon=hubstaff-green
+NoDisplay=false
+Exec=ghostty -e cbonsai
+X-GNOME-UsesNotifications=false
+Name=Cbonsai

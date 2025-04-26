@@ -1,0 +1,41 @@
+#!/bin/bash
+
+FLATPAK_APPS_TO_UPDATE_SOLEY=(
+  "io.gitlab.librewolf-community"
+  "com.brave.Browser"
+  "org.gnome.Epiphany"
+  "org.garudalinux.firedragon"
+  "org.torproject.torbrowser-launcher"
+)
+
+for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
+  /usr/bin/flatpak update --assumeyes --noninteractive "$APP"
+done
+
+
+notifyAll() {
+  for SOME_USER in /run/user/*; do
+    SOME_USER=$(basename "$SOME_USER")
+    sudo -u $(id -u -n "$SOME_USER") \
+        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -i '/usr/share/pixmaps/catcat-os-logo.svg' -a "CatCat OS Update" "$1"
+  done
+}
+
+
+# two weeks = 1209600
+# one week = 604800
+# update if system is one weeks old
+if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update.log) -lt $(( $(date +%s) - 604800 )) ]]; then
+  notifyAll "Automatic weekly update has started."
+
+  date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
+
+  /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
+
+  if [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
+    /usr/bin/update >> /etc/catcat-os/last-auto-update.log
+  fi
+
+  notifyAll "Automatic weekly update is done."
+fi
+

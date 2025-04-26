@@ -1,0 +1,83 @@
+[org/gnome/desktop/app-folders]
+folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
+
+[org/gnome/desktop/app-folders/folders/FileViewers]
+apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'org.gnome.Showtime.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'org.gnome.Decibels.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'app.drey.EarTag.desktop', 'de.leopoldluley.Clapgrep.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.Music.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop']
+name='File Viewers'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Creative]
+apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.upscayl.Upscayl.desktop', 'io.gitlab.adhami3310.Footage.desktop', 'org.pitivi.Pitivi.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'org.inkscape.Inkscape.desktop', 'com.boxy_svg.BoxySVG.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.shotcut.Shotcut.desktop', 'org.gimp.GIMP.desktop', 'fr.handbrake.ghb.desktop', 'org.libreoffice.LibreOffice.draw.desktop']
+name='Creative'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Docs]
+apps=['org.onlyoffice.desktopeditors.desktop', 'org.gnome.gedit.desktop', 'org.gnome.World.Iotas.desktop', 'com.github.johnfactotum.Foliate.desktop', 'garden.jamie.Morphosis.desktop', 'com.github.flxzt.rnote.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.x.editor.desktop']
+name='Docs'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Net]
+apps=['io.gitlab.librewolf-community.desktop', 'org.signal.Signal.desktop', 'io.freetubeapp.FreeTube.desktop', 'io.github.giantpinkrobots.varia.desktop', 'org.gnome.Epiphany.desktop', 'com.brave.Browser.desktop', 'xyz.armcord.ArmCord.desktop',  'webapp-manager.desktop', 'org.garudalinux.firedragon.desktop']
+name='Net'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Stores]
+apps=['org.gnome.Software.desktop', 'io.github.flattool.Warehouse.desktop', 'system-update.desktop', 'autostart.desktop']
+name='Stores'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Sysmon]
+apps=['net.nokyan.Resources.desktop', 'org.gnome.Logs.desktop', 'io.missioncenter.MissionCenter.desktop', 'btop.desktop', 'htop.desktop', 'org.gnome.SystemMonitor.desktop', 'nvtop.desktop']
+name='Sysmon'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/DiskBackup]
+apps=['org.gnome.DiskUtility.desktop', 'org.gnome.baobab.desktop', 'gparted.desktop', 'org.gnome.World.PikaBackup.desktop', 'io.github.mpobaschnig.Vaults.desktop', 'btrfs-assistant.desktop', 'org.kde.filelight.desktop']
+name='Disk & Backup'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/SysSecurity]
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'com.github.wwmm.easyeffects.desktop', 'org.gnome.Ptyxis.desktop', 'com.mitchellh.ghostty.desktop', 'com.github.amezin.ddterm.desktop', 'org.gnome.Terminal.desktop', 'app.drey.KeyRack.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'mcontrolcenter.desktop', 'org.wireshark.Wireshark.desktop']
+name='Sys & Security'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/VMTainer]
+apps=['org.gnome.Boxes.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'Waydroid.desktop', 'virt-manager.desktop', 'waydroid-container-restart.desktop']
+name='VM-Tainer'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Utils]
+apps=['org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Weather.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Snapshot.desktop', 'org.gnome.SoundRecorder.desktop', 'org.nickvision.cavalier.desktop', 'com.dec05eba.gpu_screen_recorder.desktop', 'org.gnome.Characters.desktop', 'net.codelogistics.clicker.desktop', 'com.belmoussaoui.Decoder.desktop', 're.sonny.Junction.desktop', 'net.sapples.LiveCaptions.desktop']
+name='Utils'
+translate=false
+
+
+[org/gnome/desktop/app-folders/folders/Tweaks]
+apps=['org.gnome.tweaks.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'ca.desrt.dconf-editor.desktop', 'menulibre.desktop', 'com.github.wwmm.easyeffects.desktop', 'io.github.flattool.Ignition.desktop', 'kvantummanager.desktop', 'qt5ct.desktop', 'qt6ct.desktop', 'io.github.realmazharhussain.GdmSettings.desktop', 'containerized-org.gnome.Adwaita1.Demo.desktop', 'awf-gtk2.desktop', 'awf-gtk3.desktop', 'awf-gtk4.desktop', 'yad-icon-browser.desktop']
+name='Tweaks'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/ProdDevel]
+apps=['codium.desktop', 'dev.zed.Zed.desktop', 'se.sjoerd.Graphs.desktop', 'io.github.efogdev.mpris-timer.desktop', 'me.iepure.devtoolbox.desktop', 'io.github.mrvladus.List.desktop', 'com.vixalien.sticky.desktop', 'com.logseq.Logseq.desktop', 'nvim.desktop', 'micro.desktop']
+name='Prod & Devel'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Gaming]
+apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'io.github.ryubing.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop']
+name='Gaming'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Tools]
+apps=['syncthing-ui.desktop', 'org.gnome.World.Secrets.desktop', 'org.localsend.localsend_app.desktop', 'scrcpy-console.desktop', 'com.github.tenderowl.frog.desktop', 'syncthing-start.desktop', 'scrcpy.desktop']
+name='Tools'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Optimize]
+apps=['io.github.giantpinkrobots.flatsweep.desktop', 'org.bleachbit.BleachBit.desktop', 'com.github.hannesschulze.optimizer.desktop']
+name='Optimize'
+translate=false
+
+[org/gnome/desktop/app-folders/folders/Others]
+apps=['oneko.desktop', 'Cmatrix.desktop', 'Asciiquarium.desktop', 'Pipes.desktop', 'Cmatrix_Bold_Rainbow.desktop', 'Cbonsai.desktop', 'com.github.alex11br.themechanger.desktop', 'bazzite-documentation.desktop', 'yelp.desktop', 'discourse.desktop', 'yafti.desktop', 'discover_overlay_configure.desktop', 'org.gnome.Tour.desktop']
+name='Others'
+translate=false

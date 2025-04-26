@@ -1,0 +1,10 @@
+[com/usebottles/bottles]
+startup-view='page_list'
+force-offline=false
+show-sandbox-warning=false
+update-date=true
+temp=true
+experiments-sandbox=true
+release-candidate=true
+auto-close-bottles=true
+steam-proton-support=true

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Icon=a7800
+NoDisplay=false
+Exec=ghostty -e pipes.sh -R -t 1 -p 3 -s 9 -r 90000 -f 100
+X-GNOME-UsesNotifications=false
+Name=Pipes

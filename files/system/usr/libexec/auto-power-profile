@@ -1,0 +1,63 @@
+#!/bin/bash
+
+setPowerProfile() {
+  echo "Setting power profile to: ${1}"
+  local profile=${1}
+  local power_policy='/sys/module/pcie_aspm/parameters/policy'
+  #/sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference
+  #scaling_governor='/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+  #intel_turbo='/sys/devices/system/cpu/intel_pstate/no_turbo'
+  #boosto='/sys/devices/system/cpu/cpufreq/boost'
+
+  case $profile in
+    "powersave")
+      command -v powerprofilesctl && powerprofilesctl set power-saver
+      command -v tuned-adm && tuned-adm profile powersave
+      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 0
+      [[ -f $power_policy ]] && echo "powersupersave" | tee $power_policy
+      ;;
+    "performance")
+      command -v powerprofilesctl && powerprofilesctl set performance
+      command -v tuned-adm && tuned-adm profile throughput-performance
+      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 1
+      [[ -f $power_policy ]] && echo "performance" | tee $power_policy
+      ;;
+    "balanced")
+      command -v powerprofilesctl && powerprofilesctl set balanced
+      command -v tuned-adm && tuned-adm profile balanced
+      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 1
+      [[ -f $power_policy ]] && echo "default" | tee $power_policy
+      ;;
+    *)
+      echo "Unknown power profile: $profile"
+      ;;
+  esac
+}
+
+previous_profile=""
+system_load_threshold=2
+
+while true; do
+  system_load=$(awk '{print int($1)}' /proc/loadavg)
+  current_power_state=$(upower -d | grep -iE 'state.*discharging')
+  override_profile=$OVERRIDE_POWER_PROFILE
+
+  # Determine the target profile based on system load and power state
+  if [[ -z "$override_profile" ]]; then
+    [[ -n "$current_power_state" ]] && target_profile="powersave" || {
+      [[ $system_load -gt $system_load_threshold ]] && target_profile="performance" || target_profile="balanced"
+    }
+  else
+    # If an override profile is set, use it
+    target_profile=$override_profile
+  fi
+
+  # Change the power profile if the target profile is different from the previous one
+  [[ "$target_profile" != "$previous_profile" ]] && {
+    setPowerProfile "$target_profile"
+    previous_profile=$target_profile
+  }
+
+  sleep 30s
+done
+

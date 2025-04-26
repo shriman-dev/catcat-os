@@ -1,0 +1,8 @@
+colourful: true
+
+filekinds:
+  directory: {foreground: "#FAB387"}
+  symlink: {foreground: "#ffe8b5"}
+  mount_point: {foreground: "#FAB387"}
+
+symlink_path: {foreground: "#FAB387"}

@@ -1,0 +1,158 @@
+#!/bin/bash
+run_as_users() {
+  for SOME_USER in /run/user/*; do
+    SOME_USER=$(basename "$SOME_USER")
+    if [[ ! "$SOME_USER" == "0" ]]; then
+      sudo -u $(id -u -n "$SOME_USER") bash -c "$(declare -f $@); $@"
+    fi
+  done
+}
+
+
+update_flatpak() {
+  local scope="--user"
+  [[ $(id -u) -eq 0 ]] && scope="--system"
+
+  echo -e "\n----------Flatpak ${scope:2} update----------\n"
+
+  /usr/bin/flatpak update $scope --assumeyes --noninteractive --appstream
+  /usr/bin/flatpak update $scope --assumeyes --noninteractive
+  /usr/bin/flatpak uninstall $scope --unused --assumeyes --noninteractive >/dev/null 2>&1
+
+  echo -e "\nRunning flatpak repair"
+  /usr/bin/flatpak repair $scope
+}
+
+update_nixpkg() {
+  local scope="user"
+  local cmdpath="$HOME/.local/state/nix/profile/bin"
+
+  [[ $(id -u) -eq 0 ]] && {
+    scope="global"
+    cmdpath="/nix/var/nix/profiles/default/bin"
+  }
+
+  if [[ -x "${cmdpath}/nix-env" ]]; then
+    echo -e "\n----------Nixpkg $scope update----------\n"
+
+    ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
+    ${cmdpath}/nix-store --optimise >/dev/null 2>&1
+    ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
+  fi
+}
+
+update_dns_blocklist() {
+  echo -e "\n----------DNS blocklist update----------\n"
+  /usr/bin/localdnsctl -v -u
+
+}
+
+update_firmware() {
+  echo -e "\n----------Firmware update----------\n"
+
+  sudo sh -c '
+    /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
+    /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
+    /usr/bin/fwupdmgr -y update
+  '
+}
+
+update_system() {
+  echo -e "\n----------System update----------\n"
+
+  if [[ $(id -u) -eq 0 ]]; then
+    bootc upgrade --quiet
+    rpm-ostree db diff --changelogs
+    rpm-ostree cleanup -bm &>/dev/null
+    ostree prune &>/dev/null
+    systemd-tmpfiles --clean &>/dev/null
+  else
+    rpm-ostree upgrade
+  fi
+}
+
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [command1] [command2] [command3] ...
+
+Available commands:
+    all            Perform all update operations (system, firmware, DNS blocklist, 
+                   Flatpak, and Nixpkg updates for all users)
+
+    extra          Update Flatpak and Nixpkg for all users
+                   If run as root, also updates firmware and DNS blocklist
+
+    flat-nix       Update both Flatpak and Nixpkg for current user
+
+    flatpak        Update Flatpak packages for current user
+                   If run as root, updates system-wide packages
+
+    nixpkg         Update Nixpkg packages for current user
+                   If run as root, updates system-wide packages
+
+    dns-blocklist  Update DNS blocklist (requires root privileges)
+
+    system         Update system packages (default if no command is provided)
+
+    help           Display this help message
+
+Note: Multiple commands can be provided and will be executed in sequence.
+      Some operations require root privileges to update system-wide packages.
+
+EOF
+}
+
+process_command() {
+    case "$1" in
+        "all")
+            update_system
+            update_firmware
+            update_dns_blocklist
+            update_flatpak
+            update_nixpkg
+            [[ $(id -u) -eq 0 ]] && run_as_users update_flatpak
+            [[ $(id -u) -eq 0 ]] && run_as_users update_nixpkg
+            ;;
+        "extra")
+            update_flatpak
+            update_nixpkg
+            [[ $(id -u) -eq 0 ]] && run_as_users update_flatpak
+            [[ $(id -u) -eq 0 ]] && run_as_users update_nixpkg
+            [[ $(id -u) -eq 0 ]] && { update_firmware; update_dns_blocklist; }
+            ;;
+        "flat-nix")
+            update_flatpak
+            update_nixpkg
+            ;;
+        "flatpak")
+            update_flatpak
+            ;;
+        "nixpkg")
+            update_nixpkg
+            ;;
+        "dns-blocklist")
+            update_dns_blocklist
+            ;;
+        "system")
+            update_system
+            ;;
+        "help")
+            show_help
+            ;;
+        *)
+            echo "Error: Unknown command $1"
+            echo "Run $(basename $0) help for usage information"
+            return 1
+            ;;
+    esac
+}
+
+if [[ $# -eq 0 ]]; then
+    update_system
+    exit 0
+fi
+
+# Process all provided arguments
+for arg in "$@"; do
+    process_command "$arg" || exit 1
+done

@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+# remove useless logs, dirs or files
+[[ -d /home/linuxbrew ]] && rm -rf /home/linuxbrew
+
+
+# one week = 604800
+if [[ $(stat -c "%Y" /etc/catcat-os/last_cleanup) -lt $(( $(date +%s) - 604800 )) ]]; then
+  # system clean up
+  /usr/bin/podman image prune -af
+  /usr/bin/podman volume prune -f
+  /usr/bin/systemd-tmpfiles --clean
+  /usr/bin/flatpak uninstall --assumeyes --noninteractive
+
+  # delete dns logs older than 3 months
+  /usr/bin/localdnsctl -v --flush-logs
+
+  date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last_cleanup
+fi

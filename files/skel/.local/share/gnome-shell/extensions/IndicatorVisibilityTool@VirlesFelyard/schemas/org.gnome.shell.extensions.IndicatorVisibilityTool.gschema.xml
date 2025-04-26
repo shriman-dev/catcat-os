@@ -1,0 +1,64 @@
+<schemalist>
+    <schema id="org.gnome.shell.extensions.IndicatorVisibilityTool" path="/org/gnome/shell/extensions/IndicatorVisibilityTool/">
+        <key name="system-mode" type="s">
+            <default>'default'</default>
+            <summary>System Mode</summary>
+            <description>Controls visibility of the system indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="unsafe-mode" type="s">
+            <default>'default'</default>
+            <summary>Unsafe Mode</summary>
+            <description>Controls visibility of the unsafe indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="volume-output-mode" type="s">
+            <default>'default'</default>
+            <summary>Volume Output Mode</summary>
+            <description>Controls visibility of the volume output indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="rfkill-mode" type="s">
+            <default>'default'</default>
+            <summary>RFKill Mode</summary>
+            <description>Controls visibility of the rfkill indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="bluetooth-mode" type="s">
+            <default>'default'</default>
+            <summary>Bluetooth Mode</summary>
+            <description>Controls visibility of the bluetooth indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="network-mode" type="s">
+            <default>'default'</default>
+            <summary>Network Mode</summary>
+            <description>Controls visibility of the network indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="night-light-mode" type="s">
+            <default>'default'</default>
+            <summary>Night Light Mode</summary>
+            <description>Controls visibility of the night light indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="thunderbolt-mode" type="s">
+            <default>'default'</default>
+            <summary>Thunderbolt Mode</summary>
+            <description>Controls visibility of the thunderbolt indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="location-mode" type="s">
+            <default>'default'</default>
+            <summary>Location Mode</summary>
+            <description>Controls visibility of the location indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="volume-input-mode" type="s">
+            <default>'default'</default>
+            <summary>Volume Input Mode</summary>
+            <description>Controls visibility of the volume input indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="camera-mode" type="s">
+            <default>'default'</default>
+            <summary>Camera Mode</summary>
+            <description>Controls visibility of the camera indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+        <key name="remote-access-mode" type="s">
+            <default>'default'</default>
+            <summary>Remote Access Mode</summary>
+            <description>Controls visibility of the remote access indicator: 'hidden' to forcibly hide, 'shown' to forcibly show, and 'default' allows the system to manage it.</description>
+        </key>
+    </schema>
+</schemalist>

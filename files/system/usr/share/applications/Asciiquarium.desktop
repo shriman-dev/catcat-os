@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Icon=bluefish
+NoDisplay=false
+Exec=ghostty -e asciiquarium
+X-GNOME-UsesNotifications=false
+Name=Asciiquarium

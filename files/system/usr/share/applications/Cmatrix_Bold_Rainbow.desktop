@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Icon=calligraflow
+NoDisplay=false
+Exec=ghostty -e cmatrix -br
+X-GNOME-UsesNotifications=false
+Name=Cmatrix Rainbow
