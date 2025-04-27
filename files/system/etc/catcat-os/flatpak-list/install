@@ -1,5 +1,6 @@
 # fileViewers
-app/org.gnome.eog/x86_64/stable
+#app/org.gnome.eog/x86_64/stable
+app/org.gnome.Loupe/x86_64/stable
 app/app.fotema.Fotema/x86_64/stable
 app/org.gnome.Papers/x86_64/stable
 app/org.gnome.FileRoller/x86_64/stable
@@ -100,6 +101,10 @@ runtime/org.kde.KStyle.Kvantum/x86_64/5.15-23.08
 runtime/org.kde.KStyle.Kvantum/x86_64/5.15-22.08
 runtime/org.kde.KStyle.Kvantum/x86_64/5.15-21.08
 runtime/org.kde.KStyle.Kvantum/x86_64/5.15
+runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/24.08
+runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/23.08
+runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/22.08
+runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/21.08
 runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/24.08
 runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/23.08
 runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/22.08

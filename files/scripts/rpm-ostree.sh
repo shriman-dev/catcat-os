@@ -5,7 +5,7 @@ echo -e "\n$0\n"
 addRepos() {
 cd /etc/yum.repos.d/
 
-curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
+#curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
 
 
 dnf5 -y copr enable atim/starship

@@ -1,2 +1,0 @@
-[Context]
-filesystems=host-etc;home;host-os;~/.local/share/flatpak;~/.var;host;/tmp;
