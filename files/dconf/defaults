@@ -33,11 +33,18 @@ always-show-universal-access-status=false
 screen-keyboard-enabled=false
 screen-magnifier-enabled=false
 
+[org/gnome/desktop/a11y/interface]
+show-status-shapes=false
+
+[org/gnome/desktop/a11y/keyboard]
+togglekeys-enable=true
+
 [org/gnome/desktop/a11y/magnifier]
 cross-hairs-color='#fab387'
 cross-hairs-length=4096
 cross-hairs-opacity=1.0
 cross-hairs-thickness=1
+focus-tracking='proportional'
 mag-factor=1.0
 mouse-tracking='proportional'
 show-cross-hairs=false
