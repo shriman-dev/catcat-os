@@ -4,6 +4,7 @@ echo -e "\n$0\n"
 
 addRepos() {
 cd /etc/yum.repos.d/
+ls -A1
 
 #curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
 
