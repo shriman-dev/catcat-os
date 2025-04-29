@@ -3,10 +3,10 @@ set -oue pipefail
 echo -e "\n$0\n"
 
 #sddm.service
-#nix.mount
 services_enable() {
   systemctl -f enable \
     fstrim.timer \
+    nix.mount \
     libvirtd.service \
     auto-power-profile.service \
     catcat-system-setup.service \
