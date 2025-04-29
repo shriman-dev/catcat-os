@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 run_as_users() {
   for SOME_USER in /run/user/*; do
     SOME_USER=$(basename "$SOME_USER")

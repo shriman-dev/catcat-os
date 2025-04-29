@@ -26,10 +26,6 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 #  cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
 #  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
 
-  # bat config for root
-  mkdir -p /root/.config/
-  [[ ! -d /root/.config/bat ]] && ln -sf /etc/bat /root/.config/
-
   # set DNS blocklist
   rm -f /etc/dnsmasq.d/domains-blocklist*
   cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist-mini.conf.tar.zst* | tar -C /tmp/ --zstd -xvf -
@@ -48,8 +44,10 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 fi
 
 if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
-  /usr/bin/dconf update
+  [[ ! -d /root/.config/bat ]] && { mkdir -p /root/.config/ ; ln -sf /etc/bat /root/.config/; }
   /usr/bin/bat cache --build
+
+  /usr/bin/dconf update
 
   cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
 fi
@@ -126,14 +124,14 @@ fi
 
 
 # enable nvidia optimus if device is laptop and has nvidia dgpu
-if command -v nvidia-smi; then
-  if [[ -d /sys/module/battery ]] && [[ -d /proc/acpi/button/lid ]]; then
-    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia.conf; then
-      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia.conf
-      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia.conf
-    fi
-  fi
-fi
+#if command -v nvidia-smi; then
+#  if [[ -d /sys/module/battery ]] && [[ -d /proc/acpi/button/lid ]]; then
+#    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia.conf; then
+#      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia.conf
+#      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia.conf
+#    fi
+#  fi
+#fi
 
 # configure systemd services
 if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then

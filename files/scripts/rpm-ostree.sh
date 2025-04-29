@@ -6,8 +6,10 @@ addRepos() {
 cd /etc/yum.repos.d/
 ls -A1
 
-#curl -LO https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
-
+#dnf5 -y install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
+#dnf5 -y config-manager setopt "*terra*".priority=3 "*terra*".exclude="nerd-fonts topgrade"
+#dnf5 -y config-manager setopt "terra-mesa".enabled=true
+#dnf5 -y config-manager setopt "terra-nvidia".enabled=false
 
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable atim/lazygit
@@ -17,7 +19,7 @@ dnf5 -y copr enable pesader/hblock
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-$(rpm -E %fedora)/atim-starship-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -E %fedora)/zeno-scrcpy-fedora-$(rpm -E %fedora).repo
-
+ls -A1
 cd -
 }
 addRepos

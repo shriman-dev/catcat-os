@@ -53,7 +53,7 @@ alias ......='cd ../../../../..'
 alias fcc="fc-cache -fvr --really-force "
 alias hw='hwinfo --short'
 alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
-alias killit='pkill -KILL -fe'
+alias killall='killall -vw'
 alias ramcln="sudo /bin/ramclean.sh"
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
@@ -77,7 +77,7 @@ alias lt='eza -aT --git --color=always --hyperlink --group-directories-first --i
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias pscpu='procs --sortd cpu'
 alias psmem='procs --sortd rss'
-alias procstree='procs --tree'
+alias ps-tree='procs --tree'
 
 # flatpak alias
 alias flup="flatpak update"

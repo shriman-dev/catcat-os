@@ -14,6 +14,7 @@ $SCRIPT_DIR/cleanup.sh
 FILESDIR="$(dirname $SCRIPT_DIR)"
 mkdir -p /var/lib/alternatives
 mkdir -p /usr/etc/dconf/db/distro.d/
+mkdir -p /nix
 cp -drf  ${FILESDIR}/system/* /
 cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
 cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/

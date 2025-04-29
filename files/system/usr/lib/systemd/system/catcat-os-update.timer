@@ -1,10 +1,11 @@
 [Unit]
 Description=Auto Update System Timer For CatCat OS
-Wants=network-online.target
+ConditionPathExists=/run/ostree-booted
 
 [Timer]
 OnBootSec=20min
 OnUnitInactiveSec=2h
+OnCalendar=*-*-* 4:00:00
 Persistent=true
 
 [Install]

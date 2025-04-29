@@ -1,7 +1,7 @@
 # Check for local overrides
 check-local-overrides:
     #!/usr/bin/bash
-    diff -r \
+    sudo diff -r \
              --suppress-common-lines \
              --color="always" \
              --exclude "passwd*" \
@@ -31,6 +31,28 @@ check-local-overrides:
              --exclude="default.target" \
              --exclude="domains-blocklist.*" \
              /usr/etc /etc 2>/dev/null | sed '/Binary\ files\ /d' | rg --color=always --colors 'match:fg:yellow' --passthru 'Only in.*'
+
+# Dump debug info
+debug-info:
+    #!/usr/bin/bash
+    echo -e "=== Rpm-Ostree Status ===\n"
+    sudo rpm-ostree status --verbose
+    echo -e "\n"
+    sudo fpaste --sysinfo --printonly
+    echo "=== Flatpaks Installed ==="
+    flatpak list --columns=name,application,version,size,origin,options
+    echo -e "\n=== Listing Local Overrides ===\n"
+    sudo ostree admin config-diff && ujust check-local-overrides
+    echo -e "\n=== Recent System Events ===\n"
+    sudo journalctl -b -p err..alert --since "1 day ago"
+    echo -e "\n=== Failed Services ===\n"
+    sudo systemctl list-units --state=failed
+    echo -e "\n=== CatCat OS Changelog ===\n"
+    sudo rpm-ostree db diff --changelogs
+    echo -e "\n---System flatpaks changelog---\n"
+    sudo flatpak --system history
+    echo -e "\n---User flatpaks changelog---\n"
+    flatpak --user history
 
 # Update system, flatpaks, and nixpkgs all at once
 update:
@@ -68,4 +90,3 @@ toggle-extension EXTENSION_ID:
     #!/usr/bin/env bash
     EXTENSION_ID={{ EXTENSION_ID }}
     gnome-extensions $(gnome-extensions show ${EXTENSION_ID} | grep -qow 'ACTIVE' && echo "disable" || echo "enable") ${EXTENSION_ID}
-
