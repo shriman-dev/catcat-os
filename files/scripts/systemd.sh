@@ -10,7 +10,7 @@ services_enable() {
     libvirtd.service \
     auto-power-profile.service \
     catcat-system-setup.service \
-    catcat-system-maintenance.service \
+    catcat-system-maintenance.timer \
     catcat-flatpak-manager.timer \
     catcat-os-update.timer
 

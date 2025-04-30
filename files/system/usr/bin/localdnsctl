@@ -11,18 +11,20 @@ DNSMASQLOGDIR='/var/log'
 QUIET=false
 VERBOSE=
 
-bat /etc/dnscrypt-proxy/allowed-ips.txt >/dev/null 2>&1 || bat cache --build >/dev/null 2>&1
-
 # Error logging with optional verbose output
 log() {
-    local level=$1
+    local level="$1"
     shift
     local msg="$*"
 
+    # Colors for output
+    local red='\033[0;31m' green='\033[0;32m' yellow='\033[1;33m'
+    local noc='\033[0m' # No Color
+
     case "$level" in
-        "INFO")  [[ $QUIET == false ]] && echo "[INFO] $msg" ;;
-        "WARN")  echo "[WARNING] $msg" >&2 ;;
-        "ERROR") echo "[ERROR] $msg" >&2 ;;
+        "INFO")  [[ $QUIET == false ]] && echo -e "${green}[INFO]${noc} $msg" ;;
+        "WARN")  echo -e "${yellow}[WARNING]${noc} $msg" >&2 ;;
+        "ERROR") echo -e "${red}[ERROR]${noc} $msg" >&2 ;;
     esac
 }
 
@@ -34,7 +36,7 @@ die() {
 }
 
 need_root() {
-    [[ $EUID -eq 0 ]] || die "This operation requires root privileges"
+    [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
 }
 
 update_blocklist() {
@@ -43,9 +45,8 @@ update_blocklist() {
 
     local mini=$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
     local target_type=$([[ -f "$CONFIG_DIR/only-dnscrypt-blocklist" ]] && echo "dnscrypt" || echo "dnsmasq")
-    
-    log "INFO" "Using ${target_type} backend with $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large') DNS blocklist"
 
+    log "INFO" "Updating DNS blocklist (Backend: ${target_type}, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
     local src_file dst_file subdir
     if [[ $target_type == "dnscrypt" ]]; then
         src_file="domains-filtered-subdomains${mini}"
@@ -252,16 +253,17 @@ dnscrypt_logs() {
 
 # Execute the appropriate function based on log type
 log_types() {
+    bat /etc/dnscrypt-proxy/allowed-ips.txt >/dev/null 2>&1 || bat cache --build >/dev/null 2>&1
     case $LOG_TYPE in
         "dnsmasq-"*) dnsmasq_logs ${LOG_TYPE#dnsmasq-} ;;
         "dnscrypt-"*) dnscrypt_logs ${LOG_TYPE#dnscrypt-} ;;
-        *) die "Invalid log type specified" show_help ;;
+        *) die "Invalid log type specified: $LOG_TYPE" show_help ;;
     esac
 }
 
 
 show_help() {
-    echo "Usage: $0 [OPTIONS]"
+    echo "Usage: $(basename "$0") [OPTIONS]"
     echo "Configure and manage DNS to block Ad/Malware using blocklist or monitor DNS logs with localdns"
     echo
     echo "Options:"

@@ -1,0 +1,207 @@
+#!/usr/bin/bash
+QUIET=false
+VERBOSE=
+
+# Error logging with optional verbose output
+log() {
+    local level="$1"
+    shift
+    local msg="$*"
+    local datestamp
+    [[ $VERBOSE == true ]] && datestamp="[$(date '+%Y-%m-%d %H:%M:%S')] "
+
+    # Colors for output
+    local red='\033[0;31m' green='\033[0;32m' yellow='\033[1;33m'
+    local noc='\033[0m' # No Color
+
+    case "$level" in
+        "INFO")  [[ $QUIET == false ]] && echo -e "${datestamp}${green}[INFO]${noc} $msg" ;;
+        "WARN")  echo -e "${datestamp}${yellow}[WARNING]${noc} $msg" >&2 ;;
+        "ERROR") echo -e "${datestamp}${red}[ERROR]${noc} $msg" >&2 ;;
+    esac
+}
+
+# Error handling with optional function call
+die() {
+    log "ERROR" "$1"
+    [[ -n "$2" ]] && $2
+    exit 1
+}
+
+need_root() {
+    [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
+}
+
+# Validate BTRFS mount point
+validate_btrfs_mount() {
+    local mount_point="$1"
+    [[ -z "$mount_point" ]] && die "Mount point not specified"
+    [[ -d "$mount_point" ]] || die "Mount point $mount_point does not exist"
+    findmnt -n -o FSTYPE -T "$mount_point" | grep -q "btrfs" || die "$mount_point is not a BTRFS filesystem"
+}
+
+# Get all BTRFS mount points
+get_btrfs_mounts() {
+    lsblk -lo FSTYPE,MOUNTPOINT | awk '$1=="btrfs" {print $2}'
+}
+
+# Show filesystem usage
+show_btrfs_usage() {
+    local path="$1"
+    validate_btrfs_mount "$path"
+    log "INFO" "Showing BTRFS usage for $path"
+    btrfs filesystem usage "$path"
+    echo
+    log "INFO" "Showing BTRFS df for $path"
+    btrfs filesystem df "$path"
+}
+
+# Perform balance operation
+balance() {
+    local path="all" musage=50 dusage=80
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -m) musage="$2"; shift ;;
+            -d) dusage="$2"; shift ;;
+            -p) path="$2"; shift ;;
+            *) die "Invalid balance option: $1" ;;
+        esac
+        shift
+    done
+
+    local mounts=("$path")
+    [[ "$path" == "all" ]] && mounts=($(get_btrfs_mounts))
+    for mount in ${mounts[@]}; do
+        validate_btrfs_mount "$mount"
+        log "INFO" "Starting balance on $mount"
+        [[ $VERBOSE == true ]] && { log "INFO" "Pre-balance space usage (df):"; btrfs filesystem df "$mount"; }
+        echo
+        btrfs ${VERBOSE:+-v} balance start -musage="${musage}" -dusage="${dusage}" --enqueue $mount
+        echo
+        [[ $VERBOSE == true ]] && { log "INFO" "Post-balance space usage (df):"; btrfs filesystem df "$mount"; }
+        log "INFO" "Balance completed for $mount"
+    done
+}
+
+# Perform defragmentation
+defrag() {
+    local path comp level level_opt
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -c) comp="$2"; shift ;;
+            -l) level="$2"; shift ;;
+            -p) path="$2"; shift ;;
+            *) die "Invalid defrag option: $1" ;;
+        esac
+        shift
+    done
+    [[ -z ${comp} || -z ${path} ]] && die "Both compression (-c) and path (-p) are required for defrag"
+
+    validate_btrfs_mount "$path"
+
+    [[ -n "$level" ]] && level_opt="--level $level"
+
+    log "INFO" "Starting defragmentation on $path (compression: ${comp}${level:+, level: $level})"
+    btrfs ${VERBOSE:+-v} filesystem defragment -r -c"${comp}" $level_opt "$path"
+    log "INFO" "Defragmentation completed for $path"
+}
+
+# Perform scrub operation
+scrub() {
+    local path="$1"
+    validate_btrfs_mount "$path"
+    log "INFO" "Starting scrub on $path"
+    btrfs ${VERBOSE:+-v} scrub start -B "$path"
+    log "INFO" "Scrub completed for $path"
+}
+
+
+# Perform TRIM operation
+trim() {
+    local path="${1:-}"
+    if [[ -z "$path" ]]; then
+        log "INFO" "Running TRIM on fstab entries"
+        fstrim ${VERBOSE:+-v} --fstab
+        log "INFO" "TRIM completed on fstab entries"
+    else
+        validate_btrfs_mount "$path"
+        log "INFO" "Running TRIM on $path"
+        fstrim ${VERBOSE:+-v} "$path"
+        log "INFO" "TRIM completed on $path"
+    fi
+}
+
+show_help() {
+    echo "Usage: $(basename "$0") [global_options] command1 [options] [command2 [options] ..."
+    echo "Global Options:"
+    echo "  -h, --help              Show this help message"
+    echo "  -v, --verbose           Enable verbose output"
+    echo "  -q, --quiet             Suppress non-error output"
+    echo
+    echo "Commands:"
+    echo "  usage  <path>           Show BTRFS filesystem usage and df"
+    echo "  balance                 Start balance operation on BTRFS filesystem"
+    echo "                          Note: Balance operation auto detects all BTRFS mount points if no path specified"
+    echo "                          Options: -m <musage> -d <dusage> -p <path|all> (Defaults: musage=50, dusage=80, path=all)"
+    echo "  defrag                  Defragment BTRFS filesystem with given compression algorithm"
+    echo "                          Options: -c <algorithm> -l <level> -p <path>"
+    echo "  scrub  <path>           Start a scrub operation on BTRFS filesystem"
+    echo "  trim   [path]           Perform TRIM operation on the path"
+    echo "                          Note: TRIM operation uses fstab entries if no path specified"
+}
+
+execute_command() {
+    # Parse commands
+    command=$1; shift
+    case "$command" in
+        usage) [[ $# -eq 1 ]] && show_btrfs_usage "$1" ||
+                   die "BTRFS mount path required to show usage"
+            ;;
+        defrag) defrag "$@"
+            ;;
+        balance) balance "$@"
+            ;;
+        scrub) [[ $# -eq 1 ]] && scrub "$1" ||
+                   die "BTRFS mount path required for scrub"
+            ;;
+        trim) [[ $# -le 1 ]] && trim  "$@" ||
+                  die "Usage: $(basename $0) trim [PATH]"
+            ;;
+        *) die "Unknown command: $command"
+            ;;
+    esac
+}
+
+# Parse command line arguments
+main() {
+    need_root
+
+    [[ $# -eq 0 ]] && die "No arguments provided" show_help
+
+    # Parse global options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help) show_help; exit 0 ;;
+            -v|--verbose) VERBOSE=true ;;
+            -q|--quiet) QUIET=true ;;
+            *) break ;;
+        esac
+        shift
+    done
+
+    # Process commands
+    local valid_commands=("usage" "balance" "defrag" "scrub" "trim")
+    while [[ $# -gt 0 ]]; do
+        local cmd=$1 cmd_args=()
+        shift
+
+        while [[ $# -gt 0 && ! " ${valid_commands[*]} " =~ " $1 " ]]; do
+            cmd_args+=("$1")
+            shift
+        done
+
+        execute_command "$cmd" "${cmd_args[@]}"
+    done
+}
+
+main "$@"
