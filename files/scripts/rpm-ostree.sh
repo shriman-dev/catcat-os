@@ -38,7 +38,7 @@ rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/do
 monitoringTools='htop btop bandwhich nethogs procs wireshark'
 
 #dmraid
-diskFileMan='compsize ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
+diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
 
 terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi poppler wl-clipboard hyperfine'
 

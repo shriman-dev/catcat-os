@@ -2,7 +2,6 @@
 # remove useless logs, dirs or files
 [[ -d /home/linuxbrew ]] && rm -rf /home/linuxbrew
 
-
 # one week = 604800
 if [[ $(stat -c "%Y" /etc/catcat-os/last_cleanup) -lt $(( $(date +%s) - 604800 )) ]]; then
   # system clean up
