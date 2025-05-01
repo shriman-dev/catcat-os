@@ -72,9 +72,8 @@ balance() {
     local mounts=("$path")
     [[ "$path" == "all" ]] && {
         log "INFO" "Auto detecting BTRFS mount points"
-        log "DEBUG" "Fetching all BTRFS mount points"
         [[ $VERBOSE -ge 2 ]] && mounts=($(get_btrfs_mounts))
-        log "DEBUG" "Mount points detected: ${mounts[@]}"
+        log "INFO" "Mount points detected: ${mounts[@]}"
         }
     for mount in ${mounts[@]}; do
         validate_btrfs_mount "$mount"
