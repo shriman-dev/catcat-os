@@ -4,21 +4,19 @@ VERBOSE=
 
 # Error logging with optional verbose output
 log() {
-    local level="$1"
-    shift
-    local msg="$*"
-    local datestamp
-    [[ $VERBOSE == true ]] && datestamp="[$(date '+%Y-%m-%d %H:%M:%S')] "
+    local level="$1" msg="${@:2}"
+    local dt="$([[ $VERBOSE -ge 2 ]] && date -u '+[%Y-%m-%d %H:%M:%S] ')"  # UTC time format
 
-    # Colors for output
-    local red='\033[0;31m' green='\033[0;32m' yellow='\033[1;33m'
-    local noc='\033[0m' # No Color
-
+    local bold='\033[1m' red='\033[1;31m' green='\033[1;32m' yellow='\033[1;33m' cyan='\033[1;36m'
+    local color  noc='\033[0m' # No Color
     case "$level" in
-        "INFO")  [[ $QUIET == false ]] && echo -e "${datestamp}${green}[INFO]${noc} $msg" ;;
-        "WARN")  echo -e "${datestamp}${yellow}[WARNING]${noc} $msg" >&2 ;;
-        "ERROR") echo -e "${datestamp}${red}[ERROR]${noc} $msg" >&2 ;;
+        "DEBUG") color=$cyan; [[ $QUIET == false && $VERBOSE -ge 2 ]] || return ;;
+        "INFO")  color=$green; [[ $QUIET == false ]] || return ;;
+        "WARN")  color=$yellow ;;
+        "ERROR") color=$red ;;
     esac
+
+    echo -e "${bold}${dt}${color}[${level^^}]${noc} $msg"
 }
 
 # Error handling with optional function call
@@ -37,7 +35,9 @@ validate_btrfs_mount() {
     local mount_point="$1"
     [[ -z "$mount_point" ]] && die "Mount point not specified"
     [[ -d "$mount_point" ]] || die "Mount point $mount_point does not exist"
-    findmnt -n -o FSTYPE -T "$mount_point" | grep -q "btrfs" || die "$mount_point is not a BTRFS filesystem"
+    [[ $VERBOSE -ge 2 ]] && log "DEBUG" "Validating BTRFS mount point: $mount_point"
+    findmnt -n -o FSTYPE -T "$mount_point" | grep -q "btrfs" || die "$mount_point is not a BTRFS filesystem" &&
+    [[ $VERBOSE -ge 2 ]] && log "DEBUG" "$mount_point is valid BTRFS mount point"
 }
 
 # Get all BTRFS mount points
@@ -49,10 +49,10 @@ get_btrfs_mounts() {
 show_btrfs_usage() {
     local path="$1"
     validate_btrfs_mount "$path"
-    log "INFO" "Showing BTRFS usage for $path"
+    log "INFO" "Showing BTRFS detailed usage for $path"
     btrfs filesystem usage "$path"
     echo
-    log "INFO" "Showing BTRFS df for $path"
+    log "INFO" "Showing BTRFS disk space for $path"
     btrfs filesystem df "$path"
 }
 
@@ -70,15 +70,20 @@ balance() {
     done
 
     local mounts=("$path")
-    [[ "$path" == "all" ]] && mounts=($(get_btrfs_mounts))
+    [[ "$path" == "all" ]] && {
+        log "INFO" "Auto detecting BTRFS mount points"
+        log "DEBUG" "Fetching all BTRFS mount points"
+        [[ $VERBOSE -ge 2 ]] && mounts=($(get_btrfs_mounts))
+        log "DEBUG" "Mount points detected: ${mounts[@]}"
+        }
     for mount in ${mounts[@]}; do
         validate_btrfs_mount "$mount"
         log "INFO" "Starting balance on $mount"
-        [[ $VERBOSE == true ]] && { log "INFO" "Pre-balance space usage (df):"; btrfs filesystem df "$mount"; }
+        [[ -n $VERBOSE ]] && { log "INFO" "Pre-balance disk space usage (df):"; btrfs filesystem df "$mount"; }
         echo
         btrfs ${VERBOSE:+-v} balance start -musage="${musage}" -dusage="${dusage}" --enqueue $mount
         echo
-        [[ $VERBOSE == true ]] && { log "INFO" "Post-balance space usage (df):"; btrfs filesystem df "$mount"; }
+        [[ -n $VERBOSE ]] && { log "INFO" "Post-balance disk space usage (df):"; btrfs filesystem df "$mount"; }
         log "INFO" "Balance completed for $mount"
     done
 }
@@ -135,16 +140,16 @@ show_help() {
     echo "Usage: $(basename "$0") [global_options] command1 [options] [command2 [options] ..."
     echo "Global Options:"
     echo "  -h, --help              Show this help message"
-    echo "  -v, --verbose           Enable verbose output"
-    echo "  -q, --quiet             Suppress non-error output"
+    echo "  -v, --verbose           Enable verbose output (use -vv for debug level verbosity)"
+    echo "  -q, --quiet             Suppress all non-error output"
     echo
     echo "Commands:"
-    echo "  usage  <path>           Show BTRFS filesystem usage and df"
+    echo "  usage  <path>           Show BTRFS filesystem usage and disk space information"
     echo "  balance                 Start balance operation on BTRFS filesystem"
     echo "                          Note: Balance operation auto detects all BTRFS mount points if no path specified"
-    echo "                          Options: -m <musage> -d <dusage> -p <path|all> (Defaults: musage=50, dusage=80, path=all)"
-    echo "  defrag                  Defragment BTRFS filesystem with given compression algorithm"
-    echo "                          Options: -c <algorithm> -l <level> -p <path>"
+    echo "                          Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"
+    echo "  defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"
+    echo "                          Options: -c <algorithm> -l [level] -p <path>"
     echo "  scrub  <path>           Start a scrub operation on BTRFS filesystem"
     echo "  trim   [path]           Perform TRIM operation on the path"
     echo "                          Note: TRIM operation uses fstab entries if no path specified"
@@ -182,7 +187,8 @@ main() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -h|--help) show_help; exit 0 ;;
-            -v|--verbose) VERBOSE=true ;;
+            -v|--verbose) VERBOSE=1 ;;
+            -vv) VERBOSE=2 ;;
             -q|--quiet) QUIET=true ;;
             *) break ;;
         esac

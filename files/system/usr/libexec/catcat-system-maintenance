@@ -19,5 +19,5 @@ fi
 # 20 days = 1728000
 if [[ $(stat -c "%Y" /etc/catcat-os/buttercare.log) -lt $(( $(date +%s) - 1728000 )) ]]; then
   # run buttercare every 20 days
-  /usr/bin/buttercare -v balance trim > /etc/catcat-os/buttercare.log
+  /usr/bin/buttercare -vv balance trim > /etc/catcat-os/buttercare.log
 fi
