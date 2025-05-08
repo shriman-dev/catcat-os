@@ -70,7 +70,7 @@ login-shell=true
 opacity=1.0
 palette='Catppuccin-Mocha-mine'
 preserve-container='never'
-preserve-directory='safe'
+preserve-directory='never'
 scrollback-lines=2147483647
 use-custom-command=true
 
@@ -243,6 +243,7 @@ show-only-directories=false
 
 [org/nemo/window-state]
 maximized=false
+my-computer-expanded=false
 side-pane-view='tree'
 sidebar-bookmark-breakpoint=4
 start-with-menu-bar=false

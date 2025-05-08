@@ -73,12 +73,12 @@ update_blocklist() {
 
 toggle_localdns() {
     need_root
-    [[ ! -f "$CONFIG_DIR/localdns-resolv.conf" ]] && die "localdns-resolv.conf missing"
+    [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf missing"
 
     case "$1" in
         enable)
             log "INFO" "Enabling local DNS..."
-            ln ${VERBOSE:+-v} -sf $CONFIG_DIR/localdns-resolv.conf /etc/resolv.conf &&
+            ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
             systemctl enable --force --now dnscrypt-proxy.service dnsmasq.service ||
                 die "Failed to enable DNS services"
             ;;

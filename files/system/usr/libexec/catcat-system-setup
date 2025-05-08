@@ -55,7 +55,8 @@ fi
 # to use dnscrypt-proxy
 if systemctl is-enabled dnscrypt-proxy.service; then
   mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
-  ln -sf /etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
+  ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
+  chattr +i /etc/catcat-os/localdns.d/localdns-resolv.conf
 fi
 
 # setup grub
@@ -126,22 +127,27 @@ fi
 # enable nvidia optimus if device is laptop and has nvidia dgpu
 #if command -v nvidia-smi; then
 #  if [[ -d /sys/module/battery ]] && [[ -d /proc/acpi/button/lid ]]; then
-#    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia.conf; then
-#      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia.conf
-#      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia.conf
+#    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
+#      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
 #    fi
 #  fi
 #fi
+
+# enable i2c-dev support to configure monitors via ddcutil if device is not laptop
+if ! inxi -M | grep "Type:.*Laptop"; then
+  echo "i2c-dev" > /etc/modules-load.d/i2c-dev.conf
+  # enable i2c support for nvidia cards
+  if command -v nvidia-smi; then
+    echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > /etc/modprobe.d/nvidia-i2c-support.conf
+  fi
+fi
 
 # configure systemd services
 if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then
   systemctl disable --force --now mcontrolcenter.helper.service
   systemctl --global disable mcontrolcenter.helper.service
 fi
-
-#if ! inxi -M | grep -qE "Type: Laptop"; then
-#  systemctl disable --force --now auto-power-profile.service
-#fi
 
 
 # FIXES

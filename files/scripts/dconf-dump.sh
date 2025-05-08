@@ -36,6 +36,7 @@ declare -A appPathsWithSed=(
 /window-state/,/^$/d
 /type-ahead-search/d"
     ['/org/nemo/']="
+s/side-pane-view=.*/side-pane-view='tree'/
 /geometry/d"
     ['/org/gnome/Ptyxis/']="
 /window-size=(/d"
@@ -70,7 +71,8 @@ s|video-path=.*|video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.
     ['/org/gnome/shell/extensions/default-workspace/']=""
     ['/org/gnome/shell/extensions/forge/']=""
     ['/org/gnome/shell/extensions/notification-timeout/']=""
-    ['/org/gnome/shell/extensions/vitals/']=""
+    ['/org/gnome/shell/extensions/vitals/']="
+s/hot-sensors=.*/hot-sensors=\['__temperature_avg__', '_processor_usage_', '_memory_allocated_', '__network-tx_max__', '__network-rx_max__'\]/"
     ['/org/gnome/shell/extensions/user-theme/']=""
 )
 
@@ -93,7 +95,7 @@ dconfDump '/org/gnome/desktop/interface/' "" $DCONF_DIR/interface
 # wmpreferences
 > $DCONF_DIR/wmpreferences
 dconfDump '/org/gnome/desktop/wm/preferences/' "" $DCONF_DIR/wmpreferences
-dconfDump '/org/gnome/mutter/' "" $DCONF_DIR/wmpreferences
+dconfDump '/org/gnome/mutter/' "/output-luminance/d" $DCONF_DIR/wmpreferences
 
 
 # shell

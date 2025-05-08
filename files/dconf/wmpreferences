@@ -26,3 +26,7 @@ experimental-features=['autoclose-xwayland', 'variable-refresh-rate']
 overlay-key='Super'
 workspaces-only-on-primary=false
 
+[org/gnome/mutter/keybindings]
+toggle-tiled-left=['<Super>Left']
+toggle-tiled-right=['<Super>Right']
+

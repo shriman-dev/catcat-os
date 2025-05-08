@@ -37,6 +37,8 @@ debug-info:
     #!/usr/bin/bash
     echo -e "=== Rpm-Ostree Status ===\n"
     sudo rpm-ostree status --verbose
+    echo -e "=== Hardware Information ===\n"
+    sudo inxi --basic --expanded -xxxa --verbosity 8
     echo -e "\n"
     sudo fpaste --sysinfo --printonly
     echo "=== Flatpaks Installed ==="

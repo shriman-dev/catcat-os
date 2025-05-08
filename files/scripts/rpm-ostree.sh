@@ -26,8 +26,8 @@ addRepos
 
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-rpm-ostree override remove fastfetch gnome-browser-connector plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
-#sunshine
+rpm-ostree override remove fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
+#sunshine gnome-browser-connector
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier hblock'
 #curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | cut -d '"' -f4
@@ -40,7 +40,7 @@ monitoringTools='htop btop bandwhich nethogs procs wireshark'
 #dmraid
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool inxi poppler wl-clipboard hyperfine'
+terminalTools='aria2 asciinema brightnessctl ffmpeg inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
