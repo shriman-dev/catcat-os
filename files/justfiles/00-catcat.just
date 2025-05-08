@@ -35,26 +35,23 @@ check-local-overrides:
 # Dump debug info
 debug-info:
     #!/usr/bin/bash
-    echo -e "=== Rpm-Ostree Status ===\n"
-    sudo rpm-ostree status --verbose
-    echo -e "=== Hardware Information ===\n"
-    sudo inxi --basic --expanded -xxxa --verbosity 8
-    echo -e "\n"
     sudo fpaste --sysinfo --printonly
-    echo "=== Flatpaks Installed ==="
-    flatpak list --columns=name,application,version,size,origin,options
-    echo -e "\n=== Listing Local Overrides ===\n"
-    sudo ostree admin config-diff && ujust check-local-overrides
+    echo -e "\n===System flatpaks history===\n"
+    sudo flatpak --system history
+    echo -e "\n===User flatpaks history===\n"
+    flatpak --user history
     echo -e "\n=== Recent System Events ===\n"
     sudo journalctl -b -p err..alert --since "1 day ago"
+    echo -e "\n=== Sys+Hardware Information ===\n"
+    sudo inxi --basic --expanded -xxxa --verbosity 8
+    echo -e "\n=== Listing Local Overrides ===\n"
+    sudo ostree admin config-diff && ujust check-local-overrides
     echo -e "\n=== Failed Services ===\n"
     sudo systemctl list-units --state=failed
+    echo -e "\n=== Rpm-Ostree Status ===\n"
+    sudo rpm-ostree status --verbose
     echo -e "\n=== CatCat OS Changelog ===\n"
     sudo rpm-ostree db diff --changelogs
-    echo -e "\n---System flatpaks changelog---\n"
-    sudo flatpak --system history
-    echo -e "\n---User flatpaks changelog---\n"
-    flatpak --user history
 
 # Update system, flatpaks, and nixpkgs all at once
 update:
