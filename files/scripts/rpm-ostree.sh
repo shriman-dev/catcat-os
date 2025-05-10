@@ -134,7 +134,7 @@ bandwhich
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
 buttersnap; btdu; gocryptfs; yazi
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine'
+terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
@@ -158,7 +158,7 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth lm_sensors'
 
-virtualization='gnome-boxes virt-manager edk2-ovmf libvirt libvirt-client libvirt-client-qemu bridge-utils qemu qemu-img qemu-kvm'
+virtualization='gnome-boxes virt-manager genisoimage socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
 
