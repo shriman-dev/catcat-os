@@ -102,8 +102,8 @@ ls -A1
 
 dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
-#dnf5 -y copr enable atim/lazygit
 dnf5 -y copr enable zeno/scrcpy
+#dnf5 -y copr enable atim/lazygit
 
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-$(rpm -E %fedora)/atim-starship-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
@@ -138,7 +138,7 @@ terminalTools='aria2 asciinema brightnessctl ffmpeg inxi hwinfo kpcli zenity par
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
-#ghostty
+#lazygit ghostty
 devTools='ptyxis git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
