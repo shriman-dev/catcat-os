@@ -12,6 +12,21 @@ mkdir -p /tmp/ezaTarExtract
 tar -xf /tmp/eza.tar.gz -C /tmp/ezaTarExtract
 cp -dvf /tmp/ezaTarExtract/eza /usr/bin/
 chmod +x /usr/bin/eza
+rm -rf /tmp/eza.tar.gz /tmp/ezaTarExtract
+}
+
+hblock() {
+curl -Lo /usr/bin/hblock https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master/hblock
+chmod +x /usr/bin/hblock 
+}
+
+bandwhich() {
+curl -Lo /tmp/bandwhich.tar.gz $(curl -s -X GET https://api.github.com/repos/imsnif/bandwhich/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
+mkdir -p /tmp/bandwhichTarExtract
+tar -xf /tmp/bandwhich.tar.gz -C /tmp/bandwhichTarExtract
+cp -dvf /tmp/bandwhichTarExtract/bandwhich /usr/bin/
+chmod +x /usr/bin/bandwhich
+rm -rf /tmp/bandwhich.tar.gz /tmp/bandwhichTarExtract
 }
 
 buttersnap() {
@@ -30,6 +45,7 @@ mkdir -p /tmp/gocryptfsTarExtract
 tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
 cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
 chmod +x /usr/bin/gocryptfs
+rm -rf /tmp/gocryptfs.tar.gz /tmp/gocryptfsTarExtract
 }
 
 yazi() {
@@ -41,17 +57,18 @@ unzip /tmp/yazi.zip
 cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
 chmod +x /usr/bin/yazi
 chmod +x /usr/bin/ya
+
+rm -rf /tmp/yazi.zip yazi-x86_64-unknown-linux-gnu/
 }
 
 extra_pkgs() {
 # ascii-image-converter
 curl -Lo /tmp/ascii-image-converter.tar.gz https://github.com/TheZoraiz/ascii-image-converter/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz
-
 mkdir -p /tmp/ascii-image-converter
 tar -xf /tmp/ascii-image-converter.tar.gz -C /tmp/ascii-image-converter --strip-components=1
-
 cp -dvf /tmp/ascii-image-converter/ascii-image-converter /usr/bin/
 chmod +x /usr/bin/ascii-image-converter
+rm -rf /tmp/ascii-image-converter.tar.gz /tmp/ascii-image-converter
 
 # pipes.sh
 git clone https://github.com/pipeseroni/pipes.sh.git /tmp/pipes.sh
@@ -85,9 +102,8 @@ ls -A1
 
 dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
-dnf5 -y copr enable atim/lazygit
+#dnf5 -y copr enable atim/lazygit
 dnf5 -y copr enable zeno/scrcpy
-dnf5 -y copr enable pesader/hblock
 
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-$(rpm -E %fedora)/atim-starship-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
@@ -102,7 +118,8 @@ addRepos
 rpm-ostree override remove fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
 #sunshine gnome-browser-connector
 
-security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier hblock'
+security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier'
+hblock
 #curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | cut -d '"' -f4
 
 # zellij
@@ -110,8 +127,8 @@ shellSetup='fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
 eza
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-#bandwhich
 monitoringTools='htop btop nethogs procs wireshark'
+bandwhich
 
 #dmraid
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
@@ -122,7 +139,7 @@ terminalTools='aria2 asciinema brightnessctl ffmpeg inxi hwinfo kpcli zenity par
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 #ghostty
-devTools='ptyxis git lazygit micro neovim sassc codium'
+devTools='ptyxis git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
