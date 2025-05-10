@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-/usr/bin/gdu --config-file /etc/gdu/gdu.yaml
+/usr/bin/gdu --config-file /etc/gdu/gdu.yaml "$@"
