@@ -20,13 +20,13 @@ for SOME_USER in ${REAL_USERS[@]}; do
   fi
 done
 
-
+# first boot setup
 if [[ ! -f /etc/catcat-os/first-boot ]]; then
   /usr/bin/dconf update
 #  cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
 #  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
 
-  # set DNS blocklist
+  # Set DNS blocklist
   rm -f /etc/dnsmasq.d/domains-blocklist*
   cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist-mini.conf.tar.zst* | tar -C /tmp/ --zstd -xvf -
   cp -f /tmp/blocklist-mini.conf /etc/dnsmasq.d/domains-blocklist.conf
@@ -43,6 +43,7 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
+# sync configs on update
 if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   [[ ! -d /root/.config/bat ]] && { mkdir -p /root/.config/ ; ln -sf /etc/bat /root/.config/; }
   /usr/bin/bat cache --build
@@ -54,9 +55,11 @@ fi
 
 # to use dnscrypt-proxy
 if systemctl is-enabled dnscrypt-proxy.service; then
-  mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
-  ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
-  chattr +i /etc/catcat-os/localdns.d/localdns-resolv.conf
+  if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
+    mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
+    ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
+    chattr +i /etc/catcat-os/localdns.d/localdns-resolv.conf
+  fi
 fi
 
 # setup grub
@@ -135,7 +138,7 @@ fi
 #fi
 
 # enable i2c-dev support to configure monitors via ddcutil if device is not laptop
-if ! inxi -M | grep "Type:.*Laptop"; then
+if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
   echo "i2c-dev" > /etc/modules-load.d/i2c-dev.conf
   # enable i2c support for nvidia cards
   if command -v nvidia-smi; then
@@ -144,7 +147,7 @@ if ! inxi -M | grep "Type:.*Laptop"; then
 fi
 
 # configure systemd services
-if ! inxi -M | grep -qE "System: Micro-Star|System: MSI"; then
+if ! inxi -M | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
   systemctl disable --force --now mcontrolcenter.helper.service
   systemctl --global disable mcontrolcenter.helper.service
 fi

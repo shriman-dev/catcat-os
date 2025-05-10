@@ -129,13 +129,13 @@ setupBookmarksUserdirs() {
   grep -q "admin:/// AdminRoot" "$bookmarks" || {
     bakBefore "$bookmarks"
     mkdir -pv "$(dirname "$bookmarks")" &&
-    sh -c "echo 'file://$HOME_DIR/Me Me
-file://$HOME_DIR/Me/Documents Documents
-file://$HOME_DIR/Me/Downloads Downloads
-file://$HOME_DIR/Me/Pictures Pictures
-file://$HOME_DIR/Me/Videos Videos
-file://$HOME_DIR/Me/Music Music
-file://$HOME_DIR/Me/Notes Notes
+    sh -c "echo 'file:///home/$USER/Me Me
+file:///home/$USER/Me/Documents Documents
+file:///home/$USER/Me/Downloads Downloads
+file:///home/$USER/Me/Pictures Pictures
+file:///home/$USER/Me/Videos Videos
+file:///home/$USER/Me/Music Music
+file:///home/$USER/Me/Notes Notes
 admin:/// AdminRoot
 file:///tmp/tmp-$USER Temporary' > $bookmarks" || err "Failed to add bookmarks"
     }

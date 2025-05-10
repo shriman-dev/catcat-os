@@ -2,6 +2,78 @@
 set -oue pipefail 
 echo -e "\n$0\n"
 
+################
+## EXTRA PKGS ##
+################
+
+eza() {
+curl -Lo /tmp/eza.tar.gz https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz
+mkdir -p /tmp/ezaTarExtract
+tar -xf /tmp/eza.tar.gz -C /tmp/ezaTarExtract
+cp -dvf /tmp/ezaTarExtract/eza /usr/bin/
+chmod +x /usr/bin/eza
+}
+
+buttersnap() {
+curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttersnap.sh
+chmod +x /usr/bin/buttersnap.sh
+}
+
+btdu() {
+curl -Lo /usr/bin/btdu https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64
+chmod +x /usr/bin/btdu
+}
+
+gocryptfs() {
+curl -Lo /tmp/gocryptfs.tar.gz $(curl -s -X GET https://api.github.com/repos/rfjakob/gocryptfs/releases/latest | grep -i '"browser_download_url": "[^"]*amd64.tar.gz"' | cut -d '"' -f4)
+mkdir -p /tmp/gocryptfsTarExtract
+tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
+cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
+chmod +x /usr/bin/gocryptfs
+}
+
+yazi() {
+curl -Lo /tmp/yazi.zip https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip
+curl -Lo /usr/share/applications/yazi.desktop https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/yazi.desktop
+curl -Lo /usr/share/icons/yazi.png https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/logo.png
+
+unzip /tmp/yazi.zip
+cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
+chmod +x /usr/bin/yazi
+chmod +x /usr/bin/ya
+}
+
+extra_pkgs() {
+# ascii-image-converter
+curl -Lo /tmp/ascii-image-converter.tar.gz https://github.com/TheZoraiz/ascii-image-converter/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz
+
+mkdir -p /tmp/ascii-image-converter
+tar -xf /tmp/ascii-image-converter.tar.gz -C /tmp/ascii-image-converter --strip-components=1
+
+cp -dvf /tmp/ascii-image-converter/ascii-image-converter /usr/bin/
+chmod +x /usr/bin/ascii-image-converter
+
+# pipes.sh
+git clone https://github.com/pipeseroni/pipes.sh.git /tmp/pipes.sh
+cp -dvf /tmp/pipes.sh/pipes.sh /usr/bin/
+
+## pokemonsay-newgenerations
+#git clone https://github.com/HRKings/pokemonsay-newgenerations.git /tmp/pokemonsay-newgenerations
+
+#cp -drf /tmp/pokemonsay-newgenerations/pokemons /usr/bin/
+#cp -dvf /tmp/pokemonsay-newgenerations/pokemonsay.sh /usr/bin/
+#cp -dvf /tmp/pokemonsay-newgenerations/pokemonthink.sh /usr/bin/
+
+# extra
+curl -Lo /usr/share/applications/micro.desktop https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
+
+}
+extra_pkgs
+
+##############
+## RPM PKGS ##
+##############
+
 addRepos() {
 cd /etc/yum.repos.d/
 ls -A1
@@ -11,6 +83,7 @@ ls -A1
 #dnf5 -y config-manager setopt "terra-mesa".enabled=true
 #dnf5 -y config-manager setopt "terra-nvidia".enabled=false
 
+dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable atim/lazygit
 dnf5 -y copr enable zeno/scrcpy
@@ -32,19 +105,23 @@ rpm-ostree override remove fastfetch plocate gnome-shell-extension-just-perfecti
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier hblock'
 #curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | cut -d '"' -f4
 
-shellSetup='fish bat eza starship fzf fd-find ripgrep zoxide tmux zellij'
+# zellij
+shellSetup='fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
+eza
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
 monitoringTools='htop btop bandwhich nethogs procs wireshark'
 
 #dmraid
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
+buttersnap; btdu; gocryptfs; yazi
 
 terminalTools='aria2 asciinema brightnessctl ffmpeg inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 devTools='ptyxis git lazygit micro neovim sassc codium ghostty'
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
 
