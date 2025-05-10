@@ -127,6 +127,30 @@
         {
             "wmClass": "io.github.efogdev.mpris-timer",
             "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Loupe",
+            "mode": "float"
+        },
+        {
+            "wmClass": "eog",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Decibels",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Characters",
+            "mode": "float"
+        },
+        {
+            "wmClass": "com.github.tenderowl.frog",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.giantpinkrobots.varia",
+            "mode": "float"
         }
     ]
 }
