@@ -54,12 +54,16 @@ use-system-font=true
 visual-bell=false
 
 [org/gnome/Ptyxis/Profiles/80a34f2cafa4b10d8524dd1966ea26f3]
-label='default-shell'
+custom-command='bash'
+label='bash'
 limit-scrollback=false
 login-shell=true
 opacity=1.0
 palette='Catppuccin-Mocha-mine'
+preserve-container='never'
+preserve-directory='never'
 scrollback-lines=2147483647
+use-custom-command=true
 
 [org/gnome/Ptyxis/Profiles/db8703c64d752ad6daf64e776707763b]
 custom-command='fish'
