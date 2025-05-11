@@ -59,7 +59,8 @@ secondary-color='#373754'
 
 [org/gnome/desktop/peripherals/mouse]
 accel-profile='adaptive'
-speed=0.11111111
+natural-scroll=true
+speed=0.27611940298507465
 
 [org/gnome/desktop/peripherals/touchpad]
 accel-profile='adaptive'
