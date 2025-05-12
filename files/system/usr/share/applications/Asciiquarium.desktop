@@ -2,6 +2,7 @@
 Type=Application
 Icon=bluefish
 NoDisplay=false
-Exec=ghostty -e asciiquarium
+Exec=asciiquarium
+Terminal=true
 X-GNOME-UsesNotifications=false
 Name=Asciiquarium

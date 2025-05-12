@@ -59,7 +59,10 @@ services_disable() {
     tracker-miner-rss-3.service \
     tracker-writeback-3.service \
     tracker-xdg-portal-3.service \
-    ublue-update.timer
+    ublue-update.service \
+    ublue-update.timer \
+    uupd.service \
+    uupd.timer
 
   systemctl mask \
     geoclue.service \
@@ -85,7 +88,10 @@ services_disable() {
     tracker-miner-rss-3.service \
     tracker-writeback-3.service \
     tracker-xdg-portal-3.service \
-    ublue-update.timer
+    ublue-update.service \
+    ublue-update.timer \
+    uupd.service \
+    uupd.timer
 
   systemctl --global disable \
     bazzite-user-setup.service \

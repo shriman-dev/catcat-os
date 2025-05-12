@@ -2,7 +2,7 @@
 Type=Application
 Icon=a7xpg
 NoDisplay=false
-Exec=ghostty -e cmatrix
+Exec=cmatrix
+Terminal=true
 X-GNOME-UsesNotifications=false
 Name=Cmatrix
-

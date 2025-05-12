@@ -2,6 +2,7 @@
 Type=Application
 Icon=hubstaff-green
 NoDisplay=false
-Exec=ghostty -e cbonsai
+Exec=cbonsai
+Terminal=true
 X-GNOME-UsesNotifications=false
 Name=Cbonsai

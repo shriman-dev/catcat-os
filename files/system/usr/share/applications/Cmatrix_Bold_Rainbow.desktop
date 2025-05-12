@@ -2,6 +2,7 @@
 Type=Application
 Icon=calligraflow
 NoDisplay=false
-Exec=ghostty -e cmatrix -br
+Exec=cmatrix -br
+Terminal=true
 X-GNOME-UsesNotifications=false
 Name=Cmatrix Rainbow

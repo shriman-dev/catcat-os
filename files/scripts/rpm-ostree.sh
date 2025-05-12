@@ -122,7 +122,7 @@ addRepos
 
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-rpm-ostree override remove fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
+rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
 #sunshine gnome-browser-connector
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier'
