@@ -55,11 +55,18 @@ curl -Lo /usr/share/icons/yazi.png https://raw.githubusercontent.com/sxyazi/yazi
 
 unzip /tmp/yazi.zip
 cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
-chmod +x /usr/bin/yazi
-chmod +x /usr/bin/ya
+chmod +x /usr/bin/{ya,yazi}
 
 rm -rf /tmp/yazi.zip yazi-x86_64-unknown-linux-gnu/
 }
+
+quickemu() {
+git clone --filter=blob:none https://github.com/quickemu-project/quickemu /tmp/quickemu-tmp
+cp -dvf /tmp/quickemu-tmp/{quickemu,quickget,quickreport} /usr/bin/
+chmod +x /usr/bin/{quickemu,quickget,quickreport}
+rm -rf /tmp/quickemu-tmp
+}
+
 
 extra_pkgs() {
 # ascii-image-converter
@@ -134,7 +141,7 @@ bandwhich
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
 buttersnap; btdu; gocryptfs; yazi
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq'
+terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
@@ -158,7 +165,8 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth lm_sensors'
 
-virtualization='gnome-boxes virt-manager genisoimage socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
+virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
+quickemu
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
 
