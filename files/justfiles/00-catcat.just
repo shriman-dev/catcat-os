@@ -1,6 +1,7 @@
 # Check for local overrides
 check-local-overrides:
     #!/usr/bin/bash
+    sudo ostree admin config-diff
     sudo diff -r \
              --suppress-common-lines \
              --color="always" \
@@ -45,7 +46,7 @@ debug-info:
     echo -e "\n=== Sys+Hardware Information ===\n"
     sudo inxi --basic --expanded -xxxa --verbosity 8
     echo -e "\n=== Listing Local Overrides ===\n"
-    sudo ostree admin config-diff && ujust check-local-overrides
+    sudo ujust check-local-overrides
     echo -e "\n=== Failed Services ===\n"
     sudo systemctl list-units --state=failed
     echo -e "\n=== Rpm-Ostree Status ===\n"
@@ -56,7 +57,7 @@ debug-info:
 # Update system, flatpaks, and nixpkgs all at once
 update:
     #!/usr/bin/bash
-    /usr/bin/update all
+    sudo /usr/bin/update all
 
 # Turn automatic updates on or off
 toggle-updates ACTION="prompt":
