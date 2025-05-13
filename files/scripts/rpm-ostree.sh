@@ -145,8 +145,8 @@ terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinf
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
-#lazygit
-devTools='ptyxis git micro neovim sassc codium ghostty'
+#lazygit ghostty
+devTools='ptyxis git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
