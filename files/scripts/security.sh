@@ -51,8 +51,8 @@ curl -Lo /etc/public-resolvers.md.minisig https://raw.githubusercontent.com/DNSC
 
 # enable dnsmasq and dnscrypt-proxy
 sh -c "echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf"
-#systemctl -f enable dnscrypt-proxy.service dnsmasq.service
-#systemctl disable systemd-resolved.service
+systemctl -f enable dnscrypt-proxy.service dnsmasq.service
+systemctl disable systemd-resolved.service
 
 # get dns blocklist archive
 mkdir -p /usr/share/dnscrypt-proxy /usr/share/dnsmasq/dns-blocklist-archive
