@@ -90,7 +90,7 @@ remove_filesystem_access() {
   )
 
   for app in "${nofilesystem_for_apps[@]}"; do
-    [[ "${FLATPAK_APPS}" =~ "$app" ]] && {
+    [[ "${FLATPAK_APPS}" =~ "$app" && ! -f /var/lib/flatpak/overrides/${app} ]] && {
       echo -e "\nRemove existing filesystem permissions for app: $app"
       local metadata="/var/lib/flatpak/app/$app/current/active/metadata"
       local permitted_filesystem=$(grep 'filesystems' "$metadata" | cut -d '=' -f2- | sed 's/:[^;]*//g' | tr ';' ' ')
@@ -178,7 +178,6 @@ allow_home() {
     "org.gnome.Showtime"
     "org.kde.krita"
     "org.libreoffice.LibreOffice"
-    "org.localsend.localsend_app"
     "org.onlyoffice.desktopeditors"
   )
 
@@ -246,7 +245,7 @@ configure_gaming_apps() {
   flatpak override $SCOPE \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem={xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
     --env=DXVK_ASYNC=1 \
   com.usebottles.bottles && echo 'Done' || echo 'Error occurred'
 
@@ -254,7 +253,7 @@ configure_gaming_apps() {
   flatpak override $SCOPE \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem={xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
     --env=DXVK_ASYNC=1 \
   net.lutris.Lutris && echo 'Done' || echo 'Error occurred'
 
@@ -271,7 +270,7 @@ configure_gaming_apps() {
   flatpak override $SCOPE \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem={xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
     --env=DXVK_ASYNC=1 \
   com.heroicgameslauncher.hgl && echo 'Done' || echo 'Error occurred'
 
@@ -279,7 +278,7 @@ configure_gaming_apps() {
   flatpak override $SCOPE \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem={xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-run/gamescope-0:ro} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-run/gamescope-0:ro} \
     --env=DXVK_ASYNC=1 \
   io.github.ryubing.Ryujinx && echo 'Done' || echo 'Error occurred'
 }
@@ -343,9 +342,9 @@ main() {
 }
 
 [[ $# -eq 0 ]] && {
+  remove_filesystem_access
   grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
     SCOPE="--system"
-    remove_filesystem_access
     disable_network
     apply_global_restrictions
   }

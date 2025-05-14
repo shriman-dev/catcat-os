@@ -185,7 +185,7 @@ removeUnnecessaryDirectories() {
 
   [[ ! -f "$HOME_DIR/.mozilla/firefox/profiles.ini" ]] && rm -rvf "$HOME_DIR/.mozilla"
   [[ -f "$HOME_DIR/Me/Desktop/.gitkeep" ]] && find "$HOME_DIR/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
-  [[ -d "$HOME_DIR/Sync" ]] && [[ $(ls -A1 "$HOME_DIR/Sync" | wc -l) -lt 2 ]] && rm -rvf "$HOME_DIR/Sync"
+  [[ -d "$HOME_DIR/Sync" && $(ls -A1 "$HOME_DIR/Sync" | wc -l) -lt 2 ]] && rm -rvf "$HOME_DIR/Sync"
   log "INFO" "Done"
 }
 

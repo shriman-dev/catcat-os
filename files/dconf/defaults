@@ -58,7 +58,7 @@ secondary-color='#373754'
 [org/gnome/desktop/peripherals/keyboard]
 
 [org/gnome/desktop/peripherals/mouse]
-accel-profile='adaptive'
+accel-profile='flat'
 natural-scroll=true
 speed=0.11111111
 
