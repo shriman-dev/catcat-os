@@ -58,12 +58,11 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
 fi
 
-# to use dnscrypt-proxy
+# to use ad-malware blocking localdns
 if systemctl is-enabled dnscrypt-proxy.service; then
   if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
     mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
     ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
-    chattr +i /etc/catcat-os/localdns.d/localdns-resolv.conf
   fi
 fi
 
