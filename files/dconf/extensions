@@ -1,5 +1,6 @@
+
 [org/gnome/shell]
-enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'dash-to-panel@jderose9.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'dash-to-panel@jderose9.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [io/github/jeffshee/hanabi-extension]
 content-fit=0
@@ -85,7 +86,7 @@ appicon-margin=0
 appicon-padding=1
 available-monitors=[0]
 click-action='CYCLE-MIN'
-context-menu-entries='[{"title":"Terminal","cmd":"ptyxis"},{"title":"Calculator","cmd":"/usr/bin/flatpak run --command=gnome-calculator org.gnome.Calculator"},{"title":"Editor","cmd":"/usr/bin/flatpak run --command=gedit --file-forwarding org.gnome.gedit"},{"title":"Sticky Notes","cmd":"/usr/bin/flatpak run --command=com.vixalien.sticky com.vixalien.sticky"},{"title":"File Manager","cmd":"nautilus --new-window Me/"},{"title":"Gnome Extensions","cmd":"/usr/bin/flatpak run --command=extension-manager --file-forwarding com.mattjakeman.ExtensionManager"},{"title":"System Monitor","cmd":"gnome-system-monitor"},{"title":"System Logs","cmd":"/usr/bin/flatpak run --command=gnome-logs org.gnome.Logs"},{"title":"App Permissions","cmd":"/usr/bin/flatpak run --command=com.github.tchx84.Flatseal com.github.tchx84.Flatseal"},{"title":"Play with CatCat","cmd":"oneko"},{"title":"File Share","cmd":"/usr/bin/flatpak run --command=localsend --file-forwarding org.localsend.localsend_app"},{"title":"Toggle Color PIcker","cmd":"ujust toggle-extension color-picker@tuberry"},{"title":"Emoji Picker","cmd":"/usr/bin/flatpak run --command=/app/bin/gnome-characters org.gnome.Characters"},{"title":"Screen Recorder","cmd":"/usr/bin/flatpak run --command=gpu-screen-recorder-gtk com.dec05eba.gpu_screen_recorder"},{"title":"Password Manager","cmd":"/usr/bin/flatpak run --command=secrets --file-forwarding org.gnome.World.Secrets"}]'
+context-menu-entries='[{"title":"Calculator","cmd":"/usr/bin/flatpak run --command=gnome-calculator org.gnome.Calculator"},{"title":"Sticky Notes","cmd":"/usr/bin/flatpak run --command=com.vixalien.sticky com.vixalien.sticky"},{"title":"Text Editor","cmd":"/usr/bin/flatpak run --command=gedit --file-forwarding org.gnome.gedit"},{"title":"System Monitor","cmd":"gnome-system-monitor"},{"title":"App Permissions","cmd":"/usr/bin/flatpak run --command=com.github.tchx84.Flatseal com.github.tchx84.Flatseal"},{"title":"Gnome Extensions","cmd":"/usr/bin/flatpak run --command=extension-manager --file-forwarding com.mattjakeman.ExtensionManager"},{"title":"Play with CatCat","cmd":"oneko"},{"title":"Toggle Color PIcker","cmd":"ujust toggle-extension color-picker@tuberry"},{"title":"Emoji Picker","cmd":"/usr/bin/flatpak run --command=/app/bin/gnome-characters org.gnome.Characters"},{"title":"File Share","cmd":"/usr/bin/flatpak run --command=localsend --file-forwarding org.localsend.localsend_app"},{"title":"Screen Recorder","cmd":"/usr/bin/flatpak run --command=gpu-screen-recorder-gtk com.dec05eba.gpu_screen_recorder"},{"title":"Password Manager","cmd":"/usr/bin/flatpak run --command=secrets --file-forwarding org.gnome.World.Secrets"},{"title":"System Logs","cmd":"/usr/bin/flatpak run --command=gnome-logs org.gnome.Logs"},{"title":"Terminal","cmd":"ptyxis"}]'
 dot-color-dominant=true
 dot-color-override=false
 dot-color-unfocused-different=false
@@ -189,6 +190,112 @@ use-higher-precision=true
 [org/gnome/shell/extensions/notification-timeout]
 always-normal=false
 timeout=1000
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/misc]
+action-event-delay=50
+barrier-fallback=false
+corners-visible=false
+custom-menu-1=['toggle-overview', 'show-applications', 'show-screenshot-ui', 'black-screen', 'hide-panel', 'show-custom-menu-2', 'move-win-to-next-ws', 'move-win-to-prev-ws', 'stick-win', 'show-desktop', 'access-submenu', 'zoom-in', 'zoom-out', 'gnome-submenu', 'night-light-toggle', 'toggle-theme', 'core-submenu', 'kill-app', 'unminimize-all', 'win-control-submenu', 'fullscreen-on-empty-ws', 'system-submenu', 'lock-screen', 'suspend', 'power-off', 'log-out', 'switch-user']
+custom-menu-2=['core-submenu', 'workspaces-submenu', 'win-navigation-submenu', 'win-switcher-popup-submenu', 'win-control-submenu', 'win-reloc-submenu', 'win-thumbnails-submenu', 'win-adjust-submenu', 'win-effects-submenu', 'global-effects-submenu', 'access-submenu', 'system-submenu', 'custom-menus-submenu', 'hardware-submenu', 'debug-submenu', 'prefs-submenu', 'toggle-overview', 'show-overview', 'toggle-overview-app', 'toggle-applications', 'show-applications', 'show-desktop', 'show-desktop-mon', 'black-screen', 'show-screenshot-ui', 'black-screen-mon', 'prev-workspace', 'next-workspace', 'prev-workspace-popup', 'next-workspace-popup', 'prev-workspace-current-mon', 'next-workspace-current-mon', 'recent-workspace', 'move-to-second-last-ws', 'reorder-ws-prev', 'reorder-ws-next', 'rotate-ws-prev-mon', 'rotate-ws-next-mon', 'close-workspace', 'recent-win', 'prev-win-mon', 'prev-win-ws', 'prev-win-all', 'prev-win-all-app', 'next-win-mon', 'next-win-ws', 'next-win-all', 'next-win-all-app', 'win-switcher-popup-all', 'win-switcher-popup-ws', 'win-switcher-popup-mon', 'win-switcher-popup-ws-first', 'win-switcher-popup-apps', 'win-switcher-popup-class', 'app-switcher-popup-all', 'app-switcher-popup-ws', 'app-switcher-popup-mon', 'minimize-win', 'maximize-win', 'close-win', 'fullscreen-win', 'fullscreen-on-empty-ws', 'above-win', 'stick-win', 'open-new-window', 'quit-app', 'kill-app', 'unminimize-all-ws', 'unminimize-all', 'move-win-to-prev-ws', 'move-win-to-prev-new-ws', 'move-win-to-next-new-ws', 'move-win-to-next-ws', 'move-app-to-prev-ws', 'move-app-to-prev-new-ws', 'move-app-to-next-ws', 'move-app-to-next-new-ws', 'move-win-to-next-monitor', 'make-thumbnail-win', 'minimize-to-thumbnail', 'remove-win-thumbnails', 'bright-up-win', 'bright-down-win', 'contrast-up-win', 'contrast-down-win', 'contrast-high-win', 'contrast-low-win', 'opacity-up-win', 'opacity-down-win', 'opacity-toggle-hc-win', 'opacity-toggle-win', 'opacity-toggle-lc-win', 'invert-light-win', 'invert-light-shift-win', 'invert-colors-win', 'tint-red-toggle-win', 'tint-green-toggle-win', 'tint-custom-toggle-win', 'desaturate-win', 'remove-effects-win', 'bright-up-all', 'bright-down-all', 'contrast-up-all', 'contrast-down-all', 'contrast-high-all', 'contrast-low-all', 'invert-light-all', 'invert-light-shift-all', 'tint-red-toggle-all', 'tint-custom-toggle-all', 'tint-green-toggle-all', 'desaturate-all', 'remove-effects-all', 'toggle-zoom', 'zoom-in', 'zoom-out', 'screen-reader', 'large-text', 'keyboard', 'protan-toggle', 'deuter-toggle', 'tritan-toggle', 'protan-sim-toggle', 'deuter-sim-toggle', 'tritan-sim-toggle', 'mixer-gbr-toggle', 'gnome-submenu', 'night-light-toggle', 'toggle-theme', 'hide-panel', 'open-panel-system-menu', 'open-panel-date-menu', 'lock-screen', 'screensaver', 'suspend', 'power-off', 'switch-user', 'log-out', 'media-submenu', 'volume-up', 'volume-down', 'mute-sound', 'mpris-play-pause', 'mpris-next', 'mpris-prev', 'mpris-play-pause-spotify', 'mpris-next-spotify', 'mpris-prev-spotify', 'mpris-play-pause-firefox', 'mpris-next-firefox', 'mpris-prev-firefox', 'show-custom-menu-1', 'show-custom-menu-2', 'show-custom-menu-3', 'show-custom-menu-4', 'display-brightness-up', 'display-brightness-down', 'looking-glass', 'restart-shell', 'lg-inspector', 'run-prompt', 'swipe-ws-up', 'swipe-ws-down', 'swipe-overview-up', 'swipe-overview-down', 'prefs', 'hot-corners-require-shift', 'update-hot-corners']
+custom-tint-color='rgb(255,163,72)'
+panel-menu-enable=false
+show-osd-monitor-indexes=false
+supported-active-extensions=@as []
+win-thumbnail-scale=50
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-0]
+barrier-size-h=1
+barrier-size-v=1
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-1]
+action='recent-workspace'
+h-expand=false
+v-expand=true
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-2]
+action='fullscreen-win'
+command='io.github.seadve.Kooha'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-3]
+action='above-win'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-4]
+action='move-win-to-prev-ws'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-5]
+action='move-win-to-next-ws'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-6]
+ctrl=true
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-0]
+action='disabled'
+pressure-threshold=100
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-1]
+action='show-desktop'
+h-expand=false
+v-expand=false
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-2]
+action='unminimize-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-3]
+action='power-off'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-4]
+action='zoom-in'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-5]
+action='zoom-out'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-right-6]
+ctrl=true
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-0]
+action='disabled'
+barrier-size-h=1
+barrier-size-v=1
+pressure-threshold=350
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-1]
+action='toggle-overview'
+h-expand=false
+v-expand=false
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-2]
+action='toggle-applications'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-3]
+action='remove-effects-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-4]
+action='contrast-up-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-5]
+action='contrast-down-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-6]
+action='toggle-applications'
+ctrl=true
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-1]
+action='remove-effects-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-2]
+action='show-custom-menu-2'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-3]
+action='lock-screen'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-4]
+action='bright-down-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-5]
+action='bright-up-all'
+
+[org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-6]
+ctrl=true
 
 [org/gnome/shell/extensions/blur-my-shell]
 pipelines={'pipeline_default': {'name': <'Default'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_000000000000'>, 'params': <{'radius': <30>, 'brightness': <0.59999999999999998>}>}>]>}, 'pipeline_default_rounded': {'name': <'Default rounded'>, 'effects': <[<{'type': <'corner'>, 'id': <'effect_000000000002'>, 'params': <{'radius': <18>}>}>, <{'type': <'native_static_gaussian_blur'>, 'id': <'effect_89048584225338'>, 'params': <{'unscaled_radius': <12>, 'brightness': <0.59999999999999998>}>}>]>}}

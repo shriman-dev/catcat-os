@@ -10,7 +10,7 @@ sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup
 sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 
 # enable disk discard
-sed -i "s|issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
+sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
 # libvirt setup
 sed -i 's|.*unix_sock_group =.*|unix_sock_group = "libvirt"|' /etc/libvirt/libvirtd.conf

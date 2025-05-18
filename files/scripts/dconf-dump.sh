@@ -65,6 +65,7 @@ s|video-path=.*|video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.
 /user-enabled/d
 /indicator-position-max/d"
     ['/org/gnome/shell/extensions/clipboard-history/']=""
+    ['/org/gnome/shell/extensions/custom-hot-corners-extended/']=""
     ['/org/gnome/shell/extensions/dash-to-panel/']="
 /dash-to-panel/,/^$/ { s/{\".*0x0.*0\":/{\"0\":/ }
 /dash-to-panel/,/^$/ { /primary-monitor=/d }"
@@ -76,8 +77,8 @@ s/hot-sensors=.*/hot-sensors=\['__temperature_avg__', '_processor_usage_', '_mem
     ['/org/gnome/shell/extensions/user-theme/']=""
 )
 
-echo -e "[org/gnome/shell]
-enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'dash-to-panel@jderose9.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > $DCONF_DIR/extensions
+echo -e "\n[org/gnome/shell]
+enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'dash-to-panel@jderose9.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > $DCONF_DIR/extensions
 
 for path in "${!extensionPathsWithSed[@]}"; do
     dconfDump "$path" "${extensionPathsWithSed[$path]}" "$DCONF_DIR/extensions"
@@ -101,6 +102,7 @@ dconfDump '/org/gnome/mutter/' "/output-luminance/d" $DCONF_DIR/wmpreferences
 # shell
 declare -A shellPathsWithSed=(
     ['/org/gnome/shell/']="
+s|favorite-apps=.*|favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'io.gitlab.librewolf-community.desktop', 'io.freetubeapp.FreeTube.desktop', 'com.valvesoftware.Steam.desktop']|
 /shell\/extensions/,\$d
 /command-history/d
 /enabled-extensions/d

@@ -270,7 +270,7 @@ show_help() {
     echo "  -h, --help                                Show this help message"
     echo "  -v, --verbose                             Enable verbose output"
     echo "  -q, --quiet                               Suppress non-error output"
-    echo "  -u, --update-blocklist                    Update DNS blocklist"
+    echo "  -u, --update                              Update DNS blocklist"
     echo "  --enable                                  Enable localdns"
     echo "  --disable                                 Disable localdns"
     echo "  --restart                                 Restart DNSMasq and DNSCrypt"

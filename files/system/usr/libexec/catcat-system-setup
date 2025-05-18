@@ -9,13 +9,13 @@ U1000="$(id -un 1000)"
 echo "Current kargs: $KARGS"
 
 replaceXAdd() {
-grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+  grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
 # copy main user monitors.xml to gdm
-[[ -f /home/$USER/.config/monitors.xml && ! -f /var/lib/gdm/.config/monitors.xml ]] && {
-    cp -vf /home/$USER/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
-}
+if ! diff -q "/home/$U1000/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
+  cp -vf /home/$U1000/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
+fi
 
 # setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
@@ -90,7 +90,8 @@ fi
 
 # set kargs
 KARGS_TO_ADD=(
-  "rd.luks=discard"
+  "rd.luks.options=discard"
+  "luks.options=discard"
   "rd.udev.log_priority=3"
   "loglevel=3"
   "sysrq_always_enabled=1"

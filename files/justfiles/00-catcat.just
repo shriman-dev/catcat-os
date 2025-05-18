@@ -87,6 +87,6 @@ toggle-updates ACTION="prompt":
 
 # Enable or Disable gnome extension
 toggle-gnome-extension EXTENSION_ID:
-    #!/usr/bin/env bash
+    #!/usr/bin/bash
     EXTENSION_ID={{ EXTENSION_ID }}
     gnome-extensions $(gnome-extensions show ${EXTENSION_ID} | grep -qow 'ACTIVE' && echo "disable" || echo "enable") ${EXTENSION_ID}

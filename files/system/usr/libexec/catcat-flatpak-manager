@@ -31,26 +31,29 @@ runtimes() {
   done
 }
 
+install_flatpaks() {
 # Install or remove flatpaks if system is updated
-if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
-  # Add and set flathub
-  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
-  flatpak remote-modify --system --prio=9 flathub
+  if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
+    # Add and set flathub
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
+    flatpak remote-modify --system --prio=9 flathub
 
-  # Install flatpaks in list
-  INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
-  if check_internet_connection; then
-    echo "Installing system flatpaks from config list (requires internet)"
-    flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
-    runtimes
-    cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
+    # Install flatpaks in list
+    INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
+    if check_internet_connection; then
+      echo "Installing system flatpaks from config list (requires internet)"
+      flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
+      runtimes
+      cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
+    fi
+
+    # Remove flatpaks in list
+  #  REMOVE_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/remove ))
+  #  echo "Removing system flatpaks from config list"
+  #  flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
   fi
+}
 
-  # Remove flatpaks in list
-#  REMOVE_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/remove ))
-#  echo "Removing system flatpaks from config list"
-#  flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
-fi
 
 FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ~/.local/share/flatpak/app/)"
 SCOPE='--user'
@@ -341,9 +344,10 @@ main() {
 }
 
 [[ $# -eq 0 ]] && {
+  SCOPE="--system"
+  install_flatpaks
   remove_filesystem_access
   grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-    SCOPE="--system"
     apply_global_restrictions
   }
 }
