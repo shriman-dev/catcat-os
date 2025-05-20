@@ -69,10 +69,15 @@ name='Catppuccin-Orange-Dark'
 
 [org/gnome/shell/extensions/caffeine]
 countdown-timer=0
-duration-timer=3
+duration-timer=2
+duration-timer-list=[900, 1800, 3600]
 indicator-position=0
 indicator-position-index=0
+inhibit-apps=@as []
+prefs-default-height=591
+prefs-default-width=570
 restore-state=true
+show-indicator='never'
 
 [org/gnome/shell/extensions/dash-to-panel]
 animate-appicon-hover=true
@@ -86,7 +91,7 @@ appicon-margin=0
 appicon-padding=1
 available-monitors=[0]
 click-action='CYCLE-MIN'
-context-menu-entries='[{"title":"Calculator","cmd":"/usr/bin/flatpak run --command=gnome-calculator org.gnome.Calculator"},{"title":"Sticky Notes","cmd":"/usr/bin/flatpak run --command=com.vixalien.sticky com.vixalien.sticky"},{"title":"Text Editor","cmd":"/usr/bin/flatpak run --command=gedit --file-forwarding org.gnome.gedit"},{"title":"System Monitor","cmd":"gnome-system-monitor"},{"title":"App Permissions","cmd":"/usr/bin/flatpak run --command=com.github.tchx84.Flatseal com.github.tchx84.Flatseal"},{"title":"Gnome Extensions","cmd":"/usr/bin/flatpak run --command=extension-manager --file-forwarding com.mattjakeman.ExtensionManager"},{"title":"Play with CatCat","cmd":"oneko"},{"title":"Toggle Color PIcker","cmd":"ujust toggle-extension color-picker@tuberry"},{"title":"Emoji Picker","cmd":"/usr/bin/flatpak run --command=/app/bin/gnome-characters org.gnome.Characters"},{"title":"File Share","cmd":"/usr/bin/flatpak run --command=localsend --file-forwarding org.localsend.localsend_app"},{"title":"Screen Recorder","cmd":"/usr/bin/flatpak run --command=gpu-screen-recorder-gtk com.dec05eba.gpu_screen_recorder"},{"title":"Password Manager","cmd":"/usr/bin/flatpak run --command=secrets --file-forwarding org.gnome.World.Secrets"},{"title":"System Logs","cmd":"/usr/bin/flatpak run --command=gnome-logs org.gnome.Logs"},{"title":"Terminal","cmd":"ptyxis"}]'
+context-menu-entries='[{"title":"Calculator","cmd":"/usr/bin/flatpak run --command=gnome-calculator org.gnome.Calculator"},{"title":"Sticky Notes","cmd":"/usr/bin/flatpak run --command=com.vixalien.sticky com.vixalien.sticky"},{"title":"Text Editor","cmd":"/usr/bin/flatpak run --command=gedit --file-forwarding org.gnome.gedit"},{"title":"App Permissions","cmd":"/usr/bin/flatpak run --command=com.github.tchx84.Flatseal com.github.tchx84.Flatseal"},{"title":"Gnome Extensions","cmd":"/usr/bin/flatpak run --command=extension-manager --file-forwarding com.mattjakeman.ExtensionManager"},{"title":"Play with CatCat","cmd":"oneko"},{"title":"Toggle Color PIcker","cmd":"ujust toggle-extension color-picker@tuberry"},{"title":"Emoji Picker","cmd":"/usr/bin/flatpak run --command=/app/bin/gnome-characters org.gnome.Characters"},{"title":"File Share","cmd":"/usr/bin/flatpak run --command=localsend --file-forwarding org.localsend.localsend_app"},{"title":"Password Manager","cmd":"/usr/bin/flatpak run --command=secrets --file-forwarding org.gnome.World.Secrets"},{"title":"Screen Recorder","cmd":"/usr/bin/flatpak run --command=gpu-screen-recorder-gtk com.dec05eba.gpu_screen_recorder"},{"title":"System Monitor","cmd":"gnome-system-monitor"},{"title":"System Logs","cmd":"/usr/bin/flatpak run --command=gnome-logs org.gnome.Logs"},{"title":"Terminal","cmd":"ptyxis"}]'
 dot-color-dominant=true
 dot-color-override=false
 dot-color-unfocused-different=false
@@ -286,7 +291,7 @@ action='remove-effects-all'
 action='show-custom-menu-2'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-3]
-action='lock-screen'
+action='tint-custom-toggle-all'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-right-4]
 action='bright-down-all'

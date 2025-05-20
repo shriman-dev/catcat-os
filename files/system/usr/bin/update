@@ -105,13 +105,13 @@ EOF
 process_command() {
     case "$1" in
         "all")
-            sudo update_system
-            sudo update_firmware
-            sudo update_dns_blocklist
-            sudo update_flatpak
-            sudo update_nixpkg
-            sudo run_as_users update_flatpa
-            sudo run_as_users update_nixpkg
+            update_system
+            update_firmware
+            update_dns_blocklist
+            update_flatpak
+            update_nixpkg
+            run_as_users update_flatpak
+            run_as_users update_nixpkg
             ;;
         "extra")
             update_flatpak
