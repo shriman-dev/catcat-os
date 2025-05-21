@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <property name="step-increment">0.01</property>
     <property name="page-increment">0.10</property>
   </object>
-  <!-- n-columns=2 n-rows=11 -->
+  <!-- n-columns=2 n-rows=12 -->
   <template class="DDTermPrefsTabs" parent="GtkGrid">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -240,6 +240,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <packing>
         <property name="left-attach">0</property>
         <property name="top-attach">6</property>
+        <property name="width">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkCheckButton" id="save_restore_session_check">
+        <property name="label" translatable="yes">_Restore previous tabs on startup</property>
+        <property name="visible">1</property>
+        <property name="can-focus">1</property>
+        <property name="action-name">settings.save-restore-session</property>
+        <property name="use-underline">1</property>
+        <property name="draw-indicator">1</property>
+      </object>
+      <packing>
+        <property name="left-attach">0</property>
+        <property name="top-attach">11</property>
         <property name="width">2</property>
       </packing>
     </child>

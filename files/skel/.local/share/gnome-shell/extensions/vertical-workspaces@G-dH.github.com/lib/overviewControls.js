@@ -496,11 +496,12 @@ const ControlsManagerCommon = {
 
         // If the user starts typing or activates the search provider during the overview animation,
         // this function will be called again after the overview animation finishes
-        if (opt.SEARCH_VIEW_ANIMATION && Main.overview._animationInProgress && finalState === ControlsState.WINDOW_PICKER)
+        if (Main.overview._shown && opt.SEARCH_VIEW_ANIMATION && Main.overview._animationInProgress && finalState === ControlsState.WINDOW_PICKER)
             return;
 
         this._updateSearchStyle();
-        this._searchInProgress = true;
+        if (searchActive)
+            this._searchInProgress = true;
 
         if (this._searchAppGridMode(searchActive) && searchActive)
             return;
@@ -514,6 +515,14 @@ const ControlsManagerCommon = {
         this._animateSearchResultsIfNeeded(searchActive);
         if (opt.SHOW_BG_IN_OVERVIEW && this._bgManagerWindowPicker)
             this._updateBackground(this._bgManagerWindowPicker, this._stateAdjustment);
+    },
+
+    _updateSearchInProgress() {
+        const currentState = this._searchInProgress;
+        this._searchInProgress = this._searchController.searchActive;
+        // Update bg brightness after leaving search mode
+        if (!this._searchInProgress && currentState !== this._searchInProgress)
+            this._updateBackgroundsConfiguration();
     },
 
     _shiftOverviewStateIfNeeded(searchActive, finalState) {
@@ -538,7 +547,7 @@ const ControlsManagerCommon = {
             duration: searchActive ? inDuration : outDuration,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onStopped: () => {
-                this._searchInProgress = searchActive;
+                this._updateSearchInProgress();
                 this._workspacesDisplay.setPrimaryWorkspaceVisible(true);
             },
         });
@@ -582,7 +591,7 @@ const ControlsManagerCommon = {
             onStopped: () => {
                 this._searchController.visible = searchActive;
                 if ((opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE) || this.dash.showAppsButton.checked)
-                    this._searchInProgress = searchActive;
+                    this._updateSearchInProgress();
                 this._updateAppDisplayVisibility();
             },
         });
@@ -672,7 +681,7 @@ const ControlsManagerCommon = {
     },
 
     _updateSearchStyle(reset) {
-        if (!reset && (opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE && !this.dash.showAppsButton.checked)) {
+        if (!reset && (((opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE && !this.dash.showAppsButton.checked) || opt.SEARCH_RESULTS_BG_STYLE))) {
             this._searchController._searchResults._content.add_style_class_name('search-section-content-bg-om2');
             this._searchEntry.add_style_class_name('search-entry-om2');
         } else {
@@ -924,7 +933,7 @@ const ControlsManagerCommon = {
             if (opt.WS_TMB_TOP)
                 offset += tmbBox.height + 12;
 
-            searchTranslationY = -searchEntryBin.height - offset - 30;
+            searchTranslationY = -searchEntryBin.height - offset - 50;
         }
 
         let tmbTranslationX = 0, tmbTranslationY = 0;
@@ -988,8 +997,8 @@ const ControlsManagerCommon = {
         let panelTranslationY = 0;
         if (opt.PANEL_OVERVIEW_ONLY && (!opt.SHOW_WS_PREVIEW_BG || opt.OVERVIEW_MODE2)) {
             panelTranslationY = opt.PANEL_POSITION_TOP
-                ? -panelBox.height
-                : panelBox.height;
+                ? -panelBox.height - 10
+                : panelBox.height + 10;
         }
 
         return [
@@ -1004,7 +1013,6 @@ const ControlsManagerCommon = {
 
     animateToOverview(state, callback) {
         this._ignoreShowAppsButtonToggle = true;
-        this._searchInProgress = false;
 
         this._stateAdjustment.value = ControlsState.HIDDEN;
 
@@ -1196,12 +1204,14 @@ const ControlsManagerCommon = {
     },
 
     _updateBackground(bgManager, stateAdjustment) {
-        const searchActive = this._searchController.searchActive;
+        const searchActive = this._searchInProgress;
         const staticWorkspace = opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE;
         const { currentState } = stateAdjustment.getStateTransitionParams();
-        const stateValue = opt.FAKE_BLUR_TRANSITION || (opt.SHOW_WS_PREVIEW_BG && currentState < ControlsState.WINDOW_PICKER)
-            ? Math.ceil(currentState)
-            : currentState;
+        const stateValue =
+            (opt.FAKE_BLUR_TRANSITION && opt.OVERVIEW_BG_BLUR_SIGMA !== opt.APP_GRID_BG_BLUR_SIGMA) ||
+            (opt.SHOW_WS_PREVIEW_BG && currentState < ControlsState.WINDOW_PICKER)
+                ? Math.ceil(currentState)
+                : currentState;
 
         if (!opt.SHOW_BG_IN_OVERVIEW && !opt.SHOW_WS_PREVIEW_BG) {
             if (!(staticWorkspace && stateValue <= 1))
@@ -1210,7 +1220,7 @@ const ControlsManagerCommon = {
             const targetBg = currentState > 1 && bgManager._bgManagerAppGrid ? bgManager._bgManagerAppGrid : bgManager;
             this._setBgBrightness(targetBg, stateValue, staticWorkspace, searchActive);
             if (opt.OVERVIEW_BG_BLUR_SIGMA || opt.APP_GRID_BG_BLUR_SIGMA)
-                this._setBlurEffect(targetBg, stateValue, staticWorkspace);
+                this._setBlurEffect(targetBg, stateValue, staticWorkspace, searchActive);
 
             let progress = opt.SHOW_WS_PREVIEW_BG && currentState <= 1 ? 1 : currentState;
             if (!bgManager._bgManagerAppGrid && progress > 1 && staticWorkspace)
@@ -1229,8 +1239,8 @@ const ControlsManagerCommon = {
         }
 
         const overviewBrightness = !opt.SHOW_WS_PREVIEW_BG && staticWorkspace ? 1 : opt.OVERVIEW_BG_BRIGHTNESS;
-        let secBrightness = searchActive ? opt.SEARCH_BG_BRIGHTNESS : opt.APP_GRID_BG_BRIGHTNESS;
-        if (staticWorkspace && !this._appDisplay.visible)
+        let secBrightness = searchActive && !opt.SEARCH_RESULTS_BG_STYLE ? opt.SEARCH_BG_BRIGHTNESS : opt.APP_GRID_BG_BRIGHTNESS;
+        if ((staticWorkspace && !this._appDisplay.visible && !searchActive) || (searchActive && opt.SEARCH_RESULTS_BG_STYLE && !this.dash.showAppsButton.checked))
             secBrightness = overviewBrightness;
 
         // const vignette = !opt.SHOW_WS_PREVIEW_BG && staticWorkspace ? 0 : 0.2;
@@ -1259,12 +1269,18 @@ const ControlsManagerCommon = {
         return blurEffect.sigma === undefined ? 'radius' : 'sigma';
     },
 
-    _setBlurEffect(bgManager, stateValue, staticWorkspace) {
+    _setBlurEffect(bgManager, stateValue, staticWorkspace, searchActive) {
         const blurEffect = this._getBlurEffect(bgManager);
         const radiusProperty = this._getRadiusProperty(blurEffect);
 
-        const overviewBlurRadius = !opt.SHOW_WS_PREVIEW_BG && staticWorkspace ? 0 : opt.OVERVIEW_BG_BLUR_SIGMA;
-        const appGridBlurRadius = staticWorkspace && !blurEffect[radiusProperty] && !this._appDisplay.visible ? overviewBlurRadius : opt.APP_GRID_BG_BLUR_SIGMA;
+        const overviewBlurRadius = !opt.SHOW_WS_PREVIEW_BG && staticWorkspace
+            ? 0
+            : opt.OVERVIEW_BG_BLUR_SIGMA;
+        const appGridBlurRadius =
+            (searchActive && opt.SEARCH_RESULTS_BG_STYLE && !this.dash.showAppsButton.checked) ||
+            (staticWorkspace && !blurEffect[radiusProperty] && !this._appDisplay.visible)
+                ? overviewBlurRadius
+                : opt.APP_GRID_BG_BLUR_SIGMA;
 
         let radius;
         if (stateValue < 1)
@@ -1479,7 +1495,7 @@ const ControlsManagerLayoutVertical = {
         const transitionParams = this._stateAdjustment.getStateTransitionParams();
         const spacing = opt.SPACING;
 
-        const staticWorkspace = opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE;
+        const opaqueSearchResults = (opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE && !this._dash.showAppsButton.checked) || opt.SEARCH_RESULTS_BG_STYLE;
 
         // Panel
         const panelX = 0;
@@ -1633,7 +1649,7 @@ const ControlsManagerLayoutVertical = {
 
         // searchEntry
         const [searchEntryHeight] = this._searchEntry.get_preferred_height(width - wsTmbWidth);
-        const searchEntryY = startY + topBoxOffset + (staticWorkspace ? spacing : 0);
+        const searchEntryY = startY + topBoxOffset + (opaqueSearchResults ? spacing : 0);
 
         const searchX = startX +
             (opt.CENTER_SEARCH_VIEW || this._xAlignCenter
@@ -1651,10 +1667,10 @@ const ControlsManagerLayoutVertical = {
         this._searchEntry.allocate(childBox);
 
         // searchResults
-        const searchY = staticWorkspace
+        const searchY = opaqueSearchResults
             ? searchEntryY - 4
             : startY + topBoxOffset + searchEntryHeight + spacing;
-        const searchHeight = staticWorkspace
+        const searchHeight = opaqueSearchResults
             ? height - topBoxOffset - bottomBoxOffset
             : height - topBoxOffset - bottomBoxOffset - searchEntryHeight - 2 * spacing;
 
@@ -1696,6 +1712,8 @@ const ControlsManagerLayoutVertical = {
         this._workspacesDisplay.allocate(workspacesBox);
 
         // appDisplay
+        // Keep space for the search entry above the the app grid if app grid search mode is enabled
+        topBoxOffset += opt.spaceReservedForSearchEntry;
         params = [
             box,
             leftBoxOffsetAppGrid,
@@ -1731,7 +1749,7 @@ const ControlsManagerLayoutHorizontal = {
         const transitionParams = this._stateAdjustment.getStateTransitionParams();
         const spacing = opt.SPACING;
 
-        const staticWorkspace = opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE;
+        const opaqueSearchResults = (opt.OVERVIEW_MODE2 && !opt.WORKSPACE_MODE && !this._dash.showAppsButton.checked) || opt.SEARCH_RESULTS_BG_STYLE;
 
         // Panel
         const panelX = 0;
@@ -1829,9 +1847,11 @@ const ControlsManagerLayoutHorizontal = {
                 ? startY + wstTopOffset
                 : startY + height - wstBottomOffset - wsTmbHeight;
 
-            let offset = (width - wstLeftOffset - wsTmbWidth - wstRightOffset) / 2;
-            offset = Math.round(offset - (opt.WS_TMB_POSITION_ADJUSTMENT * offset));
-            const wsTmbX = startX + wstLeftOffset + offset;
+            // Center wsTmb always to screen
+            let offset = (width - wsTmbWidth) / 2;
+            offset -= opt.WS_TMB_POSITION_ADJUSTMENT * offset;
+            offset = Math.clamp(offset, wstLeftOffset, width - wsTmbWidth - wstRightOffset);
+            const wsTmbX = Math.round(startX + offset);
 
             childBox.set_origin(wsTmbX, wsTmbY);
             childBox.set_size(Math.max(wsTmbWidth, 1), Math.max(wsTmbHeight, 1));
@@ -1880,11 +1900,11 @@ const ControlsManagerLayoutHorizontal = {
 
         // App grid needs to be calculated for the max wsTmbWidth in app grid, independently on the current wsTmb scale
         const wsTmbHeightAppGrid = Math.round(height * opt.MAX_THUMBNAIL_SCALE_APPGRID);
-        const topBoxOffsetAppGrid = (opt.DASH_TOP ? dashHeight : spacing) + (opt.WS_TMB_TOP ? wsTmbHeightAppGrid + spacing : 0) + (opt.SHOW_SEARCH_ENTRY ? searchEntryHeight + spacing : 0);
+        let topBoxOffsetAppGrid = (opt.DASH_TOP ? dashHeight : spacing) + (opt.WS_TMB_TOP ? wsTmbHeightAppGrid + spacing : 0) + (opt.SHOW_SEARCH_ENTRY ? searchEntryHeight + spacing : 0);
         const bottomBoxOffsetAppGrid = (opt.DASH_BOTTOM ? dashHeight : spacing) + (opt.WS_TMB_BOTTOM ? wsTmbHeightAppGrid + spacing : 0);
 
         // searchEntry
-        const searchEntryY = startY + topBoxOffset + (staticWorkspace ? spacing : 0);
+        const searchEntryY = startY + topBoxOffset + (opaqueSearchResults ? spacing : 0);
 
         const searchX = startX +
             (opt.CENTER_SEARCH_VIEW || this._xAlignCenter
@@ -1902,10 +1922,10 @@ const ControlsManagerLayoutHorizontal = {
         this._searchEntry.allocate(childBox);
 
         // searchResults
-        const searchY = staticWorkspace
+        const searchY = opaqueSearchResults
             ? searchEntryY - 4
             : startY + topBoxOffset + searchEntryHeight + spacing;
-        const searchHeight = staticWorkspace
+        const searchHeight = opaqueSearchResults
             ? height - topBoxOffset - bottomBoxOffset
             : height - topBoxOffset - bottomBoxOffset - searchEntryHeight - 2 * spacing;
 
@@ -1947,6 +1967,8 @@ const ControlsManagerLayoutHorizontal = {
         this._workspacesDisplay.allocate(workspacesBox);
 
         // appDisplay
+        // Keep space for the search entry above the the app grid if app grid search mode is enabled
+        topBoxOffsetAppGrid += opt.spaceReservedForSearchEntry;
         params = [
             box,
             leftBoxOffset === spacing ? 0 : leftBoxOffset,

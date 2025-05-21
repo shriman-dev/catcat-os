@@ -1,14 +1,15 @@
 // SPDX-FileCopyrightText: tuberry
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+export const HEX = '#{Rex}{Grx}{Blx}';
 export const Preset = ['HEX', 'RGB', 'HSL', 'OKLCH'];
 
-export const Field = {
+export const Key = {
     MKEY:  'menu-key',
     QKEY:  'quit-key',
     COPY:  'auto-copy',
-    MSIZ:  'menu-size',
-    MSTL:  'menu-style',
+    MNSZ:  'menu-size',
+    MNTP:  'menu-type',
     MENU:  'format-menu',
     NTFS:  'notify-style',
     SND:   'enable-sound',

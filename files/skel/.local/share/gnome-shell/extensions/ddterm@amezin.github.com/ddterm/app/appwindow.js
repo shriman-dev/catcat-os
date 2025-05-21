@@ -135,6 +135,9 @@ export const AppWindow = GObject.registerClass({
             'no-split'
         ),
     },
+    Signals: {
+        'session-update': {},
+    },
 },
 class DDTermAppWindow extends Gtk.ApplicationWindow {
     _init(params) {
@@ -333,10 +336,12 @@ class DDTermAppWindow extends Gtk.ApplicationWindow {
         this.update_show_shortcuts();
 
         this.connect('notify::is-empty', () => {
-            if (this.is_empty) {
-                this.application.save_session();
+            if (this.is_empty)
                 this.close();
-            }
+        });
+
+        this.connect('notify::split-orientation', () => {
+            this.emit('session-update');
         });
 
         this._hide_on_close();
@@ -498,6 +503,10 @@ class DDTermAppWindow extends Gtk.ApplicationWindow {
             'tab-close-buttons',
             Gio.SettingsBindFlags.GET
         );
+
+        notebook.connect('session-update', () => {
+            this.emit('session-update');
+        });
 
         return notebook;
     }

@@ -327,6 +327,11 @@ const TerminalBase = GObject.registerClass({
 
         super._init(params);
 
+        this.connect('child-exited', () => {
+            this._child_pid = 0;
+            this.notify('child-pid');
+        });
+
         this._url_detect = new UrlDetect({
             terminal: this,
             enabled_patterns: this.url_detect_patterns,
@@ -530,11 +535,19 @@ const TerminalBase = GObject.registerClass({
         cancellable,
         callback
     ) {
+        let destroyed = false;
+        const destroy_handler = this.connect('destroy', () => {
+            destroyed = true;
+        });
+
         const callback_wrapper = (...args) => {
             const [terminal_, pid, error_] = args;
 
-            this._child_pid = pid;
-            this.notify('child-pid');
+            if (!destroyed) {
+                this.disconnect(destroy_handler);
+                this._child_pid = pid;
+                this.notify('child-pid');
+            }
 
             callback?.(...args);
         };

@@ -12,10 +12,9 @@
   ],
   "settings-schema": "org.gnome.shell.extensions.customize-ibus",
   "shell-version": [
-    "46",
-    "47"
+    "48"
   ],
   "url": "https://github.com/openSUSE/Customize-IBus",
   "uuid": "customize-ibus@hollowman.ml",
-  "version": 90
+  "version": 91
 }

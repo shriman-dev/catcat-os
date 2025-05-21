@@ -266,6 +266,8 @@ export const ColorsWidget = GObject.registerClass({
         'theme_variant_combo',
         'color_scheme_editor',
         'color_scheme_combo',
+        'color_scheme_list',
+        'copy_gnome_terminal_profile_button',
         'foreground_color',
         'background_color',
         'opacity_scale',
@@ -275,6 +277,7 @@ export const ColorsWidget = GObject.registerClass({
         'highlight_foreground_color',
         'highlight_background_color',
         'palette_combo',
+        'palette_list',
         'bold_color_check',
     ].concat(PALETTE_WIDGET_IDS),
     Properties: {
@@ -309,7 +312,7 @@ export const ColorsWidget = GObject.registerClass({
         bind_sensitive(this.settings, 'use-theme-colors', this.color_scheme_editor, true);
 
         this.color_scheme = new ColorScheme({
-            presets: this.color_scheme_combo.model,
+            presets: this.color_scheme_list,
         });
 
         this.#bind_color('foreground-color', this.foreground_color, this.color_scheme.colors[0]);
@@ -367,7 +370,7 @@ export const ColorsWidget = GObject.registerClass({
         });
 
         this.palette = new ColorScheme({
-            presets: this.palette_combo.model,
+            presets: this.palette_list,
         });
 
         this.settings.bind(
@@ -397,7 +400,17 @@ export const ColorsWidget = GObject.registerClass({
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL
         );
 
-        this.connect('realize', this.#setup_aux_actions.bind(this));
+        this.connect('realize', () => {
+            const handler = this.copy_gnome_terminal_profile_button.connect(
+                'clicked',
+                this.copy_gnome_terminal_profile.bind(this)
+            );
+
+            const unrealize_handler = this.connect('unrealize', () => {
+                this.disconnect(unrealize_handler);
+                this.copy_gnome_terminal_profile_button.disconnect(handler);
+            });
+        });
     }
 
     get title() {
@@ -444,21 +457,5 @@ export const ColorsWidget = GObject.registerClass({
 
         color_scheme_combo.sensitive =
             foreground_color.sensitive && background_color.sensitive;
-    }
-
-    #setup_aux_actions() {
-        const copy_from_gnome_terminal_action = new Gio.SimpleAction({
-            name: 'copy-gnome-terminal-profile',
-        });
-
-        copy_from_gnome_terminal_action.connect(
-            'activate',
-            this.copy_gnome_terminal_profile.bind(this)
-        );
-
-        const aux_actions = new Gio.SimpleActionGroup();
-        aux_actions.add_action(copy_from_gnome_terminal_action);
-        this.insert_action_group('aux', aux_actions);
-        this.connect('unrealize', () => this.insert_action_group('aux', null));
     }
 });

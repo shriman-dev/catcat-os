@@ -75,6 +75,28 @@ export const TerminalPage = GObject.registerClass({
             GObject.ParamFlags.READWRITE | GObject.ParamFlags.EXPLICIT_NOTIFY,
             'no-split'
         ),
+        'banner-label': GObject.ParamSpec.string(
+            'banner-label',
+            '',
+            '',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.EXPLICIT_NOTIFY,
+            ''
+        ),
+        'banner-type': GObject.ParamSpec.enum(
+            'banner-type',
+            '',
+            '',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.EXPLICIT_NOTIFY,
+            Gtk.MessageType,
+            Gtk.MessageType.INFO
+        ),
+        'banner-visible': GObject.ParamSpec.boolean(
+            'banner-visible',
+            '',
+            '',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.EXPLICIT_NOTIFY,
+            false
+        ),
     },
     Signals: {
         'new-tab-before-request': {},
@@ -85,10 +107,67 @@ export const TerminalPage = GObject.registerClass({
             param_types: [String],
         },
         'move-to-other-pane-request': {},
+        'session-update': {},
     },
 }, class DDTermTerminalPage extends Gtk.Box {
     _init(params) {
         super._init(params);
+
+        this.orientation = Gtk.Orientation.VERTICAL;
+
+        const banner_label = new Gtk.Label({
+            visible: true,
+        });
+
+        this.bind_property(
+            'banner-label',
+            banner_label,
+            'label',
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL
+        );
+
+        const banner = new Gtk.InfoBar({
+            visible: false,
+        });
+
+        this.bind_property(
+            'banner-type',
+            banner,
+            'message-type',
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL
+        );
+
+        this.bind_property(
+            'banner-visible',
+            banner,
+            'visible',
+            GObject.BindingFlags.SYNC_CREATE
+        );
+
+        this.bind_property(
+            'banner-visible',
+            banner,
+            'revealed',
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL
+        );
+
+        banner.get_content_area().pack_start(banner_label, false, false, 0);
+        banner.add_button(Gettext.gettext('Restart'), 0);
+        banner.add_button(Gettext.gettext('Close Terminal'), 1);
+
+        banner.connect('response', (_, response) => {
+            switch (response) {
+            case 0:
+                this.banner_visible = false;
+                this.spawn();
+                break;
+            case 1:
+                this.destroy();
+                break;
+            }
+        });
+
+        this.pack_start(banner, false, false, 0);
 
         const terminal_with_scrollbar = new Gtk.Box({
             visible: true,
@@ -111,15 +190,13 @@ export const TerminalPage = GObject.registerClass({
         });
 
         terminal_with_scrollbar.pack_end(this.scrollbar, false, false, 0);
-
-        this.orientation = Gtk.Orientation.VERTICAL;
+        this.pack_start(terminal_with_scrollbar, true, true, 0);
 
         this.search_bar = new SearchBar({
             visible: true,
         });
 
         this.pack_end(this.search_bar, false, false, 0);
-        this.pack_end(terminal_with_scrollbar, true, true, 0);
 
         this.search_bar.connect('find-next', this.find_next.bind(this));
         this.search_bar.connect('find-prev', this.find_prev.bind(this));
@@ -227,7 +304,8 @@ export const TerminalPage = GObject.registerClass({
         this.connect('notify::use-custom-title', () => {
             this.update_title_binding();
         });
-        this.update_title_binding();
+        // Don't update the title from the terminal until the process is started
+        this.update_title_binding(false);
 
         const use_custom_title_action = new Gio.SimpleAction({
             'name': 'use-custom-title',
@@ -410,69 +488,44 @@ export const TerminalPage = GObject.registerClass({
 
         this.terminal.connect_after('child-exited', (terminal_, status) => {
             if (this.keep_open_after_exit)
-                this.add_exit_status_banner(status);
+                this.set_exit_status_banner(status);
             else
                 this.destroy();
         });
+
+        const emit_session_update = () => this.emit('session-update');
+
+        this.connect('notify::banner-visible', emit_session_update);
+        this.connect('notify::use-custom-title', emit_session_update);
+        this.connect('notify::keep-open-after-exit', emit_session_update);
     }
 
     get_cwd() {
         return this.terminal.get_cwd();
     }
 
-    add_banner(message, message_type = Gtk.MessageType.ERROR) {
-        const label = new Gtk.Label({
-            label: message,
-            visible: true,
-        });
-
-        const banner = new Gtk.InfoBar({
-            message_type,
-            visible: true,
-            revealed: true,
-        });
-
-        banner.get_content_area().pack_start(label, false, false, 0);
-        banner.add_button(Gettext.gettext('Restart'), 0);
-        banner.add_button(Gettext.gettext('Close Terminal'), 1);
-
-        banner.connect('response', (_, response) => {
-            switch (response) {
-            case 0:
-                this.spawn();
-                banner.destroy();
-                break;
-            case 1:
-                this.destroy();
-                break;
-            }
-        });
-
-        this.pack_start(banner, false, false, 0);
-    }
-
-    add_exit_status_banner(status) {
+    set_exit_status_banner(status) {
         if (WIFEXITED(status)) {
             const code = WEXITSTATUS(status);
 
-            this.add_banner(
-                [
-                    Gettext.gettext('The child process exited with status:'),
-                    code,
-                ].join(' '),
-                code === 0 ? Gtk.MessageType.INFO : Gtk.MessageType.WARNING
-            );
+            this.banner_label = [
+                Gettext.gettext('The child process exited with status:'),
+                code,
+            ].join(' ');
+
+            this.banner_type = code === 0 ? Gtk.MessageType.INFO : Gtk.MessageType.WARNING;
+            this.banner_visible = true;
         } else {
             const signum = WTERMSIG(status);
 
-            this.add_banner(
-                [
-                    Gettext.gettext('The child process was aborted by signal:'),
-                    signum,
-                    GLib.strsignal(signum),
-                ].join(' '),
-                Gtk.MessageType.WARNING
-            );
+            this.banner_label = [
+                Gettext.gettext('The child process was aborted by signal:'),
+                signum,
+                GLib.strsignal(signum),
+            ].join(' ');
+
+            this.banner_type = Gtk.MessageType.WARNING;
+            this.banner_visible = true;
         }
     }
 
@@ -483,8 +536,11 @@ export const TerminalPage = GObject.registerClass({
         const callback_wrapper = (...args) => {
             const [terminal_, pid_, error] = args;
 
-            if (error)
-                this.add_banner(error.message);
+            if (error) {
+                this.banner_label = error.message;
+                this.banner_type = Gtk.MessageType.ERROR;
+                this.banner_visible = true;
+            }
 
             callback?.(...args);
         };
@@ -603,7 +659,7 @@ export const TerminalPage = GObject.registerClass({
         message.show();
     }
 
-    update_title_binding() {
+    update_title_binding(sync = true) {
         const enable = !this.use_custom_title;
 
         if (enable === Boolean(this._title_binding))
@@ -614,7 +670,7 @@ export const TerminalPage = GObject.registerClass({
                 'window-title',
                 this,
                 'title',
-                GObject.BindingFlags.SYNC_CREATE
+                sync ? GObject.BindingFlags.SYNC_CREATE : GObject.BindingFlags.DEFAULT
             );
         } else {
             this._title_binding?.unbind();
@@ -632,15 +688,33 @@ export const TerminalPage = GObject.registerClass({
         const command = cwd ? this.command.override_working_directory(cwd) : this.command;
 
         properties.insert_value('command', command.to_gvariant());
-        properties.insert_value('title', GLib.Variant.new_string(this.title));
+
+        if (this.title)
+            properties.insert_value('title', GLib.Variant.new_string(this.title));
+
         properties.insert_value(
             'use-custom-title',
             GLib.Variant.new_boolean(this.use_custom_title)
         );
+
         properties.insert_value(
             'keep-open-after-exit',
             GLib.Variant.new_boolean(this.keep_open_after_exit)
         );
+
+        if (this.banner_visible) {
+            properties.insert_value(
+                'banner-type',
+                GLib.Variant.new_int32(this.banner_type)
+            );
+
+            if (this.banner_label) {
+                properties.insert_value(
+                    'banner',
+                    GLib.Variant.new_string(this.banner_label)
+                );
+            }
+        }
 
         try {
             const text = this.terminal.get_text()?.trim();
@@ -660,9 +734,12 @@ export const TerminalPage = GObject.registerClass({
         const command_data = dict.lookup_value('command', variant_dict_type);
         const page = new TerminalPage({
             command: command_data ? TerminalCommand.from_gvariant(command_data) : null,
-            title: dict.lookup('title', 's'),
-            use_custom_title: dict.lookup('use-custom-title', 'b'),
-            keep_open_after_exit: dict.lookup('keep-open-after-exit', 'b'),
+            title: dict.lookup('title', 's') ?? '',
+            use_custom_title: dict.lookup('use-custom-title', 'b') ?? false,
+            keep_open_after_exit: dict.lookup('keep-open-after-exit', 'b') ?? false,
+            banner_label: dict.lookup('banner', 's') ?? '',
+            banner_type: dict.lookup('banner-type', 'i') ?? Gtk.MessageType.INFO,
+            banner_visible: dict.contains('banner-type'),
             ...properties,
         });
 

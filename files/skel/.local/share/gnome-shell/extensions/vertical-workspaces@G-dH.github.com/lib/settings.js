@@ -78,6 +78,7 @@ export const Options = class Options {
             smoothBlurTransitions: ['boolean', 'smooth-blur-transitions'],
             appGridAnimation: ['int', 'app-grid-animation'],
             searchViewAnimation: ['int', 'search-view-animation'],
+            searchResultsBgStyle: ['int', 'search-results-bg-style'],
             workspaceAnimation: ['int', 'workspace-animation'],
             animationSpeedFactor: ['int', 'animation-speed-factor'],
             winPreviewIconSize: ['int', 'win-preview-icon-size'],
@@ -402,6 +403,7 @@ export const Options = class Options {
         this.SEARCH_VIEW_ANIMATION = this.get('searchViewAnimation');
         if (this.SEARCH_VIEW_ANIMATION === 4)
             this.SEARCH_VIEW_ANIMATION = 3;
+        this.SEARCH_RESULTS_BG_STYLE = this.get('searchResultsBgStyle');
 
         this.WIN_PREVIEW_ICON_SIZE = [64, 48, 32, 22, 8][this.get('winPreviewIconSize')];
         this.WIN_TITLES_POSITION = this.get('winTitlePosition');
@@ -485,6 +487,13 @@ export const Options = class Options {
         this.APP_FOLDER_CLOSE_BUTTON = this.get('appFolderCloseButton');
         this.APP_GRID_PAGE_WIDTH_SCALE = this.get('appGridPageWidthScale') / 100;
         this.APP_GRID_PAGE_HEIGHT_SCALE = this.get('appGridPageHeightScale') / 100;
+        // Reserve space for the search entry, if needed, to prevent it from being overlapped by the grid icons
+        this.spaceReservedForSearchEntry = 0;
+        const heightThreshold = 0.8;
+        if (!this.SHOW_SEARCH_ENTRY && this.SEARCH_APP_GRID_MODE && this.APP_GRID_PAGE_HEIGHT_SCALE > heightThreshold) {
+            const scale = (this.APP_GRID_PAGE_HEIGHT_SCALE - heightThreshold) / (1 - heightThreshold);
+            this.spaceReservedForSearchEntry = Math.round(scale * 72);
+        }
         this.APP_GRID_SHOW_PAGE_ARROWS = this.get('appGridShowPageArrows');
         this.APP_GRID_REMEMBER_PAGE = this.get('appGridRememberPage');
 

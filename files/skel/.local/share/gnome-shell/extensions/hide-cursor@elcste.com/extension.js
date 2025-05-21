@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Alexander Browne
+ * Copyright 2024-25 Alexander Browne
  * Copyright 2020 Evan Welsh (https://gjs.guide/extensions/review-guidelines/review-guidelines.html#remove-main-loop-sources)
  * Copyright 2020 Jeff Channell (https://github.com/jeffchannell/jiggle/blob/master/cursor.js)
  */
@@ -24,14 +24,13 @@
 
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export default class HideCursor extends Extension {
     enable() {
         this._hideCursor = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 5, () => {
-            let tracker = Meta.CursorTracker.get_for_display(global.display);
+            let tracker = global.backend.get_cursor_tracker();
             const seat = Clutter.get_default_backend().get_default_seat();
 
             if (!seat.is_unfocus_inhibited())
@@ -47,7 +46,7 @@ export default class HideCursor extends Extension {
             GLib.Source.remove(this._hideCursor);
             this._hideCursor = null;
         }
-        let tracker = Meta.CursorTracker.get_for_display(global.display);
+        let tracker = global.backend.get_cursor_tracker();
         const seat = Clutter.get_default_backend().get_default_seat();
 
         if (seat.is_unfocus_inhibited())

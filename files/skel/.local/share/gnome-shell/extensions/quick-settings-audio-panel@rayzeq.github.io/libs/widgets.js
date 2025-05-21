@@ -470,6 +470,7 @@ export const ApplicationsMixerToggle = GObject.registerClass(class ApplicationsM
 const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSlider extends StreamSlider {
     _pactl_path;
     _pactl_path_changed_id;
+    _label;
     constructor(control, stream, settings) {
         super(control);
         this.menu.setHeader('audio-headphones-symbolic', _('Output Device'));
@@ -513,17 +514,28 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         this._menuButton.visible = menu_button_visible; // we need to reset `actor.visible` when changing parent
         // this prevent the tall panel bug when the button is shown
         this._menuButton.y_expand = false;
-        const label = new St.Label({ natural_width: 0 });
-        label.style_class = "QSAP-application-volume-slider-label";
-        stream.bind_property_full('description', label, 'text', GObject.BindingFlags.SYNC_CREATE, (_binding, _from, _to) => {
-            return [true, this._get_label_text(stream)];
-        }, null);
-        vbox.add_child(label);
+        this._label = new St.Label({ natural_width: 0 });
+        this._label.style_class = "QSAP-application-volume-slider-label";
+        const n_desc_handler_id = stream.connect("notify::description", stream => this._update_label(stream));
+        this.connect("destroy", () => stream.disconnect(n_desc_handler_id));
+        this._update_label(stream);
+        vbox.add_child(this._label);
         vbox.add_child(hbox);
     }
-    _get_label_text(stream) {
+    _update_label(stream) {
         const { name, description } = stream;
-        return name === null ? description : `${name} - ${description}`;
+        this._label.text = name === null ? description : `${name} - ${description}`;
+        if (name && name.startsWith("Chromium") && this._pactl_path) {
+            spawn([this._pactl_path, "-f", "json", "list", "sink-inputs"]).then(stdout_str => {
+                const stdout = JSON.parse(stdout_str);
+                for (const sink_input of stdout) {
+                    const binary_name = sink_input.properties["application.process.binary"];
+                    if (sink_input.index === this.stream.index && binary_name !== "chromium-browser") {
+                        this._label.text = `${binary_name} - ${description}`;
+                    }
+                }
+            });
+        }
     }
     _checkUsedSink() {
         spawn([this._pactl_path, "-f", "json", "list", "sink-inputs"]).then(stdout_str => {
@@ -588,6 +600,7 @@ export const MprisList = GObject.registerClass(class MprisList extends St.BoxLay
         super({
             orientation: Clutter.Orientation.VERTICAL,
             style: 'spacing: 12px;',
+            visible: false
         });
         this.messages = new Map();
         this.source = new MprisSource();
@@ -601,6 +614,7 @@ export const MprisList = GObject.registerClass(class MprisList extends St.BoxLay
             const message = GObject.Object.new(MprisList.MediaMessage, player);
             this.add_child(message);
             this.messages.set(player, message);
+            this.visible = true;
         }
     }
     _remove_player(player) {
@@ -608,6 +622,8 @@ export const MprisList = GObject.registerClass(class MprisList extends St.BoxLay
         if (message) {
             this.remove_child(message);
             this.messages.delete(player);
+            if (this.messages.size === 0)
+                this.visible = false;
         }
     }
 });

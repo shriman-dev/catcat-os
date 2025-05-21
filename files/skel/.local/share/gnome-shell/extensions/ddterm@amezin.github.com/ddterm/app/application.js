@@ -12,6 +12,7 @@ import Gtk from 'gi://Gtk';
 import Handy from 'gi://Handy';
 
 import Gettext from 'gettext';
+import Gi from 'gi';
 import System from 'system';
 
 import { AppWindow } from './appwindow.js';
@@ -26,6 +27,22 @@ import {
     create_extension_dbus_proxy,
     create_extension_dbus_proxy_oneshot,
 } from './extensiondbus.js';
+
+function try_require(namespace, version = undefined) {
+    try {
+        return Gi.require(namespace, version);
+    } catch (ex) {
+        logError(ex);
+        return null;
+    }
+}
+
+const GLibUnix = GLib.check_version(2, 79, 2) === null ? try_require('GLibUnix') : null;
+const signal_add = GLibUnix?.signal_add_full ?? GLib.unix_signal_add;
+
+const SIGHUP = 1;
+const SIGINT = 2;
+const SIGTERM = 15;
 
 function schedule_gc() {
     GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -89,6 +106,15 @@ class Application extends Gtk.Application {
             GLib.OptionFlags.HIDDEN,
             GLib.OptionArg.STRING,
             'Load the specified module on startup (for testing/debug, must be passed from Shell)',
+            null
+        );
+
+        this.add_main_option(
+            'sm-disable',
+            0,
+            GLib.OptionFlags.HIDDEN,
+            GLib.OptionArg.NONE,
+            'Disable registration with the session manager',
             null
         );
 
@@ -174,6 +200,12 @@ class Application extends Gtk.Application {
 
         this._trace_signal('handle-local-options', -1);
 
+        this.connect('notify', (_, pspec) => {
+            const name = pspec.get_name();
+
+            console.debug('Application property %O changed: %s', name, this[name]);
+        });
+
         this.connect('activate', () => {
             this.ensure_window_with_terminal().present();
         });
@@ -225,11 +257,7 @@ class Application extends Gtk.Application {
     startup() {
         this.settings = get_settings();
 
-        this.simple_action('quit', () => {
-            this.save_session();
-            this.quit();
-        });
-
+        this.simple_action('quit', () => this.quit());
         this.simple_action('preferences', () => this.preferences().catch(logError));
 
         [
@@ -348,20 +376,24 @@ class Application extends Gtk.Application {
         ]);
 
         this.restore_session();
-
-        this.connect('query-end', () => {
-            const cookie = this.inhibit(
-                null,
-                Gtk.ApplicationInhibitFlags.LOGOUT,
-                Gettext.gettext('Saving session…')
-            );
-
-            try {
-                this.save_session();
-            } finally {
-                this.uninhibit(cookie);
+        this.connect('shutdown', () => {
+            if (this._save_session_handler) {
+                this.window.disconnect(this._save_session_handler);
+                this._save_session_handler = null;
             }
+
+            if (this._save_session_source) {
+                GLib.Source.remove(this._save_session_source);
+                this._save_session_source = null;
+            }
+
+            this.save_session();
         });
+
+        // gdm sends SIGHUP to gnome-session's process group to terminate it
+        signal_add(GLib.PRIORITY_HIGH, SIGHUP, () => this.quit());
+        signal_add(GLib.PRIORITY_HIGH, SIGINT, () => this.quit());
+        signal_add(GLib.PRIORITY_HIGH, SIGTERM, () => this.quit());
     }
 
     _trace_signal(signal, return_value = undefined) {
@@ -386,13 +418,24 @@ class Application extends Gtk.Application {
 
         const debug_module = options.lookup('debug-module');
 
-        if (debug_module)
-            import(debug_module).catch(logError);
+        if (debug_module) {
+            const loop = GLib.MainLoop.new(null, false);
+
+            import(debug_module).catch(logError).finally(() => {
+                loop.quit();
+            });
+
+            loop.run();
+        }
 
         const allowed_gdk_backends = options.lookup('allowed-gdk-backends');
 
         if (allowed_gdk_backends)
             Gdk.set_allowed_backends(allowed_gdk_backends);
+
+        const sm_disable = options.lookup('sm-disable');
+
+        this.register_session = !sm_disable;
 
         if (this.flags & Gio.ApplicationFlags.IS_SERVICE)
             return -1;
@@ -564,9 +607,19 @@ class Application extends Gtk.Application {
         });
 
         this.window.connect('destroy', source => {
-            if (source === this.window)
-                this.window = null;
+            if (source !== this.window)
+                return;
+
+            this.window = null;
+
+            if (this._save_session_handler) {
+                source.disconnect(this._save_session_handler);
+                this._save_session_handler = null;
+            }
         });
+
+        this._save_session_handler =
+            this.window.connect('session-update', this.schedule_save_session.bind(this));
 
         return this.window;
     }
@@ -658,6 +711,9 @@ class Application extends Gtk.Application {
     }
 
     restore_session() {
+        if (!this.settings.get_boolean('save-restore-session'))
+            return;
+
         try {
             const [, data] = GLib.file_get_contents(this.session_file_path);
 
@@ -673,7 +729,15 @@ class Application extends Gtk.Application {
             if (!data_variant.is_normal_form())
                 throw new Error('Session data is malformed, probably the file was damaged');
 
-            this.ensure_window().deserialize_state(data_variant);
+            const win = this.ensure_window();
+
+            GObject.signal_handler_block(win, this._save_session_handler);
+
+            try {
+                win.deserialize_state(data_variant);
+            } finally {
+                GObject.signal_handler_unblock(win, this._save_session_handler);
+            }
         } catch (ex) {
             if (!(ex instanceof GLib.Error &&
                 ex.matches(GLib.file_error_quark(), GLib.FileError.NOENT))) {
@@ -684,7 +748,13 @@ class Application extends Gtk.Application {
     }
 
     save_session() {
+        if (!this.settings.get_boolean('save-restore-session')) {
+            GLib.unlink(this.session_file_path);
+            return;
+        }
+
         const data = this.window?.serialize_state();
+
         if (!data) {
             GLib.unlink(this.session_file_path);
             return;
@@ -700,5 +770,17 @@ class Application extends Gtk.Application {
             GLib.FileSetContentsFlags.CONSISTENT | GLib.FileSetContentsFlags.DURABLE,
             0o600
         );
+    }
+
+    schedule_save_session() {
+        if (this._save_session_source)
+            return;
+
+        this._save_session_source = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+            this._save_session_source = null;
+            this.save_session();
+
+            return GLib.SOURCE_REMOVE;
+        });
     }
 });
