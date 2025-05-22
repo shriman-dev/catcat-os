@@ -218,11 +218,11 @@ h-expand=false
 v-expand=true
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-2]
-action='fullscreen-win'
+action='maximize-win'
 command='io.github.seadve.Kooha'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-3]
-action='above-win'
+action='fullscreen-win'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-4]
 action='move-win-to-prev-ws'
@@ -272,13 +272,13 @@ v-expand=false
 action='toggle-applications'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-3]
-action='remove-effects-all'
+action='quit-app'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-4]
-action='contrast-up-all'
+action='swipe-ws-up'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-5]
-action='contrast-down-all'
+action='swipe-ws-down'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-6]
 action='toggle-applications'
