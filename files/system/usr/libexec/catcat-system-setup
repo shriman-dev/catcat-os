@@ -107,6 +107,7 @@ KARGS_TO_ADD=(
 if command -v nvidia-smi; then
   KARGS_TO_ADD+=(
     "nvidia-drm.modeset=1"
+    "nvidia-drm.fbdev=1"
     "rd.driver.blacklist=nouveau"
     "modprobe.blacklist=nouveau"
     )

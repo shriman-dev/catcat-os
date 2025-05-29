@@ -61,7 +61,7 @@ jobs:
           echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           if [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]]; then
-            echo "NVIDIA_FLAVOR=-nvidia" >> $GITHUB_ENV
+            echo "NVIDIA_FLAVOR=-nvidia-open" >> $GITHUB_ENV
           fi
 
       # Build metadata
