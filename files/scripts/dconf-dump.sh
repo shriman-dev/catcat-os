@@ -102,7 +102,7 @@ dconfDump '/org/gnome/mutter/' "/output-luminance/d" $DCONF_DIR/wmpreferences
 # shell
 declare -A shellPathsWithSed=(
     ['/org/gnome/shell/']="
-s|favorite-apps=.*|favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'io.gitlab.librewolf-community.desktop', 'io.freetubeapp.FreeTube.desktop', 'com.valvesoftware.Steam.desktop']|
+s|favorite-apps=.*|favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'io.gitlab.librewolf-community.desktop', 'io.freetubeapp.FreeTube.desktop', 'com.valvesoftware.Steam.desktop', 'steam.desktop']|
 /shell\/extensions/,\$d
 /command-history/d
 /enabled-extensions/d

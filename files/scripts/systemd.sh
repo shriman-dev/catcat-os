@@ -16,7 +16,7 @@ services_enable() {
 
   systemctl --global -f enable \
     libadwaita-theme-sync.service \
-    duelsense-catppuccin-rainbow.service \
+    dualsense-catppuccin-rainbow.service \
     catcat-user-setup.service
 }
 

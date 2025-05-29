@@ -127,10 +127,10 @@ rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier'
 hblock
-#curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | cut -d '"' -f4
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
 # zellij
-shellSetup='fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
+shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
 eza
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
@@ -142,6 +142,7 @@ diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart 
 buttersnap; btdu; gocryptfs; yazi
 
 terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 

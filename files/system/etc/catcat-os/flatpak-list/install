@@ -5,6 +5,7 @@ app/app.fotema.Fotema/x86_64/stable
 app/org.gnome.Papers/x86_64/stable
 app/org.gnome.FileRoller/x86_64/stable
 app/org.gnome.Showtime/x86_64/stable
+app/io.github.celluloid_player.Celluloid/x86_64/stable
 app/org.videolan.VLC/x86_64/stable
 app/com.github.neithern.g4music/x86_64/stable
 app/org.gnome.Decibels/x86_64/stable
@@ -78,6 +79,7 @@ app/com.github.wwmm.easyeffects/x86_64/stable
 
 # prod and devel
 app/dev.zed.Zed/x86_64/stable
+app/com.logseq.Logseq/x86_64/stable
 app/se.sjoerd.Graphs/x86_64/stable
 app/io.github.efogdev.mpris-timer/x86_64/stable
 app/me.iepure.devtoolbox/x86_64/stable

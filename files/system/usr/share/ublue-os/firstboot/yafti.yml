@@ -84,6 +84,7 @@ screens:
           default: false
           packages:
           - Zed code editor: dev.zed.Zed
+          - Logseq - productivity base: com.logseq.Logseq
           - Dev Toolbox: me.iepure.devtoolbox
           - Graphs - visualize data: se.sjoerd.Graphs
           - Play Timer - pomodoro timer: io.github.efogdev.mpris-timer

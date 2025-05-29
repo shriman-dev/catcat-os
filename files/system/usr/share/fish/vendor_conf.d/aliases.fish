@@ -8,9 +8,9 @@ end
 # Common use
 function grubup
   if command -v update-grub
-    sudo update-grub 
+    sudo update-grub
   else if command -v zypper
-    sudo grub2-mkconfig -o /boot/grub2/grub.cfg 
+    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
   else if command -v dnf || command -v ostree
     sudo grub2-editenv - unset menu_auto_hide
     sudo grub2-switch-to-blscfg
@@ -42,7 +42,7 @@ else
 end
 
 command -vq thefuck && thefuck --alias | source
-alias f="thefuck"
+alias f='thefuck'
 
 alias c='clear'
 alias ..='cd ..'
@@ -50,11 +50,11 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
-alias fcc="fc-cache -fvr --really-force "
+alias fcc='fc-cache -fvr --really-force'
 alias hw='hwinfo --short'
 alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
 alias killall='killall -vw'
-alias ramcln="sudo /bin/ramclean.sh"
+alias ramcln="sudo /usr/bin/ramclean"
 alias tarnow='tar -acf '
 alias untar='tar -xvf '
 alias wget='wget -c '
@@ -64,13 +64,13 @@ alias dir='dir --color=always'
 alias egrep='egrep --color=always'
 alias fgrep='fgrep --color=always'
 alias grep='grep --color=always'
-alias ip="ip -color=auto"
+alias ip='ip -color=auto'
 alias ls='ls --color=always'
 alias tc='tc -color=auto'
 alias vdir='vdir --color=always'
-# Replace some more things with better alternatives
-#alias cat='bat --style header --style snip --style changes --style header'
-alias l.="eza -a1"
+# Use some more things with better alternatives
+alias bat='bat --style="header,snip,changes" --paging=never'
+alias l.='eza -a1'
 alias la='eza -a --color=always --hyperlink --group-directories-first --icons=always'
 alias ll='eza -alob -SH --git --color=always --hyperlink --group-directories-first --icons=always --time-style="+%a %b %d %H:%M:%S %Y"'
 alias lt='eza -aT --git --color=always --hyperlink --group-directories-first --icons=always'
