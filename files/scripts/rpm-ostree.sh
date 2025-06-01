@@ -147,7 +147,7 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watch
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 #lazygit ghostty
-devTools='ptyxis git micro neovim sassc codium'
+devTools='criu ptyxis git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'

@@ -30,7 +30,7 @@ always-show-universal-access-status=false
 
 [org/gnome/desktop/a11y/applications]
 screen-keyboard-enabled=false
-screen-magnifier-enabled=false
+screen-magnifier-enabled=true
 
 [org/gnome/desktop/a11y/interface]
 show-status-shapes=false

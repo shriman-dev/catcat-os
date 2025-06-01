@@ -143,7 +143,7 @@ fi
 #  fi
 #fi
 
-# enable i2c-dev support to configure monitors via ddcutil if device is not laptop
+# enable i2c-dev support to configure monitors via ddcutil
 if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
   echo "i2c-dev" > /etc/modules-load.d/i2c-dev.conf
   # enable i2c support for nvidia cards

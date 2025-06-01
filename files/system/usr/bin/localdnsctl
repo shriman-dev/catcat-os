@@ -177,78 +177,100 @@ RG_BLUE="$RG_BASE --colors match:fg:blue"
 RG_YELLOW="$RG_BASE --colors match:fg:yellow"
 RG_RED="$RG_BASE --colors match:fg:red"
 RG_RED_BG_BLACK="$RG_RED --colors match:bg:black"
-LAST_LINES=5999
 
 dnsmasq_logs() {
   need_root
+  local LAST_LINES=5999
   local path="$DNSMASQLOGDIR"
-  local cmd="tail -n ${LAST_LINES} -f"
-  local common_caputer_pattern='DNS-rebind| ::$|0\.0\.0\.0|NXDOMAIN|HINFO|REFUSED|SERVFAIL'
+  local base_cmd="tail -n ${LAST_LINES} -f"
+  local filter_cmd
+  local log_file="$path/dnsmasq.log"
+  local log_format="log"
+
+  local common_pattern='DNS-rebind| ::$|0\.0\.0\.0|NXDOMAIN|HINFO|REFUSED|SERVFAIL'
   local nxdata_pattern=': .*NXDOMAIN|NODATA.*|reply.*truncated'
   local reject_pattern=': .*DNS-rebind.*|: .* ::$|: .*0\.0\.0\.0|config.*NXDOMAIN|: .*HINFO.*'
-  local error_patterns=': .*REFUSED.*|: .*SERVFAIL.*'
+  local error_pattern=': .*REFUSED.*|: .*SERVFAIL.*'
 
   case $1 in
         detailed)
-            $cmd $path/dnsmasq.log |
-            rg $RG_YELLOW "$nxdata_pattern" |
-            rg $RG_RED "$reject_pattern" |
-            rg $RG_RED_BG_BLACK "$error_patterns"
+            filter_cmd="rg $RG_YELLOW \"$nxdata_pattern\" | \
+                       rg $RG_RED \"$reject_pattern\" | \
+                       rg $RG_RED_BG_BLACK \"$error_pattern\""
             ;;
         queries)
-            $cmd $path/dnsmasq.log |
-            rg --color=never -i "query|NODATA|$common_caputer_pattern" |
-            rg $RG_YELLOW "$nxdata_pattern" |
-            rg $RG_RED "$reject_pattern" |
-            rg $RG_RED_BG_BLACK "$error_patterns"
+            filter_cmd="rg --color=never -i \"query|NODATA|$common_pattern\" | \
+                       rg $RG_YELLOW \"$nxdata_pattern\" | \
+                       rg $RG_RED \"$reject_pattern\" | \
+                       rg $RG_RED_BG_BLACK \"$error_pattern\""
             ;;
         blocked)
-            $cmd $path/dnsmasq.log |
-            rg --color=never -i "$common_caputer_pattern" |
-            rg $RG_YELLOW "$nxdata_pattern" |
-            rg $RG_RED "$reject_pattern" |
-            rg $RG_RED_BG_BLACK "$error_patterns"
+            filter_cmd="rg --color=never -i \"$common_pattern\" | \
+                       rg $RG_YELLOW \"$nxdata_pattern\" | \
+                       rg $RG_RED \"$reject_pattern\" | \
+                       rg $RG_RED_BG_BLACK \"$error_pattern\""
             ;;
-        *) die "Invalid log type: $1" ;;
-  esac | bat --paging=never -nl log
+        *)
+            die "Invalid log type: $1"
+            exit 1
+            ;;
+  esac
+
+  [[ ! -f "$log_file" ]] && die "Log file not found: $log_file"
+
+  # Execute the command pipeline
+  $base_cmd "$log_file" | eval "$filter_cmd" | bat --paging=never -nl "$log_format"
 }
 
 dnscrypt_logs() {
+  local LAST_LINES=999
   local path="$DNSCRYPTLOGDIR"
-  local cmd="tail -n ${LAST_LINES} -f"
+  local base_cmd="tail -n ${LAST_LINES} -f"
+  local filter_cmd log_file log_format
 
   [[ $1 =~ 'launch' ]] && log_format="log"
   case $1 in
         queries)
-            $cmd $path/query.log |
-            rg $RG_YELLOW 'NXDOMAIN|NODATA|SYNTH' |
-            rg $RG_RED '\t.*REJECT.*|NOT_READY|NETWORK_ERROR|SERVER_TIMEOUT|' |
-            rg $RG_RED_BG_BLACK '\t.*REFUSED.*|\t.*SERVFAIL.*|\t.*RESPONSE_ERROR.*'
+            log_file="$path/query.log"
+            filter_cmd="rg $RG_YELLOW 'NXDOMAIN|NODATA|SYNTH' | \
+                       rg $RG_RED '\t.*REJECT|NOT_READY|NETWORK_ERROR|SERVER_TIMEOUT|' | \
+                       rg $RG_RED_BG_BLACK '\t.*REFUSED.*|\t.*SERVFAIL.*|\t.*RESPONSE_ERROR.*'"
             ;;
         blocked)
-            $cmd $path/blocked-domains.log |
-            rg $RG_YELLOW '\(alias.*' |
-            rg $RG_BLUE '\*\.'
+            log_file="$path/blocked-domains.log"
+            filter_cmd="rg $RG_YELLOW '\(alias.*' | rg $RG_BLUE '\*\.'"
             ;;
         allowed)
-            $cmd $path/allowed-domains.log |
-            rg $RG_YELLOW '\(alias.*' |
-            rg $RG_BLUE '\*\.'
+            log_file="$path/allowed-domains.log"
+            filter_cmd="rg $RG_YELLOW '\(alias.*' | rg $RG_BLUE '\*\.'"
             ;;
         blocked-ips)
-            $cmd $path/blocked-ips.log
+            log_file="$path/blocked-ips.log"
             ;;
         allowed-ips)
-            $cmd $path/allowed-ips.log
+            log_file="$path/allowed-ips.log"
             ;;
         nxdomains)
-            $cmd $path/nx.log
+            log_file="$path/nx.log"
             ;;
         launch)
-            $cmd $path/dnscrypt-proxy.log
+            log_file="$path/dnscrypt-proxy.log"
+            filter_cmd="rg $RG_YELLOW 'Stopped.' | rg $RG_BLUE 'dnscrypt-proxy .*\..*\..*'"
             ;;
-        *) die "Invalid log type: $1" ;;
-  esac | bat --paging=never -nl "${log_format:-csv}"
+        *)
+            die "Invalid log type: $1"
+            exit 1
+            ;;
+  esac
+
+  [[ ! -f "$log_file" ]] && die "Log file not found: $log_file"
+
+  # Execute the command pipeline
+  if [[ -n "$filter_cmd" ]]; then
+    $base_cmd "$log_file" | eval "$filter_cmd" | bat --paging=never -nl "${log_format:-csv}"
+  else
+    $base_cmd "$log_file" | bat --paging=never -nl "${log_format:-csv}"
+  fi
 }
 
 # Execute the appropriate function based on log type

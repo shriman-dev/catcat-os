@@ -51,8 +51,8 @@ update_firmware() {
   echo -e "\n----------Firmware update----------\n"
 
   sudo sh -c '
-    /usr/bin/fwupdmgr refresh -y --force >/dev/null 2>&1
-    /usr/bin/fwupdmgr get-updates >/dev/null 2>&1
+    /usr/bin/fwupdmgr refresh -y --force
+    /usr/bin/fwupdmgr get-updates
     /usr/bin/fwupdmgr -y update
   '
 }
@@ -63,9 +63,9 @@ update_system() {
   if [[ $(id -u) -eq 0 ]]; then
     bootc upgrade --quiet
     rpm-ostree db diff --changelogs
-    rpm-ostree cleanup -bm &>/dev/null
-    ostree prune &>/dev/null
-    systemd-tmpfiles --clean &>/dev/null
+    rpm-ostree cleanup -bm >/dev/null 2>&1
+    ostree prune >/dev/null 2>&1
+    systemd-tmpfiles --clean >/dev/null 2>&1
   else
     rpm-ostree upgrade
   fi
