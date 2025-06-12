@@ -1,6 +1,8 @@
 #!/bin/bash
+SYSTEM_LOAD_THRESHOLD_LOW=1.0
+SYSTEM_LOAD_THRESHOLD_HIGH=2.0
 
-setPowerProfile() {
+set_power_profile() {
   echo "Setting power profile to: ${1}"
   local profile=${1}
   local power_policy='/sys/module/pcie_aspm/parameters/policy'
@@ -13,19 +15,16 @@ setPowerProfile() {
     "powersave")
       command -v powerprofilesctl && powerprofilesctl set power-saver
       command -v tuned-adm && tuned-adm profile powersave
-      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 0
       [[ -f $power_policy ]] && echo "powersupersave" | tee $power_policy
       ;;
     "performance")
       command -v powerprofilesctl && powerprofilesctl set performance
       command -v tuned-adm && tuned-adm profile throughput-performance
-      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 1
       [[ -f $power_policy ]] && echo "performance" | tee $power_policy
       ;;
     "balanced")
       command -v powerprofilesctl && powerprofilesctl set balanced
       command -v tuned-adm && tuned-adm profile balanced
-      command -v x86_energy_perf_policy && x86_energy_perf_policy --turbo-enable 1
       [[ -f $power_policy ]] && echo "default" | tee $power_policy
       ;;
     *)
@@ -35,28 +34,29 @@ setPowerProfile() {
 }
 
 previous_profile=""
-system_load_threshold=2
-
 while true; do
-  system_load=$(awk '{print int($1)}' /proc/loadavg)
+  system_load=$(cut -d' ' -f2 /proc/loadavg)
   current_power_state=$(upower -d | grep -iE 'state.*discharging')
-  override_profile=$OVERRIDE_POWER_PROFILE
+  override_profile=${OVERRIDE_POWER_PROFILE}
 
-  # Determine the target profile based on system load and power state
-  if [[ -z "$override_profile" ]]; then
-    [[ -n "$current_power_state" ]] && target_profile="powersave" || {
-      [[ $system_load -gt $system_load_threshold ]] && target_profile="performance" || target_profile="balanced"
-    }
-  else
-    # If an override profile is set, use it
+  if [[ -n "$override_profile" ]]; then
     target_profile=$override_profile
+  elif [[ -n "$current_power_state" ]]; then
+    target_profile="powersave"
+  else
+    if [ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]; then
+      target_profile="powersave"
+    elif [ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_HIGH" | bc -l) -eq 1 ]; then
+      target_profile="balanced"
+    else
+      target_profile="performance"
+    fi
   fi
 
-  # Change the power profile if the target profile is different from the previous one
-  [[ "$target_profile" != "$previous_profile" ]] && {
-    setPowerProfile "$target_profile"
+  if [ "$target_profile" != "$previous_profile" ]; then
+    set_power_profile "$target_profile"
     previous_profile=$target_profile
-  }
+  fi
 
   sleep 30s
 done

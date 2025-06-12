@@ -103,8 +103,6 @@
         },
         {
             "type": "terminalfont",
-            //"type": "command",
-            //"text": "fastfetch -l none --key-type none -s terminalfont | grep . || echo 'FiraCode Nerd Font'",
             "key": "{#96;1}  ├─󰉿 {$2}" // 
         },
         {
@@ -121,8 +119,7 @@
         },
         {
             "type": "display",
-            "key": "  ├─󰹑 {$2}",
-            "format": "{1}x{2} @ {3:3}Hz in {12:2}\" [{6}]"
+            "key": "  ├─󰹑 {$2}"
         },
         {
             "type": "bluetooth",
@@ -143,13 +140,14 @@
         {
             "type": "disk",
             "key": "  ├─ {$2}",
-            "format": "{3} - {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}"
+            "format": "{3} - {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}",
+            "hideFS": "overlay"
         },
         {
             "type": "memory",
             "percent": {
-            "green": 30, // [0%, 30%) will be displayed in green
-            "yellow": 60, // [30, 60) will be displayed in yellow and [60, 100] will be displayed in red
+            "green": 50, // [0%, 50%) will be displayed in green
+            "yellow": 70, // [50, 70) will be displayed in yellow and [70, 100] will be displayed in red
             "type": [ // Display percent value in monochrome bar, same as 10
                        "bar",
                        "bar-monochrome",

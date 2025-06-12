@@ -129,7 +129,8 @@ done
 declare -A defaultPathsWithSed=(
     ['/org/freedesktop/tracker/']="
 /index-recursive-directories=/d"
-    ['/org/gnome/desktop/a11y/']=""
+    ['/org/gnome/desktop/a11y/']="
+/screen-magnifier-enabled=/d"
     ['/org/gnome/desktop/datetime/']=""
     ['/org/gnome/desktop/peripherals/']="
 /peripherals\/keyboard/,/^$/ { /numlock-state=/d }"

@@ -30,20 +30,30 @@ always-show-universal-access-status=false
 
 [org/gnome/desktop/a11y/applications]
 screen-keyboard-enabled=false
-screen-magnifier-enabled=true
 
 [org/gnome/desktop/a11y/interface]
+high-contrast=false
 show-status-shapes=false
 
 [org/gnome/desktop/a11y/keyboard]
+mousekeys-enable=false
 togglekeys-enable=true
 
 [org/gnome/desktop/a11y/magnifier]
+brightness-blue=0.0
+brightness-green=0.0
+brightness-red=0.0
+color-saturation=1.0
+contrast-blue=0.0
+contrast-green=0.0
+contrast-red=0.0
 cross-hairs-color='#fab387'
 cross-hairs-length=4096
 cross-hairs-opacity=1.0
 cross-hairs-thickness=1
 focus-tracking='proportional'
+invert-lightness=false
+lens-mode=false
 mag-factor=1.0
 mouse-tracking='proportional'
 show-cross-hairs=false
