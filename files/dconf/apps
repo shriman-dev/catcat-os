@@ -85,7 +85,6 @@ select-all='<Control>a'
 zoom-in='<Control>equal'
 
 [org/gnome/gnome-system-monitor]
-current-tab='processes'
 disks-interval=30000
 maximized=false
 network-total-in-bits=false

@@ -31,6 +31,8 @@ declare -A appPathsWithSed=(
 /selected-/d"
     ['/org/fedoraproject/FirewallConfig/']=""
     ['/org/gnome/gnome-system-monitor/']="
+/current-tab/d
+/cpu-colors/d
 /window-/d"
     ['/org/gnome/nautilus/']="
 /window-state/,/^$/d
