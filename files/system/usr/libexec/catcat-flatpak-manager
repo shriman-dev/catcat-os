@@ -85,7 +85,6 @@ remove_filesystem_access() {
     "one.ablaze.floorp"
     "org.chromium.Chromium"
     "org.garudalinux.firedragon"
-    "org.gnome.Epiphany"
     "org.kde.falkon"
     "org.mozilla.firefox"
     "org.torproject.torbrowser-launcher"

@@ -134,7 +134,8 @@ shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
 eza
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-monitoringTools='htop btop nethogs procs wireshark'
+monitoringTools='lm_sensors s-tui powertop htop btop nethogs procs wireshark'
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*libadwaita.*'$(rpm -E %fedora)'.rpm"' | cut -d '"' -f4)
 bandwhich
 
 #dmraid
@@ -164,7 +165,7 @@ iconsAndFonts='rsms-inter-fonts'
 
 gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
-gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth lm_sensors openrgb'
+gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb'
 
 virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
 quickemu
