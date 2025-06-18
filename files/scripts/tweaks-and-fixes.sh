@@ -26,9 +26,11 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 # amd gpu opergb support
 git clone https://github.com/twifty/amd-gpu-i2c.git /tmp/amd-gpu-i2c
 cd /tmp/amd-gpu-i2c
-sed -i "s/sudo //g" ./Makefile
+
 kernel="$(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep 'bazzite')"
+sed -i "s/sudo //g" ./Makefile
 sed -i "s/\$(shell uname -r)/$kernel/" ./Makefile
 
 make install
 
+echo "amdgpu-i2c" > /etc/modules-load.d/amdgpu-i2c.conf # make it persistant
