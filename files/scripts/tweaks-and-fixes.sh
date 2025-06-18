@@ -28,7 +28,7 @@ git clone https://github.com/twifty/amd-gpu-i2c.git /tmp/amd-gpu-i2c
 cd /tmp/amd-gpu-i2c
 
 kernel="$(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep 'bazzite')"
-sed -i "s/sudo insmod $(MODULE_NAME).ko/cp $(MODULE_NAME).ko /lib/modules/$kernel/extra/" ./Makefile
+sed -i "s/sudo insmod \$(MODULE_NAME).ko/cp \$(MODULE_NAME).ko /lib/modules/$kernel/extra/" ./Makefile
 sed -i "s/sudo //g" ./Makefile
 sed -i "s/\$(shell uname -r)/$kernel/" ./Makefile
 
