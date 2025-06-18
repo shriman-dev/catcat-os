@@ -23,3 +23,8 @@ sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
+# amd gpu opergb support
+git clone https://github.com/twifty/amd-gpu-i2c.git /tmp/amd-gpu-i2c
+cd /tmp/amd-gpu-i2c
+make install
+
