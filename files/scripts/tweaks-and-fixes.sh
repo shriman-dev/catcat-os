@@ -26,5 +26,6 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 # amd gpu opergb support
 git clone https://github.com/twifty/amd-gpu-i2c.git /tmp/amd-gpu-i2c
 cd /tmp/amd-gpu-i2c
+sed -i 's/sudo //g' ./Makefile
 make install
 
