@@ -34,12 +34,14 @@
             "type": "kernel",
             "key": "{#93;1}  ├─ {$2}" // 󰌽 󰻀 󰘅
         },
+// gpu driver
 //        {
 //            "type": "gpu",
 //            "key": "{#93;1}  ├─ {$2}",
 //            "hideType": "integrated",
 //            "format": "{3}"
 //        },
+
         {
             "type": "initsystem",
             "key": "{#93;1}  ├─󰨾 {$2}", // 󰨾   
