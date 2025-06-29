@@ -116,6 +116,7 @@ ls -A1
 #dnf5 -y config-manager setopt "terra-mesa".enabled=true
 #dnf5 -y config-manager setopt "terra-nvidia".enabled=false
 
+sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/terra.repo
 dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable zeno/scrcpy
