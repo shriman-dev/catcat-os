@@ -7,7 +7,7 @@ name='File Viewers'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Creative]
-apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'org.upscayl.Upscayl.desktop', 'io.gitlab.adhami3310.Footage.desktop', 'org.pitivi.Pitivi.desktop', 'org.gnome.gitlab.YaLTeR.Identity.desktop', 'org.inkscape.Inkscape.desktop', 'com.boxy_svg.BoxySVG.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.shotcut.Shotcut.desktop', 'org.gimp.GIMP.desktop', 'fr.handbrake.ghb.desktop', 'org.libreoffice.LibreOffice.draw.desktop']
+apps=['com.github.PintaProject.Pinta.desktop', 'org.kde.krita.desktop', 'be.alexandervanhee.gradia.desktop', 'io.gitlab.adhami3310.Footage.desktop', 'org.pitivi.Pitivi.desktop', 'org.upscayl.Upscayl.desktop', 'org.inkscape.Inkscape.desktop', 'com.boxy_svg.BoxySVG.desktop', 'com.rawtherapee.RawTherapee.desktop', 'org.shotcut.Shotcut.desktop', 'org.gimp.GIMP.desktop', 'fr.handbrake.ghb.desktop', 'org.libreoffice.LibreOffice.draw.desktop']
 name='Creative'
 translate=false
 
@@ -27,7 +27,7 @@ name='Stores'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Sysmon]
-apps=['net.nokyan.Resources.desktop', 'org.gnome.Logs.desktop', 'io.missioncenter.MissionCenter.desktop', 'btop.desktop', 'htop.desktop', 'org.gnome.SystemMonitor.desktop', 'nvtop.desktop']
+apps=['net.nokyan.Resources.desktop', 'org.gnome.Logs.desktop', 'org.wireshark.Wireshark.desktop', 'btop.desktop', 'io.missioncenter.MissionCenter.desktop', 'org.gnome.SystemMonitor.desktop', 'htop.desktop', 'nvtop.desktop']
 name='Sysmon'
 translate=false
 
@@ -37,7 +37,7 @@ name='Disk & Backup'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/SysSecurity]
-apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'com.mitchellh.ghostty.desktop', 'firewall-config.desktop', 'opensnitch_ui.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'org.freedesktop.MalcontentControl.desktop', 'app.drey.KeyRack.desktop', 'org.wireshark.Wireshark.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'mcontrolcenter.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'com.mitchellh.ghostty.desktop', 'firewall-config.desktop', 'opensnitch_ui.desktop', 'org.openrgb.OpenRGB.desktop', 'io.github.ilya_zlobintsev.LACT.desktop', 'app.drey.KeyRack.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'org.freedesktop.MalcontentControl.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'mcontrolcenter.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
 name='Sys & Security'
 translate=false
 

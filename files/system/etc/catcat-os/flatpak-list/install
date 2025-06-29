@@ -18,6 +18,7 @@ app/fr.romainvigier.MetadataCleaner/x86_64/stable
 
 # graphicsVideoEditors
 app/com.github.PintaProject.Pinta/x86_64/stable
+app/be.alexandervanhee.gradia/x86_64/stable
 app/org.inkscape.Inkscape/x86_64/stable
 app/org.gnome.gitlab.YaLTeR.Identity/x86_64/stable
 app/org.upscayl.Upscayl/x86_64/stable

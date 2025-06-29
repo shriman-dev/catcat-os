@@ -36,7 +36,8 @@ declare -A appPathsWithSed=(
 /window-/d"
     ['/org/gnome/nautilus/']="
 /window-state/,/^$/d
-/type-ahead-search/d"
+/type-ahead-search/d
+/default-compression-format/d"
     ['/org/nemo/']="
 s/side-pane-view=.*/side-pane-view='tree'/
 /geometry/d"

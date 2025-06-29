@@ -1,5 +1,5 @@
 #!/bin/bash
-set -oue pipefail 
+set -oue pipefail
 echo -e "\n$0\n"
 
 ################
@@ -67,6 +67,15 @@ chmod +x /usr/bin/{quickemu,quickget,quickreport}
 rm -rf /tmp/quickemu-tmp
 }
 
+mfancontrol() {
+curl -Lo /tmp/MControlCenterrrr $(curl -s -X GET https://api.github.com/repos/dmitry-s93/MControlCenter/releases/latest | grep -i '"browser_download_url": "[^"]*.tar.gz"' | cut -d '"' -f4)
+
+mkdir -p /tmp/MControlCenter
+tar -xf /tmp/MControlCenterrrr -C /tmp/MControlCenter --strip-components=1
+cd /tmp/MControlCenter/
+/tmp/MControlCenter/install.sh
+cd -
+}
 
 extra_pkgs() {
 # ascii-image-converter
@@ -122,12 +131,12 @@ addRepos
 
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass
+rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
 #sunshine gnome-browser-connector
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier'
 hblock
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
+#rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
 # zellij
 shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
@@ -135,7 +144,6 @@ eza
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
 monitoringTools='lm_sensors s-tui powertop htop btop nethogs procs wireshark'
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*libadwaita.*'$(rpm -E %fedora)'.rpm"' | cut -d '"' -f4)
 bandwhich
 
 #dmraid
@@ -165,7 +173,9 @@ iconsAndFonts='rsms-inter-fonts'
 
 gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
-gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb'
+gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol'
+mfancontrol
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*libadwaita.*'$(rpm -E %fedora)'.rpm"' | cut -d '"' -f4)
 
 virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
 quickemu

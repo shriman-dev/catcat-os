@@ -37,8 +37,6 @@ done
 mkdir -p /etc/catcat-os/
 echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
 
-[[ $IMAGE_NAME == 'catcat-os' ]] && $SCRIPT_DIR/fancontrol.sh
-
 $SCRIPT_DIR/rpm-ostree.sh
 $SCRIPT_DIR/branding.sh
 $SCRIPT_DIR/tweaks-and-fixes.sh

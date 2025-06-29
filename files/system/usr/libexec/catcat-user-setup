@@ -243,7 +243,7 @@ setupApps() {
     sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > "$apps_dir/steam.desktop"
   }
 
-  inxi -M | grep -qE "System: Micro-Star|System: MSI" && command -v mcontrolcenter && {
+  inxi -M | grep -qE "System: Micro-Star|System: MSI" && command -v mcontrolcenter || {
     [[ ! -f "$apps_dir/mcontrolcenter.desktop" ]] &&
     sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > "$apps_dir/mcontrolcenter.desktop"
   }

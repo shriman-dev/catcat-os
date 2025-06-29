@@ -34,12 +34,12 @@
             "type": "kernel",
             "key": "{#93;1}  ├─ {$2}" // 󰌽 󰻀 󰘅
         },
-        {
-            "type": "gpu",
-            "key": "{#93;1}  ├─ {$2}",
-            "hideType": "integrated",
-            "format": "{3}"
-        },
+//        {
+//            "type": "gpu",
+//            "key": "{#93;1}  ├─ {$2}",
+//            "hideType": "integrated",
+//            "format": "{3}"
+//        },
         {
             "type": "initsystem",
             "key": "{#93;1}  ├─󰨾 {$2}", // 󰨾   
@@ -135,7 +135,7 @@
             "type": "gpu",
             "key": "  ├─󱉽 {$2}", //  󱩄 󱩃 󰐿 󰢮 󰤽 󱉽 󰘚 󰚗
             "hideType": "none",
-            "format": "{1} {2} [{6}]"
+            "format": "{2} [{6}]"
         },
         {
             "type": "disk",

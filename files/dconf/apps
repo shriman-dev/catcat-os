@@ -158,7 +158,6 @@ sort-col=15
 sort-order=0
 
 [org/gnome/nautilus/compression]
-default-compression-format='zip'
 
 [org/gnome/nautilus/icon-view]
 captions=['size', 'date_modified', 'none']

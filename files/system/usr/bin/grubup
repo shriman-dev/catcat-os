@@ -1,0 +1,6 @@
+#!/bin/bash
+if [[ -d /sys/firmware/efi ]]; then
+    grub2-mkconfig -o /etc/grub2-efi.cfg
+else
+    grub2-mkconfig -o /etc/grub2.cfg
+fi

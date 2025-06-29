@@ -69,6 +69,7 @@ update_system() {
   else
     rpm-ostree upgrade
   fi
+  /usr/bin/grubup
 }
 
 show_help() {

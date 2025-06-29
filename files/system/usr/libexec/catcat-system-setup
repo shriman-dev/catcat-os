@@ -97,10 +97,10 @@ KARGS_TO_ADD=(
   "sysrq_always_enabled=1"
   "processor.ignore_ppc=1"
   "split_lock_detect=off"
-  "pci=noats"
   "bluetooth.disable_ertm=1"
   "preempt=full"
 )
+# "pci=noats"
 # "amdgpu.ppfeaturemask=0xffffffff"
 # "mem_sleep_default=deep"
 
