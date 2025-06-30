@@ -33,10 +33,10 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 
   # Set DNS blocklist
   rm -f /etc/dnsmasq.d/domains-blocklist*
-  cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist-mini.conf.tar.zst* | tar -C /tmp/ --zstd -xvf -
-  cp -f /tmp/blocklist-mini.conf /etc/dnsmasq.d/domains-blocklist.conf
+  cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/ --zstd -xvf -
+  cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
   restorecon -vR /etc/dnsmasq.d/
-  rm /tmp/blocklist-mini.conf*
+  rm /tmp/blocklist.conf*
 
   hostnamectl set-hostname --static "catcat"
 

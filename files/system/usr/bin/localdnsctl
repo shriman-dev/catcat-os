@@ -43,10 +43,12 @@ update_blocklist() {
     need_root
     mkdir -p "$CONFIG_DIR" "$TMPDIR" || die "Failed to create directories"
 
-    local mini=$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
+    local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
     local target_type=$([[ -f "$CONFIG_DIR/only-dnscrypt-blocklist" ]] && echo "dnscrypt" || echo "dnsmasq")
 
-    log "INFO" "Updating DNS blocklist (Backend: ${target_type}, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
+    log "INFO" "Updating DNS blocklist (Backend: ${target_type})"
+    #, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
+    
     local src_file dst_file subdir
     if [[ $target_type == "dnscrypt" ]]; then
         src_file="domains-filtered-subdomains${mini}"
