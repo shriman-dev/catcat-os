@@ -66,10 +66,10 @@ update_system() {
     rpm-ostree cleanup -bm >/dev/null 2>&1
     ostree prune >/dev/null 2>&1
     systemd-tmpfiles --clean >/dev/null 2>&1
+    /usr/bin/grubup
   else
     rpm-ostree upgrade
   fi
-  /usr/bin/grubup
 }
 
 show_help() {
