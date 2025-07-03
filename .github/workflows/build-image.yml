@@ -53,7 +53,9 @@ jobs:
           pwd
           ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          pwd
           source ${{ github.workspace }}/files/VAR.sh
+          pwd
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
