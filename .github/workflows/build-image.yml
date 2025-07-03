@@ -53,20 +53,15 @@ jobs:
           pwd
           ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
-          pwd
           source ${{ github.workspace }}/files/VAR.sh
-          pwd
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
-          pwd
           [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]] && echo "BASE_IMAGE_NAME=bazzite-gnome-nvidia-open" >> $GITHUB_ENV
-          pwd
           [[ ${{ matrix.IMAGE_NAME }} =~ '-hh' ]] && echo "BASE_IMAGE_NAME=bazzite-deck-gnome" >> $GITHUB_ENV
-          pwd
 
 
       # Build metadata
