@@ -61,8 +61,7 @@ jobs:
           echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]] && echo "BASE_IMAGE_NAME=bazzite-gnome-nvidia-open" >> $GITHUB_ENV
-          [[ ${{ matrix.IMAGE_NAME }} =~ '-hh' ]] && echo "BASE_IMAGE_NAME=
-bazzite-deck-gnome" >> $GITHUB_ENV
+          [[ ${{ matrix.IMAGE_NAME }} =~ '-hh' ]] && echo "BASE_IMAGE_NAME=bazzite-deck-gnome" >> $GITHUB_ENV
 
 
       # Build metadata
