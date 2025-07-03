@@ -17,8 +17,8 @@ chmod 000 /usr/libexec/evolution-addressbook-factory
 chmod 000 /usr/libexec/evolution-calendar-factory
 chmod 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
 
-chmod 000 /usr/libexec/goa-daemon 
-chmod 000 /usr/libexec/goa-identity-service 
+chmod 000 /usr/libexec/goa-daemon
+chmod 000 /usr/libexec/goa-identity-service
 
 rm -rf /home/linuxbrew
 rm -rf /usr/share/ublue-os/homebrew

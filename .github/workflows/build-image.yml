@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        IMAGE_NAME: ["catcat-os", "catcat-os-nv"]
+        IMAGE_NAME: ["catcat-os", "catcat-os-nv", "catcat-os-hh"]
 
     steps:
       - name: Checkout Repo
@@ -60,9 +60,10 @@ jobs:
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "AH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
-          if [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]]; then
-            echo "NVIDIA_FLAVOR=-nvidia-open" >> $GITHUB_ENV
-          fi
+          [[ ${{ matrix.IMAGE_NAME }} =~ '-nv' ]] && echo "BASE_IMAGE_NAME=bazzite-gnome-nvidia-open" >> $GITHUB_ENV
+          [[ ${{ matrix.IMAGE_NAME }} =~ '-hh' ]] && echo "BASE_IMAGE_NAME=
+bazzite-deck-gnome" >> $GITHUB_ENV
+
 
       # Build metadata
       - name: Image Metadata
@@ -104,7 +105,6 @@ jobs:
             COMMIT_SHA=${{ env.COMMIT_SHA }}
             PULL_IMAGE_REGISTRY=${{ env.PULL_IMAGE_REGISTRY }}
             BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }}
-            NVIDIA_FLAVOR=${{ env.NVIDIA_FLAVOR }}
           labels: ${{ steps.meta.outputs.labels }}
           oci: false
 
@@ -171,7 +171,7 @@ jobs:
       # using Cosign and save the private key as a repository secret in Github for this workflow
       # to consume. For more details, review the image signing section of the README.
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.9.0
+        uses: sigstore/cosign-installer@v3.9.1
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
 
       - name: Sign container image
