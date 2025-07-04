@@ -30,7 +30,7 @@ add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
 # Delete luks keyslot
 delete-luks-keyslot SLOT:
     #!/usr/bin/bash
-    sudo cryptsetup luksKillSlot {{ SLOT }}
+    sudo cryptsetup luksKillSlot {{ DEVICE_PATH }} {{ SLOT }}
 
 # Backup luks header
 backup-luks-header DEVICE_PATH BACKUP_FILE:

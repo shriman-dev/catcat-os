@@ -71,6 +71,7 @@ s|video-path=.*|video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.
     ['/org/gnome/shell/extensions/custom-hot-corners-extended/']=""
     ['/org/gnome/shell/extensions/dash-to-panel/']="
 /dash-to-panel/,/^$/ { s/{\".*0x0.*0\":/{\"0\":/ }
+/dash-to-panel/,/^$/ { s/\"A.*-.*33\"/\"\"/ }
 /dash-to-panel/,/^$/ { /primary-monitor=/d }"
     ['/org/gnome/shell/extensions/default-workspace/']=""
     ['/org/gnome/shell/extensions/forge/']=""
@@ -80,9 +81,8 @@ s/hot-sensors=.*/hot-sensors=\['__temperature_avg__', '_processor_usage_', '_mem
     ['/org/gnome/shell/extensions/user-theme/']=""
 )
 
-#dash-to-panel@jderose9.github.com
 echo -e "\n[org/gnome/shell]
-enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > $DCONF_DIR/extensions
+enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'dash-to-panel@jderose9.github.com', 'default-workspace@mateusrodcosta.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > $DCONF_DIR/extensions
 
 for path in "${!extensionPathsWithSed[@]}"; do
     dconfDump "$path" "${extensionPathsWithSed[$path]}" "$DCONF_DIR/extensions"
