@@ -37,3 +37,19 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 #make install
 
 #echo "amdgpu-i2c" > /etc/modules-load.d/amdgpu-i2c.conf # make it persistant
+
+# handheld specific tweaks
+if command -v hhdctl; then
+    rm -vf /usr/etc/xdg/autostart/steam.desktop
+    # login manager
+    sed -i 's/.*Session=.*/Session=gnome-wayland.desktop/g' /etc/sddm.conf.d/steamos.conf
+    systemctl disable sddm
+    systemctl enable gdm
+    # edit /etc/gdm/custom.conf
+    sed -i "s/screen-keyboard-enabled=.*/screen-keyboard-enabled=true/" /etc/dconf/db/distro.d/defaults
+    sed -i "s/toolkit-accessibility=.*/toolkit-accessibility=true/" /etc/dconf/db/distro.d/interface
+    cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
+    # extension
+    sed -i "s/this.monitor.width.*sf,/this.monitor.width * 0.01, 1 * sf,/" /etc/skel/.local/share/gnome-shell/extensions/touchup@mityax/features/navigationBar/widgets/gestureNavigationBar.js
+    sed -i "s/Math.min(height.*sf,/Math.min(height * 0.01, 1 * sf,/" /etc/skel/.local/share/gnome-shell/extensions/touchup@mityax/features/navigationBar/widgets/gestureNavigationBar.js
+fi

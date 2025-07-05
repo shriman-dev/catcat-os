@@ -22,7 +22,7 @@ auto-maximize=false
 center-new-windows=true
 dynamic-workspaces=false
 edge-tiling=true
-experimental-features=['scale-monitor-framebuffer', 'autoclose-xwayland', 'variable-refresh-rate']
+experimental-features=['scale-monitor-framebuffer', 'variable-refresh-rate']
 overlay-key='Super'
 workspaces-only-on-primary=false
 

@@ -58,5 +58,5 @@ rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
 rm -vf  /etc/xdg/autostart/tracker-miner-fs-3.desktop
 rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
-
+rm -vf  /etc/xdg/autostart/steam.desktop
 rm -vf /etc/yum.repos.d/google-chrome.repo

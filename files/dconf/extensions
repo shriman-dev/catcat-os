@@ -175,7 +175,7 @@ window-preview-use-custom-icon-size=true
 default-workspace-number=3
 
 [org/gnome/shell/extensions/vitals]
-battery-slot=1
+battery-slot=3
 fixed-widths=false
 hide-icons=false
 hot-sensors=['__temperature_avg__', '_processor_usage_', '_memory_allocated_', '__network-tx_max__', '__network-rx_max__']

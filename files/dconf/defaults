@@ -100,6 +100,9 @@ view-type='grid'
 [org/gnome/system/location]
 enabled=false
 
+[org/gnome/desktop/session]
+idle-delay=uint32 120
+
 [org/gnome/login-screen]
 allowed-failures=5
 banner-message-enable=true
@@ -129,7 +132,7 @@ night-light-schedule-to=7.0
 free-percent-notify=0.10000000000000001
 
 [org/gnome/settings-daemon/plugins/power]
-ambient-enabled=false
+sleep-inactive-battery-timeout=120
 
 [org/gnome/desktop/search-providers]
 disabled=['org.gnome.Software.desktop']

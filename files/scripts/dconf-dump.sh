@@ -141,6 +141,7 @@ declare -A defaultPathsWithSed=(
     ['/org/gnome/desktop/privacy/']=""
     ['/org/gnome/desktop/screensaver/']=""
     ['/org/gnome/desktop/search-providers/']=""
+    ['/org/gnome/desktop/session/']=""
     ['/org/gnome/desktop/sound/']=""
     ['/org/gnome/login-screen/']="
 s|message-text=.*|message-text='Meow'|"

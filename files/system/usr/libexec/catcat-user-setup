@@ -20,7 +20,7 @@ bakBefore() {
 
 exitIfRoot() {
   [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
-  [[ "$HOME" == "gdm" ]] && { err "Cannot run as gdm user"; exit 1; }
+  id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
 }
 
 

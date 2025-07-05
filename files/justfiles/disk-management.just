@@ -28,7 +28,7 @@ add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
     sudo cryptsetup luksAddKey {{ DEVICE_PATH }} {{ KEY_FILE }} --pbkdf-force-iterations {{ ITER_VALUE }}
 
 # Delete luks keyslot
-delete-luks-keyslot SLOT:
+delete-luks-keyslot DEVICE_PATH SLOT:
     #!/usr/bin/bash
     sudo cryptsetup luksKillSlot {{ DEVICE_PATH }} {{ SLOT }}
 
