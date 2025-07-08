@@ -35,6 +35,5 @@ for qual_kernel in "${QUALIFIED_KERNEL[@]}"; do
   INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${qual_kernel}/initramfs.img"
   echo "Starting initramfs regeneration for kernel version: ${qual_kernel}"
   "${DRACUT}" --no-hostonly --kver "${qual_kernel}" --reproducible -v --add ostree -f "${INITRAMFS_IMAGE}"
-  command -v hhdctl && "${DRACUT}" --no-hostonly --kver "${qual_kernel}" --reproducible -v --add ostree unl0kr -f "${INITRAMFS_IMAGE}"
   chmod 0600 "${INITRAMFS_IMAGE}"
 done
