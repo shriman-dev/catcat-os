@@ -132,6 +132,7 @@ night-light-schedule-to=7.0
 free-percent-notify=0.10000000000000001
 
 [org/gnome/settings-daemon/plugins/power]
+idle-dim=false
 sleep-inactive-battery-timeout=120
 
 [org/gnome/desktop/search-providers]

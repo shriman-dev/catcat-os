@@ -117,6 +117,7 @@ ls -A1
 #dnf5 -y config-manager setopt "terra-nvidia".enabled=false
 
 sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/terra.repo
+dnf5 -y copr enable kylegospo/unl0kr
 dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable zeno/scrcpy
@@ -174,7 +175,7 @@ iconsAndFonts='rsms-inter-fonts'
 
 gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
-gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol'
+gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol unl0kr-dracut'
 mfancontrol
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*libadwaita.*'$(rpm -E %fedora)'.rpm"' | cut -d '"' -f4)
 
