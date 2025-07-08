@@ -66,6 +66,12 @@ gnomeShellSetup() {
   sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' \
     $LOCALSHARE/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg || err "Syncthing style setup failed"
 
+  # Enabled extensions for Handheld
+  if command -v hhdctl; then
+    dconf read /org/gnome/shell/enabled-extensions | grep 'gjsosk@vishram1123.com' || {
+      gnome-extensions enable gjsosk@vishram1123.com
+    }
+  fi
 
   # Setup burn-my-windows
   local bmw_profile="$CONFIG/burn-my-windows/profiles/1679372508290696.conf"
@@ -82,7 +88,7 @@ gnomeShellSetup() {
     cp -drv "$SKEL/.config/$forge_stylesheet" "$CONFIG/$forge_stylesheet" || err "Forge style setup failed"
   }
 
-  # make vitals and tophat extension to use resources app as default monitor app
+  # make vitals and tophat extension to use resources app as default monitoring app
   if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
     local vitals_schema="$LOCALSHARE/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
     [[ -f "$vitals_schema" ]] && grep -q 'net.nokyan.Resources' "$vitals_schema" || {

@@ -46,7 +46,6 @@ if command -v hhdctl; then
     systemctl disable sddm
     systemctl enable gdm
     # edit /etc/gdm/custom.conf
-    gnome-extensions enable gjsosk@vishram1123.com
     sed -i "s/screen-keyboard-enabled=.*/screen-keyboard-enabled=true/" /etc/dconf/db/distro.d/defaults
     sed -i "s/toolkit-accessibility=.*/toolkit-accessibility=true/" /etc/dconf/db/distro.d/interface
     sed -i "s/text-scaling-factor=.*/text-scaling-factor=1.2/" /etc/dconf/db/distro.d/interface

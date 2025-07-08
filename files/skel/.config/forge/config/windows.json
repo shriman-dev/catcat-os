@@ -159,10 +159,6 @@
         {
             "wmClass": "io.github.jorchube.monitorets",
             "mode": "float"
-        },
-        {
-            "wmClass": "dev.hhd.hhd-ui",
-            "mode": "float"
         }
     ]
 }
