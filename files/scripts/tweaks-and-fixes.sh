@@ -46,8 +46,11 @@ if command -v hhdctl; then
     systemctl disable sddm
     systemctl enable gdm
     # edit /etc/gdm/custom.conf
+    sed -i "/enabled-extensions=/,/^$/ { s/']/, 'gjsosk@vishram1123.com']/ }" /etc/dconf/db/distro.d/extensions
     sed -i "s/screen-keyboard-enabled=.*/screen-keyboard-enabled=true/" /etc/dconf/db/distro.d/defaults
     sed -i "s/toolkit-accessibility=.*/toolkit-accessibility=true/" /etc/dconf/db/distro.d/interface
+    sed -i "s/text-scaling-factor=.*/text-scaling-factor=1.2/" /etc/dconf/db/distro.d/interface
+    cat /etc/dconf/db/distro.d/{interface,defaults}
     cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
     # extension
     sed -i "s/this.monitor.width.*sf,/this.monitor.width * 0.01, 1 * sf,/" /etc/skel/.local/share/gnome-shell/extensions/touchup@mityax/features/navigationBar/widgets/gestureNavigationBar.js

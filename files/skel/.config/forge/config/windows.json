@@ -151,6 +151,18 @@
         {
             "wmClass": "io.github.giantpinkrobots.varia",
             "mode": "float"
+        },
+        {
+            "wmClass": "io.github.herve4m.Length",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.jorchube.monitorets",
+            "mode": "float"
+        },
+        {
+            "wmClass": "dev.hhd.hhd-ui",
+            "mode": "float"
         }
     ]
 }

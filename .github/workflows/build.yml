@@ -52,6 +52,14 @@ jobs:
       fail-fast: false  # Continues with other builds even if one fails
     secrets: inherit    # Uses secrets from parent workflow
 
+  build-iso-no-fl:
+    name: Build ISOs No-fl
+    needs: [build-image]
+    uses: ./.github/workflows/build-iso-no-fl.yml
+    strategy:
+      fail-fast: false
+    secrets: inherit
+
   build-iso:
     name: Build ISOs
     needs: [build-image]
