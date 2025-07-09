@@ -41,8 +41,6 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 # handheld specific tweaks
 if command -v hhdctl; then
     rm -vf /usr/etc/xdg/autostart/steam.desktop
-    # luks unlock
-    sed -i 's/default=breezy-.*/default=breezy-light/g' /etc/unl0kr.conf
     # login manager
     sed -i 's/.*Session=.*/Session=gnome-wayland.desktop/g' /etc/sddm.conf.d/steamos.conf
     systemctl disable sddm
