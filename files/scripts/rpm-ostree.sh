@@ -136,7 +136,7 @@ addRepos
 rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
 #sunshine gnome-browser-connector
 
-security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier'
+security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier unl0kr-dracut'
 hblock
 #rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 

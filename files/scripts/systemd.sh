@@ -5,6 +5,7 @@ echo -e "\n$0\n"
 #sddm.service
 #auto-power-profile.service \
 services_enable() {
+  command -v hhdctl && systemctl -f enable unl0kr-ask-password.service
   systemctl -f enable \
     fstrim.timer \
     nix.mount \
