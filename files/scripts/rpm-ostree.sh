@@ -175,7 +175,7 @@ iconsAndFonts='rsms-inter-fonts'
 
 gnomeShellExtensions='gnome-shell-extension-gsconnect'
 
-gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol unl0kr-dracut'
+gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol'
 mfancontrol
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*libadwaita.*'$(rpm -E %fedora)'.rpm"' | cut -d '"' -f4)
 
