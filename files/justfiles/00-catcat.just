@@ -1,7 +1,7 @@
 # Start SSH
 start-ssh:
     #!/usr/bin/bash
-    sudo systemctl unmask sshd.service && sudo systemctl start sshd
+    sudo systemctl unmask sshd.service ; sudo systemctl start sshd
 
 # Check for local overrides
 check-local-overrides:
