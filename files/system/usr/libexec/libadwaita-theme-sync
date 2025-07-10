@@ -1,10 +1,8 @@
 #!/bin/bash
 
 exitIfRoot() {
-  if [[ $(id -u) -eq 0 ]]; then
-    echo -e "script was ran as root. exiting.\n"
-    exit 1
-  fi
+  [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
+  id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
 }
 exitIfRoot
 

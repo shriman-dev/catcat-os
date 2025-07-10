@@ -1,5 +1,11 @@
 #!/bin/bash
 
+exitIfRoot() {
+  [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
+  id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
+}
+exitIfRoot
+
 interpolate() {
     start=($1) end=($2) step=$3 steps=$4
     r=$((start[0] + (step * (end[0] - start[0]) / steps)))

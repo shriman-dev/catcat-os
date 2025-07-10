@@ -178,7 +178,6 @@ removeUnnecessaryDirectories() {
   dirlist=(
     "$HOME_DIR/Desktop"
     "$HOME_DIR/Downloads"
-    "$HOME_DIR/Templates"
     "$HOME_DIR/Public"
     "$HOME_DIR/Documents"
     "$HOME_DIR/Music"
@@ -186,6 +185,7 @@ removeUnnecessaryDirectories() {
     "$HOME_DIR/Videos"
   )
 
+  rm -rf "$HOME_DIR/Templates"
   for dir in "${dirlist[@]}"; do
     [[ -d ${dir} ]] && rmdir ${dir}
   done
