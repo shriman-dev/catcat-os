@@ -40,7 +40,7 @@ install_flatpaks() {
 
     # Install flatpaks in list
     INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
-    if [[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]] && check_internet_connection; then
+    if check_internet_connection && [[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]; then
       echo "Installing system flatpaks from config list (requires internet)"
       flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
       runtimes

@@ -19,6 +19,9 @@ desktopFiles() {
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
+
+  sed -i 's|^Icon=.*|Icon=appgrid|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
+  sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
 }
 
 icons() {
@@ -132,8 +135,14 @@ shellExts() {
 }
 
 desktopFiles
+cat /etc/dconf/db/distro.d/{interface,defaults}
 icons
+cat /etc/dconf/db/distro.d/{interface,defaults}
 gtkThemes
+cat /etc/dconf/db/distro.d/{interface,defaults}
 gdmTheme
+cat /etc/dconf/db/distro.d/{interface,defaults}
 shellExts
+cat /etc/dconf/db/distro.d/{interface,defaults}
 defaultConfigs
+cat /etc/dconf/db/distro.d/{interface,defaults}

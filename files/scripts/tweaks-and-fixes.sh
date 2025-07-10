@@ -53,3 +53,4 @@ if command -v hhdctl; then
     sed -i "s/this.monitor.width.*sf,/this.monitor.width * 0.01, 1 * sf,/" /etc/skel/.local/share/gnome-shell/extensions/touchup@mityax/features/navigationBar/widgets/gestureNavigationBar.js
     sed -i "s/Math.min(height.*sf,/Math.min(height * 0.01, 1 * sf,/" /etc/skel/.local/share/gnome-shell/extensions/touchup@mityax/features/navigationBar/widgets/gestureNavigationBar.js
 fi
+cat /etc/dconf/db/distro.d/{interface,defaults}
