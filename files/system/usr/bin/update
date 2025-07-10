@@ -61,7 +61,7 @@ update_system() {
   echo -e "\n----------System update----------\n"
 
   if [[ $(id -u) -eq 0 ]]; then
-    bootc upgrade --quiet
+    rpm-ostree upgrade --quiet
     rpm-ostree db diff --changelogs
     rpm-ostree cleanup -bm >/dev/null 2>&1
     ostree prune >/dev/null 2>&1

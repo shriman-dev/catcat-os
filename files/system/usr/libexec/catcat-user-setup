@@ -71,6 +71,7 @@ gnomeShellSetup() {
     dconf read /org/gnome/shell/enabled-extensions | grep 'gjsosk@vishram1123.com' || {
       gnome-extensions enable gjsosk@vishram1123.com
     }
+    dconf write /org/gnome/desktop/interface/text-scaling-factor "1.2"
   fi
 
   # Setup burn-my-windows

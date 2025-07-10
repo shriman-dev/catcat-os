@@ -135,14 +135,8 @@ shellExts() {
 }
 
 desktopFiles
-cat /etc/dconf/db/distro.d/{interface,defaults}
 icons
-cat /etc/dconf/db/distro.d/{interface,defaults}
 gtkThemes
-cat /etc/dconf/db/distro.d/{interface,defaults}
 gdmTheme
-cat /etc/dconf/db/distro.d/{interface,defaults}
 shellExts
-cat /etc/dconf/db/distro.d/{interface,defaults}
 defaultConfigs
-cat /etc/dconf/db/distro.d/{interface,defaults}
