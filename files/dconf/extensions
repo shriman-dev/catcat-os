@@ -116,7 +116,7 @@ middle-click-action='LAUNCH'
 multi-monitors=true
 overview-click-to-exit=true
 panel-anchors='{"0":"MIDDLE","":"MIDDLE"}'
-panel-element-positions='{"0":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":true,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}],"":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"showAppsButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
+panel-element-positions='{"0":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":true,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}],"":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":true,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
 panel-element-positions-monitors-sync=true
 panel-lengths='{"0":100}'
 panel-positions='{"0":"TOP","":"TOP"}'
@@ -221,11 +221,11 @@ h-expand=false
 v-expand=true
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-2]
-action='maximize-win'
+action='fullscreen-win'
 command='io.github.seadve.Kooha'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-3]
-action='fullscreen-win'
+action='maximize-win'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-bottom-left-4]
 action='move-win-to-prev-ws'
@@ -262,13 +262,13 @@ ctrl=true
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-0]
 action='disabled'
-barrier-size-h=1
+barrier-size-h=25
 barrier-size-v=1
 pressure-threshold=350
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-1]
 action='toggle-overview'
-h-expand=false
+h-expand=true
 v-expand=false
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-2]
@@ -278,10 +278,10 @@ action='toggle-applications'
 action='quit-app'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-4]
-action='swipe-ws-up'
+action='prev-workspace'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-5]
-action='swipe-ws-down'
+action='next-workspace'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-6]
 action='toggle-applications'

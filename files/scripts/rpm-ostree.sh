@@ -152,7 +152,7 @@ bandwhich
 diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
 buttersnap; btdu; gocryptfs; yazi
 
-terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
+terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo memtester nvme-cli kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'

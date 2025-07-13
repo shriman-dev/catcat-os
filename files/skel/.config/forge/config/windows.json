@@ -159,6 +159,14 @@
         {
             "wmClass": "io.github.jorchube.monitorets",
             "mode": "float"
+        },
+        {
+            "wmClass": "wlroots",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Waydroid",
+            "mode": "float"
         }
     ]
 }

@@ -66,6 +66,13 @@ if systemctl is-enabled dnscrypt-proxy.service; then
   fi
 fi
 
+# nix path sudo support for user 1000
+nix_user_path="/home/$U1000/.local/state/nix/profile"
+sudoersd_file="/etc/sudoers.d/nix-sudo-env"
+grep "$nix_user_path" $sudoersd_file || sed -i "/secure_path = /s|$|:$nix_user_path|" $sudoersd_file
+# Proper sudoers.d perms
+chmod --recursive 644 /etc/sudoers.d/
+
 # setup grub
 if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   mkdir -p /boot/grub_themes

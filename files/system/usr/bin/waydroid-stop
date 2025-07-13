@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+if zenity --question \
+    --title="Waydroid Cleanup" \
+    --text="Do you want to stop Waydroid session and clean RAM?" \
+    --width=300; then
+    /usr/bin/waydroid session stop
+    sudo /usr/bin/ramclean
+    /usr/bin/notify-send "Completed" "Waydroid session stopped and RAM cleaned successfully!"
+else
+    /usr/bin/notify-send "Cancelled" "Operation cancelled by user."
+fi
