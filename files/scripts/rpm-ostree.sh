@@ -165,7 +165,8 @@ encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
 
 androidTools='android-tools scrcpy'
 
-files='nautilus-extensions nautilus-python nemo nemo-emblems nemo-extensions nemo-gsconnect nemo-preview nemo-python sushi'
+files='nautilus-extensions nautilus-python nemo nemo-emblems nemo-extensions nemo-preview nemo-python sushi'
+#nemo-gsconnect
 
 themingCompatibility='gnome-tweaks dconf-editor libgtop2 libappindicator-gtk3 gnome-menus gnome-themes-extra gtk-murrine-engine gtk2-engines glib2-devel kvantum qt5ct qt6ct qt5-qtquickcontrols2 qt5-qtsvg qt6-qtsvg menulibre awf-gtk2 awf-gtk3 awf-gtk4'
 #appeditor sddm
