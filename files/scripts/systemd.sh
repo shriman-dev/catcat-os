@@ -3,8 +3,8 @@ set -oue pipefail
 echo -e "\n$0\n"
 
 #sddm.service
-#auto-power-profile.service \
 services_enable() {
+  command -v hhdctl || systemctl -f enable auto-power-profile.service
   systemctl -f enable \
     fstrim.timer \
     nix.mount \

@@ -1,6 +1,6 @@
 #!/bin/bash
-SYSTEM_LOAD_THRESHOLD_LOW=1.0
-SYSTEM_LOAD_THRESHOLD_HIGH=2.0
+SYSTEM_LOAD_THRESHOLD_LOW=1.5
+SYSTEM_LOAD_THRESHOLD_HIGH=3
 
 set_power_profile() {
   echo "Setting power profile to: ${1}"
@@ -44,9 +44,9 @@ while true; do
   elif [[ -n "$current_power_state" ]]; then
     target_profile="powersave"
   else
-    if [ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]; then
+    if [[ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]]; then
       target_profile="powersave"
-    elif [ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_HIGH" | bc -l) -eq 1 ]; then
+    elif [[ $(echo "$system_load > $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]] && [[ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_HIGH" | bc -l) -eq 1 ]]; then
       target_profile="balanced"
     else
       target_profile="performance"
