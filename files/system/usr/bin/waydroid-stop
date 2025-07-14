@@ -3,8 +3,8 @@ if zenity --question \
     --title="Waydroid Cleanup" \
     --text="Do you want to stop Waydroid session and clean RAM?" \
     --width=300; then
-    waydroid session stop
-    sudo /usr/bin/ramclean
+    waydroid session stop &&
+    sudo /usr/bin/ramclean &&
     notify-send "Completed" "Waydroid session stopped and RAM cleaned successfully!"
 else
     notify-send "Cancelled" "Operation cancelled by user."
