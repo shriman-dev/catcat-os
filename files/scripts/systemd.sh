@@ -5,14 +5,14 @@ echo -e "\n$0\n"
 #sddm.service
 services_enable() {
   command -v hhdctl || systemctl -f enable auto-power-profile.service
+  command -v hhdctl || systemctl -f enable catcat-os-update.timer
   systemctl -f enable \
     fstrim.timer \
     nix.mount \
     libvirtd.service \
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
-    catcat-flatpak-manager.timer \
-    catcat-os-update.timer
+    catcat-flatpak-manager.timer
 
   systemctl --global -f enable \
     libadwaita-theme-sync.service \

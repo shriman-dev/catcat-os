@@ -45,7 +45,7 @@ while true; do
     target_profile="powersave"
   else
     if [[ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]]; then
-      target_profile="powersave"
+      inxi -M | grep -o "Type: Desktop" && target_profile="balanced" || target_profile="powersave"
     elif [[ $(echo "$system_load > $SYSTEM_LOAD_THRESHOLD_LOW" | bc -l) -eq 1 ]] && [[ $(echo "$system_load < $SYSTEM_LOAD_THRESHOLD_HIGH" | bc -l) -eq 1 ]]; then
       target_profile="balanced"
     else
