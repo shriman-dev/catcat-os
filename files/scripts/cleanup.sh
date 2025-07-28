@@ -43,6 +43,7 @@ rm -vf  /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
 rm -vf  /usr/share/fish/vendor_conf.d/brew.fish
 rm -vf  /usr/share/fish/vendor_conf.d/nano-default-editor.fish
 rm -vf  /usr/share/fish/functions/fish_greeting.fish
+rm -rvf /usr/share/ublue-os/bazaar/blocklist.txt
 rm -rvf /usr/share/ublue-os/dconfs
 rm -rvf /usr/share/ublue-os/motd
 

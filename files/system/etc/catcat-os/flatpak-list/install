@@ -91,6 +91,7 @@ app/com.vixalien.sticky/x86_64/stable
 app/com.usebottles.bottles/x86_64/stable
 app/com.vysp3r.ProtonPlus/x86_64/stable
 app/page.kramo.Cartridges/x86_64/stable
+app/io.github.radiolamp.mangojuice/x86_64/stable
 
 # tools
 app/org.gnome.World.Secrets/x86_64/stable

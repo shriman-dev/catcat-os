@@ -27,7 +27,7 @@ desktopFiles() {
 }
 
 icons() {
-  curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
+  curl -Lo /tmp/papirus $(curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4)
 
   mkdir -p /tmp/papirusicon
   tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1

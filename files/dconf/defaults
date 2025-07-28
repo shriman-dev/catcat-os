@@ -137,7 +137,7 @@ sleep-inactive-battery-timeout=120
 
 [org/gnome/desktop/search-providers]
 disabled=['org.gnome.Software.desktop']
-enabled=['com.toolstack.Folio.desktop', 'org.gnome.World.Iotas.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.Calendar.desktop', 'page.kramo.Cartridges.desktop', 'org.gnome.Characters.desktop']
+enabled=['com.toolstack.Folio.desktop', 'org.gnome.World.Iotas.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.Calendar.desktop', 'page.kramo.Cartridges.desktop', 'me.iepure.devtoolbox.desktop']
 sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Boxes.desktop']
 
 

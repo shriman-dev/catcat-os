@@ -8,9 +8,9 @@ set -gx ni "$HOME/.local/state/nix/profiles/profile/bin"
 
 # Set var for android home
 if test -d $HOME/.local/share/waydroid/data/media/0
-  set -gx ANH "$HOME/.local/share/waydroid/data/media/0"
+  set -gx ANHOME "$HOME/.local/share/waydroid/data/media/0"
 else
-  set -gx ANH "/storage/emulated/0"
+  set -gx ANHOME "/storage/emulated/0"
 end
 
 # Set bat command as manpager for syntax highlighting

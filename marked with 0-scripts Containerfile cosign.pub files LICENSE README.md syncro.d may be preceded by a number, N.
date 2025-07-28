@@ -1,0 +1,97 @@
+[1mdiff --git a/files/dconf/appfolders b/files/dconf/appfolders[m
+[1mindex 47f65c6e..0a331c0f 100644[m
+[1m--- a/files/dconf/appfolders[m
+[1m+++ b/files/dconf/appfolders[m
+[36m@@ -63,7 +63,7 @@[m [mname='Prod & Devel'[m
+ translate=false[m
+ [m
+ [org/gnome/desktop/app-folders/folders/Gaming][m
+[31m-apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'io.github.ryubing.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop', 'dev.lizardbyte.app.Sunshine.desktop'][m
+[32m+[m[32mapps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'io.github.ryubing.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', , 'io.github.radiolamp.mangojuice.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop', 'dev.lizardbyte.app.Sunshine.desktop'][m
+ name='Gaming'[m
+ translate=false[m
+ [m
+[1mdiff --git a/files/scripts/cleanup.sh b/files/scripts/cleanup.sh[m
+[1mindex 9d41526c..cce1359b 100755[m
+[1m--- a/files/scripts/cleanup.sh[m
+[1m+++ b/files/scripts/cleanup.sh[m
+[36m@@ -43,6 +43,7 @@[m [mrm -vf  /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish[m
+ rm -vf  /usr/share/fish/vendor_conf.d/brew.fish[m
+ rm -vf  /usr/share/fish/vendor_conf.d/nano-default-editor.fish[m
+ rm -vf  /usr/share/fish/functions/fish_greeting.fish[m
+[32m+[m[32mrm -rvf /usr/share/ublue-os/bazaar/blocklist.txt[m
+ rm -rvf /usr/share/ublue-os/dconfs[m
+ rm -rvf /usr/share/ublue-os/motd[m
+ [m
+[1mdiff --git a/files/scripts/config-and-theming.sh b/files/scripts/config-and-theming.sh[m
+[1mindex 0835232c..cbcaaca3 100755[m
+[1m--- a/files/scripts/config-and-theming.sh[m
+[1m+++ b/files/scripts/config-and-theming.sh[m
+[36m@@ -27,7 +27,7 @@[m [mdesktopFiles() {[m
+ }[m
+ [m
+ icons() {[m
+[31m-  curl -Lo /tmp/papirus $( curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )[m
+[32m+[m[32m  curl -Lo /tmp/papirus $(curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4)[m
+ [m
+   mkdir -p /tmp/papirusicon[m
+   tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1[m
+[1mdiff --git a/files/scripts/systemd.sh b/files/scripts/systemd.sh[m
+[1mindex 9a1b3783..d7c64f0f 100755[m
+[1m--- a/files/scripts/systemd.sh[m
+[1m+++ b/files/scripts/systemd.sh[m
+[36m@@ -4,7 +4,7 @@[m [mecho -e "\n$0\n"[m
+ [m
+ #sddm.service[m
+ services_enable() {[m
+[31m-  command -v hhdctl || systemctl -f enable auto-power-profile.service[m
+[32m+[m[32m#  command -v hhdctl || systemctl -f enable auto-power-profile.service[m
+   command -v hhdctl || systemctl -f enable catcat-os-update.timer[m
+   systemctl -f enable \[m
+     fstrim.timer \[m
+[1mdiff --git a/files/system/etc/catcat-os/flatpak-list/install b/files/system/etc/catcat-os/flatpak-list/install[m
+[1mindex 435041d2..32e46555 100644[m
+[1m--- a/files/system/etc/catcat-os/flatpak-list/install[m
+[1m+++ b/files/system/etc/catcat-os/flatpak-list/install[m
+[36m@@ -91,6 +91,7 @@[m [mapp/com.vixalien.sticky/x86_64/stable[m
+ app/com.usebottles.bottles/x86_64/stable[m
+ app/com.vysp3r.ProtonPlus/x86_64/stable[m
+ app/page.kramo.Cartridges/x86_64/stable[m
+[32m+[m[32mapp/io.github.radiolamp.mangojuice/x86_64/stable[m
+ [m
+ # tools[m
+ app/org.gnome.World.Secrets/x86_64/stable[m
+[1mdiff --git a/files/system/usr/bin/buttercare b/files/system/usr/bin/buttercare[m
+[1mindex 3d50be51..5e954f3d 100755[m
+[1m--- a/files/system/usr/bin/buttercare[m
+[1m+++ b/files/system/usr/bin/buttercare[m
+[36m@@ -144,12 +144,16 @@[m [mshow_help() {[m
+     echo[m
+     echo "Commands:"[m
+     echo "  usage  <path>           Show BTRFS filesystem usage and disk space information"[m
+[32m+[m[32m    echo[m
+     echo "  balance                 Start balance operation on BTRFS filesystem"[m
+     echo "                          Note: Balance operation auto detects all BTRFS mount points if no path specified"[m
+     echo "                          Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"[m
+[32m+[m[32m    echo[m
+     echo "  defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"[m
+     echo "                          Options: -c <algorithm> -l [level] -p <path>"[m
+[32m+[m[32m    echo[m
+     echo "  scrub  <path>           Start a scrub operation on BTRFS filesystem"[m
+[32m+[m[32m    echo[m
+     echo "  trim   [path]           Perform TRIM operation on the path"[m
+     echo "                          Note: TRIM operation uses fstab entries if no path specified"[m
+ }[m
+[1mdiff --git a/files/system/usr/libexec/auto-power-profile b/files/system/usr/libexec/auto-power-profile[m
+[1mindex 9e56f529..45146265 100755[m
+[1m--- a/files/system/usr/libexec/auto-power-profile[m
+[1m+++ b/files/system/usr/libexec/auto-power-profile[m
+[36m@@ -55,7 +55,7 @@[m [mwhile true; do[m
+ [m
+   if [ "$target_profile" != "$previous_profile" ]; then[m
+     set_power_profile "$target_profile"[m
+[31m-    previous_profile=$target_profile[m
+[32m+[m[32m    previous_profile="$target_profile"[m
+   fi[m
+ [m
+   sleep 30s[m

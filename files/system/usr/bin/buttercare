@@ -144,12 +144,16 @@ show_help() {
     echo
     echo "Commands:"
     echo "  usage  <path>           Show BTRFS filesystem usage and disk space information"
+    echo
     echo "  balance                 Start balance operation on BTRFS filesystem"
     echo "                          Note: Balance operation auto detects all BTRFS mount points if no path specified"
     echo "                          Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"
+    echo
     echo "  defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"
     echo "                          Options: -c <algorithm> -l [level] -p <path>"
+    echo
     echo "  scrub  <path>           Start a scrub operation on BTRFS filesystem"
+    echo
     echo "  trim   [path]           Perform TRIM operation on the path"
     echo "                          Note: TRIM operation uses fstab entries if no path specified"
 }

@@ -4,10 +4,10 @@ echo -e "\n$0\n"
 
 #sddm.service
 services_enable() {
-  command -v hhdctl || systemctl -f enable auto-power-profile.service
+#command -v hhdctl || systemctl -f enable auto-power-profile.service
+# fstrim.time
   command -v hhdctl || systemctl -f enable catcat-os-update.timer
   systemctl -f enable \
-    fstrim.timer \
     nix.mount \
     libvirtd.service \
     catcat-system-setup.service \
@@ -60,6 +60,7 @@ services_disable() {
     tracker-miner-rss-3.service \
     tracker-writeback-3.service \
     tracker-xdg-portal-3.service \
+    ublue-os-media-automount.service \
     ublue-update.service \
     ublue-update.timer \
     uupd.service \
