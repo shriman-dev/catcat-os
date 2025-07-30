@@ -12,7 +12,10 @@ services_enable() {
     libvirtd.service \
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
-    catcat-flatpak-manager.timer
+    catcat-flatpak-manager.timer \
+    coolercontrold.service \
+    lactd.service \
+    waydroid-container.service
 
   systemctl --global -f enable \
     libadwaita-theme-sync.service \

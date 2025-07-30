@@ -299,7 +299,7 @@ show_help() {
     echo "  --disable                                 Disable localdns"
     echo "  --restart                                 Restart DNSMasq and DNSCrypt"
     echo "  --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnsmasq)"
-    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
+#    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
     echo
     echo "Log Options:"
     echo "  --flush-logs TIME                         Remove logs older than TIME"
@@ -350,11 +350,11 @@ while [[ $# -gt 0 ]]; do
             [[ $1 ]] && switch_blocklist "$1" || die "Backend type required (dnsmasq|dnscrypt)"
             shift
             ;;
-        --set-blocklist-size)
-            shift
-            [[ $1 ]] && set_size "$1" || die "Size required (mini|large)"
-            shift
-            ;;
+#        --set-blocklist-size)
+#            shift
+#            [[ $1 ]] && set_size "$1" || die "Size required (mini|large)"
+#            shift
+#            ;;
         --flush-logs)
             shift
             [[ $# -eq 0 ]] && { log "INFO" "Using default retention period"; clean_old_logs; } || \
