@@ -29,7 +29,7 @@ desktopFiles() {
 icons() {
   curl -Lo /tmp/papirus $(curl -s -X GET https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4)
 
-  mkdir -p /tmp/papirusicon
+  mkdir -vp /tmp/papirusicon
   tar -xf /tmp/papirus -C /tmp/papirusicon --strip-components=1
   cp -drf /tmp/papirusicon/Papirus* /usr/share/icons/
 }
@@ -37,7 +37,7 @@ icons() {
 gtkThemes() {
   # Lavanda-gtk-theme
   curl -Lo /tmp/lavanda-gtk-theme $( curl -s -X GET https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme/releases/latest | grep -i '"tarball_url"' | cut -d '"' -f4 )
-  mkdir -p /tmp/Lavanda-gtk-theme
+  mkdir -vp /tmp/Lavanda-gtk-theme
   tar -xf /tmp/lavanda-gtk-theme -C /tmp/Lavanda-gtk-theme --strip-components=1
   /tmp/Lavanda-gtk-theme/install.sh --color light dark
 
