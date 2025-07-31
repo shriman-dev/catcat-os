@@ -1,14 +1,26 @@
 #!/bin/bash
 
-FLATPAK_APPS_TO_UPDATE_SOLEY=(
+REG_FLATPAK_APPS_UPDATE=(
+  "org.mozilla.firefox"
   "io.gitlab.librewolf-community"
-  "com.brave.Browser"
-  "org.gnome.Epiphany"
+  "net.mullvad.MullvadBrowser"
   "org.garudalinux.firedragon"
+  "one.ablaze.floorp"
+  "app.zen_browser.zen"
   "org.torproject.torbrowser-launcher"
+  "org.chromium.Chromium"
+  "com.brave.Browser"
+  "io.github.ungoogled_software.ungoogled_chromium"
+  "com.vivaldi.Vivaldi"
+  "com.opera.Opera"
+  "com.microsoft.Edge"
+  "com.google.Chrome"
+  "org.kde.falkon"
+  "org.gnome.Epiphany"
+  "re.sonny.Tangram"
 )
 
-for APP in "${FLATPAK_APPS_TO_UPDATE_SOLEY[@]}"; do
+for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
   /usr/bin/flatpak update --assumeyes --noninteractive "$APP"
 done
 

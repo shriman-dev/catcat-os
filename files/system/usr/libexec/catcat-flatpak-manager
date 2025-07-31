@@ -66,28 +66,31 @@ remove_filesystem_access() {
     "com.visualstudio.code"
     "com.spotify.Client"
     "org.videolan.VLC"
+    "io.freetubeapp.FreeTube"
     "io.github.ryubing.Ryujinx"
     "net.lutris.Lutris"
     "com.usebottles.bottles"
     "com.valvesoftware.Steam"
     "com.heroicgameslauncher.hgl"
-    "app.zen_browser.zen"
-    "com.brave.Browser"
-    "com.google.Chrome"
-    "com.microsoft.Edge"
-    "com.opera.Opera"
-    "com.vivaldi.Vivaldi"
-    "io.freetubeapp.FreeTube"
-    "io.github.ungoogled_software.ungoogled_chromium"
+    "org.libretro.RetroArch"
+    "net.pcsx2.PCSX2"
+    "net.rpcs3.RPCS3"
+    "org.mozilla.firefox"
     "io.gitlab.librewolf-community"
     "net.mullvad.MullvadBrowser"
-    "net.waterfox.waterfox"
-    "one.ablaze.floorp"
-    "org.chromium.Chromium"
     "org.garudalinux.firedragon"
-    "org.kde.falkon"
-    "org.mozilla.firefox"
+    "one.ablaze.floorp"
+    "app.zen_browser.zen"
     "org.torproject.torbrowser-launcher"
+    "org.chromium.Chromium"
+    "com.brave.Browser"
+    "io.github.ungoogled_software.ungoogled_chromium"
+    "com.vivaldi.Vivaldi"
+    "com.opera.Opera"
+    "com.microsoft.Edge"
+    "com.google.Chrome"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
     "re.sonny.Tangram"
   )
 
@@ -167,14 +170,16 @@ allow_home() {
     "com.github.PintaProject.Pinta"
     "com.github.qarmin.czkawka"
     "com.github.rafostar.Clapper"
-    "com.toolstack.Folio"
+    "org.gnome.World.Iotas"
     "dev.geopjr.Collision"
     "garden.jamie.Morphosis"
+    "io.github.celluloid_player.Celluloid"
     "io.github.mpobaschnig.Vaults"
     "org.gimp.GIMP"
     "org.gnome.Evince"
     "org.gnome.FileRoller"
     "org.gnome.Loupe"
+    "org.gnome.meld"
     "org.gnome.Music"
     "org.gnome.Papers"
     "org.gnome.Showtime"
@@ -193,24 +198,40 @@ allow_home() {
 allow_gpu_acceleration() {
   gpu_acceleration_for_apps=(
     "com.dec05eba.gpu_screen_recorder"
+    "app.grayjay.Grayjay"
+    "io.freetubeapp.FreeTube"
     "com.discordapp.Discord"
     "dev.vencord.Vesktop"
     "xyz.armcord.ArmCord"
-    "io.freetubeapp.FreeTube"
-    "app.zen_browser.zen"
-    "com.brave.Browser"
-    "com.vivaldi.Vivaldi"
-    "io.github.ungoogled_software.ungoogled_chromium"
-    "io.gitlab.librewolf-community"
-    "io.missioncenter.MissionCenter"
-    "net.mullvad.MullvadBrowser"
-    "net.waterfox.waterfox"
-    "one.ablaze.floorp"
-    "org.garudalinux.firedragon"
-    "org.gnome.Epiphany"
-    "org.kde.falkon"
     "org.mozilla.firefox"
+    "io.gitlab.librewolf-community"
+    "net.mullvad.MullvadBrowser"
+    "org.garudalinux.firedragon"
+    "one.ablaze.floorp"
+    "app.zen_browser.zen"
+    "org.torproject.torbrowser-launcher"
+    "org.chromium.Chromium"
+    "com.brave.Browser"
+    "io.github.ungoogled_software.ungoogled_chromium"
+    "com.vivaldi.Vivaldi"
+    "com.opera.Opera"
+    "com.microsoft.Edge"
+    "com.google.Chrome"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
     "re.sonny.Tangram"
+    "com.jeffser.Alpaca"
+    "io.github.celluloid_player.Celluloid"
+    "com.github.rafostar.Clapper"
+    "org.gnome.Cheese"
+    "org.gnome.Snapshot"
+    "org.kde.krita"
+    "org.pitivi.Pitivi"
+    "org.shotcut.Shotcut"
+    "org.gnome.Showtime"
+    "org.upscayl.Upscayl"
+    "org.videolan.VLC"
+    "dev.zed.Zed"
   )
 
   echo ''
@@ -220,25 +241,38 @@ allow_gpu_acceleration() {
   done
 }
 
-
 app_specific_perms() {
   # Allow all devices (cam) for camera apps
   echo ''
-  for app in org.gnome.Cheese org.gnome.Snapshot; do
+  for app in org.gnome.Cheese \
+             org.gnome.Snapshot; do
     echo -e "Permitting cam for app $app"
     flatpak override $SCOPE --unshare=network --device=all $app && echo 'Done' || echo 'Error occurred'
   done
 
   # Enable kvm and gpu acceleration for virtualization apps
   echo ''
-  for app in org.gnome.Boxes org.virt_manager.virt-manager; do
+  for app in org.gnome.Boxes \
+             org.virt_manager.virt-manager; do
     echo -e "Enabling virtualization for app $app"
     flatpak override $SCOPE --device={dri,kvm} $app && echo 'Done' || echo 'Error occurred'
   done
 
+  # Fix qt apps on wayland
+  echo ''
+  for app in org.videolan.VLC \
+             org.shotcut.Shotcut \
+             com.calibre_ebook.calibre \
+             net.pcsx2.PCSX2 \
+             net.rpcs3.RPCS3 \
+             org.libretro.RetroArch; do
+    echo -e "Disabling wayland socket for app $app"
+    flatpak override $SCOPE --nosoket=wayland $app && echo 'Done' || echo 'Error occurred'
+  done
+
   # Allow gedit to edit files all over system
   echo -e "\nAllow gedit to edit files all over system"
-  flatpak override $SCOPE --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit && echo 'Done' || echo 'Error occurred'
+  flatpak override $SCOPE --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit && echo 'Done' || echo 'Error occurred'
 }
 
 # perms for gaming apps
@@ -281,8 +315,28 @@ configure_gaming_apps() {
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-run/gamescope-0:ro} \
-    --env=DXVK_ASYNC=1 \
   io.github.ryubing.Ryujinx && echo 'Done' || echo 'Error occurred'
+
+  echo -e "\nGiving necessary permissions for gaming to: org.libretro.RetroArch"
+  flatpak override $SCOPE \
+    --device={input,dri,kvm} \
+    --allow={devel,multiarch,per-app-dev-shm} \
+    --filesystem=~/Me/Games \
+  org.libretro.RetroArch
+
+  echo -e "\nGiving necessary permissions for gaming to: net.rpcs3.RPCS3"
+  flatpak override $SCOPE \
+    --device={input,dri,kvm} \
+    --allow={devel,multiarch,per-app-dev-shm} \
+    --filesystem=~/Me/Games \
+  net.rpcs3.RPCS3
+
+  echo -e "\nGiving necessary permissions for gaming to: net.pcsx2.PCSX2"
+  flatpak override $SCOPE \
+    --device={input,dri,kvm} \
+    --allow={devel,multiarch,per-app-dev-shm} \
+    --filesystem=~/Me/Games \
+  net.pcsx2.PCSX2
 }
 
 show_help() {

@@ -25,18 +25,9 @@ sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
-# amd gpu opergb support
-#kernel="$(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep 'bazzite')"
-
-#git clone https://github.com/twifty/amd-gpu-i2c.git /tmp/amd-gpu-i2c
-#cd /tmp/amd-gpu-i2c
-#sed -i "s|sudo insmod \$(MODULE_NAME).ko|cp \$(MODULE_NAME).ko /lib/modules/$kernel/extra/|" ./Makefile
-#sed -i "s/sudo //g" ./Makefile
-#sed -i "s/\$(shell uname -r)/$kernel/" ./Makefile
-
-#make install
-
-#echo "amdgpu-i2c" > /etc/modules-load.d/amdgpu-i2c.conf # make it persistant
+# copy over logind.conf for easy of access
+mkdir -vp /etc/systemd/logind.conf.d/
+cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 
 # handheld specific tweaks
 if command -v hhdctl; then

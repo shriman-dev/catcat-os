@@ -22,6 +22,7 @@ desktopFiles() {
 
   sed -i 's|^Icon=.*|Icon=appgrid|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
+  sed -i 's|--auto-service||' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
 
   sed -i 's|^Exec=.*|Exec=waydroid show-full-ui|' /usr/share/applications/Waydroid.desktop
 }

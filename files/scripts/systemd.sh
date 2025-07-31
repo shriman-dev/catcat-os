@@ -99,6 +99,7 @@ services_disable() {
     uupd.timer
 
   systemctl --global disable \
+    io.github.kolunmi.Bazaar.service \
     bazzite-user-setup.service \
     tracker-miner-fs-3.service \
     tracker-miner-fs-control-3.service \
@@ -107,6 +108,7 @@ services_disable() {
     tracker-xdg-portal-3.service
 
   systemctl --global mask \
+    io.github.kolunmi.Bazaar.service \
     bazzite-user-setup.service \
     tracker-miner-fs-3.service \
     tracker-miner-fs-control-3.service \
