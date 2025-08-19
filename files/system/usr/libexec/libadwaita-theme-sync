@@ -1,12 +1,8 @@
 #!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+exit_if_root
 
-exitIfRoot() {
-  [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
-  id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
-}
-exitIfRoot
-
-syncLibadwaitaTheme() {
+sync_libadwaita_theme() {
   local selected_theme="${1}"
   local previous_theme="${2}"
   local theme_path="${3}"
@@ -28,7 +24,7 @@ while true; do
   theme_path=$(find "$HOME/.themes/" -maxdepth 1 -mindepth 1 -type d -iname "${selected_gtk_theme}")
   previous_gtk_theme="${previous_gtk_theme:-}"
 
-  syncLibadwaitaTheme "${selected_gtk_theme}" "${previous_gtk_theme}" "${theme_path}"
+  sync_libadwaita_theme "${selected_gtk_theme}" "${previous_gtk_theme}" "${theme_path}"
 
   previous_gtk_theme="${selected_gtk_theme}"
   sleep 10s

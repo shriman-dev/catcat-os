@@ -70,8 +70,7 @@ s|video-path=.*|video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.
     ['/org/gnome/shell/extensions/clipboard-history/']=""
     ['/org/gnome/shell/extensions/custom-hot-corners-extended/']=""
     ['/org/gnome/shell/extensions/dash-to-panel/']="
-/dash-to-panel/,/^$/ { s/{\".*0x0.*0\":/{\"0\":/ }
-/dash-to-panel/,/^$/ { s/\"A.*-.*33\"/\"\"/ }
+/dash-to-panel/,/^$/ { s/\"A.*-.*[0-9]\"/\"\"/ }
 /dash-to-panel/,/^$/ { /primary-monitor=/d }"
     ['/org/gnome/shell/extensions/default-workspace/']=""
     ['/org/gnome/shell/extensions/forge/']=""

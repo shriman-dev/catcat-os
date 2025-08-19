@@ -56,11 +56,12 @@ systemctl disable systemd-resolved.service
 
 # get dns blocklist archive
 mkdir -p /usr/share/dnscrypt-proxy /usr/share/dnsmasq/dns-blocklist-archive
-curl -Lo /tmp/blocklist.conf.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist.conf.tar.zst
-split -dC 5M /tmp/blocklist.conf.tar.zst /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst
 
-#curl -Lo /tmp/domains-filtered-subdomains-mini.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains.d/domains-filtered-subdomains-mini.tar.zst
-#split -dC 5M /tmp/domains-filtered-subdomains-mini.tar.zst /usr/share/dnscrypt-proxy/domains-filtered-subdomains-mini.tar.zst
+#curl -Lo /tmp/blocklist.conf.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/dnsmasq.d/blocklist.conf.tar.zst
+#split -dC 5M /tmp/blocklist.conf.tar.zst /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst
+
+curl -Lo /tmp/domains-filtered-subdomains.tar.zst https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main/domains.d/domains-filtered-subdomains.tar.zst
+split -dC 5M /tmp/domains-filtered-subdomains.tar.zst /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst
 
 
 

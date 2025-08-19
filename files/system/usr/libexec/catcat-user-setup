@@ -1,6 +1,7 @@
 #!/bin/bash
 shopt -s extglob nocasematch
-
+source /usr/lib/catcat/funcvar.sh
+VERBOSE=2
 HOME_DIR="$HOME"
 CONFIG="$HOME_DIR/.config"
 LOCALSHARE="$HOME_DIR/.local/share"
@@ -9,23 +10,20 @@ CATCAT_CONF="$LOCALSHARE/catcat-os"
 
 FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ $LOCALSHARE/flatpak/app/)"
 
-log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] $2"; }
-err() { log "ERROR" "$1"; return 1; }
-
-bakBefore() {
+bak_before() {
   [[ ! -d $1.bak.og ]] && cp -drf $1 $1.bak.og || err "Backup failed for orignal $1"
   cp -drf $1 $1.bak || err "Backup failed for $1"
 }
 
 
-exitIfRoot() {
+exit_if_root() {
   [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
   id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
 }
 
 
 # sync default configs for user home
-syncDefaultConfigs() {
+sync_default_configs() {
   local update_sha="/etc/catcat-os/update_sha"
   local prev_sha="$CATCAT_CONF/previous_update_sha"
 
@@ -46,11 +44,11 @@ syncDefaultConfigs() {
 }
 
 
-gnomeShellSetup() {
+gnome_shell_setup() {
   log "INFO" "Setting up GNOME Shell..."
   local app_folders_dconf="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
   [[ ! "${app_folders_dconf}" =~ 'FileViewers' ]] && {
-    bakBefore "$CONFIG/dconf"
+    bak_before "$CONFIG/dconf"
 #    cp -dvf /etc/dconf/db/distro "$CONFIG/dconf/user"
 #    for i in $(ls -A1d /etc/dconf/db/distro.d/*);
 #    do
@@ -76,7 +74,7 @@ gnomeShellSetup() {
   # Setup burn-my-windows
   local bmw_profile="$CONFIG/burn-my-windows/profiles/1679372508290696.conf"
   [[ ! -f "$bmw_profile" ]] && {
-    bakBefore "$CONFIG/burn-my-windows"
+    bak_before "$CONFIG/burn-my-windows"
     cp -drv "$SKEL/.config/burn-my-windows" "$CONFIG/" &&
     dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$bmw_profile'" || err "Burn my windows style setup failed"
   }
@@ -84,7 +82,7 @@ gnomeShellSetup() {
   # Setup forge stylesheet
   local forge_stylesheet="forge/stylesheet/forge/stylesheet.css"
   [[ $(grep -c 'border-width: 1px' "$CONFIG/$forge_stylesheet") -lt 6 ]] && {
-    bakBefore "$CONFIG/forge"
+    bak_before "$CONFIG/forge"
     cp -drv "$SKEL/.config/$forge_stylesheet" "$CONFIG/$forge_stylesheet" || err "Forge style setup failed"
   }
 
@@ -122,19 +120,19 @@ gnomeShellSetup() {
 }
 
 
-setupBookmarksUserdirs() {
+setup_bookmarks_userdirs() {
   local user_dirs_file="$CONFIG/user-dirs.dirs"
   local bookmarks="$CONFIG/gtk-3.0/bookmarks"
 
   log "INFO" "Setting up default user directories and adding Bookmarks..."
   grep -q "$USER/Me/" "$user_dirs_file" || {
-    bakBefore "$user_dirs_file"
+    bak_before "$user_dirs_file"
         cp -drf "$SKEL/.config/user-dirs.dirs" "$CONFIG/" #|| err "Failed to set default user directories"
     }
 
   mkdir -pv /tmp/tmp-$USER
   grep -q "admin:/// AdminRoot" "$bookmarks" || {
-    bakBefore "$bookmarks"
+    bak_before "$bookmarks"
     mkdir -pv "$(dirname "$bookmarks")" &&
     sh -c "echo 'file:///home/$USER/Me Me
 file:///home/$USER/Me/Documents Documents
@@ -173,7 +171,7 @@ file:///tmp/tmp-$USER Temporary' > $bookmarks" || err "Failed to add bookmarks"
 }
 
 
-removeUnnecessaryDirectories() {
+remove_unnecessary_directories() {
   log "INFO" "Removing unnecessary directories..."
   dirlist=(
     "$HOME_DIR/Desktop"
@@ -198,7 +196,7 @@ removeUnnecessaryDirectories() {
 
 
 
-shellSetup() {
+shell_setup() {
   log "INFO" "Setting up shell..."
   [[ ! -f "$CONFIG/fish/fish_variables" ]] && { cp -drf $SKEL/.config/fish "$CONFIG/" || err "Failed to setup fish_variables"; }
 
@@ -215,11 +213,11 @@ unset rc'
 
 
 
-themeFlatpakApps() {
+theme_flatpak_apps() {
   log "INFO" "Setting theme, icons and permissions for flatpak apps..."
   mkdir -pv "$LOCALSHARE/flatpak/overrides"
   grep 'devices=.*!all' "$LOCALSHARE/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-    bakBefore "$LOCALSHARE/flatpak/overrides/global"
+    bak_before "$LOCALSHARE/flatpak/overrides/global"
     /usr/libexec/catcat-flatpak-manager --user --all || err "Failed to configure flatpak permissions"
   }
 
@@ -236,7 +234,7 @@ themeFlatpakApps() {
 
 
 
-setupApps() {
+setup_apps() {
   log "INFO" "Configuring apps and desktop files..."
 
   local apps_dir="$LOCALSHARE/applications"
@@ -290,15 +288,15 @@ setupApps() {
 
 
 main() {
-  exitIfRoot
+  exit_if_root
 
-  syncDefaultConfigs
-  gnomeShellSetup
-  setupBookmarksUserdirs
-  removeUnnecessaryDirectories
-  shellSetup
-  themeFlatpakApps
-  setupApps
+  sync_default_configs
+  gnome_shell_setup
+  setup_bookmarks_userdirs
+  remove_unnecessary_directories
+  shell_setup
+  theme_flatpak_apps
+  setup_apps
 
 #  wait
 }

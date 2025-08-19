@@ -1,9 +1,11 @@
 #!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
 
 # Default values
 CONFIG_DIR="/etc/catcat-os/localdns.d"
 TMPDIR="/tmp/dns-blocklist"
 REPO_URL="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
+BACKEND_TYPE=$([[ -f "$CONFIG_DIR/only-dnscrypt-blocklist" ]] && echo "dnscrypt" || echo "dnsmasq")
 DNSCRYPTDIR='/etc/dnscrypt-proxy'
 DNSMASQDIR='/etc/dnsmasq.d'
 DNSCRYPTLOGDIR='/var/log/dnscrypt-proxy'
@@ -11,46 +13,17 @@ DNSMASQLOGDIR='/var/log'
 QUIET=false
 VERBOSE=
 
-# Error logging with optional verbose output
-log() {
-    local level="$1" msg="${@:2}"
-    local dt="$([[ $VERBOSITY -ge 2 ]] && date -u '+[%Y-%m-%d %H:%M:%S] ')"  # UTC time format
-
-    local bold='\033[1m' red='\033[1;31m' green='\033[1;32m' yellow='\033[1;33m' cyan='\033[1;36m'
-    local color  noc='\033[0m' # No Color
-    case "$level" in
-        "DEBUG") color=$cyan; [[ $QUIET == false && $VERBOSITY -ge 2 ]] || return ;;
-        "INFO")  color=$green; [[ $QUIET == false ]] || return ;;
-        "WARN")  color=$yellow ;;
-        "ERROR") color=$red ;;
-    esac
-
-    echo -e "${bold}${dt}${color}[${level^^}]${noc} $msg"
-}
-
-# Error handling with optional function call
-die() {
-    log "ERROR" "$1"
-    [[ -n "$2" ]] && $2
-    exit 1
-}
-
-need_root() {
-    [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
-}
-
 update_blocklist() {
     need_root
     mkdir -p "$CONFIG_DIR" "$TMPDIR" || die "Failed to create directories"
 
     local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
-    local target_type=$([[ -f "$CONFIG_DIR/only-dnscrypt-blocklist" ]] && echo "dnscrypt" || echo "dnsmasq")
 
-    log "INFO" "Updating DNS blocklist (Backend: ${target_type})"
+    log "INFO" "Updating DNS blocklist (Backend: ${BACKEND_TYPE})"
     #, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
     
     local src_file dst_file subdir
-    if [[ $target_type == "dnscrypt" ]]; then
+    if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
         src_file="domains-filtered-subdomains${mini}"
         dst_file="${DNSCRYPTDIR}/domains-blocklist.txt"
         subdir="domains.d"
@@ -81,7 +54,13 @@ toggle_localdns() {
         enable)
             log "INFO" "Enabling local DNS..."
             ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
-            systemctl enable --force --now dnscrypt-proxy.service dnsmasq.service ||
+            { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
+                 systemctl disable --force --now dnsmasq.service
+                 systemctl enable --force --now dnscrypt-proxy.service
+              elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
+                 systemctl disable --force --now dnscrypt-proxy.service
+                 systemctl enable --force --now dnsmasq.service
+              fi } ||
                 die "Failed to enable DNS services"
             ;;
         disable)
@@ -89,13 +68,15 @@ toggle_localdns() {
             local nm_resolvconf='/run/NetworkManager/resolv.conf'
             [[ ! -f "$nm_resolvconf" ]] && die "NetworkManager resolv.conf missing at $nm_resolvconf"
             cp ${VERBOSE:+-v} -f $nm_resolvconf /etc/resolv.conf &&
-            systemctl disable --force --now dnscrypt-proxy.service dnsmasq.service &&
+            { [[ $BACKEND_TYPE == "dnscrypt" ]] && systemctl disable --force --now dnscrypt-proxy.service
+              [[ $BACKEND_TYPE == "dnsmasq" ]] && systemctl disable --force --now dnsmasq.service; } &&
             systemctl restart NetworkManager.service ||
                 die "Failed to disable DNS services"
             ;;
         restart)
             log "INFO" "Restarting DNS services..."
-            systemctl restart dnscrypt-proxy.service dnsmasq.service ||
+            { [[ $BACKEND_TYPE == "dnscrypt" ]] && systemctl restart dnscrypt-proxy.service
+              [[ $BACKEND_TYPE == "dnsmasq" ]] && systemctl restart dnsmasq.service; } ||
                 die "Failed to restart DNS services"
             ;;
         *) 
@@ -109,18 +90,18 @@ toggle_localdns() {
 switch_blocklist() {
     need_root
     case "${1,,}" in
-        dnsmasq)
-            rm ${VERBOSE:+-v} -f "$CONFIG_DIR/only-dnscrypt-blocklist"
-            log "INFO" "Switched to DNSMasq backend"
-            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
-            ;;
         dnscrypt)
             touch "$CONFIG_DIR/only-dnscrypt-blocklist"
             log "INFO" "Switched to DNSCrypt backend"
             log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
             ;;
+        dnsmasq)
+            rm ${VERBOSE:+-v} -f "$CONFIG_DIR/only-dnscrypt-blocklist"
+            log "INFO" "Switched to DNSMasq backend"
+            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            ;;
         *) 
-            die "Invalid backend. Use 'dnsmasq' or 'dnscrypt'"
+            die "Invalid backend. Use 'dnscrypt' or 'dnsmasq'"
             ;;
     esac
 }
@@ -298,7 +279,7 @@ show_help() {
     echo "  --enable                                  Enable localdns"
     echo "  --disable                                 Disable localdns"
     echo "  --restart                                 Restart DNSMasq and DNSCrypt"
-    echo "  --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnsmasq)"
+    echo "  --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
 #    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
     echo
     echo "Log Options:"

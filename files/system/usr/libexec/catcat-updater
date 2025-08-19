@@ -1,4 +1,5 @@
 #!/bin/bash
+source /usr/lib/catcat/funcvar.sh
 
 REG_FLATPAK_APPS_UPDATE=(
   "org.mozilla.firefox"
@@ -25,29 +26,25 @@ for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
 done
 
 
-notifyAll() {
-  for SOME_USER in /run/user/*; do
-    SOME_USER=$(basename "$SOME_USER")
-    sudo -u $(id -u -n "$SOME_USER") \
-        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$SOME_USER"/bus notify-send -a "CatCat OS Update" -i '/usr/share/pixmaps/catcat-os-logo.svg' "$1"
-  done
+notify_all() {
+  notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "$1"
 }
 
+one_week=604800
+two_week=1209600
 
-# two weeks = 1209600
-# one week = 604800
-# update if system is one weeks old
-if [[ $(stat -c "%Y" /etc/catcat-os/last-auto-update.log) -lt $(( $(date +%s) - 604800 )) ]]; then
-  notifyAll "Automatic weekly update has started."
+# Auto update if system is one weeks old
+if is_file_older $one_week "/etc/catcat-os/last-auto-update.log"; then
+  notify_all "Weekly automatic update has started."
 
   date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
 
   /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
 
-  if [[ $(stat -c "%Y" /etc/catcat-os/update_sha) -lt $(( $(date +%s) - 604800 )) ]]; then
+  if is_file_older $one_week "/etc/catcat-os/update_sha"; then
     /usr/bin/update >> /etc/catcat-os/last-auto-update.log
   fi
 
-  notifyAll "Automatic weekly update is done."
+  notify_all "Weekly automatic update is done."
 fi
 

@@ -1,17 +1,12 @@
 #!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
 
-# GLOBAL
 KARGS=$(rpm-ostree kargs)
 NEEDED_KARGS=()
 U1000="$(id -un 1000)"
 
 # KERNEL ARGUMENTS
 echo "Current kargs: $KARGS"
-
-replaceXAdd() {
-  grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
-}
-
 # copy main user monitors.xml to gdm
 if ! diff -q "/home/$U1000/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
   cp -vf /home/$U1000/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
@@ -32,11 +27,18 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 #  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
 
   # Set DNS blocklist
-  rm -f /etc/dnsmasq.d/domains-blocklist*
-  cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/ --zstd -xvf -
-  cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
-  restorecon -vR /etc/dnsmasq.d/
-  rm /tmp/blocklist.conf*
+  mkdir -p /tmp/dns-blocklist
+  if ls -A1d /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst*; then
+    rm -f /etc/dnscrypt-proxy/domains-blocklist.txt
+    cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
+    cp -f /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
+  elif ls -A1d /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst*; then
+    rm -f /etc/dnsmasq.d/domains-blocklist*
+    cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
+    cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
+    restorecon -vR /etc/dnsmasq.d/
+  fi
+  rm -rf /tmp/dns-blocklist/
 
   hostnamectl set-hostname --static "catcat"
 
@@ -59,7 +61,7 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
 fi
 
 # to use ad-malware blocking localdns
-if systemctl is-enabled dnscrypt-proxy.service; then
+if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
   if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
     mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
     ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
@@ -78,13 +80,13 @@ if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
   mkdir -p /boot/grub_themes
   cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
-  replaceXAdd 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
-#  replaceXAdd 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
-  replaceXAdd 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
-  replaceXAdd 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+  replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+#  replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+  replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
+  replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
   #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
-  replaceXAdd 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
-  replaceXAdd 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+  replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+  replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
 
   if [[ -d /sys/firmware/efi ]]; then
     grub2-mkconfig -o /etc/grub2-efi.cfg
@@ -142,7 +144,8 @@ fi
 
 # nvidia specific
 if command -v nvidia-smi; then
-  sed '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
+  sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
+  sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
   # enable nvidia optimus if device is laptop and has nvidia dgpu
 #  if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
 #    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
@@ -162,7 +165,7 @@ if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
 fi
 
 # configure systemd services
-if ! inxi -M | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
+if ! inxi -M | grep -i "Type:.*Laptop" | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
   systemctl disable --force --now mcontrolcenter.helper.service
   systemctl --global disable mcontrolcenter.helper.service
 fi

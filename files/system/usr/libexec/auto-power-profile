@@ -1,4 +1,6 @@
 #!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
 SYSTEM_LOAD_THRESHOLD_LOW=1.5
 SYSTEM_LOAD_THRESHOLD_HIGH=3
 
@@ -28,7 +30,7 @@ set_power_profile() {
       [[ -f $power_policy ]] && echo "default" | tee $power_policy
       ;;
     *)
-      echo "Unknown power profile: $profile"
+      die "Unknown power profile: $profile"
       ;;
   esac
 }
