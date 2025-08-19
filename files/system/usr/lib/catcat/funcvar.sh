@@ -150,13 +150,3 @@ bak_before() {
   [[ ! -d $1.bak.og ]] && cp -drf $1 $1.bak.og || err "Backup failed for orignal $1"
   cp -drf $1 $1.bak || err "Backup failed for $1"
 }
-
-
-
-
-
-
-
-
-
-
