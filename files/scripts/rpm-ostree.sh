@@ -107,7 +107,7 @@ extra_pkgs
 ## RPM PKGS ##
 ##############
 
-addRepos() {
+add_repos() {
 cd /etc/yum.repos.d/
 ls -A1
 
@@ -129,7 +129,7 @@ dnf5 -y copr enable zeno/scrcpy
 ls -A1
 cd -
 }
-addRepos
+add_repos
 
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
@@ -158,7 +158,7 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watch
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 #lazygit ghostty
-devTools='criu ptyxis git micro neovim sassc codium'
+devTools='criu ptyxis ghostty git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
@@ -185,4 +185,23 @@ quickemu
 
 extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
 
-rpm-ostree install --assumeyes $( echo "$security" "$shellSetup" "$monitoringTools" "$diskFileMan" "$terminalTools" "$funTerminalTools" "$devTools" "$encryptionAndBackupTools" "$androidTools" "$files" "$themingCompatibility" "$iconsAndFonts" "$gnomeShellExtensions" "$gaming" "$virtualization" "$extras" )
+all_pkgs=(
+    "${security[@]}"
+    "${shellSetup[@]}"
+    "${monitoringTools[@]}"
+    "${diskFileMan[@]}"
+    "${terminalTools[@]}"
+    "${funTerminalTools[@]}"
+    "${devTools[@]}"
+    "${encryptionAndBackupTools[@]}"
+    "${androidTools[@]}"
+    "${files[@]}"
+    "${themingCompatibility[@]}"
+    "${iconsAndFonts[@]}"
+    "${gnomeShellExtensions[@]}"
+    "${gaming[@]}"
+    "${virtualization[@]}"
+    "${extras[@]}"
+)
+
+rpm-ostree install --assumeyes "${all_pkgs[@]}"
