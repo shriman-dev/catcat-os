@@ -204,4 +204,4 @@ all_pkgs=(
     "${extras[@]}"
 )
 
-rpm-ostree install ${all_pkgs[@]}
+rpm-ostree install antimicrox
