@@ -20,7 +20,7 @@ video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'
 cache-only-favorites=false
 cache-size=10
 display-mode=0
-history-size=1000
+history-size=2000
 private-mode=false
 process-primary-selection=true
 window-width-percentage=23
@@ -129,7 +129,7 @@ panel-side-padding=2
 panel-sizes='{"":32}'
 panel-top-bottom-margins=0
 panel-top-bottom-padding=0
-prefs-opened=true
+prefs-opened=false
 preview-custom-opacity=30
 preview-use-custom-opacity=true
 progress-show-count=true
@@ -210,6 +210,7 @@ corners-visible=false
 custom-menu-1=['toggle-overview', 'show-applications', 'show-screenshot-ui', 'black-screen', 'hide-panel', 'show-custom-menu-2', 'move-win-to-next-ws', 'move-win-to-prev-ws', 'stick-win', 'show-desktop', 'access-submenu', 'zoom-in', 'zoom-out', 'gnome-submenu', 'night-light-toggle', 'toggle-theme', 'core-submenu', 'kill-app', 'unminimize-all', 'win-control-submenu', 'fullscreen-on-empty-ws', 'system-submenu', 'lock-screen', 'suspend', 'power-off', 'log-out', 'switch-user']
 custom-menu-2=['core-submenu', 'workspaces-submenu', 'win-navigation-submenu', 'win-switcher-popup-submenu', 'win-control-submenu', 'win-reloc-submenu', 'win-thumbnails-submenu', 'win-adjust-submenu', 'win-effects-submenu', 'global-effects-submenu', 'access-submenu', 'system-submenu', 'custom-menus-submenu', 'hardware-submenu', 'debug-submenu', 'prefs-submenu', 'toggle-overview', 'show-overview', 'toggle-overview-app', 'toggle-applications', 'show-applications', 'show-desktop', 'show-desktop-mon', 'black-screen', 'show-screenshot-ui', 'black-screen-mon', 'prev-workspace', 'next-workspace', 'prev-workspace-popup', 'next-workspace-popup', 'prev-workspace-current-mon', 'next-workspace-current-mon', 'recent-workspace', 'move-to-second-last-ws', 'reorder-ws-prev', 'reorder-ws-next', 'rotate-ws-prev-mon', 'rotate-ws-next-mon', 'close-workspace', 'recent-win', 'prev-win-mon', 'prev-win-ws', 'prev-win-all', 'prev-win-all-app', 'next-win-mon', 'next-win-ws', 'next-win-all', 'next-win-all-app', 'win-switcher-popup-all', 'win-switcher-popup-ws', 'win-switcher-popup-mon', 'win-switcher-popup-ws-first', 'win-switcher-popup-apps', 'win-switcher-popup-class', 'app-switcher-popup-all', 'app-switcher-popup-ws', 'app-switcher-popup-mon', 'minimize-win', 'maximize-win', 'close-win', 'fullscreen-win', 'fullscreen-on-empty-ws', 'above-win', 'stick-win', 'open-new-window', 'quit-app', 'kill-app', 'unminimize-all-ws', 'unminimize-all', 'move-win-to-prev-ws', 'move-win-to-prev-new-ws', 'move-win-to-next-new-ws', 'move-win-to-next-ws', 'move-app-to-prev-ws', 'move-app-to-prev-new-ws', 'move-app-to-next-ws', 'move-app-to-next-new-ws', 'move-win-to-next-monitor', 'make-thumbnail-win', 'minimize-to-thumbnail', 'remove-win-thumbnails', 'bright-up-win', 'bright-down-win', 'contrast-up-win', 'contrast-down-win', 'contrast-high-win', 'contrast-low-win', 'opacity-up-win', 'opacity-down-win', 'opacity-toggle-hc-win', 'opacity-toggle-win', 'opacity-toggle-lc-win', 'invert-light-win', 'invert-light-shift-win', 'invert-colors-win', 'tint-red-toggle-win', 'tint-green-toggle-win', 'tint-custom-toggle-win', 'desaturate-win', 'remove-effects-win', 'bright-up-all', 'bright-down-all', 'contrast-up-all', 'contrast-down-all', 'contrast-high-all', 'contrast-low-all', 'invert-light-all', 'invert-light-shift-all', 'tint-red-toggle-all', 'tint-custom-toggle-all', 'tint-green-toggle-all', 'desaturate-all', 'remove-effects-all', 'toggle-zoom', 'zoom-in', 'zoom-out', 'screen-reader', 'large-text', 'keyboard', 'protan-toggle', 'deuter-toggle', 'tritan-toggle', 'protan-sim-toggle', 'deuter-sim-toggle', 'tritan-sim-toggle', 'mixer-gbr-toggle', 'gnome-submenu', 'night-light-toggle', 'toggle-theme', 'hide-panel', 'open-panel-system-menu', 'open-panel-date-menu', 'lock-screen', 'screensaver', 'suspend', 'power-off', 'switch-user', 'log-out', 'media-submenu', 'volume-up', 'volume-down', 'mute-sound', 'mpris-play-pause', 'mpris-next', 'mpris-prev', 'mpris-play-pause-spotify', 'mpris-next-spotify', 'mpris-prev-spotify', 'mpris-play-pause-firefox', 'mpris-next-firefox', 'mpris-prev-firefox', 'show-custom-menu-1', 'show-custom-menu-2', 'show-custom-menu-3', 'show-custom-menu-4', 'display-brightness-up', 'display-brightness-down', 'looking-glass', 'restart-shell', 'lg-inspector', 'run-prompt', 'swipe-ws-up', 'swipe-ws-down', 'swipe-overview-up', 'swipe-overview-down', 'prefs', 'hot-corners-require-shift']
 custom-tint-color='rgb(255,163,72)'
+hot-corners-require-shift=false
 keyboard-shortcuts=['contrast-up-all <Shift><Control>Page_Up', 'contrast-down-all <Shift><Control>Page_Down', 'remove-effects-all <Shift><Control>End']
 panel-menu-enable=false
 show-osd-monitor-indexes=false
@@ -273,12 +274,12 @@ barrier-size-v=1
 pressure-threshold=200
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-1]
-action='toggle-overview'
+action='toggle-applications'
 h-expand=true
 v-expand=false
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-2]
-action='toggle-applications'
+action='toggle-overview'
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-3]
 action='quit-app'

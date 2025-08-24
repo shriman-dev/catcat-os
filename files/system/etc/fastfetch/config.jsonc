@@ -13,7 +13,26 @@
     "constants": [
       "········",
       "→"
-      ]
+      ],
+    "bar": {
+      "width": 10,      // Width of percentage bars
+      "char": {
+        "elapsed": "●", // Character for elapsed portion
+        "total": "·",   // Character for total portion
+      }
+    },
+    "percent": {
+      "type": [
+        "num",
+        "num-color",
+        "bar"
+      ],                // 1=number, 2=bar, 3=both, 9=colored number
+      "color": {
+        "green": "green",
+        "yellow": "light_yellow",
+        "red": "light_red"
+      }
+    }
   },
   "modules": [
     {
@@ -132,28 +151,25 @@
     {
       "type": "gpu",
       "key": "  ├─󱉽 {$2}", //  󱩄 󱩃 󰐿 󰢮 󰤽 󱉽 󰘚 󰚗
-      "format": "{14} - {2} [{6}]" // ({8}/{7})"
+      "driverSpecific": true,
+      "format": "{14}| {2} [{6}]" // ({8}/{7})"
       //"hideType": "none"
     },
     {
       "type": "disk",
       "key": "  ├─ {$2}",
-      "format": "{3} - {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}",
+      "format": "{3}| {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}",
       "hideFS": "overlay"
     },
     {
       "type": "memory",
       "percent": {
-        "green": 50, // [0%, 50%) will be displayed in green
-        "yellow": 70, // [50, 70) will be displayed in yellow and [70, 100] will be displayed in red
-        "type": [ // Display percent value in monochrome bar, same as 10
-          "bar",
-          "bar-monochrome",
-          "num"
-          ]
+        "type": 0,    // Show both percentage number and bar
+        "green": 50,  // [0%, 50%) will be displayed in green
+        "yellow": 70  // [50, 70) will be displayed in yellow and [70, 100] will be displayed in red
         },
       "key": "  ╰─ {$2}",
-      "format": "{3} - {1} {4} {2}"
+      "format": "{3}| {1} {4} {2}"
     },
     {
       "type": "custom",

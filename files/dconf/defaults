@@ -123,6 +123,12 @@ remove-old-trash-files=true
 report-technical-problems=false
 send-software-usage-stats=false
 
+[org/gnome/settings-daemon/global-shortcuts]
+applications=['com.dec05eba.gpu_screen_recorder']
+
+[org/gnome/settings-daemon/global-shortcuts/com.dec05eba.gpu_screen_recorder]
+shortcuts=[('gpu_screen_recorder_start_stop_recording', {'description': <'Start/stop recording/replay/streaming'>}), ('gpu_screen_recorder_pause_unpause_recording', {'description': <'Pause/unpause recording'>}), ('gpu_screen_recorder_save_replay', {'description': <'Save replay'>})]
+
 [org/gnome/settings-daemon/plugins/color]
 night-light-schedule-automatic=false
 night-light-schedule-from=7.0
