@@ -133,7 +133,8 @@ add_repos
 
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-rpm-ostree override remove topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
+sed -i 's|gnome-software ||' /etc/dnf/repos.override.d/99-config_manager.repo
+rpm-ostree override remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
 #sunshine gnome-browser-connector
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier pam_mount'
@@ -183,7 +184,7 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev
 virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
 quickemu
 
-extras='bleachbit gnome-system-monitor uresourced irqbalance xed'
+extras='bleachbit gnome-system-monitor gnome-software uresourced irqbalance xed'
 
 all_pkgs=(
     "${security[@]}"

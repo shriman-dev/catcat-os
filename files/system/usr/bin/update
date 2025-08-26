@@ -36,7 +36,6 @@ update_nixpkg() {
 update_dns_blocklist() {
   echo -e "\n----------DNS blocklist update----------\n"
   /usr/bin/localdnsctl -v -u
-
 }
 
 update_firmware() {
@@ -44,7 +43,7 @@ update_firmware() {
 
   sudo sh -c '
     /usr/bin/fwupdmgr refresh -y --force
-    /usr/bin/fwupdmgr get-updates
+    /usr/bin/fwupdmgr -y get-updates
     /usr/bin/fwupdmgr -y update
   '
 }

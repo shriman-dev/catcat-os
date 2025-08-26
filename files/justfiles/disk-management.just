@@ -3,15 +3,15 @@ create-partition-table TABLE_TYPE DEVICE_PATH:
     #!/usr/bin/bash
     sudo parted {{ DEVICE_PATH }} mktable {{ TABLE_TYPE }}
 
+# Create luks partition
+create-luks-part DEVICE_PATH:
+    #!/usr/bin/bash
+    sudo cryptsetup luksFormat --type luks2 --sector-size 4096 {{ DEVICE_PATH }}
+
 # Dump info of luks device
 dump-info-luks DEVICE_PATH:
     #!/usr/bin/bash
     sudo cryptsetup luksDump {{ DEVICE_PATH }}
-
-# Reencrypt luks device with sector size 4096 for some performance gain (Caution: backup data before proceeding)
-reencrypt-4096 DEVICE_PATH:
-    #!/usr/bin/bash
-    sudo cryptsetup reencrypt --sector-size=4096 {{ DEVICE_PATH }}
 
 # Enable luks discard for better health of ssd
 enable-luks-discard DEVICE_MAPPER_PATH:
@@ -21,6 +21,11 @@ enable-luks-discard DEVICE_MAPPER_PATH:
     sudo rpm-ostree kargs --append-if-missing=rd.luks.options=discard --append-if-missing=luks.options=discard
     sudo cryptsetup refresh --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent {{ DEVICE_MAPPER_PATH }}
     echo -e 'Regenerate initramfs using:\nsudo rpm-ostree initramfs --enable'
+
+# Reencrypt luks device with sector size 4096 for some performance gain (Caution: backup data before proceeding)
+reencrypt-4096 DEVICE_PATH:
+    #!/usr/bin/bash
+    sudo cryptsetup reencrypt --sector-size=4096 {{ DEVICE_PATH }}
 
 # Add keyfile to luks device
 add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
@@ -67,4 +72,3 @@ auto-unlock-encrypted-root KEY_FILE DEVICE_PATH:
         echo 'echo "install_items=\"{{ KEY_FILE }} /etc/crypttab\"" | sudo tee /etc/dracut.conf.d/99-root-luks-key.conf'
         echo "sudo rpm-ostree initramfs --disable ; sudo rpm-ostree initramfs --enable"
     fi
-    

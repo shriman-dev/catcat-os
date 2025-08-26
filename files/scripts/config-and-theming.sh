@@ -3,6 +3,9 @@ set -oue pipefail
 echo -e "\n$0\n"
 
 desktopFiles() {
+  # to use catcat update
+  sed -i "s|Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" /usr/share/applications/system-update.desktop
+
   sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
   sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
   cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop /usr/share/applications/ || true

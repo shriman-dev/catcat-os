@@ -133,6 +133,7 @@ show_help() {
 }
 
 execute_command() {
+    need_root
     # Parse commands
     command=$1; shift
     case "$command" in
@@ -156,8 +157,6 @@ execute_command() {
 
 # Parse command line arguments
 main() {
-    need_root
-
     [[ $# -eq 0 ]] && die "No arguments provided" show_help
 
     # Parse global options
