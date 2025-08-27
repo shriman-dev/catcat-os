@@ -251,8 +251,11 @@ app_specific_perms() {
              net.rpcs3.RPCS3 \
              org.libretro.RetroArch; do
     log "INFO" "Disabling wayland socket for app $app"
-    flatpak override $SCOPE --nosoket=wayland $app && echo 'Done' || echo 'Error occurred'
+    flatpak override $SCOPE --nosocket=wayland $app && echo 'Done' || echo 'Error occurred'
   done
+
+  # Allow host for GPU screen recorder
+  flatpak override $SCOPE --unshare=network --filesystem=host com.dec05eba.gpu_screen_recorder
 
   # Allow gedit to edit files all over system
   log "INFO" "\nAllow gedit to edit files all over system"
