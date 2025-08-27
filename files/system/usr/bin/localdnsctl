@@ -60,7 +60,8 @@ toggle_localdns() {
               elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
                  systemctl disable --force --now dnscrypt-proxy.service
                  systemctl enable --force --now dnsmasq.service
-              fi } ||
+              fi
+            } ||
                 die "Failed to enable DNS services"
             ;;
         disable)
@@ -68,15 +69,23 @@ toggle_localdns() {
             local nm_resolvconf='/run/NetworkManager/resolv.conf'
             [[ ! -f "$nm_resolvconf" ]] && die "NetworkManager resolv.conf missing at $nm_resolvconf"
             cp ${VERBOSE:+-v} -f $nm_resolvconf /etc/resolv.conf &&
-            { [[ $BACKEND_TYPE == "dnscrypt" ]] && systemctl disable --force --now dnscrypt-proxy.service
-              [[ $BACKEND_TYPE == "dnsmasq" ]] && systemctl disable --force --now dnsmasq.service; } &&
-            systemctl restart NetworkManager.service ||
+            { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
+                 systemctl disable --force --now dnscrypt-proxy.service
+              elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
+                 systemctl disable --force --now dnsmasq.servic
+              fi
+            } &&
+                systemctl restart NetworkManager.service ||
                 die "Failed to disable DNS services"
             ;;
         restart)
             log "INFO" "Restarting DNS services..."
-            { [[ $BACKEND_TYPE == "dnscrypt" ]] && systemctl restart dnscrypt-proxy.service
-              [[ $BACKEND_TYPE == "dnsmasq" ]] && systemctl restart dnsmasq.service; } ||
+            { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
+                 systemctl restart dnscrypt-proxy.service
+              elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
+                 systemctl restart dnsmasq.service
+              fi
+            } ||
                 die "Failed to restart DNS services"
             ;;
         *) 
@@ -278,7 +287,7 @@ show_help() {
     echo "  -u, --update                              Update DNS blocklist"
     echo "  --enable                                  Enable localdns"
     echo "  --disable                                 Disable localdns"
-    echo "  --restart                                 Restart DNSMasq and DNSCrypt"
+    echo "  --restart                                 Restart localdns"
     echo "  --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
 #    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
     echo

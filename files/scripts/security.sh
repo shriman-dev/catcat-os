@@ -45,13 +45,14 @@ tar -xf /tmp/dnscrypt-proxy.tar.gz -C /tmp/dnscrypt-proxyTarExtract
 cp -dvf /tmp/dnscrypt-proxyTarExtract/linux-x86_64/dnscrypt-proxy /usr/bin/
 chmod +x /usr/bin/dnscrypt-proxy
 
-curl -Lo /etc/public-resolvers.md https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md
-curl -Lo /etc/public-resolvers.md.minisig https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md.minisig
+curl -Lo /etc/dnscrypt-proxy/public-resolvers.md https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md
+curl -Lo /etc/dnscrypt-proxy/public-resolvers.md.minisig https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md.minisig
 
 
 # enable dnsmasq and dnscrypt-proxy
 sh -c "echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf"
-systemctl -f enable dnscrypt-proxy.service dnsmasq.service
+/usr/bin/localdnsctl --switch-blocklist-backend dnscrypt
+systemctl -f enable dnscrypt-proxy.service
 systemctl disable systemd-resolved.service
 
 # get dns blocklist archive

@@ -27,6 +27,7 @@ scheme='catpuccin-mocha'
 [org/x/editor/preferences/ui]
 menubar-visible=true
 minimap-visible=false
+side-panel-active-page=-1970755255
 side-panel-visible=false
 statusbar-visible=true
 toolbar-visible=false

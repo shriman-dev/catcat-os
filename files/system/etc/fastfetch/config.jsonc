@@ -136,7 +136,7 @@
     {
       "type": "display",
       "key": "  ├─󰹑 {$2}",
-      "format": "{1}x{2} @ {3} in {12}\" ({21})"
+      "format": "{1}x{2} @ {3} in {12}\" [{21}x]"
     },
     {
       "type": "bluetooth",
@@ -146,19 +146,20 @@
       "type": "cpu",
       "key": "  ├─ {$2}",
       "showPeCoreCount": true,
-      "format": "{1} {?9}({9})"
+      "format": "{1} {?9}[{9}]"
     },
     {
       "type": "gpu",
       "key": "  ├─󱉽 {$2}", //  󱩄 󱩃 󰐿 󰢮 󰤽 󱉽 󰘚 󰚗
-      "driverSpecific": true,
-      "format": "{14}| {2} [{6}]" // ({8}/{7})"
+      "format": "{2} [{6}]"
+      //"driverSpecific": true,
+      //"format": "{14}| {2} [{6}]" // ({8}/{7})"
       //"hideType": "none"
     },
     {
       "type": "disk",
       "key": "  ├─ {$2}",
-      "format": "{3}| {1} / {2} - {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}",
+      "format": "{3}| {1} / {2} {9}{?7} [extr]{?}{?8} [hidden]{?}{?11} [ro]{?}",
       "hideFS": "overlay"
     },
     {

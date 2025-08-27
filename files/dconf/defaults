@@ -107,6 +107,8 @@ idle-delay=uint32 120
 allowed-failures=5
 banner-message-enable=true
 banner-message-text='Meow'
+enable-fingerprint-authentication=true
+enable-smartcard-authentication=false
 fallback-logo=''
 logo=''
 
