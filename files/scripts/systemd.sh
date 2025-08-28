@@ -17,9 +17,9 @@ services_enable() {
     lactd.service \
     waydroid-container.service
 
+#dualsense-catppuccin-rainbow.service
   systemctl --global -f enable \
     libadwaita-theme-sync.service \
-    dualsense-catppuccin-rainbow.service \
     catcat-user-setup.service
 }
 
