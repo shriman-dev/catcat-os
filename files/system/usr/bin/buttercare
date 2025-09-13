@@ -77,7 +77,7 @@ defrag() {
 
     validate_paths "${path}"
 
-    log "INFO" "Starting defragmentation on ${path} (compression: ${comp} ${level:+, level: $level})"
+    log "INFO" "Starting defragmentation on ${path} (compression: ${comp}${level:+, level: $level})"
     ${BTRFS} filesystem defragment -r -c"${comp}" ${level} "${path}"
     log "INFO" "Defragmentation completed for ${path}"
 }
