@@ -7,15 +7,24 @@ U1000="$(id -un 1000)"
 
 # KERNEL ARGUMENTS
 echo "Current kargs: $KARGS"
+
+# selinux fix
+#restorecon  -vR /home/${U1000}/.local/share/icc
+#restorecon -vR /etc/dnsmasq.d/
+#restorecon -vR /var/log/usbguard
+#restorecon -vR /var/lib/waydroid
+
+
 # copy main user monitors.xml to gdm
-if ! diff -q "/home/$U1000/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
-  cp -vf /home/$U1000/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
+if ! diff -q "/home/${U1000}/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
+  cp -vf /home/${U1000}/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
+  restorecon  -vR /home/${U1000}/.local/share/icc
 fi
 
 # setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do
-  if [[ ! "$SOME_USER" == "root" ]]; then
+  if [[ ! "$SOME_USER" =~ ^(gdm|root)$ ]]; then
     sudo -u "$SOME_USER" bash -c "/usr/libexec/catcat-user-setup" &
   fi
 done
@@ -56,6 +65,8 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   /usr/bin/bat cache --build
 
   /usr/bin/dconf update
+
+  [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
 
   cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
 fi
@@ -107,6 +118,7 @@ KARGS_TO_ADD=(
   "processor.ignore_ppc=1"
   "split_lock_detect=off"
   "bluetooth.disable_ertm=1"
+  "mem_sleep_default=deep"
   "preempt=full"
 )
 # "pci=noats"

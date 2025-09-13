@@ -26,10 +26,8 @@ declare -r lightpink=$'\033[38;2;255;181;192m'
 
 # Text Formating
 declare -r bold=$'\033[1m'
-declare -r b="$bold"
 declare -r dim=$'\033[2m'
 declare -r underline=$'\033[4m'
-declare -r u="$underline"
 declare -r blink=$'\033[5m'
 declare -r invert=$'\033[7m'
 declare -r highlight="$invert"
@@ -66,13 +64,23 @@ function Urllink (){
     printf "\033]8;;%s\033\\%s\033]8;;\033\\" "$URL" "$TEXT${n}"
 }
 
+# Quiet mode handling function
+_quiet_exec() {
+    local cmd="$@"
+    if [[ $QUIET == true ]]; then
+        ${cmd} >/dev/null
+    else
+        ${cmd}
+    fi
+}
+
 # Logging with optional verbose output
 log() {
     local color level="$1" msg="${@:2}"
-    local datetime="$([[ $VERBOSE -ge 2 ]] && date -u '+[%Y-%m-%d %H:%M:%S] ')"  # UTC time format
+    local datetime="$([[ $VERBOSE -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
 
     case "$level" in
-        "DEBUG") color=$cyan; [[ $QUIET == false && $VERBOSE -ge 2 ]] || return ;;
+        "DEBUG") color=$cyan; [[ $QUIET == false && $VERBOSE -eq 2 ]] || return ;;
         "INFO")  color=$green; [[ $QUIET == false ]] || return ;;
         "WARN")  color=$yellow; [[ $QUIET == false ]] || return  ;;
         "ERROR") color=$red ;;
@@ -85,19 +93,15 @@ log() {
 err() { log "ERROR" "$1"; return 1; }
 
 # Error handling with optional function call
-die() {
-    log "ERROR" "$1"
-    [[ -n "$2" ]] && $2
-    exit 1
-}
+die() { log "ERROR" "$1"; [[ -n "$2" ]] && $2; exit 1; }
 
 need_root() {
     [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
 }
 
 exit_if_root() {
-    [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
-    id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
+    [[ $(id -u) -eq 0 ]] && die "Cannot run as root"
+    id | grep 'uid.*gdm' && die "Cannot run as gdm user"
 }
 
 run_as_users() {
@@ -120,8 +124,8 @@ notify_users() {
 # Check if a file is older than a specified number of seconds
 is_file_older() {
     local max_age_seconds="$1"
-    local file_path="$2"
-    [[ $(stat -c "%Y" "$file_path") -lt $(( $(date +%s) - max_age_seconds )) ]]
+    local path="$2"
+    [[ $(stat -c "%Y" "$path") -lt $(( $(date +%s) - max_age_seconds )) ]]
 }
 
 check_internet_connection() {

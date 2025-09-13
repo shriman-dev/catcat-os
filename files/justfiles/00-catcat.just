@@ -3,6 +3,16 @@ start-ssh:
     #!/usr/bin/bash
     sudo systemctl unmask sshd.service ; sudo systemctl start sshd
 
+# Log all the errors
+log-errors:
+    #!/usr/bin/bash
+    sudo journalctl -p err
+
+# Log all the errors
+logs-selinux:
+    #!/usr/bin/bash
+    sudo journalctl -t setroubleshoot
+
 # Check for local overrides
 check-local-overrides:
     #!/usr/bin/bash

@@ -10,12 +10,11 @@ DNSCRYPTDIR='/etc/dnscrypt-proxy'
 DNSMASQDIR='/etc/dnsmasq.d'
 DNSCRYPTLOGDIR='/var/log/dnscrypt-proxy'
 DNSMASQLOGDIR='/var/log'
-QUIET=false
 VERBOSE=
 
 update_blocklist() {
     need_root
-    mkdir -p "$CONFIG_DIR" "$TMPDIR" || die "Failed to create directories"
+    mkdir -p "${CONFIG_DIR}" "${TMPDIR}" || die "Failed to create directories"
 
     local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
 
@@ -34,15 +33,15 @@ update_blocklist() {
     fi
 
     log "INFO" "Downloading blocklist..."
-    curl -sLo "$TMPDIR/$src_file.tar.zst" "$REPO_URL/$subdir/$src_file.tar.zst" ||
+    curl -sLo "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
         die "Failed to download blocklist"
 
     log "INFO" "Extracting blocklist..."
-    tar --use-compress-program "zstd -d" -xf "$TMPDIR/$src_file.tar.zst" -C "$TMPDIR/" ||
+    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
         die "Failed to extract blocklist"
     rm ${VERBOSE:+-v} -f "${DNSMASQDIR}/domains-blocklist.conf" "${DNSCRYPTDIR}/domains-blocklist.txt"
-    cp ${VERBOSE:+-v} -f "$TMPDIR/$src_file" "$dst_file"
-    rm -rf "$TMPDIR"
+    cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
+    rm -rf "${TMPDIR}"
     log "INFO" "Blocklist update completed successfully"
 }
 
@@ -50,16 +49,17 @@ toggle_localdns() {
     need_root
     [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf missing"
 
+    SYSTEMCTL="systemctl"
     case "$1" in
         enable)
             log "INFO" "Enabling local DNS..."
             ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
             { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
-                 systemctl disable --force --now dnsmasq.service
-                 systemctl enable --force --now dnscrypt-proxy.service
+                 ${SYSTEMCTL} disable --force --now dnsmasq.service
+                 ${SYSTEMCTL} enable --force --now dnscrypt-proxy.service
               elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
-                 systemctl disable --force --now dnscrypt-proxy.service
-                 systemctl enable --force --now dnsmasq.service
+                 ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+                 ${SYSTEMCTL} enable --force --now dnsmasq.service
               fi
             } ||
                 die "Failed to enable DNS services"
@@ -67,23 +67,23 @@ toggle_localdns() {
         disable)
             log "INFO" "Disabling local DNS..."
             local nm_resolvconf='/run/NetworkManager/resolv.conf'
-            [[ ! -f "$nm_resolvconf" ]] && die "NetworkManager resolv.conf missing at $nm_resolvconf"
-            cp ${VERBOSE:+-v} -f $nm_resolvconf /etc/resolv.conf &&
+            [[ ! -f "${nm_resolvconf}" ]] && die "NetworkManager resolv.conf missing at ${nm_resolvconf}"
+            cp ${VERBOSE:+-v} -f ${nm_resolvconf} /etc/resolv.conf &&
             { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
-                 systemctl disable --force --now dnscrypt-proxy.service
+                 ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
               elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
-                 systemctl disable --force --now dnsmasq.servic
+                 ${SYSTEMCTL} disable --force --now dnsmasq.servic
               fi
             } &&
-                systemctl restart NetworkManager.service ||
+                ${SYSTEMCTL} restart NetworkManager.service ||
                 die "Failed to disable DNS services"
             ;;
         restart)
             log "INFO" "Restarting DNS services..."
             { if [[ $BACKEND_TYPE == "dnscrypt" ]]; then
-                 systemctl restart dnscrypt-proxy.service
+                 ${SYSTEMCTL} restart dnscrypt-proxy.service
               elif [[ $BACKEND_TYPE == "dnsmasq" ]]; then
-                 systemctl restart dnsmasq.service
+                 ${SYSTEMCTL} restart dnsmasq.service
               fi
             } ||
                 die "Failed to restart DNS services"
@@ -92,7 +92,7 @@ toggle_localdns() {
             die "Invalid service action. Use 'enable', 'disable', or 'restart'"
             ;;
     esac
-    systemctl daemon-reload
+    ${SYSTEMCTL} daemon-reload
     log "INFO" "Operation completed successfully"
 }
 
@@ -145,19 +145,18 @@ clean_old_logs() {
     local dnscrypt_date_format="$(date -d "-$retention" +"%Y-%m-%d")"
     local dnsmasq_date_format="$(date -d "-$retention" +"%b %d")"
 
-    [[ $VERBOSE == true ]] && log "DEBUG" "dnscrypt_date_format: $dnscrypt_date_format, dnsmasq_date_format: $dnsmasq_date_format"
+    log "DEBUG" "dnscrypt_date_format: $dnscrypt_date_format, dnsmasq_date_format: $dnsmasq_date_format"
 
     # Clean logs
     for log_file in "$DNSMASQLOGDIR/dnsmasq.log" "$DNSCRYPTLOGDIR"/*.log; do
         [[ $log_file == *"$DNSCRYPTLOGDIR"* ]] && date_format="$dnscrypt_date_format" || date_format="$dnsmasq_date_format"
         line=$(rg -n "${date_format}" "$log_file" | cut -d: -f1 | tail -n1)
 
-        [[ $VERBOSE == true ]] && echo '' && log "DEBUG" "Clean logs before '${date_format}' from line ${line:-0} in log file: ${log_file}"
-
+        log "DEBUG" "Clean logs before '${date_format}' from line ${line:-0} in log file: ${log_file}"
         if [[ ! -z $line ]]; then
             sed -i "1,${line} d" "$log_file" || die "Log cleanup failed for ${log_file}"
         else
-            [[ $VERBOSE == true ]] && log "DEBUG" "No logs before '${date_format}' in log file: ${log_file}"
+            log "DEBUG" "No logs before '${date_format}' in log file: ${log_file}"
         fi
     done
 
@@ -281,33 +280,32 @@ show_help() {
     echo "Configure and manage DNS to block Ad/Malware using blocklist or monitor DNS logs with localdns"
     echo
     echo "Options:"
-    echo "  -h, --help                                Show this help message"
-    echo "  -v, --verbose                             Enable verbose output"
-    echo "  -q, --quiet                               Suppress non-error output"
-    echo "  -u, --update                              Update DNS blocklist"
-    echo "  --enable                                  Enable localdns"
-    echo "  --disable                                 Disable localdns"
-    echo "  --restart                                 Restart localdns"
-    echo "  --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
+    echo " -h, --help                                Show this help message"
+    echo " -v, --verbose                             Enable verbose output"
+    echo " -u, --update                              Update DNS blocklist"
+    echo " --enable                                  Enable localdns"
+    echo " --disable                                 Disable localdns"
+    echo " --restart                                 Restart localdns"
+    echo " --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
 #    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
     echo
     echo "Log Options:"
-    echo "  --flush-logs TIME                         Remove logs older than TIME"
-    echo "                                            TIME format: N 'day(s)|week(s)|month(s)|year(s)' (default: 3 months)"
-    echo "  -n, --lines NUMBER                        Show last N lines of log (default: 5999)"
-    echo "  -l, --log TYPE                            Specify log type to display"
+    echo " --flush-logs TIME                         Remove logs older than TIME"
+    echo "                                           TIME format: N 'day(s)|week(s)|month(s)|year(s)' (default: 3 months)"
+    echo " -n, --lines NUMBER                        Show last N lines of log (default: 5999)"
+    echo " -l, --log TYPE                            Specify log type to display"
     echo
     echo "Log types:"
-    echo "  dnsmasq-detailed         Show detailed DNSMasq logs"
-    echo "  dnsmasq-queries          Show DNSMasq queries"
-    echo "  dnsmasq-blocked          Show blocked DNSMasq queries"
-    echo "  dnscrypt-queries         Show DNSCrypt queries"
-    echo "  dnscrypt-blocked         Show blocked DNSCrypt queries"
-    echo "  dnscrypt-allowed         Show allowed DNSCrypt queries"
-    echo "  dnscrypt-blocked-ips     Show blocked IPs in DNSCrypt"
-    echo "  dnscrypt-allowed-ips     Show allowed IPs in DNSCrypt"
-    echo "  dnscrypt-nxdomains       Show DNSCrypt NXDOMAIN responses"
-    echo "  dnscrypt-launch          Show DNSCrypt launch logs"
+    echo " dnsmasq-detailed         Show detailed DNSMasq logs"
+    echo " dnsmasq-queries          Show DNSMasq queries"
+    echo " dnsmasq-blocked          Show blocked DNSMasq queries"
+    echo " dnscrypt-queries         Show DNSCrypt queries"
+    echo " dnscrypt-blocked         Show blocked DNSCrypt queries"
+    echo " dnscrypt-allowed         Show allowed DNSCrypt queries"
+    echo " dnscrypt-blocked-ips     Show blocked IPs in DNSCrypt"
+    echo " dnscrypt-allowed-ips     Show allowed IPs in DNSCrypt"
+    echo " dnscrypt-nxdomains       Show DNSCrypt NXDOMAIN responses"
+    echo " dnscrypt-launch          Show DNSCrypt launch logs"
 }
 
 # Main argument parsing
@@ -321,10 +319,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v|--verbose)
             VERBOSE=2
-            shift
-            ;;
-        -q|--quiet)
-            QUIET=true
             shift
             ;;
         -u|--update)

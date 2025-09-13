@@ -22,11 +22,6 @@
       }
     },
     "percent": {
-      "type": [
-        "num",
-        "num-color",
-        "bar"
-      ],                // 1=number, 2=bar, 3=both, 9=colored number
       "color": {
         "green": "green",
         "yellow": "light_yellow",
@@ -165,10 +160,14 @@
     {
       "type": "memory",
       "percent": {
-        "type": 0,    // Show both percentage number and bar
+        "type": [
+          "num",
+          "num-color",
+          "bar"
+        ],           // 1=number, 2=bar, 3=both, 9=colored number
         "green": 50,  // [0%, 50%) will be displayed in green
         "yellow": 70  // [50, 70) will be displayed in yellow and [70, 100] will be displayed in red
-        },
+      },
       "key": "  ╰─ {$2}",
       "format": "{3}| {1} {4} {2}"
     },

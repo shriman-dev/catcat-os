@@ -1,17 +1,17 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
 
-QUIET=false
 VERBOSE=
 
-# Validate BTRFS mount point
-validate_btrfs_mount() {
-    local mount_point="$1"
-    [[ -z "$mount_point" ]] && die "Mount point not specified"
-    [[ -d "$mount_point" ]] || die "Mount point $mount_point does not exist"
-    [[ $VERBOSE -ge 2 ]] && log "DEBUG" "Validating BTRFS mount point: $mount_point"
-    findmnt -n -o FSTYPE -T "$mount_point" | grep -q "btrfs" || die "$mount_point is not a BTRFS filesystem" &&
-    [[ $VERBOSE -ge 2 ]] && log "DEBUG" "$mount_point is valid BTRFS mount point"
+# Validate paths
+validate_paths() {
+    [[ $# -eq 0 ]] && err "No path provided to validate"
+    for path in "$@"; do
+        [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
+        log "DEBUG" "Validating if path is on BTRFS filesystem: ${path}"
+        findmnt -n -o FSTYPE -T "${path}" | grep -q "btrfs" || die "Path is not on a BTRFS filesystem: ${path}"
+        log "DEBUG" "${path} is on BTRFS filesystem"
+    done
 }
 
 # Get all BTRFS mount points
@@ -22,12 +22,12 @@ get_btrfs_mounts() {
 # Show filesystem usage
 show_btrfs_usage() {
     local path="$1"
-    validate_btrfs_mount "$path"
+    validate_paths "$path"
     log "INFO" "Showing BTRFS detailed usage for $path"
-    btrfs filesystem usage "$path"
+    ${BTRFS} filesystem usage "$path"
     echo
     log "INFO" "Showing BTRFS disk space for $path"
-    btrfs filesystem df "$path"
+    ${BTRFS} filesystem df "$path"
 }
 
 # Perform balance operation
@@ -46,28 +46,28 @@ balance() {
     local mounts=("$path")
     [[ "$path" == "all" ]] && {
         log "INFO" "Auto detecting BTRFS mount points"
-        [[ $VERBOSE -ge 2 ]] && mounts=($(get_btrfs_mounts))
+        [[ $VERBOSE -eq 2 ]] && mounts=($(get_btrfs_mounts))
         log "INFO" "Mount points detected: ${mounts[@]}"
-        }
+    }
     for mount in ${mounts[@]}; do
-        validate_btrfs_mount "$mount"
+        validate_paths "$mount"
         log "INFO" "Starting balance on $mount"
-        [[ -n $VERBOSE ]] && { log "INFO" "Pre-balance disk space usage (df):"; btrfs filesystem df "$mount"; }
+        [[ -n $VERBOSE ]] && { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "$mount"; }
         echo
-        btrfs ${VERBOSE:+-v} balance start -musage="${musage}" -dusage="${dusage}" --enqueue $mount
+        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue $mount
         echo
-        [[ -n $VERBOSE ]] && { log "INFO" "Post-balance disk space usage (df):"; btrfs filesystem df "$mount"; }
+        [[ -n $VERBOSE ]] && { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "$mount"; }
         log "INFO" "Balance completed for $mount"
     done
 }
 
 # Perform defragmentation
 defrag() {
-    local path comp level level_opt
+    local path comp level
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -c) comp="$2"; shift ;;
-            -l) level="$2"; shift ;;
+            -l) level="--level $2"; shift ;;
             -p) path="$2"; shift ;;
             *) die "Invalid defrag option: $1" ;;
         esac
@@ -75,68 +75,66 @@ defrag() {
     done
     [[ -z ${comp} || -z ${path} ]] && die "Both compression (-c) and path (-p) are required for defrag"
 
-    validate_btrfs_mount "$path"
+    validate_paths "${path}"
 
-    [[ -n "$level" ]] && level_opt="--level $level"
-
-    log "INFO" "Starting defragmentation on $path (compression: ${comp}${level:+, level: $level})"
-    btrfs ${VERBOSE:+-v} filesystem defragment -r -c"${comp}" $level_opt "$path"
-    log "INFO" "Defragmentation completed for $path"
+    log "INFO" "Starting defragmentation on ${path} (compression: ${comp} ${level:+, level: $level})"
+    ${BTRFS} filesystem defragment -r -c"${comp}" ${level} "${path}"
+    log "INFO" "Defragmentation completed for ${path}"
 }
 
 # Perform scrub operation
 scrub() {
     local path="$1"
-    validate_btrfs_mount "$path"
-    log "INFO" "Starting scrub on $path"
-    btrfs ${VERBOSE:+-v} scrub start -B "$path"
-    log "INFO" "Scrub completed for $path"
+    validate_paths "${path}"
+    log "INFO" "Starting scrub on ${path}"
+    ${BTRFS} scrub start -B "${path}"
+    log "INFO" "Scrub completed for ${path}"
 }
 
 
 # Perform TRIM operation
 trim() {
     local path="${1:-}"
-    if [[ -z "$path" ]]; then
+    if [[ -z "${path}" ]]; then
         log "INFO" "Running TRIM on fstab entries"
-        fstrim ${VERBOSE:+-v} --fstab
+        ${FSTRIM} --fstab
         log "INFO" "TRIM completed on fstab entries"
     else
-        validate_btrfs_mount "$path"
-        log "INFO" "Running TRIM on $path"
-        fstrim ${VERBOSE:+-v} "$path"
-        log "INFO" "TRIM completed on $path"
+        log "INFO" "Running TRIM on ${path}"
+        ${FSTRIM} "${path}"
+        log "INFO" "TRIM completed on ${path}"
     fi
 }
 
 show_help() {
-    echo "Usage: $(basename "$0") [global_options] command1 [options] [command2 [options] ..."
+    echo "Usage: $(basename "${0}") [global_options] command1 [options] [command2 [options] ..."
     echo "Global Options:"
-    echo "  -h, --help              Show this help message"
-    echo "  -v, --verbose           Enable verbose output (use -vv for debug level verbosity)"
-    echo "  -q, --quiet             Suppress all non-error output"
+    echo " -h, --help              Show this help message"
+    echo " -v, --verbose           Enable verbose output (use -vv for debug verbosity)"
     echo
     echo "Commands:"
-    echo "  usage  <path>           Show BTRFS filesystem usage and disk space information"
+    echo " usage  <path>           Show BTRFS filesystem usage and disk space information"
     echo
-    echo "  balance                 Start balance operation on BTRFS filesystem"
-    echo "                          Note: Balance operation auto detects all BTRFS mount points if no path specified"
-    echo "                          Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"
+    echo " balance                 Start balance operation on BTRFS filesystem"
+    echo "                         Note: Balance operation auto detects all BTRFS mount points if no path specified"
+    echo "                         Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"
     echo
-    echo "  defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"
-    echo "                          Options: -c <algorithm> -l [level] -p <path>"
+    echo " defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"
+    echo "                         Options: -c <algorithm> -l [level] -p <path>"
     echo
-    echo "  scrub  <path>           Start a scrub operation on BTRFS filesystem"
+    echo " scrub  <path>           Start a scrub operation on BTRFS filesystem"
     echo
-    echo "  trim   [path]           Perform TRIM operation on the path"
-    echo "                          Note: TRIM operation uses fstab entries if no path specified"
+    echo " trim   [path]           Perform TRIM operation on the path"
+    echo "                         Note: TRIM operation uses fstab entries if no path specified"
 }
 
 execute_command() {
     need_root
+    BTRFS="$(echo 'btrfs' ${VERBOSE:+-v})"
+    FSTRIM="$(echo 'fstrim' ${VERBOSE:+-v})"
     # Parse commands
     command=$1; shift
-    case "$command" in
+    case "${command}" in
         usage) [[ $# -eq 1 ]] && show_btrfs_usage "$1" ||
                    die "BTRFS mount path required to show usage"
             ;;
@@ -150,7 +148,7 @@ execute_command() {
         trim) [[ $# -le 1 ]] && trim  "$@" ||
                   die "Usage: $(basename $0) trim [PATH]"
             ;;
-        *) die "Unknown command: $command"
+        *) die "Unknown command: ${command}" show_help
             ;;
     esac
 }
@@ -165,7 +163,6 @@ main() {
             -h|--help) show_help; exit 0 ;;
             -v|--verbose) VERBOSE=1 ;;
             -vv) VERBOSE=2 ;;
-            -q|--quiet) QUIET=true ;;
             *) break ;;
         esac
         shift
@@ -182,7 +179,7 @@ main() {
             shift
         done
 
-        execute_command "$cmd" "${cmd_args[@]}"
+        execute_command "${cmd}" "${cmd_args[@]}"
     done
 }
 

@@ -22,9 +22,14 @@ sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
-# copy over logind.conf for easy of access
-mkdir -vp /etc/systemd/logind.conf.d/
+# Ignore inhabitors for suspend and set suspend to deep sleep
+sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/lib/systemd/logind.conf
+sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
+# copy over logind.conf and sleep.con for ease of access
+mkdir -vp /etc/systemd/logind.conf.d/ /etc/systemd/sleep.conf.d/
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
+cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
+
 
 # handheld specific tweaks
 if command -v hhdctl; then
