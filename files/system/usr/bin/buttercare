@@ -6,6 +6,7 @@ VERBOSE=
 # Validate paths
 validate_paths() {
     [[ $# -eq 0 ]] && err "No path provided to validate"
+    local path
     for path in "$@"; do
         [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
         log "DEBUG" "Validating if path is on BTRFS filesystem: ${path}"
@@ -21,43 +22,43 @@ get_btrfs_mounts() {
 
 # Show filesystem usage
 show_btrfs_usage() {
-    local path="$1"
-    validate_paths "$path"
-    log "INFO" "Showing BTRFS detailed usage for $path"
-    ${BTRFS} filesystem usage "$path"
+    local path="${1}"
+    validate_paths "${path}"
+    log "INFO" "Showing BTRFS detailed usage for ${path}"
+    ${BTRFS} filesystem usage "${path}"
     echo
-    log "INFO" "Showing BTRFS disk space for $path"
-    ${BTRFS} filesystem df "$path"
+    log "INFO" "Showing BTRFS disk space for ${path}"
+    ${BTRFS} filesystem df "${path}"
 }
 
 # Perform balance operation
 balance() {
     local path="all" musage=50 dusage=80
     while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -m) musage="$2"; shift ;;
-            -d) dusage="$2"; shift ;;
-            -p) path="$2"; shift ;;
-            *) die "Invalid balance option: $1" ;;
+        case "${1}" in
+            -m) musage="${2}"; shift ;;
+            -d) dusage="${2}"; shift ;;
+            -p) path="${2}"; shift ;;
+            *) die "Invalid balance option: ${1}" ;;
         esac
         shift
     done
 
-    local mounts=("$path")
-    [[ "$path" == "all" ]] && {
+    local mounts=("${path}")
+    [[ "${path}" == "all" ]] && {
         log "INFO" "Auto detecting BTRFS mount points"
-        [[ $VERBOSE -eq 2 ]] && mounts=($(get_btrfs_mounts))
+        [[ ${VERBOSE} -eq 2 ]] && mounts=($(get_btrfs_mounts))
         log "INFO" "Mount points detected: ${mounts[@]}"
     }
     for mount in ${mounts[@]}; do
-        validate_paths "$mount"
-        log "INFO" "Starting balance on $mount"
-        [[ -n $VERBOSE ]] && { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "$mount"; }
+        validate_paths "${mount}"
+        log "INFO" "Starting balance on ${mount}"
+        [[ -n ${VERBOSE} ]] && { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
         echo
-        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue $mount
+        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue ${mount}
         echo
-        [[ -n $VERBOSE ]] && { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "$mount"; }
-        log "INFO" "Balance completed for $mount"
+        [[ -n ${VERBOSE} ]] && { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+        log "INFO" "Balance completed for ${mount}"
     done
 }
 
@@ -65,11 +66,11 @@ balance() {
 defrag() {
     local path comp level
     while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -c) comp="$2"; shift ;;
-            -l) level="--level $2"; shift ;;
-            -p) path="$2"; shift ;;
-            *) die "Invalid defrag option: $1" ;;
+        case "${1}" in
+            -c) comp="${2}"; shift ;;
+            -l) level="--level ${2}"; shift ;;
+            -p) path="${2}"; shift ;;
+            *) die "Invalid defrag option: ${1}" ;;
         esac
         shift
     done
@@ -84,7 +85,7 @@ defrag() {
 
 # Perform scrub operation
 scrub() {
-    local path="$1"
+    local path="${1}"
     validate_paths "${path}"
     log "INFO" "Starting scrub on ${path}"
     ${BTRFS} scrub start -B "${path}"
@@ -133,20 +134,20 @@ execute_command() {
     BTRFS="$(echo 'btrfs' ${VERBOSE:+-v})"
     FSTRIM="$(echo 'fstrim' ${VERBOSE:+-v})"
     # Parse commands
-    command=$1; shift
+    command=${1}; shift
     case "${command}" in
-        usage) [[ $# -eq 1 ]] && show_btrfs_usage "$1" ||
+        usage) [[ $# -eq 1 ]] && show_btrfs_usage "${1}" ||
                    die "BTRFS mount path required to show usage"
             ;;
         defrag) defrag "$@"
             ;;
         balance) balance "$@"
             ;;
-        scrub) [[ $# -eq 1 ]] && scrub "$1" ||
+        scrub) [[ $# -eq 1 ]] && scrub "${1}" ||
                    die "BTRFS mount path required for scrub"
             ;;
         trim) [[ $# -le 1 ]] && trim  "$@" ||
-                  die "Usage: $(basename $0) trim [PATH]"
+                  die "Usage: $(basename ${0}) trim [PATH]"
             ;;
         *) die "Unknown command: ${command}" show_help
             ;;
@@ -159,7 +160,7 @@ main() {
 
     # Parse global options
     while [[ $# -gt 0 ]]; do
-        case "$1" in
+        case "${1}" in
             -h|--help) show_help; exit 0 ;;
             -v|--verbose) VERBOSE=1 ;;
             -vv) VERBOSE=2 ;;
@@ -171,11 +172,11 @@ main() {
     # Process commands
     local valid_commands=("usage" "balance" "defrag" "scrub" "trim")
     while [[ $# -gt 0 ]]; do
-        local cmd=$1 cmd_args=()
+        local cmd=${1} cmd_args=()
         shift
 
-        while [[ $# -gt 0 && ! " ${valid_commands[*]} " =~ " $1 " ]]; do
-            cmd_args+=("$1")
+        while [[ $# -gt 0 && ! " ${valid_commands[*]} " =~ " ${1} " ]]; do
+            cmd_args+=("${1}")
             shift
         done
 

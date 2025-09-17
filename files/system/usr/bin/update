@@ -7,17 +7,17 @@ update_flatpak() {
 
   echo -e "\n----------Flatpak ${scope:2} update----------\n"
 
-  /usr/bin/flatpak update $scope --assumeyes --noninteractive --appstream
-  /usr/bin/flatpak update $scope --assumeyes --noninteractive
-  /usr/bin/flatpak uninstall $scope --unused --assumeyes --noninteractive >/dev/null 2>&1
+  /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
+  /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
+  /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
 
   echo -e "\nRunning flatpak repair"
-  /usr/bin/flatpak repair $scope
+  /usr/bin/flatpak repair ${scope}
 }
 
 update_nixpkg() {
   local scope="user"
-  local cmdpath="$HOME/.local/state/nix/profile/bin"
+  local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
   [[ $(id -u) -eq 0 ]] && {
     scope="global"
@@ -25,7 +25,7 @@ update_nixpkg() {
   }
 
   if [[ -x "${cmdpath}/nix-env" ]]; then
-    echo -e "\n----------Nixpkg $scope update----------\n"
+    echo -e "\n----------Nixpkg ${scope} update----------\n"
 
     ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
     ${cmdpath}/nix-store --optimise >/dev/null 2>&1
@@ -95,7 +95,7 @@ EOF
 }
 
 process_command() {
-    case "$1" in
+    case "${1}" in
         "all")
             update_system
             update_firmware
@@ -132,7 +132,7 @@ process_command() {
             show_help
             ;;
         *)
-            die "Error: Unknown argument $1" show_help
+            die "Error: Unknown argument ${1}" show_help
             ;;
     esac
 }
@@ -144,5 +144,5 @@ fi
 
 # Process all provided arguments
 for arg in "$@"; do
-    process_command "$arg" || exit 1
+    process_command "${arg}" || exit 1
 done

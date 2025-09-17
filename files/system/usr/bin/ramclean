@@ -45,7 +45,7 @@ setroubleshootd'
 
 for II in ${KILLP[*]}
 do 
-  pkill -KILL -fe $II
+  pkill -KILL -fe ${II}
 done
 
 exit 0
