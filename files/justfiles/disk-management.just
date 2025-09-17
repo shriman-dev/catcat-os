@@ -18,12 +18,12 @@ dump-info-luks DEVICE_PATH:
 
 # Enable luks discard for better health of ssd
 [group("Disk Management")]
-enable-luks-discard DEVICE_MAPPER_PATH:
+enable-luks-discard DEVICE_NAME:
     #!/usr/bin/bash
     echo 'Add "discard" option for the device entry in /etc/crypttab'
     sudo sed -i "s|.*issue_discards =.*|issue_discards = 1|"
     sudo rpm-ostree kargs --append-if-missing=rd.luks.options=discard --append-if-missing=luks.options=discard
-    sudo cryptsetup refresh --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent {{ DEVICE_MAPPER_PATH }}
+    sudo cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent refresh {{ DEVICE_NAME }}
     echo -e 'Regenerate initramfs using:\nsudo rpm-ostree initramfs --enable'
 
 # Reencrypt luks device with sector size 4096 for some performance gain (Caution: backup data before proceeding)
