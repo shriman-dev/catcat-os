@@ -151,6 +151,6 @@ replace_add() {
 }
 
 bak_before() {
-  [[ ! -d ${1}.bak.og ]] && cp -drf ${1} ${1}.bak.og || err "Backup failed for orignal ${1}"
-  cp -drf ${1} ${1}.bak || err "Backup failed for ${1}"
+  [[ ! -d ${1}.bak.og ]] && cp -drvf ${1} ${1}.bak.og || err "Backup failed for orignal ${1}"
+  cp -drvf ${1} ${1}.bak || err "Backup failed for ${1}"
 }

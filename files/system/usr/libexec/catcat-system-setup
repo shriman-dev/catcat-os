@@ -58,18 +58,18 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
 fi
 
 # Set ad-malware blocking localdns
-mkdir -p /tmp/dns-blocklist
+mkdir -pv /tmp/dns-blocklist
 if [[ -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnscrypt-proxy/domains-blocklist.txt ]]; then
-    rm -f /etc/dnscrypt-proxy/domains-blocklist.txt
+    rm -vf /etc/dnscrypt-proxy/domains-blocklist.txt
     cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -f /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
+    cp -vf /tmp/dns-blocklist/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
 elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnsmasq.d/domains-blocklist.conf ]]; then
-    rm -f /etc/dnsmasq.d/domains-blocklist*
+    rm -vf /etc/dnsmasq.d/domains-blocklist*
     cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
+    cp -vf /tmp/dns-blocklist/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
     restorecon -vR /etc/dnsmasq.d/
 fi
-rm -rf /tmp/dns-blocklist/
+rm -rvf /tmp/dns-blocklist/
 
 if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
     if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
@@ -87,7 +87,7 @@ chmod --recursive 644 /etc/sudoers.d/
 
 # setup grub
 if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
-  mkdir -p /boot/grub_themes
+  mkdir -vp /boot/grub_themes
   cp -drf /usr/share/grub/themes/* /boot/grub_themes
 
   replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub

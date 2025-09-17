@@ -10,18 +10,6 @@ CATCAT_CONF="${LOCALSHARE}/catcat-os"
 
 FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ${LOCALSHARE}/flatpak/app/)"
 
-bak_before() {
-  [[ ! -d ${1}.bak.og ]] && cp -drf ${1} ${1}.bak.og || err "Backup failed for orignal ${1}"
-  cp -drf ${1} ${1}.bak || err "Backup failed for ${1}"
-}
-
-
-exit_if_root() {
-  [[ $(id -u) -eq 0 ]] && { err "Cannot run as root"; exit 1; }
-  id | grep 'uid.*gdm' && { err "Cannot run as gdm user"; exit 1; }
-}
-
-
 # sync default configs for user home
 sync_default_configs() {
   local update_sha="/etc/catcat-os/update_sha"
@@ -127,7 +115,7 @@ setup_bookmarks_userdirs() {
   log "INFO" "Setting up default user directories and adding Bookmarks..."
   grep -q "${USER}/Me/" "${user_dirs_file}" || {
     bak_before "${user_dirs_file}"
-        cp -drf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}/" #|| err "Failed to set default user directories"
+        cp -drvf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}/" #|| err "Failed to set default user directories"
     }
 
   mkdir -pv /tmp/tmp-${USER}
@@ -185,11 +173,11 @@ remove_unnecessary_directories() {
 
   rm -rf "${HOME_DIR}/Templates"
   for dir in "${dirlist[@]}"; do
-    [[ -d ${dir} ]] && rmdir ${dir}
+    [[ -d ${dir} ]] && rmdir -v ${dir}
   done
 
   [[ ! -f "${HOME_DIR}/.mozilla/firefox/profiles.ini" ]] && rm -rvf "${HOME_DIR}/.mozilla"
-  [[ -f "${HOME_DIR}/Me/Desktop/.gitkeep" ]] && find "${HOME_DIR}/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
+  [[ -f "${HOME_DIR}/Me/Desktop/.gitkeep" ]] && find "${HOME_DIR}/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -print -delete
   [[ -d "${HOME_DIR}/Sync" && $(ls -A1 "${HOME_DIR}/Sync" | wc -l) -lt 2 ]] && rm -rvf "${HOME_DIR}/Sync"
   log "INFO" "Done"
 }
@@ -224,10 +212,10 @@ theme_flatpak_apps() {
   [[ ! "$(ls -Al  "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]] && {
     mkdir -pv ${LOCALSHARE}/{themes,icons,fonts}
     for dir in themes icons; do
-      [[ -d "${HOME_DIR}/.${dir}" ]] && cp -drf ${{HOME_DIR}}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rf "${{HOME_DIR}}/.${dir}"
+      [[ -d "${HOME_DIR}/.${dir}" ]] && cp -drf ${{HOME_DIR}}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rvf "${{HOME_DIR}}/.${dir}"
       ln -srfTv "${LOCALSHARE}/${dir}" "${{HOME_DIR}}/.${dir}"
     done
-    [[ $(ls -A1 "${CONFIG}/gtk-4.0" | wc -l) -eq 0 ]] && cp -drf "${SKEL}/.config/gtk-4.0" "${CONFIG}/"
+    [[ $(ls -A1 "${CONFIG}/gtk-4.0" | wc -l) -eq 0 ]] && cp -drvf "${SKEL}/.config/gtk-4.0" "${CONFIG}/"
   }
   log "INFO" "Done"
 }
@@ -270,10 +258,10 @@ setup_apps() {
 
   # Setup additional apps config
   [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette" ]] &&
-    { cp -drf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}/" || err "Failed to configure Ptyxis"; }
+    { cp -drvf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}/" || err "Failed to configure Ptyxis"; }
 
   [[ ! -f "${HOME_DIR}/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml" ]] &&
-    { cp -drf "${SKEL}/.var/app/org.gnome.gedit" "${HOME_DIR}/.var/app/" || err "Failed to configure Gedit"; }
+    { cp -drvf "${SKEL}/.var/app/org.gnome.gedit" "${HOME_DIR}/.var/app/" || err "Failed to configure Gedit"; }
 
   # VSCodium extensions
   local vs_extdir="${HOME_DIR}/.vscode-oss/extensions"
