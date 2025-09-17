@@ -54,6 +54,9 @@ rm -vf  /etc/profile.d/bazzite-neofetch.sh
 rm -vf  /etc/profile.d/brew.sh
 rm -vf  /etc/profile.d/user-motd.sh
 
+ls -l1 /etc/xdg/autostart/org.gnome.Software.desktop
+ls -l1 /usr/etc/xdg/autostart/org.gnome.Software.desktop
+
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
@@ -62,3 +65,6 @@ rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
 rm -vf  /etc/xdg/autostart/steam.desktop
 rm -vf  /usr/etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf /etc/yum.repos.d/google-chrome.repo
+
+ls -l1 /etc/xdg/autostart/org.gnome.Software.desktop
+ls -l1 /usr/etc/xdg/autostart/org.gnome.Software.desktop
