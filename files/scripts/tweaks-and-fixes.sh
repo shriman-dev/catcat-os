@@ -31,6 +31,10 @@ cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
 
+# Disable gnome software running in background
+rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
+rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
+
 # handheld specific tweaks
 if command -v hhdctl; then
     rm -vf /usr/etc/xdg/autostart/steam.desktop
