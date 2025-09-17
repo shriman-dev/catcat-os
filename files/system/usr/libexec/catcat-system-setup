@@ -71,7 +71,6 @@ elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /et
 fi
 rm -rf /tmp/dns-blocklist/
 
-
 if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
     if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
         mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
