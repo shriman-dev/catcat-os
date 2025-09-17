@@ -20,7 +20,7 @@ sync_default_configs() {
     mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
 
     rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}/" "${HOME_DIR}/" &&
-    rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell/" || err "Configs sync failed"
+    rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell/" || err "Gnome extensions update failed"
 
     rm -rf "${LOCALSHARE}/themes/"*{Catppuccin,Lavanda}*
     cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes/" || err "Theme update failed"
@@ -113,7 +113,7 @@ setup_bookmarks_userdirs() {
   local bookmarks="${CONFIG}/gtk-3.0/bookmarks"
 
   log "INFO" "Setting up default user directories and adding Bookmarks..."
-  grep -q "${USER}/Me/" "${user_dirs_file}" || {
+  grep -q "HOME/Me/" "${user_dirs_file}" || {
     bak_before "${user_dirs_file}"
         cp -drvf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}/" #|| err "Failed to set default user directories"
     }
@@ -177,7 +177,7 @@ remove_unnecessary_directories() {
   done
 
   [[ ! -f "${HOME_DIR}/.mozilla/firefox/profiles.ini" ]] && rm -rvf "${HOME_DIR}/.mozilla"
-  [[ -f "${HOME_DIR}/Me/Desktop/.gitkeep" ]] && find "${HOME_DIR}/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -print -delete
+  [[ -f "${HOME_DIR}/Me/Desktop/.gitkeep" ]] && find "${HOME_DIR}/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep' -print -delete
   [[ -d "${HOME_DIR}/Sync" && $(ls -A1 "${HOME_DIR}/Sync" | wc -l) -lt 2 ]] && rm -rvf "${HOME_DIR}/Sync"
   log "INFO" "Done"
 }
@@ -212,8 +212,8 @@ theme_flatpak_apps() {
   [[ ! "$(ls -Al  "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]] && {
     mkdir -pv ${LOCALSHARE}/{themes,icons,fonts}
     for dir in themes icons; do
-      [[ -d "${HOME_DIR}/.${dir}" ]] && cp -drf ${{HOME_DIR}}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rvf "${{HOME_DIR}}/.${dir}"
-      ln -srfTv "${LOCALSHARE}/${dir}" "${{HOME_DIR}}/.${dir}"
+      [[ -d "${HOME_DIR}/.${dir}" ]] && cp -drf ${HOME_DIR}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rvf "${HOME_DIR}/.${dir}"
+      ln -srfTv "${LOCALSHARE}/${dir}" "${HOME_DIR}/.${dir}"
     done
     [[ $(ls -A1 "${CONFIG}/gtk-4.0" | wc -l) -eq 0 ]] && cp -drvf "${SKEL}/.config/gtk-4.0" "${CONFIG}/"
   }
