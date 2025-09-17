@@ -35,20 +35,6 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
 #  cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
 #  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
 
-  # Set DNS blocklist
-  mkdir -p /tmp/dns-blocklist
-  if ls -A1d /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst*; then
-    rm -f /etc/dnscrypt-proxy/domains-blocklist.txt
-    cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -f /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
-  elif ls -A1d /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst*; then
-    rm -f /etc/dnsmasq.d/domains-blocklist*
-    cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
-    restorecon -vR /etc/dnsmasq.d/
-  fi
-  rm -rf /tmp/dns-blocklist/
-
   hostnamectl set-hostname --static "catcat"
 
   # Permit main user
@@ -71,12 +57,26 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
 fi
 
-# to use ad-malware blocking localdns
+# Set ad-malware blocking localdns
+mkdir -p /tmp/dns-blocklist
+if [[ -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnscrypt-proxy/domains-blocklist.txt ]]; then
+    rm -f /etc/dnscrypt-proxy/domains-blocklist.txt
+    cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
+    cp -f /tmp/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
+elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnsmasq.d/domains-blocklist.conf ]]; then
+    rm -f /etc/dnsmasq.d/domains-blocklist*
+    cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
+    cp -f /tmp/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
+    restorecon -vR /etc/dnsmasq.d/
+fi
+rm -rf /tmp/dns-blocklist/
+
+
 if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
-  if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
-    mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
-    ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
-  fi
+    if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
+        mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
+        ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
+    fi
 fi
 
 # nix path sudo support for user 1000
