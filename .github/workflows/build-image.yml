@@ -42,8 +42,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v5
 
-#      - name: Maximize build space
-#        uses: ublue-os/remove-unwanted-software@v9
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@v9
 
       - name: Pre Build Configuration
         id: pre-build-config
