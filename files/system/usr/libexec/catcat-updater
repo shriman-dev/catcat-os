@@ -2,49 +2,49 @@
 source /usr/lib/catcat/funcvar.sh
 
 REG_FLATPAK_APPS_UPDATE=(
-  "org.mozilla.firefox"
-  "io.gitlab.librewolf-community"
-  "net.mullvad.MullvadBrowser"
-  "org.garudalinux.firedragon"
-  "one.ablaze.floorp"
-  "app.zen_browser.zen"
-  "org.torproject.torbrowser-launcher"
-  "org.chromium.Chromium"
-  "com.brave.Browser"
-  "io.github.ungoogled_software.ungoogled_chromium"
-  "com.vivaldi.Vivaldi"
-  "com.opera.Opera"
-  "com.microsoft.Edge"
-  "com.google.Chrome"
-  "org.kde.falkon"
-  "org.gnome.Epiphany"
-  "re.sonny.Tangram"
+    "org.mozilla.firefox"
+    "io.gitlab.librewolf-community"
+    "net.mullvad.MullvadBrowser"
+    "org.garudalinux.firedragon"
+    "one.ablaze.floorp"
+    "app.zen_browser.zen"
+    "org.torproject.torbrowser-launcher"
+    "org.chromium.Chromium"
+    "com.brave.Browser"
+    "io.github.ungoogled_software.ungoogled_chromium"
+    "com.vivaldi.Vivaldi"
+    "com.opera.Opera"
+    "com.microsoft.Edge"
+    "com.google.Chrome"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
+    "re.sonny.Tangram"
 )
 
 for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
-  /usr/bin/flatpak update --assumeyes --noninteractive "$APP"
+    /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
 done
 
 
 notify_all() {
-  notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "$1"
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}"
 }
 
 one_week=604800
 two_week=1209600
 
 # Auto update if system is one weeks old
-if is_file_older $one_week "/etc/catcat-os/last-auto-update.log"; then
-  notify_all "Weekly automatic update has started."
+if is_file_older ${one_week} "/etc/catcat-os/last-auto-update.log"; then
+    notify_all "Weekly automatic update has started."
 
-  date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
+    date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
 
-  /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
+    /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
 
-  if is_file_older $one_week "/etc/catcat-os/update_sha"; then
-    /usr/bin/update >> /etc/catcat-os/last-auto-update.log
-  fi
+    if is_file_older ${one_week} "/etc/catcat-os/update_sha"; then
+        /usr/bin/update >> /etc/catcat-os/last-auto-update.log
+    fi
 
-  notify_all "Weekly automatic update is done."
+    notify_all "Weekly automatic update is done."
 fi
 

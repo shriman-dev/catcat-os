@@ -6,7 +6,7 @@ NEEDED_KARGS=()
 U1000="$(id -un 1000)"
 
 # KERNEL ARGUMENTS
-echo "Current kargs: $KARGS"
+echo "Current kargs: ${KARGS}"
 
 # selinux fix
 #restorecon  -vR /home/${U1000}/.local/share/icc
@@ -24,8 +24,8 @@ fi
 # setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do
-  if [[ ! "$SOME_USER" =~ ^(gdm|root)$ ]]; then
-    sudo -u "$SOME_USER" bash -c "/usr/libexec/catcat-user-setup" &
+  if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
+    sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup" &
   fi
 done
 
@@ -38,8 +38,8 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   hostnamectl set-hostname --static "catcat"
 
   # Permit main user
-  usermod -aG input $U1000
-  usermod -aG libvirt $U1000
+  usermod -aG input ${U1000}
+  usermod -aG libvirt ${U1000}
 
   mkdir -p /etc/catcat-os/
   echo 'first boot' > /etc/catcat-os/first-boot
@@ -79,9 +79,9 @@ if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.s
 fi
 
 # nix path sudo support for user 1000
-nix_user_path="/home/$U1000/.local/state/nix/profile"
+nix_user_path="/home/${U1000}/.local/state/nix/profile"
 sudoersd_file="/etc/sudoers.d/nix-sudo-env"
-grep "$nix_user_path" $sudoersd_file || sed -i "/secure_path = /s|$|:$nix_user_path|" $sudoersd_file
+grep "${nix_user_path}" ${sudoersd_file} || sed -i "/secure_path = /s|$|:${nix_user_path}|" ${sudoersd_file}
 # Proper sudoers.d perms
 chmod --recursive 644 /etc/sudoers.d/
 
@@ -134,18 +134,18 @@ if command -v nvidia-smi; then
 fi
 
 for karg in "${KARGS_TO_ADD[@]}"; do
-  if [[ ! $KARGS =~ $karg ]]; then
-    echo "Adding needed kargs for $karg"
-    NEEDED_KARGS+=("--append-if-missing=$karg")
+  if [[ ! ${KARGS} =~ ${karg} ]]; then
+    echo "Adding needed kargs for ${karg}"
+    NEEDED_KARGS+=("--append-if-missing=${karg}")
   fi
 done
 
-if [[ $KARGS =~ "nomodeset" ]]; then
+if [[ ${KARGS} =~ "nomodeset" ]]; then
   echo "Removing nomodeset"
   NEEDED_KARGS+=("--delete-if-present=nomodeset")
 fi
 
-if [[ -n "$NEEDED_KARGS" ]]; then
+if [[ -n "${NEEDED_KARGS}" ]]; then
   echo "Found needed karg changes, applying the following: ${NEEDED_KARGS[*]}"
   rpm-ostree kargs ${NEEDED_KARGS[*]} &
 else

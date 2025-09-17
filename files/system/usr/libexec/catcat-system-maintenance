@@ -6,7 +6,7 @@ source /usr/lib/catcat/funcvar.sh
 
 # System clean up
 one_week=604800
-if is_file_older $one_week "/etc/catcat-os/last_cleanup"; then
+if is_file_older ${one_week} "/etc/catcat-os/last_cleanup"; then
   /usr/bin/podman image prune -af
   /usr/bin/podman volume prune -f
   /usr/bin/systemd-tmpfiles --clean
@@ -20,6 +20,6 @@ fi
 
 # Run buttercare trim every 20 days
 twenty_days=1728000
-if is_file_older $twenty_days "/etc/catcat-os/buttercare.log"; then
+if is_file_older ${twenty_days} "/etc/catcat-os/buttercare.log"; then
   /usr/bin/buttercare -vv balance trim > /etc/catcat-os/buttercare.log
 fi

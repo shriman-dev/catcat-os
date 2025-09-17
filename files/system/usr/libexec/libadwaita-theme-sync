@@ -9,8 +9,8 @@ sync_libadwaita_theme() {
 
   if [ "${selected_theme}" != "${previous_theme}" ]; then
     if [ -d "${theme_path}/gtk-4.0" ]; then
-      rm -rf "$HOME/.config/gtk-4.0"
-      cp -drf "${theme_path}/gtk-4.0" "$HOME/.config/"
+      rm -rf "${HOME}/.config/gtk-4.0"
+      cp -drf "${theme_path}/gtk-4.0" "${HOME}/.config/"
     else
       return 1
     fi
@@ -21,7 +21,7 @@ sync_libadwaita_theme() {
 
 while true; do
   selected_gtk_theme=$(dconf read /org/gnome/desktop/interface/gtk-theme | tr -d \')
-  theme_path=$(find "$HOME/.themes/" -maxdepth 1 -mindepth 1 -type d -iname "${selected_gtk_theme}")
+  theme_path=$(find "${HOME}/.themes/" -maxdepth 1 -mindepth 1 -type d -iname "${selected_gtk_theme}")
   previous_gtk_theme="${previous_gtk_theme:-}"
 
   sync_libadwaita_theme "${selected_gtk_theme}" "${previous_gtk_theme}" "${theme_path}"

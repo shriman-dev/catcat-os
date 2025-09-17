@@ -6,46 +6,46 @@ echo -e "\n$0\n"
 ## EXTRA PKGS ##
 ################
 
-eza() {
-curl -Lo /tmp/eza.tar.gz https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz
-mkdir -p /tmp/ezaTarExtract
-tar -xf /tmp/eza.tar.gz -C /tmp/ezaTarExtract
-cp -dvf /tmp/ezaTarExtract/eza /usr/bin/
-chmod +x /usr/bin/eza
-rm -rf /tmp/eza.tar.gz /tmp/ezaTarExtract
-}
+#eza() {
+#curl -Lo /tmp/eza.tar.gz https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz
+#mkdir -p /tmp/ezaTarExtract
+#tar -xf /tmp/eza.tar.gz -C /tmp/ezaTarExtract
+#cp -dvf /tmp/ezaTarExtract/eza /usr/bin/
+#chmod +x /usr/bin/eza
+#rm -rf /tmp/eza.tar.gz /tmp/ezaTarExtract
+#}
+
+#bandwhich() {
+#curl -Lo /tmp/bandwhich.tar.gz $(curl -s -X GET https://api.github.com/repos/imsnif/bandwhich/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
+#mkdir -p /tmp/bandwhichTarExtract
+#tar -xf /tmp/bandwhich.tar.gz -C /tmp/bandwhichTarExtract
+#cp -dvf /tmp/bandwhichTarExtract/bandwhich /usr/bin/
+#chmod +x /usr/bin/bandwhich
+#rm -rf /tmp/bandwhich.tar.gz /tmp/bandwhichTarExtract
+#}
+
+#btdu() {
+#curl -Lo /usr/bin/btdu https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64
+#chmod +x /usr/bin/btdu
+#}
+
+#gocryptfs() {
+#curl -Lo /tmp/gocryptfs.tar.gz $(curl -s -X GET https://api.github.com/repos/rfjakob/gocryptfs/releases/latest | grep -i '"browser_download_url": "[^"]*amd64.tar.gz"' | cut -d '"' -f4)
+#mkdir -p /tmp/gocryptfsTarExtract
+#tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
+#cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
+#chmod +x /usr/bin/gocryptfs
+#rm -rf /tmp/gocryptfs.tar.gz /tmp/gocryptfsTarExtract
+#}
 
 hblock() {
 curl -Lo /usr/bin/hblock https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master/hblock
 chmod +x /usr/bin/hblock 
 }
 
-bandwhich() {
-curl -Lo /tmp/bandwhich.tar.gz $(curl -s -X GET https://api.github.com/repos/imsnif/bandwhich/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
-mkdir -p /tmp/bandwhichTarExtract
-tar -xf /tmp/bandwhich.tar.gz -C /tmp/bandwhichTarExtract
-cp -dvf /tmp/bandwhichTarExtract/bandwhich /usr/bin/
-chmod +x /usr/bin/bandwhich
-rm -rf /tmp/bandwhich.tar.gz /tmp/bandwhichTarExtract
-}
-
 buttersnap() {
 curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttersnap.sh
 chmod +x /usr/bin/buttersnap.sh
-}
-
-btdu() {
-curl -Lo /usr/bin/btdu https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64
-chmod +x /usr/bin/btdu
-}
-
-gocryptfs() {
-curl -Lo /tmp/gocryptfs.tar.gz $(curl -s -X GET https://api.github.com/repos/rfjakob/gocryptfs/releases/latest | grep -i '"browser_download_url": "[^"]*amd64.tar.gz"' | cut -d '"' -f4)
-mkdir -p /tmp/gocryptfsTarExtract
-tar -xf /tmp/gocryptfs.tar.gz -C /tmp/gocryptfsTarExtract
-cp -dvf /tmp/gocryptfsTarExtract/gocryptfs /usr/bin/
-chmod +x /usr/bin/gocryptfs
-rm -rf /tmp/gocryptfs.tar.gz /tmp/gocryptfsTarExtract
 }
 
 yazi() {
@@ -58,13 +58,6 @@ cp -dvf yazi-x86_64-unknown-linux-gnu/{ya,yazi} /usr/bin/
 chmod +x /usr/bin/{ya,yazi}
 
 rm -rf /tmp/yazi.zip yazi-x86_64-unknown-linux-gnu/
-}
-
-quickemu() {
-git clone --filter=blob:none https://github.com/quickemu-project/quickemu /tmp/quickemu-tmp
-cp -dvf /tmp/quickemu-tmp/{quickemu,quickget,quickreport} /usr/bin/
-chmod +x /usr/bin/{quickemu,quickget,quickreport}
-rm -rf /tmp/quickemu-tmp
 }
 
 mfancontrol() {
@@ -134,31 +127,28 @@ add_repos
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
 sed -i 's|gnome-software ||' /etc/dnf/repos.override.d/99-config_manager.repo
-rpm-ostree override remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
+dnf5 -y remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
 #sunshine gnome-browser-connector
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier pam_mount'
 hblock
 #rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
-# zellij
-shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux'
-eza
+shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux eza zellij'
 rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
-monitoringTools='lm_sensors s-tui powertop htop btop nethogs procs wireshark'
-bandwhich
+monitoringTools='lm_sensors s-tui powertop htop btop nethogs procs wireshark bandwhich'
 
 #dmraid
-diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted'
-buttersnap; btdu; gocryptfs; yazi
+diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart gparted btdu gocryptfs'
+buttersnap; yazi
 
 terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo memtester nvme-cli kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
-#lazygit ghostty
+#lazygit
 devTools='criu ptyxis ghostty git micro neovim sassc codium'
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
@@ -182,8 +172,7 @@ mfancontrol
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
-virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm'
-quickemu
+virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm quickemu'
 
 extras='bleachbit gnome-system-monitor gnome-software uresourced irqbalance xed'
 

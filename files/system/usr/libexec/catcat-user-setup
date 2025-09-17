@@ -2,17 +2,17 @@
 shopt -s extglob nocasematch
 source /usr/lib/catcat/funcvar.sh
 VERBOSE=2
-HOME_DIR="$HOME"
-CONFIG="$HOME_DIR/.config"
-LOCALSHARE="$HOME_DIR/.local/share"
+HOME_DIR="${HOME}"
+CONFIG="${HOME_DIR}/.config"
+LOCALSHARE="${HOME_DIR}/.local/share"
 SKEL="/etc/skel"
-CATCAT_CONF="$LOCALSHARE/catcat-os"
+CATCAT_CONF="${LOCALSHARE}/catcat-os"
 
-FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ $LOCALSHARE/flatpak/app/)"
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ${LOCALSHARE}/flatpak/app/)"
 
 bak_before() {
-  [[ ! -d $1.bak.og ]] && cp -drf $1 $1.bak.og || err "Backup failed for orignal $1"
-  cp -drf $1 $1.bak || err "Backup failed for $1"
+  [[ ! -d ${1}.bak.og ]] && cp -drf ${1} ${1}.bak.og || err "Backup failed for orignal ${1}"
+  cp -drf ${1} ${1}.bak || err "Backup failed for ${1}"
 }
 
 
@@ -25,20 +25,20 @@ exit_if_root() {
 # sync default configs for user home
 sync_default_configs() {
   local update_sha="/etc/catcat-os/update_sha"
-  local prev_sha="$CATCAT_CONF/previous_update_sha"
+  local prev_sha="${CATCAT_CONF}/previous_update_sha"
 
-  if ! diff -q "$update_sha" "$prev_sha" &>/dev/null; then
+  if ! diff -q "${update_sha}" "${prev_sha}" &>/dev/null; then
     log "INFO" "Updating configs..."
-    mkdir -pv "$CATCAT_CONF" || err "$CATCAT_CONF creation failed"
+    mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
 
-    rsync -aK --ignore-existing --exclude='*.gitkeep*' "$SKEL/" "$HOME_DIR/" &&
-    rsync -au "$SKEL/.local/share/gnome-shell/extensions" "$LOCALSHARE/gnome-shell/" || err "Configs sync failed"
+    rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}/" "${HOME_DIR}/" &&
+    rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell/" || err "Configs sync failed"
 
-    rm -rf "$LOCALSHARE/themes/"*{Catppuccin,Lavanda}*
-    cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "$LOCALSHARE/themes/" || err "Theme update failed"
+    rm -rf "${LOCALSHARE}/themes/"*{Catppuccin,Lavanda}*
+    cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes/" || err "Theme update failed"
 
     bat cache --build
-    cp -fv "$update_sha" "$prev_sha" || err "SHA update failed"
+    cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
     log "INFO" "Configs updated"
   fi
 }
@@ -48,8 +48,8 @@ gnome_shell_setup() {
   log "INFO" "Setting up GNOME Shell..."
   local app_folders_dconf="$(dconf read /org/gnome/desktop/app-folders/folder-children)"
   [[ ! "${app_folders_dconf}" =~ 'FileViewers' ]] && {
-    bak_before "$CONFIG/dconf"
-#    cp -dvf /etc/dconf/db/distro "$CONFIG/dconf/user"
+    bak_before "${CONFIG}/dconf"
+#    cp -dvf /etc/dconf/db/distro "${CONFIG}/dconf/user"
 #    for i in $(ls -A1d /etc/dconf/db/distro.d/*);
 #    do
 #    dconf load / < $i &
@@ -60,44 +60,44 @@ gnome_shell_setup() {
   # Setup dash to panel and syncthing styles
   # TODO: set condition here
   sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' \
-    "$LOCALSHARE/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css" || err "Dash to panel style setup failed"
+    "${LOCALSHARE}/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css" || err "Dash to panel style setup failed"
   sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' \
-    $LOCALSHARE/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg || err "Syncthing style setup failed"
+    ${LOCALSHARE}/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg || err "Syncthing style setup failed"
 
   # Enabled extensions for Handheld
-  check_firstboot=$(stat -c "%Y" /etc/catcat-os/first-boot)
+  local check_firstboot=$(stat -c "%Y" /etc/catcat-os/first-boot)
   if command -v hhdctl; then
     dconf read /org/gnome/shell/enabled-extensions | grep 'gjsosk@vishram1123.com' || gnome-extensions enable gjsosk@vishram1123.com
-    [[ $check_firstboot -lt $(( $(date +%s) - 600 )) ]] && dconf write /org/gnome/desktop/interface/text-scaling-factor "1.2"
+    [[ ${check_firstboot} -lt $(( $(date +%s) - 600 )) ]] && dconf write /org/gnome/desktop/interface/text-scaling-factor "1.2"
   fi
 
   # Setup burn-my-windows
-  local bmw_profile="$CONFIG/burn-my-windows/profiles/1679372508290696.conf"
-  [[ ! -f "$bmw_profile" ]] && {
-    bak_before "$CONFIG/burn-my-windows"
-    cp -drv "$SKEL/.config/burn-my-windows" "$CONFIG/" &&
-    dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'$bmw_profile'" || err "Burn my windows style setup failed"
+  local bmw_profile="${CONFIG}/burn-my-windows/profiles/1679372508290696.conf"
+  [[ ! -f "${bmw_profile}" ]] && {
+    bak_before "${CONFIG}/burn-my-windows"
+    cp -drv "${SKEL}/.config/burn-my-windows" "${CONFIG}/" &&
+    dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'${bmw_profile}'" || err "Burn my windows style setup failed"
   }
 
   # Setup forge stylesheet
   local forge_stylesheet="forge/stylesheet/forge/stylesheet.css"
-  [[ $(grep -c 'border-width: 1px' "$CONFIG/$forge_stylesheet") -lt 6 ]] && {
-    bak_before "$CONFIG/forge"
-    cp -drv "$SKEL/.config/$forge_stylesheet" "$CONFIG/$forge_stylesheet" || err "Forge style setup failed"
+  [[ $(grep -c 'border-width: 1px' "${CONFIG}/${forge_stylesheet}") -lt 6 ]] && {
+    bak_before "${CONFIG}/forge"
+    cp -drv "${SKEL}/.config/${forge_stylesheet}" "${CONFIG}/${forge_stylesheet}" || err "Forge style setup failed"
   }
 
   # make vitals and tophat extension to use resources app as default monitoring app
   if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
-    local vitals_schema="$LOCALSHARE/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
-    [[ -f "$vitals_schema" ]] && grep -q 'net.nokyan.Resources' "$vitals_schema" || {
+    local vitals_schema="${LOCALSHARE}/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
+    [[ -f "${vitals_schema}" ]] && grep -q 'net.nokyan.Resources' "${vitals_schema}" || {
       sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' \
-        $vitals_schema &&
-      glib-compile-schemas $(dirname $vitals_schema) &&
+        ${vitals_schema} &&
+      glib-compile-schemas $(dirname ${vitals_schema}) &&
       gnome-extensions disable Vitals@CoreCoding.com &&
       gnome-extensions enable Vitals@CoreCoding.com || err "Resources app integration with vitals failed"
     }
 
-#    local th_monitor="$LOCALSHARE/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js"
+#    local th_monitor="${LOCALSHARE}/gnome-shell/extensions/tophat@fflewddur.github.io/monitor.js"
 #    [[ -f "$th_monitor" ]] && grep -q 'net.nokyan.Resources.desktop' $th_monitor || {
 #      sed -i "s|'.*onitor\.desktop|'net.nokyan.Resources.desktop|" $th_monitor &&
 #      gnome-extensions disable tophat@fflewddur.github.io &&
@@ -107,10 +107,10 @@ gnome_shell_setup() {
   log "INFO" "Styling Done"
 
   # Disable extension update if there are no updates in extension update directory
-  local ext_updates="$LOCALSHARE/gnome-shell/extension-updates"
-  mkdir -pv "$ext_updates"
-  octalmode=$( [[ $(ls -A1 "$ext_updates" | wc -l) -eq 0 ]] && echo "544" || echo "755" )
-  chmod $octalmode "$ext_updates" && log "INFO" "Extensions update directory octal permission set to $octalmode"
+  local ext_updates="${LOCALSHARE}/gnome-shell/extension-updates"
+  mkdir -pv "${ext_updates}"
+  local octalmode=$( [[ $(ls -A1 "${ext_updates}" | wc -l) -eq 0 ]] && echo "544" || echo "755" )
+  chmod ${octalmode} "${ext_updates}" && log "INFO" "Extensions update directory octal permission set to ${octalmode}"
 
   # Enable syncthing extension if syncthing if running, disable if not running
   systemctl --user is-enabled syncthing.service &&
@@ -121,33 +121,33 @@ gnome_shell_setup() {
 
 
 setup_bookmarks_userdirs() {
-  local user_dirs_file="$CONFIG/user-dirs.dirs"
-  local bookmarks="$CONFIG/gtk-3.0/bookmarks"
+  local user_dirs_file="${CONFIG}/user-dirs.dirs"
+  local bookmarks="${CONFIG}/gtk-3.0/bookmarks"
 
   log "INFO" "Setting up default user directories and adding Bookmarks..."
-  grep -q "$USER/Me/" "$user_dirs_file" || {
-    bak_before "$user_dirs_file"
-        cp -drf "$SKEL/.config/user-dirs.dirs" "$CONFIG/" #|| err "Failed to set default user directories"
+  grep -q "${USER}/Me/" "${user_dirs_file}" || {
+    bak_before "${user_dirs_file}"
+        cp -drf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}/" #|| err "Failed to set default user directories"
     }
 
-  mkdir -pv /tmp/tmp-$USER
-  grep -q "admin:/// AdminRoot" "$bookmarks" || {
-    bak_before "$bookmarks"
-    mkdir -pv "$(dirname "$bookmarks")" &&
-    sh -c "echo 'file:///home/$USER/Me Me
-file:///home/$USER/Me/Documents Documents
-file:///home/$USER/Me/Downloads Downloads
-file:///home/$USER/Me/Pictures Pictures
-file:///home/$USER/Me/Videos Videos
-file:///home/$USER/Me/Music Music
-file:///home/$USER/Me/Notes Notes
+  mkdir -pv /tmp/tmp-${USER}
+  grep -q "admin:/// AdminRoot" "${bookmarks}" || {
+    bak_before "${bookmarks}"
+    mkdir -pv "$(dirname "${bookmarks}")" &&
+    sh -c "echo 'file:///home/${USER}/Me Me
+file:///home/${USER}/Me/Documents Documents
+file:///home/${USER}/Me/Downloads Downloads
+file:///home/${USER}/Me/Pictures Pictures
+file:///home/${USER}/Me/Videos Videos
+file:///home/${USER}/Me/Music Music
+file:///home/${USER}/Me/Notes Notes
 admin:/// AdminRoot
-file:///tmp/tmp-$USER Temporary' > $bookmarks" || err "Failed to add bookmarks"
+file:///tmp/tmp-${USER} Temporary' > ${bookmarks}" || err "Failed to add bookmarks"
     }
   log "INFO" "Done"
 
   # Set folder icons
-  gio info -a metadata "$HOME_DIR/Me" | grep -q 'metadata::custom-icon-name: user-home' || {
+  gio info -a metadata "${HOME_DIR}/Me" | grep -q 'metadata::custom-icon-name: user-home' || {
     log "INFO" "Setting up folder icons"
     declare -A icons=(
       ["Me"]="user-home"
@@ -161,10 +161,10 @@ file:///tmp/tmp-$USER Temporary' > $bookmarks" || err "Failed to add bookmarks"
       ["Me/Syncthing"]="folder-syncthing"
     )
     for dir in "${!icons[@]}"; do
-      [[ ! -d "$HOME_DIR/$dir" ]] && mkdir -pv "$HOME_DIR/$dir"
-      { gio set "$HOME_DIR/$dir" metadata::custom-icon-name "${icons[$dir]}" &&
-        log "INFO" "Folder icon '${icons[$dir]}' set to $HOME_DIR/$dir"; } ||
-          err "Failed to set Folder icon '${icons[$dir]}' to $HOME_DIR/$dir"
+      [[ ! -d "${HOME_DIR}/${dir}" ]] && mkdir -pv "${HOME_DIR}/${dir}"
+      { gio set "${HOME_DIR}/${dir}" metadata::custom-icon-name "${icons[${dir}]}" &&
+        log "INFO" "Folder icon '${icons[${dir}]}' set to ${HOME_DIR}/${dir}"; } ||
+          err "Failed to set Folder icon '${icons[${dir}]}' to ${HOME_DIR}/${dir}"
     done
     log "INFO" "Done"
   }
@@ -174,23 +174,23 @@ file:///tmp/tmp-$USER Temporary' > $bookmarks" || err "Failed to add bookmarks"
 remove_unnecessary_directories() {
   log "INFO" "Removing unnecessary directories..."
   dirlist=(
-    "$HOME_DIR/Desktop"
-    "$HOME_DIR/Downloads"
-    "$HOME_DIR/Public"
-    "$HOME_DIR/Documents"
-    "$HOME_DIR/Music"
-    "$HOME_DIR/Pictures"
-    "$HOME_DIR/Videos"
+    "${HOME_DIR}/Desktop"
+    "${HOME_DIR}/Downloads"
+    "${HOME_DIR}/Public"
+    "${HOME_DIR}/Documents"
+    "${HOME_DIR}/Music"
+    "${HOME_DIR}/Pictures"
+    "${HOME_DIR}/Videos"
   )
 
-  rm -rf "$HOME_DIR/Templates"
+  rm -rf "${HOME_DIR}/Templates"
   for dir in "${dirlist[@]}"; do
     [[ -d ${dir} ]] && rmdir ${dir}
   done
 
-  [[ ! -f "$HOME_DIR/.mozilla/firefox/profiles.ini" ]] && rm -rvf "$HOME_DIR/.mozilla"
-  [[ -f "$HOME_DIR/Me/Desktop/.gitkeep" ]] && find "$HOME_DIR/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
-  [[ -d "$HOME_DIR/Sync" && $(ls -A1 "$HOME_DIR/Sync" | wc -l) -lt 2 ]] && rm -rvf "$HOME_DIR/Sync"
+  [[ ! -f "${HOME_DIR}/.mozilla/firefox/profiles.ini" ]] && rm -rvf "${HOME_DIR}/.mozilla"
+  [[ -f "${HOME_DIR}/Me/Desktop/.gitkeep" ]] && find "${HOME_DIR}/Me" -maxdepth 2 -mindepth 1 -type f -name '*.gitkeep*' -delete
+  [[ -d "${HOME_DIR}/Sync" && $(ls -A1 "${HOME_DIR}/Sync" | wc -l) -lt 2 ]] && rm -rvf "${HOME_DIR}/Sync"
   log "INFO" "Done"
 }
 
@@ -198,15 +198,15 @@ remove_unnecessary_directories() {
 
 shell_setup() {
   log "INFO" "Setting up shell..."
-  [[ ! -f "$CONFIG/fish/fish_variables" ]] && { cp -drf $SKEL/.config/fish "$CONFIG/" || err "Failed to setup fish_variables"; }
+  [[ ! -f "${CONFIG}/fish/fish_variables" ]] && { cp -drf ${SKEL}/.config/fish "${CONFIG}/" || err "Failed to setup fish_variables"; }
 
   local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "$rc" ]] && . "$rc"; done
 unset rc'
-  grep -q ".shell.d" "$HOME_DIR/.bashrc" || echo "$shell_rc" >> "$HOME_DIR/.bashrc"
+  grep -q ".shell.d" "${HOME_DIR}/.bashrc" || echo "${shell_rc}" >> "${HOME_DIR}/.bashrc"
 
-  grep -q "\[ -f ~/.bashrc \]" "$HOME_DIR/.bash_profile" || {
-    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> "$HOME_DIR/.bash_profile"
+  grep -q "\[ -f ~/.bashrc \]" "${HOME_DIR}/.bash_profile" || {
+    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> "${HOME_DIR}/.bash_profile"
   }
   log "INFO" "Done"
 }
@@ -215,19 +215,19 @@ unset rc'
 
 theme_flatpak_apps() {
   log "INFO" "Setting theme, icons and permissions for flatpak apps..."
-  mkdir -pv "$LOCALSHARE/flatpak/overrides"
-  grep 'devices=.*!all' "$LOCALSHARE/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-    bak_before "$LOCALSHARE/flatpak/overrides/global"
+  mkdir -pv "${LOCALSHARE}/flatpak/overrides"
+  grep 'devices=.*!all' "${LOCALSHARE}/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+    bak_before "${LOCALSHARE}/flatpak/overrides/global"
     /usr/libexec/catcat-flatpak-manager --user --all || err "Failed to configure flatpak permissions"
   }
 
-  [[ ! "$(ls -Al  "$HOME_DIR/.themes" )"  =~ '.local/share/themes' ]] && {
+  [[ ! "$(ls -Al  "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]] && {
     mkdir -pv ${LOCALSHARE}/{themes,icons,fonts}
     for dir in themes icons; do
-      [[ -d "$HOME_DIR/.$dir" ]] && cp -drf ${HOME_DIR}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rf "${HOME_DIR}/.${dir}"
-      ln -srfTv "${LOCALSHARE}/${dir}" "${HOME_DIR}/.${dir}"
+      [[ -d "${HOME_DIR}/.${dir}" ]] && cp -drf ${{HOME_DIR}}/.${dir}/* "${LOCALSHARE}/${dir}/" && rm -rf "${{HOME_DIR}}/.${dir}"
+      ln -srfTv "${LOCALSHARE}/${dir}" "${{HOME_DIR}}/.${dir}"
     done
-    [[ $(ls -A1 "$CONFIG/gtk-4.0" | wc -l) -eq 0 ]] && cp -drf "$SKEL/.config/gtk-4.0" "$CONFIG/"
+    [[ $(ls -A1 "${CONFIG}/gtk-4.0" | wc -l) -eq 0 ]] && cp -drf "${SKEL}/.config/gtk-4.0" "${CONFIG}/"
   }
   log "INFO" "Done"
 }
@@ -237,19 +237,19 @@ theme_flatpak_apps() {
 setup_apps() {
   log "INFO" "Configuring apps and desktop files..."
 
-  local apps_dir="$LOCALSHARE/applications"
-  mkdir -pv "$apps_dir"
+  local apps_dir="${LOCALSHARE}/applications"
+  mkdir -pv "${apps_dir}"
 
   # Handle desktop entries
   # prioritize steam flatpak
   [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && {
-    [[ ! -f "$apps_dir/steam.desktop" ]] &&
-    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > "$apps_dir/steam.desktop"
+    [[ ! -f "${apps_dir}/steam.desktop" ]] &&
+    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > "${apps_dir}/steam.desktop"
   }
 
   inxi -M | grep -qE "System: Micro-Star|System: MSI" && command -v mcontrolcenter || {
-    [[ ! -f "$apps_dir/mcontrolcenter.desktop" ]] &&
-    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > "$apps_dir/mcontrolcenter.desktop"
+    [[ ! -f "${apps_dir}/mcontrolcenter.desktop" ]] &&
+    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > "${apps_dir}/mcontrolcenter.desktop"
   }
 
   # Modify app icons
@@ -261,26 +261,26 @@ setup_apps() {
   )
 
   for app in "${!app_icons[@]}"; do
-    [[ ! -f "$apps_dir/$app.desktop" ]] && {
-      [[ "${FLATPAK_APPS}" =~ "$app" ]] &&
-        sed "s|^Icon=.*|Icon=${app_icons[$app]}|" \
-          "/var/lib/flatpak/exports/share/applications/$app.desktop" > "$apps_dir/$app.desktop"
+    [[ ! -f "${apps_dir}/${app}.desktop" ]] && {
+      [[ "${FLATPAK_APPS}" =~ "${app}" ]] &&
+        sed "s|^Icon=.*|Icon=${app_icons[${app}]}|" \
+          "/var/lib/flatpak/exports/share/applications/${app}.desktop" > "${apps_dir}/${app}.desktop"
     }
   done
 
   # Setup additional apps config
-  [[ ! -f "$LOCALSHARE/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette" ]] &&
-    { cp -drf "$SKEL/.local/share/org.gnome.Ptyxis" "$LOCALSHARE/" || err "Failed to configure Ptyxis"; }
+  [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette" ]] &&
+    { cp -drf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}/" || err "Failed to configure Ptyxis"; }
 
-  [[ ! -f "$HOME_DIR/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml" ]] &&
-    { cp -drf "$SKEL/.var/app/org.gnome.gedit" "$HOME_DIR/.var/app/" || err "Failed to configure Gedit"; }
+  [[ ! -f "${HOME_DIR}/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml" ]] &&
+    { cp -drf "${SKEL}/.var/app/org.gnome.gedit" "${HOME_DIR}/.var/app/" || err "Failed to configure Gedit"; }
 
   # VSCodium extensions
-  local vs_extdir="$HOME_DIR/.vscode-oss/extensions"
-  mkdir -pv "$vs_extdir"
+  local vs_extdir="${HOME_DIR}/.vscode-oss/extensions"
+  mkdir -pv "${vs_extdir}"
   ls -A1d ${vs_extdir}/*atppuccin* || {
-    cp -drf ${SKEL}/.vscode-oss/extensions/* "$vs_extdir/" &&
-    cp -drf ${SKEL}/.config/VSCodium "$CONFIG/" || err "Failed to configure VSCodium"
+    cp -drf ${SKEL}/.vscode-oss/extensions/* "${vs_extdir}/" &&
+    cp -drf ${SKEL}/.config/VSCodium "${CONFIG}/" || err "Failed to configure VSCodium"
   }
 
   log "INFO" "Done"

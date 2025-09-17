@@ -11,14 +11,14 @@ runtimes() {
     'org.freedesktop.Platform.VulkanLayer.OBSVkCapture'
 )
   for rr in "${runtimes[@]}"; do
-    flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch $rr | awk '{print $1 "//" $2}')
+    flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch ${rr} | awk '{print $1 "//" $2}')
   done
 
   # Get lsfg-vk runtimes
   cd /tmp/
   for url in $(curl -s https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.flatpak"' | cut -d'"' -f4); do
-    curl -LO $url
-    flatpak install --system -y --noninteractive "$(basename "$url")" && rm "$(basename "$url")"
+    curl -LO ${url}
+    flatpak install --system -y --noninteractive "$(basename "${url}")" && rm "$(basename "${url}")"
   done
   cd -
 }
@@ -87,18 +87,18 @@ remove_filesystem_access() {
   )
 
   for app in "${nofilesystem_for_apps[@]}"; do
-    [[ "${FLATPAK_APPS}" =~ "$app" && ! -f /var/lib/flatpak/overrides/${app} ]] && {
-      log "INFO" "\nRemove existing filesystem permissions for app: $app"
-      local metadata="/var/lib/flatpak/app/$app/current/active/metadata"
-      local permitted_filesystem=$(grep 'filesystems' "$metadata" | cut -d '=' -f2- | sed 's/:[^;]*//g' | tr ';' ' ')
-      [[ -z $permitted_filesystem ]] || {
+    [[ "${FLATPAK_APPS}" =~ "${app}" && ! -f /var/lib/flatpak/overrides/${app} ]] && {
+      log "INFO" "\nRemove existing filesystem permissions for app: ${app}"
+      local metadata="/var/lib/flatpak/app/${app}/current/active/metadata"
+      local permitted_filesystem=$(grep 'filesystems' "${metadata}" | cut -d '=' -f2- | sed 's/:[^;]*//g' | tr ';' ' ')
+      [[ -z ${permitted_filesystem} ]] || {
         local perms=()
         permitted_filesystem=${permitted_filesystem::-1}
-        for perm in $permitted_filesystem; do
-          perms+=("--nofilesystem=$perm")
+        for perm in ${permitted_filesystem}; do
+          perms+=("--nofilesystem=${perm}")
         done
         log "INFO" "Removing permissions: '${permitted_filesystem}'"
-        flatpak override $SCOPE "${perms[@]}" "$app" && echo 'Done' || echo 'Error occurred'
+        flatpak override ${SCOPE} "${perms[@]}" "${app}" && echo 'Done' || echo 'Error occurred'
       }
     }
   done
@@ -134,14 +134,14 @@ remove_filesystem_access() {
 #  echo ''
 #  for app in "${nonet_for_apps[@]}"; do
 #    echo "Remove existing network permissions for app: $app"
-#    flatpak override $SCOPE --unshare=network $app && echo 'Done' || echo 'Error occurred'
+#    flatpak override ${SCOPE} --unshare=network $app && echo 'Done' || echo 'Error occurred'
 #  done
 #}
 
 # secure flatpak apps
 apply_global_restrictions() {
   log "INFO" "\nRestricting unnecessary permissions and allowing read-only permissions"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --unshare=ipc \
     --nosocket={{session,system}-bus,ssh-auth,pcsc,cups,gpg-agent,inherit-wayland-socket} \
     --nodevice={all,input,usb,kvm,shm} \
@@ -182,8 +182,8 @@ allow_home() {
 
   echo ''
   for app in "${allowhome_for_apps[@]}"; do
-    echo "Allowing home access for app: $app"
-    flatpak override $SCOPE --unshare=network --filesystem=home $app && echo 'Done' || echo 'Error occurred'
+    echo "Allowing home access for app: ${app}"
+    flatpak override ${SCOPE} --unshare=network --filesystem=home ${app} && echo 'Done' || echo 'Error occurred'
   done
 }
 
@@ -228,8 +228,8 @@ allow_gpu_acceleration() {
 
   echo ''
   for app in "${gpu_acceleration_for_apps[@]}"; do
-    echo "Allowing gpu acceleration for app: $app"
-    flatpak override $SCOPE --device=dri $app && echo 'Done' || echo 'Error occurred'
+    echo "Allowing gpu acceleration for app: ${app}"
+    flatpak override ${SCOPE} --device=dri ${app} && echo 'Done' || echo 'Error occurred'
   done
 }
 
@@ -238,16 +238,16 @@ app_specific_perms() {
   echo ''
   for app in org.gnome.Cheese \
              org.gnome.Snapshot; do
-    log "INFO" "Permitting cam for app $app"
-    flatpak override $SCOPE --unshare=network --device=all $app && echo 'Done' || echo 'Error occurred'
+    log "INFO" "Permitting cam for app ${app}"
+    flatpak override ${SCOPE} --unshare=network --device=all ${app} && echo 'Done' || echo 'Error occurred'
   done
 
   # Enable kvm and gpu acceleration for virtualization apps
   echo ''
   for app in org.gnome.Boxes \
              org.virt_manager.virt-manager; do
-    log "INFO" "Enabling virtualization for app $app"
-    flatpak override $SCOPE --device={dri,kvm} $app && echo 'Done' || echo 'Error occurred'
+    log "INFO" "Enabling virtualization for app ${app}"
+    flatpak override ${SCOPE} --device={dri,kvm} ${app} && echo 'Done' || echo 'Error occurred'
   done
 
   # Fix qt apps on wayland
@@ -258,22 +258,22 @@ app_specific_perms() {
              net.pcsx2.PCSX2 \
              net.rpcs3.RPCS3 \
              org.libretro.RetroArch; do
-    log "INFO" "Disabling wayland socket for app $app"
-    flatpak override $SCOPE --nosocket=wayland $app && echo 'Done' || echo 'Error occurred'
+    log "INFO" "Disabling wayland socket for app ${app}"
+    flatpak override ${SCOPE} --nosocket=wayland ${app} && echo 'Done' || echo 'Error occurred'
   done
 
   # Allow host for GPU screen recorder
-  flatpak override $SCOPE --unshare=network --filesystem=host com.dec05eba.gpu_screen_recorder
+  flatpak override ${SCOPE} --unshare=network --filesystem=host com.dec05eba.gpu_screen_recorder
 
   # Allow gedit to edit files all over system
   log "INFO" "\nAllow gedit to edit files all over system"
-  flatpak override $SCOPE --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit && echo 'Done' || echo 'Error occurred'
+  flatpak override ${SCOPE} --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit && echo 'Done' || echo 'Error occurred'
 }
 
 # perms for gaming apps
 configure_gaming_apps() {
   log "INFO" "\nGiving necessary permissions for gaming to: com.usebottles.bottles"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
@@ -281,7 +281,7 @@ configure_gaming_apps() {
   com.usebottles.bottles && echo 'Done' || echo 'Error occurred'
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.lutris.Lutris"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
@@ -289,7 +289,7 @@ configure_gaming_apps() {
   net.lutris.Lutris && echo 'Done' || echo 'Error occurred'
 
   log "INFO" "\nGiving necessary permissions for gaming to: com.valvesoftware.Steam"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=xdg-config/{MangoHud:ro,vkBasalt:ro} \
@@ -298,7 +298,7 @@ configure_gaming_apps() {
 
 
   log "INFO" "\nGiving necessary permissions for gaming to: com.heroicgameslauncher.hgl"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
@@ -306,28 +306,28 @@ configure_gaming_apps() {
   com.heroicgameslauncher.hgl && echo 'Done' || echo 'Error occurred'
 
   log "INFO" "\nGiving necessary permissions for gaming to: io.github.ryubing.Ryujinx"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-run/gamescope-0:ro} \
   io.github.ryubing.Ryujinx && echo 'Done' || echo 'Error occurred'
 
   log "INFO" "\nGiving necessary permissions for gaming to: org.libretro.RetroArch"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
   org.libretro.RetroArch
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.rpcs3.RPCS3"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
   net.rpcs3.RPCS3
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.pcsx2.PCSX2"
-  flatpak override $SCOPE \
+  flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
@@ -335,7 +335,7 @@ configure_gaming_apps() {
 }
 
 show_help() {
-  echo "Usage: $0 [options]"
+  echo "Usage: ${0} [options]"
   echo ""
   echo "Options:"
   echo " -h, --help            Display this help message"
@@ -351,7 +351,7 @@ show_help() {
 
 main() {
   while [[ $# -gt 0 ]]; do
-    case $1 in
+    case ${1} in
       -h|--help)
         show_help
         exit 0
@@ -383,7 +383,7 @@ main() {
         configure_gaming_apps
         ;;
       *)
-        die "Unknown option: $1"
+        die "Unknown option: ${1}"
         ;;
     esac
     shift
