@@ -27,7 +27,7 @@ desktopFiles() {
   sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|--auto-service||' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
 
-  sed -i 's|^Exec=.*|Exec=waydroid show-full-ui|' /usr/share/applications/Waydroid.desktop
+  sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' /usr/share/applications/Waydroid.desktop
 }
 
 icons() {

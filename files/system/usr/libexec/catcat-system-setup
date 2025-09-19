@@ -14,6 +14,14 @@ if ! diff -q "/home/${U1000}/.config/monitors.xml" "/var/lib/gdm/.config/monitor
   restorecon  -vR /home/${U1000}/.local/share/icc
 fi
 
+# Set primary monitor for dash to panel
+monitor_vendor_serial_id=($(hwinfo --monitor | grep -E "Vendor:|Serial ID:" | cut -d':' -f2 | tr -d '"' | tr -d "'"))
+monitor_id="${monitor_vendor_serial_id[0]}-${monitor_vendor_serial_id[1]}"
+sed -i "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" /etc/dconf/db/distro.d/extensions
+sed -i "s|panel-element-positions='{\".*\":|panel-element-positions='{\"${monitor_id}\":|" /etc/dconf/db/distro.d/extensions
+sed -i "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" /etc/dconf/db/distro.d/extensions
+sed -i "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" /etc/dconf/db/distro.d/extensions
+
 # setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do

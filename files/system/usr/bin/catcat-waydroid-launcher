@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+waydroid show-full-ui &
+
+waydroid prop set persist.waydroid.uevent false
+waydroid prop set persist.waydroid.multi_windows false
+
+for file in ${HOME}/.local/share/applications/waydroid.*.desktop; do
+    desktop-file-edit --set-key=NoDisplay --set-value=true ${file}
+done

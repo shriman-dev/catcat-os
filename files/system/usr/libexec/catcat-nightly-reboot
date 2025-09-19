@@ -2,6 +2,16 @@
 source /usr/lib/catcat/funcvar.sh
 REBOOT_DELAY=300  # 5 minutes
 
+run_as_users() {
+  for SOME_USER in /run/user/*; do
+    SOME_USER=$(basename "${SOME_USER}")
+    if [[ ! "${SOME_USER}" == "0" ]]; then
+      log "INFO" "Running given command as user: $(id -u -n "${SOME_USER}")"
+      sudo -u $(id -u -n "${SOME_USER}") bash -c "$(declare -f $@); $@" &
+    fi
+  done
+}
+
 # Send Zenity warning dialog
 send_warning() {
     source /usr/lib/catcat/funcvar.sh

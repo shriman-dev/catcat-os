@@ -44,10 +44,12 @@ gnome_shell_setup() {
   }
 
   log "INFO" "Styling up GNOME Shell Extensions..."
-  # Setup dash to panel and syncthing styles
+  # Setup dash to panel
   # TODO: set condition here
   sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' \
     "${LOCALSHARE}/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css" || err "Dash to panel style setup failed"
+
+  # Syncthing style
   sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' \
     ${LOCALSHARE}/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg || err "Syncthing style setup failed"
 
