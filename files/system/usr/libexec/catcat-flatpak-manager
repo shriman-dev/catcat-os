@@ -1,6 +1,5 @@
 #!/bin/bash
 source /usr/lib/catcat/funcvar.sh
-VERBOSE=2
 
 runtimes() {
   runtimes=(
@@ -26,23 +25,17 @@ runtimes() {
 install_flatpaks() {
 # Install or remove flatpaks if system is updated
   if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
-    # Add and set flathub
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
-    flatpak remote-modify --system --prio=9 flathub
-
     # Install flatpaks in list
-    INSTALL_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install ))
-    if check_internet_connection && [[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]; then
+    INSTALL_LIST=($(sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install))
+    if check_network_connection && [[ $(is_network_metered) -lt 3 ]] && [[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]; then
       log "INFO" "Installing system flatpaks from config list (requires internet)"
+      # Add and set flathub
+      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
+      flatpak remote-modify --system --prio=9 flathub
       flatpak install --system -y --noninteractive flathub ${INSTALL_LIST[@]}
       runtimes
       cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
     fi
-
-    # Remove flatpaks in list
-  #  REMOVE_LIST=($( sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/remove ))
-  #  log "INFO" "Removing system flatpaks from config list"
-  #  flatpak uninstall --system -y --noninteractive ${REMOVE_LIST[@]}
   fi
 }
 

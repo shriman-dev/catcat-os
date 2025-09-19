@@ -26,6 +26,7 @@ rm -vf /usr/lib/systemd/system/brew-dir-fix.service
 rm -vf /usr/lib/systemd/system/brew-setup.service
 rm -vf /usr/lib/systemd/system/brew-update.service
 rm -vf /usr/lib/systemd/system/brew-upgrade.service
+rm -vf /usr/lib/tmpfiles.d/homebrew.conf
 
 rm -vf /usr/lib/systemd/user/tracker-miner-fs-3.service
 rm -vf /usr/lib/systemd/user/tracker-miner-fs-control-3.service
@@ -41,6 +42,7 @@ rm -vf  /usr/share/applications/bazzite-steam-bpm.desktop
 rm -vf  /usr/share/applications/gnome-ssh-askpass.desktop
 rm -vf  /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
 rm -vf  /usr/share/fish/vendor_conf.d/brew.fish
+rm -vf  /usr/share/fish/vendor_conf.d/ublue-brew.fish
 rm -vf  /usr/share/fish/vendor_conf.d/nano-default-editor.fish
 rm -vf  /usr/share/fish/functions/fish_greeting.fish
 rm -rvf /usr/share/ublue-os/bazaar/blocklist.txt
@@ -52,6 +54,7 @@ rm -rvf /usr/share/ublue-os/motd
 rm -vf  /etc/profile.d/askpass.sh
 rm -vf  /etc/profile.d/bazzite-neofetch.sh
 rm -vf  /etc/profile.d/brew.sh
+rm -vf  /etc/profile.d/brew-bash-completion.sh
 rm -vf  /etc/profile.d/user-motd.sh
 
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop

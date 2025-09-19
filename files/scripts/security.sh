@@ -48,7 +48,6 @@ chmod +x /usr/bin/dnscrypt-proxy
 curl -Lo /etc/dnscrypt-proxy/public-resolvers.md https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md
 curl -Lo /etc/dnscrypt-proxy/public-resolvers.md.minisig https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master/v3/public-resolvers.md.minisig
 
-
 # enable dnsmasq and dnscrypt-proxy
 sh -c "echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf"
 /usr/bin/localdnsctl --switch-blocklist-backend dnscrypt

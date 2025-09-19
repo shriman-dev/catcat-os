@@ -1,19 +1,12 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
-
-KARGS=$(rpm-ostree kargs)
-NEEDED_KARGS=()
 U1000="$(id -un 1000)"
-
-# KERNEL ARGUMENTS
-echo "Current kargs: ${KARGS}"
 
 # selinux fix
 #restorecon  -vR /home/${U1000}/.local/share/icc
 #restorecon -vR /etc/dnsmasq.d/
 #restorecon -vR /var/log/usbguard
 #restorecon -vR /var/lib/waydroid
-
 
 # copy main user monitors.xml to gdm
 if ! diff -q "/home/${U1000}/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
@@ -29,11 +22,25 @@ for SOME_USER in ${REAL_USERS[@]}; do
   fi
 done
 
+# Support to run nix commands with sudo for user 1000
+nix_user_path="/home/${U1000}/.local/state/nix/profile"
+sudoersd_file="/etc/sudoers.d/nix-sudo-env"
+grep "${nix_user_path}" ${sudoersd_file} || sed -i "/secure_path = /s|$|:${nix_user_path}|" ${sudoersd_file}
+# Proper sudoers.d perms
+chmod --recursive 644 /etc/sudoers.d/
+
 # first boot setup
 if [[ ! -f /etc/catcat-os/first-boot ]]; then
-  /usr/bin/dconf update
-#  cp -dvf /etc/dconf/db/distro /etc/skel/.config/dconf/user
-#  cp -dvf /etc/dconf/db/distro /var/home/*/.config/dconf/user
+  # Setup grub
+  mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
+  replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+  replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
+  replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+  replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+  replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+  #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+  #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+  /usr/bin/grubup
 
   hostnamectl set-hostname --static "catcat"
 
@@ -45,7 +52,7 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
   echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
-# sync configs on update
+# Sync configs on update
 if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   [[ ! -d /root/.config/bat ]] && { mkdir -p /root/.config/ ; ln -sf /etc/bat /root/.config/; }
   /usr/bin/bat cache --build
@@ -78,36 +85,9 @@ if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.s
     fi
 fi
 
-# nix path sudo support for user 1000
-nix_user_path="/home/${U1000}/.local/state/nix/profile"
-sudoersd_file="/etc/sudoers.d/nix-sudo-env"
-grep "${nix_user_path}" ${sudoersd_file} || sed -i "/secure_path = /s|$|:${nix_user_path}|" ${sudoersd_file}
-# Proper sudoers.d perms
-chmod --recursive 644 /etc/sudoers.d/
-
-# setup grub
-if [[ ! -d /boot/grub_themes/catppuccin-mocha-grub-theme ]]; then
-  mkdir -vp /boot/grub_themes
-  cp -drf /usr/share/grub/themes/* /boot/grub_themes
-
-  replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
-#  replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
-  replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
-  replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
-  #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
-  replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
-  replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
-
-  if [[ -d /sys/firmware/efi ]]; then
-    grub2-mkconfig -o /etc/grub2-efi.cfg
-    #sed -i --follow-symlinks 's|linux16|linuxefi|;s|initrd16|initrdefi|' /etc/grub2-efi.cfg
-  else
-    grub2-mkconfig -o /etc/grub2.cfg
-  fi
-  #grub2-editenv - unset menu_auto_hide
-fi
-
-# set kargs
+# Set kargs
+KARGS=$(rpm-ostree kargs)
+NEEDED_KARGS=()
 KARGS_TO_ADD=(
   "rd.luks.options=discard"
   "luks.options=discard"
@@ -153,7 +133,7 @@ else
 fi
 
 
-# nvidia specific
+# Nvidia specific
 if command -v nvidia-smi; then
   sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
   sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
@@ -166,7 +146,7 @@ if command -v nvidia-smi; then
 #  fi
 fi
 
-# enable i2c-dev support to configure monitors via ddcutil
+# Enable i2c-dev support to configure monitors via ddcutil
 if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
   echo "i2c-dev" > /etc/modules-load.d/i2c-dev.conf
   # enable i2c support for nvidia cards
@@ -175,7 +155,7 @@ if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
   fi
 fi
 
-# configure systemd services
+# Configure systemd services
 if ! inxi -M | grep -i "Type:.*Laptop" | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
   systemctl disable --force --now mcontrolcenter.helper.service
   systemctl --global disable mcontrolcenter.helper.service

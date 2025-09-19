@@ -44,6 +44,7 @@ declare -r uninvert=$'\033[27m'
 declare -r unhide=$'\033[28m'
 
 QUIET=false
+VERBOSE=2
 
 # Function to generate background color from foreground color
 # option 38 (foreground) which can be flipped to 48 (background)
@@ -108,6 +109,7 @@ run_as_users() {
   for SOME_USER in /run/user/*; do
     SOME_USER=$(basename "${SOME_USER}")
     if [[ ! "${SOME_USER}" == "0" ]]; then
+      log "INFO" "Running given command as user: $(id -u -n "${SOME_USER}")"
       sudo -u $(id -u -n "${SOME_USER}") bash -c "$(declare -f $@); $@"
     fi
   done
@@ -116,8 +118,12 @@ run_as_users() {
 notify_users() {
   for SOME_USER in /run/user/*; do
     SOME_USER=$(basename "${SOME_USER}")
-    sudo -u $(id -u -n "${SOME_USER}") \
-        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${SOME_USER}"/bus notify-send -i "${1}" -a "${2}" "${3}"
+    if [[ ! "${SOME_USER}" == "0" ]]; then
+        log "INFO" "Sending notification to user: $(id -u -n "${SOME_USER}")"
+        sudo -u $(id -u -n "${SOME_USER}") \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${SOME_USER}"/bus \
+            notify-send -i "${1}" -a "${2}" "${3}"
+    fi
   done
 }
 
@@ -128,7 +134,7 @@ is_file_older() {
     [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
 }
 
-check_internet_connection() {
+check_network_connection() {
     local max_attempts=3
     local sleep_time=2
     local attempt=1
@@ -137,13 +143,17 @@ check_internet_connection() {
         if curl --silent --head --fail "https://fedoraproject.org" > /dev/null; then
           return 0
         else
-          log "INFO" "Internet connection is not available. Waiting..."
+          log "INFO" "Network connection is not available. Waiting..."
           sleep ${sleep_time}
           (( attempt++ ))
         fi
     done
 
     return 1
+}
+
+is_network_metered() {
+    /usr/bin/busctl get-property org.freedesktop.NetworkManager /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
 }
 
 replace_add() {

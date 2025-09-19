@@ -63,7 +63,7 @@ name='Prod & Devel'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Gaming]
-apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'io.github.ryubing.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'io.github.radiolamp.mangojuice.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop', 'dev.lizardbyte.app.Sunshine.desktop']
+apps=['com.valvesoftware.Steam.desktop', 'steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'io.github.antimicrox.antimicrox.desktop', 'io.github.ryubing.Ryujinx.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'io.github.radiolamp.mangojuice.desktop', 'com.vysp3r.ProtonPlus.desktop', 'page.kramo.Cartridges.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'io.github.benjamimgois.goverlay.desktop', 'sunshine.desktop', 'dev.lizardbyte.app.Sunshine.desktop', 'lsfg-vk-ui.desktop']
 name='Gaming'
 translate=false
 

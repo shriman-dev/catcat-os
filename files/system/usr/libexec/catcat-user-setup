@@ -1,7 +1,6 @@
 #!/bin/bash
 shopt -s extglob nocasematch
 source /usr/lib/catcat/funcvar.sh
-VERBOSE=2
 HOME_DIR="${HOME}"
 CONFIG="${HOME_DIR}/.config"
 LOCALSHARE="${HOME_DIR}/.local/share"

@@ -21,30 +21,33 @@ REG_FLATPAK_APPS_UPDATE=(
     "re.sonny.Tangram"
 )
 
-for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
-    /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
-done
-
+if check_network_connection; then
+    for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
+        /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
+    done
+fi
 
 notify_all() {
     notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}"
 }
 
+current_time=$(date +"%H:%M")
 one_week=604800
 two_week=1209600
 
 # Auto update if system is one weeks old
-if is_file_older ${one_week} "/etc/catcat-os/last-auto-update.log"; then
-    notify_all "Weekly automatic update has started."
+if check_network_connection && [[ $(is_network_metered) -lt 3 ]]; then
+    if is_file_older ${one_week} "/etc/catcat-os/last-auto-update.log"; then
+        notify_all "Weekly automatic update has started."
 
-    date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
+        date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last-auto-update.log
 
-    /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
+        /usr/bin/update extra >> /etc/catcat-os/last-auto-update.log
 
-    if is_file_older ${one_week} "/etc/catcat-os/update_sha"; then
-        /usr/bin/update >> /etc/catcat-os/last-auto-update.log
+        is_file_older ${one_week} "/etc/catcat-os/update_sha" && \
+            /usr/bin/update >> /etc/catcat-os/last-auto-update.log
+
+        notify_all "Weekly automatic update is done."
     fi
-
-    notify_all "Weekly automatic update is done."
 fi
 

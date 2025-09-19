@@ -5,11 +5,10 @@ echo -e "\n$0\n"
 #sddm.service
 services_enable() {
 #command -v hhdctl || systemctl -f enable auto-power-profile.service
-# fstrim.time
-  command -v hhdctl || systemctl -f enable catcat-os-update.timer
+# fstrim.time libvirtd.service \
   systemctl -f enable \
     nix.mount \
-    libvirtd.service \
+    catcat-os-update.timer
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
     catcat-flatpak-manager.timer \
@@ -47,6 +46,8 @@ services_disable() {
     nfs-mountd.service \
     nfsdcld.service \
     NetworkManager-wait-online.service \
+    pcscd.service \
+    pcscd.socket \
     rpc-gssd.service \
     rpc-statd-notify.service \
     rpc-statd.service \
@@ -88,6 +89,7 @@ services_disable() {
     sshd.service \
     sssd-kcm.service \
     sssd.service \
+    systemd-remount-fs.service \
     tracker-miner-fs-3.service \
     tracker-miner-fs-control-3.service \
     tracker-miner-rss-3.service \

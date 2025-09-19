@@ -1,7 +1,14 @@
 # Start SSH
+[group("network")]
 start-ssh:
     #!/usr/bin/bash
     sudo systemctl unmask sshd.service ; sudo systemctl start sshd
+
+# Stop SSH
+[group("network")]
+stop-ssh:
+    #!/usr/bin/bash
+    sudo systemctl mask sshd.service ; sudo systemctl stop sshd
 
 # Log all the errors
 log-errors:
@@ -9,7 +16,7 @@ log-errors:
     sudo journalctl -p err
 
 # Log all the errors
-logs-selinux:
+log-selinux:
     #!/usr/bin/bash
     sudo journalctl -t setroubleshoot
 
@@ -70,11 +77,13 @@ debug-info:
     sudo rpm-ostree db diff --changelogs
 
 # Update system, flatpaks, and nixpkgs all at once
+[group("system")]
 update:
     #!/usr/bin/bash
     sudo /usr/bin/update all
 
 # Turn automatic updates on or off
+[group("system")]
 toggle-updates ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/ujust/ujust.sh
@@ -99,6 +108,11 @@ toggle-updates ACTION="prompt":
     elif [ "${OPTION,,}" == "disable" ]; then
       sudo systemctl disable catcat-os-update.timer
     fi
+
+# Turn automatic updates on or off
+_toggle-updates:
+    #!/usr/bin/bash
+    ujust toggle-updates
 
 # Enable or Disable gnome extension
 toggle-gnome-extension EXTENSION_ID:

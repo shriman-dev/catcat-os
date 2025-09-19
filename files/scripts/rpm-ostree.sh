@@ -172,7 +172,7 @@ mfancontrol
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
-virtualization='gnome-boxes virt-manager genisoimage swtpm socat spice-gtk-tools edk2-ovmf bridge-utils libvirt libvirt-client libvirt-client-qemu qemu qemu-img qemu-kvm quickemu'
+virtualization='gnome-boxes virt-manager quickemu'
 
 extras='bleachbit gnome-system-monitor gnome-software uresourced irqbalance xed'
 

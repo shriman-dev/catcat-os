@@ -1,0 +1,58 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+REBOOT_DELAY=300  # 5 minutes
+
+# Send Zenity warning dialog
+send_warning() {
+    source /usr/lib/catcat/funcvar.sh
+    zenity \
+        --question \
+        --title="System Reboot Notification" \
+        --text="System will reboot in $((REBOOT_DELAY/60)) minutes.\n\nAll unsaved work will be lost.\n\nDo you want to cancel the reboot?" \
+        --cancel-label="Cancel Reboot" \
+        --ok-label="Continue Reboot"
+
+    # Check the return status
+    local return_status=$?
+    log "DEBUG" "User: ${USER}, Return Status: ${return_status}"
+    if [[ ${return_status} -eq 1 ]]; then
+        mkdir -pv /tmp/NIGHTLY_REBOOT_CANCELLED
+        touch /tmp/NIGHTLY_REBOOT_CANCELLED/by_user_"${USER}"
+        echo "${USER}" | tee /tmp/NIGHTLY_REBOOT_CANCELLED/user
+    fi
+}
+
+# Main reboot sequence
+main() {
+    log "INFO" "Starting nightly reboot sequence..."
+    {
+        sleep ${REBOOT_DELAY}
+        log "INFO" "Performing system reboot"
+        wall "System reboot imminent. Stopping all applications."
+        notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot Imminent" \
+                "Rebooting now..."
+        sleep 1
+        /usr/bin/reboot -f
+    } &
+    local reboot_cmd_pid=$!
+    log "DEBUG" "Reboot command PID: ${reboot_cmd_pid}"
+
+    # Broadcast warning to all users and send warning dialog
+    wall "System will reboot in $((REBOOT_DELAY/60)) minutes. Please save your work."
+    run_as_users send_warning
+    log "INFO" "Reboot warning sent."
+
+    [[ -f "/tmp/NIGHTLY_REBOOT_CANCELLED/user" ]] && {
+        NIGHTLY_REBOOT_CANCEL_USER="$(cat /tmp/NIGHTLY_REBOOT_CANCELLED/user)"
+        log "INFO" "Reboot cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
+        wall "Nightly Reboot was cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
+        notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot Cancelled" \
+                "Nightly Reboot was cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
+        kill -s SIGKILL ${reboot_cmd_pid}
+        rm -v /tmp/NIGHTLY_REBOOT_CANCELLED/user
+        log "INFO" "Nightly Reboot cancelled."
+    }
+}
+
+main
+

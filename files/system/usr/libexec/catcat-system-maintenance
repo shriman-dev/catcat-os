@@ -2,7 +2,7 @@
 source /usr/lib/catcat/funcvar.sh
 
 # Remove useless logs, dirs or files
-[[ -d /home/linuxbrew ]] && rmdir /home/linuxbrew
+#
 
 # System clean up
 one_week=604800
@@ -10,9 +10,9 @@ if is_file_older ${one_week} "/etc/catcat-os/last_cleanup"; then
   /usr/bin/podman image prune -af
   /usr/bin/podman volume prune -f
   /usr/bin/systemd-tmpfiles --clean
-  /usr/bin/flatpak uninstall --assumeyes --noninteractive
+  /usr/bin/flatpak --system uninstall --unused --assumeyes --noninteractive
 
-  # delete dns logs older than 3 months (default}
+  # Delete DNS logs older than 3 months (default}
   /usr/bin/localdnsctl -v --flush-logs
 
   date "+%a %b %d %H:%M:%S %Y" > /etc/catcat-os/last_cleanup
