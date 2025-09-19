@@ -42,7 +42,7 @@ name='Sys & Security'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/DroidCons]
-apps=['org.gnome.Boxes.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'Waydroid.desktop', 'virt-manager.desktop', 'waydroid-stop.desktop', 'waydroid-container-restart.desktop']
+apps=['Waydroid.desktop', 'waydroid-stop.desktop', 'waydroid-container-restart.desktop']
 categories=['X-WayDroid-App']
 name='Droid-Cons'
 translate=false
