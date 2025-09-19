@@ -15,7 +15,7 @@ clock-format='12h'
 date-format='with-time'
 expand-folders=true
 location-mode='path-bar'
-show-hidden=false
+show-hidden=true
 show-size-column=true
 show-type-column=true
 sidebar-width=186
@@ -101,7 +101,7 @@ view-type='grid'
 enabled=false
 
 [org/gnome/desktop/session]
-idle-delay=uint32 120
+idle-delay=uint32 900
 
 [org/gnome/login-screen]
 allowed-failures=5
@@ -125,12 +125,6 @@ remove-old-trash-files=true
 report-technical-problems=false
 send-software-usage-stats=false
 
-[org/gnome/settings-daemon/global-shortcuts]
-applications=['com.dec05eba.gpu_screen_recorder']
-
-[org/gnome/settings-daemon/global-shortcuts/com.dec05eba.gpu_screen_recorder]
-shortcuts=[('gpu_screen_recorder_start_stop_recording', {'description': <'Start/stop recording/replay/streaming'>}), ('gpu_screen_recorder_pause_unpause_recording', {'description': <'Pause/unpause recording'>}), ('gpu_screen_recorder_save_replay', {'description': <'Save replay'>})]
-
 [org/gnome/settings-daemon/plugins/color]
 night-light-schedule-automatic=false
 night-light-schedule-from=7.0
@@ -141,6 +135,7 @@ free-percent-notify=0.10000000000000001
 
 [org/gnome/settings-daemon/plugins/power]
 ambient-enabled=false
+power-button-action='interactive'
 sleep-inactive-battery-timeout=120
 
 [org/gnome/desktop/search-providers]

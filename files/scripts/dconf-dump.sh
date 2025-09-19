@@ -147,6 +147,7 @@ s|message-text=.*|message-text='Meow'|"
     ['/org/gnome/settings-daemon/']="
 /media-keys/,/^$/d
 /touchscreen/,/^$/d
+/global-shortcuts/,/^$/d
 /sleep-inactive-ac-type/d
 /sleep-inactive-battery-type/d
 /night-light-enabled/d
