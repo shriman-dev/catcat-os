@@ -122,6 +122,7 @@ middle-click-action='LAUNCH'
 overview-click-to-exit=true
 panel-anchors='{"":"MIDDLE"}'
 panel-element-positions='{"":[{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"showAppsButton","visible":true,"position":"centerMonitor"},{"element":"activitiesButton","visible":true,"position":"centerMonitor"},{"element":"centerBox","visible":true,"position":"centerMonitor"},{"element":"taskbar","visible":true,"position":"centerMonitor"},{"element":"desktopButton","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"}]}'
+panel-element-positions-monitors-sync=true
 panel-lengths='{}'
 panel-positions='{"":"TOP"}'
 panel-side-margins=0

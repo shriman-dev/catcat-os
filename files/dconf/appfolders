@@ -1,5 +1,5 @@
 [org/gnome/desktop/app-folders]
-folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'VMTainer', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
+folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'DroidCons', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
 apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'org.gnome.Showtime.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'org.gnome.Decibels.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'io.github.celluloid_player.Celluloid.desktop', 'app.drey.EarTag.desktop', 'com.github.qarmin.czkawka.desktop', 'fr.romainvigier.MetadataCleaner.desktop', 'de.leopoldluley.Clapgrep.desktop', 'org.gnome.FileRoller.desktop', 'nemo.desktop', 'yazi.desktop', 'com.github.rafostar.Clapper.desktop', 'org.gnome.Music.desktop', 'org.gnome.eog.desktop', 'org.gnome.Loupe.desktop']
@@ -41,9 +41,10 @@ apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.
 name='Sys & Security'
 translate=false
 
-[org/gnome/desktop/app-folders/folders/VMTainer]
+[org/gnome/desktop/app-folders/folders/DroidCons]
 apps=['org.gnome.Boxes.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'Waydroid.desktop', 'virt-manager.desktop', 'waydroid-stop.desktop', 'waydroid-container-restart.desktop']
-name='VM-Tainer'
+categories=['X-WayDroid-App']
+name='Droid-Cons'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Utils]
@@ -58,7 +59,7 @@ name='Tweaks'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/ProdDevel]
-apps=['codium.desktop', 'dev.zed.Zed.desktop', 'com.logseq.Logseq.desktop', 'io.github.efogdev.mpris-timer.desktop', 'com.vixalien.sticky.desktop', 'se.sjoerd.Graphs.desktop', 'me.iepure.devtoolbox.desktop', 'io.github.mrvladus.List.desktop', 'nvim.desktop', 'micro.desktop']
+apps=['codium.desktop', 'dev.zed.Zed.desktop', 'com.logseq.Logseq.desktop', 'io.github.efogdev.mpris-timer.desktop', 'com.jeffser.Alpaca.desktop', 'se.sjoerd.Graphs.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'org.gnome.Boxes.desktop', 'virt-manager.desktop', 'com.vixalien.sticky.desktop', 'me.iepure.devtoolbox.desktop', 'io.github.mrvladus.List.desktop', 'nvim.desktop', 'micro.desktop']
 name='Prod & Devel'
 translate=false
 

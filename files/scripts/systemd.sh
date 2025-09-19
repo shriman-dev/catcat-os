@@ -8,7 +8,7 @@ services_enable() {
 # fstrim.time libvirtd.service \
   systemctl -f enable \
     nix.mount \
-    catcat-os-update.timer
+    catcat-os-update.timer \
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
     catcat-flatpak-manager.timer \
