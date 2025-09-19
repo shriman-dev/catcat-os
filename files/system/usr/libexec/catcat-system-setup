@@ -147,7 +147,7 @@ if command -v nvidia-smi; then
   sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
   # enable nvidia optimus if device is laptop and has nvidia dgpu
 #  if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
-#    if [ ! -f /etc/modprobe.d/nvidia.conf ] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#    if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
 #      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
 #      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
 #    fi

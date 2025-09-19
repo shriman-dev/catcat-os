@@ -92,27 +92,54 @@ toggle-updates ACTION="prompt":
       CURRENT_STATE="Enabled"
     fi
     OPTION={{ ACTION }}
-    if [ "$OPTION" == "prompt" ]; then
+    if [[ "${OPTION}" == "prompt" ]]; then
       echo "Automatic updates are currently: ${bold}${CURRENT_STATE}${normal}"
       echo "Enable or Disable automatic updates?"
       OPTION=$(ugum choose Enable Disable)
-    elif [ "$OPTION" == "help" ]; then
+    elif [[ "${OPTION,,}" == "help" ]]; then
       echo "Usage: ujust toggle-updates <option>"
       echo "  <option>: Specify the quick option - 'enable' or 'disable'"
       echo "  Use 'enable' to Enable automatic updates."
       echo "  Use 'disable' to Disable automatic updates."
       exit 0
     fi
-    if [ "${OPTION,,}" == "enable" ]; then
-      sudo systemctl enable catcat-os-update.timer
-    elif [ "${OPTION,,}" == "disable" ]; then
-      sudo systemctl disable catcat-os-update.timer
+    if [[ "${OPTION,,}" == "enable" ]]; then
+      sudo systemctl enable --force --now catcat-os-update.timer
+    elif [[ "${OPTION,,}" == "disable" ]]; then
+      sudo systemctl disable --force --now catcat-os-update.timer
     fi
 
 # Turn automatic updates on or off
 _toggle-updates:
     #!/usr/bin/bash
     ujust toggle-updates
+
+# Turn automatic nightly reboot on or off
+toggle-nightly-reboot:
+    #!/usr/bin/bash
+    source /usr/lib/ujust/ujust.sh
+    CURRENT_STATE="Disabled"
+    if systemctl is-enabled catcat-nightly-reboot.timer | grep -q enabled; then
+      CURRENT_STATE="Enabled"
+    fi
+    OPTION={{ ACTION }}
+    if [[ "${OPTION}" == "prompt" ]]; then
+      echo "Automatic Nightly Reboot are currently: ${bold}${CURRENT_STATE}${normal}"
+      echo "Enable or Disable Automatic Nightly Reboot?"
+      OPTION=$(ugum choose Enable Disable)
+    elif [[ "${OPTION,,}" == "help" ]]; then
+      echo "Usage: ujust toggle-nightly-reboot <option>"
+      echo "  <option>: Specify the quick option - 'enable' or 'disable'"
+      echo "  Use 'enable' to Enable Automatic Nightly Reboot."
+      echo "  Use 'disable' to Disable Automatic Nightly Reboot."
+      exit 0
+    fi
+    if [[ "${OPTION,,}" == "enable" ]]; then
+      sudo systemctl enable --force --now catcat-nightly-reboot.timer
+    elif [[ "${OPTION,,}" == "disable" ]]; then
+      sudo systemctl disable --force --now catcat-nightly-reboot.timer
+    fi
+
 
 # Enable or Disable gnome extension
 toggle-gnome-extension EXTENSION_ID:

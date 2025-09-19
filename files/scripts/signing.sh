@@ -11,13 +11,13 @@ mkdir -p /etc/containers/registries.d/
 TEMPLATE_POLICY="${SCRIPT_DIR}/setup-files/policy.json"
 
 
-if ! [ -f "/etc/pki/containers/catcat-os.pub" ]; then
+if [[ ! -f "/etc/pki/containers/catcat-os.pub" ]]; then
   echo "ERROR: Cannot find 'catcat-os.pub' image key in '/etc/pki/containers/'"
   exit 1
 fi
 
 if rpm -q ublue-os-signing &>/dev/null; then
-  if ! [ -d "/usr/etc/containers/" ]; then
+  if [[ ! -d "/usr/etc/containers/" ]]; then
     mkdir -p "/usr/etc/containers/"
   fi
   POLICY_FILE="/usr/etc/containers/policy.json"
@@ -26,7 +26,7 @@ else
 fi
 
 # If there is no policy.json file, then copy the template policy
-if ! [ -f "${POLICY_FILE}" ]; then
+if [[ ! -f "${POLICY_FILE}" ]]; then
   cp "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 fi
 
