@@ -245,7 +245,6 @@ setup_apps() {
   declare -A app_icons=(
     ["io.freetubeapp.FreeTube"]="/usr/share/icons/crafted/yt2.svg"
     ["io.gitlab.librewolf-community"]="firefox"
-    ["xyz.armcord.ArmCord"]="discord"
     ["com.github.tenderowl.frog"]="com.endlessnetwork.frogsquash"
   )
 

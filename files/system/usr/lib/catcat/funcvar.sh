@@ -106,23 +106,27 @@ exit_if_root() {
 }
 
 run_as_users() {
-  for SOME_USER in /run/user/*; do
-    SOME_USER=$(basename "${SOME_USER}")
-    if [[ ! "${SOME_USER}" == "0" ]]; then
-      log "INFO" "Running given command as user: $(id -u -n "${SOME_USER}")"
-      sudo -u $(id -u -n "${SOME_USER}") bash -c "$(declare -f $@); $@"
+  local running_user
+  for running_user in /run/user/*; do
+    local some_user_id=$(basename "${running_user}")
+    local some_user="$(id -u -n $(basename "${some_user_id}"))"
+    if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
+      log "INFO" "Running given command as user: ${some_user}"
+      sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
     fi
   done
 }
 
 notify_users() {
-  for SOME_USER in /run/user/*; do
-    SOME_USER=$(basename "${SOME_USER}")
-    if [[ ! "${SOME_USER}" == "0" ]]; then
-        log "INFO" "Sending notification to user: $(id -u -n "${SOME_USER}")"
-        sudo -u $(id -u -n "${SOME_USER}") \
-            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${SOME_USER}"/bus \
-            notify-send -i "${1}" -a "${2}" "${3}"
+  local running_user
+  for running_user in /run/user/*; do
+    local some_user_id=$(basename "${running_user}")
+    local some_user="$(id -u -n $(basename "${some_user_id}"))"
+    if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
+        log "INFO" "Sending notification to user: ${some_user}"
+        sudo -u "${some_user}"  \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
+            notify-send -i "${1}" -a "${2}" "${3}" "${4}"
     fi
   done
 }

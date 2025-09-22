@@ -2,34 +2,42 @@
 source /usr/lib/catcat/funcvar.sh
 REBOOT_DELAY=300  # 5 minutes
 
-run_as_users() {
-  for SOME_USER in /run/user/*; do
-    SOME_USER=$(basename "${SOME_USER}")
-    if [[ ! "${SOME_USER}" == "0" ]]; then
-      log "INFO" "Running given command as user: $(id -u -n "${SOME_USER}")"
-      sudo -u $(id -u -n "${SOME_USER}") bash -c "$(declare -f $@); $@" &
-    fi
-  done
+
+notify_all() {
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot" "${1}" "${2}"
 }
 
-# Send Zenity warning dialog
+# Send warning notification
 send_warning() {
-    source /usr/lib/catcat/funcvar.sh
-    zenity \
-        --question \
-        --title="System Reboot Notification" \
-        --text="System will reboot in $((REBOOT_DELAY/60)) minutes.\n\nAll unsaved work will be lost.\n\nDo you want to cancel the reboot?" \
-        --cancel-label="Cancel Reboot" \
-        --ok-label="Continue Reboot"
+    notify_all "System will reboot in 5 minutes" \
+            "To cancel use command: \"ujust cancel_nightly_reboot\""
+}
 
-    # Check the return status
-    local return_status=$?
-    log "DEBUG" "User: ${USER}, Return Status: ${return_status}"
-    if [[ ${return_status} -eq 1 ]]; then
-        mkdir -pv /tmp/NIGHTLY_REBOOT_CANCELLED
-        touch /tmp/NIGHTLY_REBOOT_CANCELLED/by_user_"${USER}"
-        echo "${USER}" | tee /tmp/NIGHTLY_REBOOT_CANCELLED/user
-    fi
+monitor_cancel_file() {
+    local cancel_file="/tmp/CATCAT_NIGHTLY_REBOOT/user"
+    local attempts=0
+    local max_attempts=${REBOOT_DELAY}
+
+    mkdir -pv /tmp/CATCAT_NIGHTLY_REBOOT
+    chmod -R 666 /tmp/CATCAT_NIGHTLY_REBOOT
+    while [[ ${attempts} -lt ${max_attempts} ]]; do
+        if [[ -f "${cancel_file}" ]]; then
+            local cancel_user="$(cat ${cancel_file})"
+            kill -s SIGKILL ${reboot_cmd_pid}
+            log "INFO" "Cancel file detected: ${cancel_file}"
+            log "INFO" "Reboot cancelled by user: ${cancel_user}"
+            wall "Nightly Reboot was cancelled by user: ${cancel_user}"
+            notify_all "Nightly Reboot was cancelled by user: ${cancel_user}"
+            rm -v /tmp/CATCAT_NIGHTLY_REBOOT/user
+            return 0
+            break
+        fi
+        ((attempts++))
+        sleep 1
+    done
+
+    log "INFO" "Monitoring timeout reached"
+    return 1
 }
 
 # Main reboot sequence
@@ -38,30 +46,22 @@ main() {
     {
         sleep ${REBOOT_DELAY}
         log "INFO" "Performing system reboot"
-        wall "System reboot imminent. Stopping all applications."
-        notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot Imminent" \
-                "Rebooting now..."
-        sleep 1
+        wall "System reboot imminent. Stopping all process."
+        notify_all "Nightly Reboot Imminent" "Rebooting now..."
+        sleep 2
         /usr/bin/reboot -f
     } &
-    local reboot_cmd_pid=$!
-    log "DEBUG" "Reboot command PID: ${reboot_cmd_pid}"
 
-    # Broadcast warning to all users and send warning dialog
-    wall "System will reboot in $((REBOOT_DELAY/60)) minutes. Please save your work."
-    run_as_users send_warning
+    reboot_cmd_pid=$!
+    log "INFO" "Reboot command PID: ${reboot_cmd_pid}"
+
+    # Broadcast warning to all users and send warning notification
+    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nujust cancel_nightly_reboot')"
+
+    send_warning
     log "INFO" "Reboot warning sent."
 
-    [[ -f "/tmp/NIGHTLY_REBOOT_CANCELLED/user" ]] && {
-        NIGHTLY_REBOOT_CANCEL_USER="$(cat /tmp/NIGHTLY_REBOOT_CANCELLED/user)"
-        log "INFO" "Reboot cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
-        wall "Nightly Reboot was cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
-        notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot Cancelled" \
-                "Nightly Reboot was cancelled by user: ${NIGHTLY_REBOOT_CANCEL_USER}"
-        kill -s SIGKILL ${reboot_cmd_pid}
-        rm -v /tmp/NIGHTLY_REBOOT_CANCELLED/user
-        log "INFO" "Nightly Reboot cancelled."
-    }
+    monitor_cancel_file
 }
 
 main

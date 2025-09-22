@@ -57,7 +57,6 @@ services_disable() {
     sshd.service \
     sssd-kcm.service \
     sssd.service \
-    systemd-remount-fs.service \
     tailscaled.service \
     tracker-miner-fs-3.service \
     tracker-miner-fs-control-3.service \
@@ -89,7 +88,6 @@ services_disable() {
     sshd.service \
     sssd-kcm.service \
     sssd.service \
-    systemd-remount-fs.service \
     tracker-miner-fs-3.service \
     tracker-miner-fs-control-3.service \
     tracker-miner-rss-3.service \

@@ -68,11 +68,11 @@ show_help() {
 Usage: $(basename "$0") [command1] [command2] [command3] ...
 
 Available commands:
-    all            Perform all update operations (system, firmware, DNS blocklist, 
+    all            Perform all update operations (System, Firmware, DNS blocklist,
                    Flatpak, and Nixpkg updates for all users)
 
     extra          Update Flatpak and Nixpkg for all users
-                   If run as root, also updates firmware and DNS blocklist
+                   If run as root, also updates Firmware and DNS blocklist
 
     flat-nix       Update both Flatpak and Nixpkg for current user
 
@@ -97,6 +97,7 @@ EOF
 process_command() {
     case "${1}" in
         "all")
+            need_root
             update_system
             update_firmware
             update_dns_blocklist
@@ -123,6 +124,7 @@ process_command() {
             update_nixpkg
             ;;
         "dns-blocklist")
+            need_root
             update_dns_blocklist
             ;;
         "system")

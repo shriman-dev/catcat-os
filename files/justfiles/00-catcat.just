@@ -115,6 +115,7 @@ _toggle-updates:
     ujust toggle-updates
 
 # Turn automatic nightly reboot on or off
+[group("nightly reboot")]
 toggle-nightly-reboot:
     #!/usr/bin/bash
     source /usr/lib/ujust/ujust.sh
@@ -140,6 +141,16 @@ toggle-nightly-reboot:
       sudo systemctl disable --force --now catcat-nightly-reboot.timer
     fi
 
+# Cancel automatic nightly reboot sequence
+[group("nightly reboot")]
+cancel_nightly_reboot:
+    #!/usr/bin/bash
+    if [[ ! -d /tmp/CATCAT_NIGHTLY_REBOOT ]]; then
+        echo "Nightly reboot was not sequenced correctly"
+        exit 1
+    fi
+    echo "${USER}" | tee /tmp/CATCAT_NIGHTLY_REBOOT/user
+    touch /tmp/CATCAT_NIGHTLY_REBOOT/cancelled_by_user_"${USER}"
 
 # Enable or Disable gnome extension
 toggle-gnome-extension EXTENSION_ID:

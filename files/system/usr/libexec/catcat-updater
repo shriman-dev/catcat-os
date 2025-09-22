@@ -28,7 +28,7 @@ if check_network_connection; then
 fi
 
 notify_all() {
-    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}"
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
 }
 
 current_time=$(date +"%H:%M")

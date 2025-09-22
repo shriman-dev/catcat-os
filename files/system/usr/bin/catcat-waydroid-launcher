@@ -7,5 +7,5 @@ waydroid prop set persist.waydroid.uevent false
 waydroid prop set persist.waydroid.multi_windows false
 
 for file in ${HOME}/.local/share/applications/waydroid.*.desktop; do
-    desktop-file-edit --set-key=NoDisplay --set-value=true ${file}
+    grep "NoDisplay=true" ${file} || desktop-file-edit --set-key=NoDisplay --set-value=true ${file}
 done

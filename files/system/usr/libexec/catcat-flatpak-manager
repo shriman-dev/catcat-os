@@ -47,7 +47,6 @@ remove_filesystem_access() {
   nofilesystem_for_apps=(
     "com.discordapp.Discord"
     "dev.vencord.Vesktop"
-    "xyz.armcord.ArmCord"
     "com.visualstudio.code"
     "com.spotify.Client"
     "org.videolan.VLC"
@@ -187,7 +186,6 @@ allow_gpu_acceleration() {
     "io.freetubeapp.FreeTube"
     "com.discordapp.Discord"
     "dev.vencord.Vesktop"
-    "xyz.armcord.ArmCord"
     "org.mozilla.firefox"
     "io.gitlab.librewolf-community"
     "net.mullvad.MullvadBrowser"

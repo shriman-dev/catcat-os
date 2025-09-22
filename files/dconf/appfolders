@@ -17,7 +17,7 @@ name='Docs'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Net]
-apps=['io.gitlab.librewolf-community.desktop', 'org.signal.Signal.desktop', 'io.freetubeapp.FreeTube.desktop', 'io.github.giantpinkrobots.varia.desktop', 'org.gnome.Epiphany.desktop', 'com.brave.Browser.desktop', 'xyz.armcord.ArmCord.desktop',  'webapp-manager.desktop', 'org.garudalinux.firedragon.desktop']
+apps=['io.gitlab.librewolf-community.desktop', 'org.signal.Signal.desktop', 'io.freetubeapp.FreeTube.desktop', 'io.github.giantpinkrobots.varia.desktop', 'org.gnome.Epiphany.desktop', 'com.brave.Browser.desktop',  'webapp-manager.desktop', 'org.garudalinux.firedragon.desktop']
 name='Net'
 translate=false
 

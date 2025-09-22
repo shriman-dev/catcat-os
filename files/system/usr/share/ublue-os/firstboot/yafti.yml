@@ -76,7 +76,6 @@ screens:
           - Brave Browser: com.brave.Browser
           - Varia - download Manager: io.github.giantpinkrobots.varia
           - FreeTube - youtube frontend: io.freetubeapp.FreeTube
-          - ArmCord - discord frontend: xyz.armcord.ArmCord
           - Signal messenger: org.signal.Signal
 
         Productivity and Development:

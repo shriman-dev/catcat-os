@@ -29,6 +29,8 @@ while true; do
     if grep -i 'dualsense' /proc/bus/input/devices; then
         dualsensectl microphone off
         dualsensectl player-leds 0
+        dualsensectl speaker both
+        dualsensectl volume 255
 
         for (( i=0; i<${#colors[@]}; i++ )); do
             next=$(( (i + 1) % ${#colors[@]} ))
