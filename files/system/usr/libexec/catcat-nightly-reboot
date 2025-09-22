@@ -10,7 +10,7 @@ notify_all() {
 # Send warning notification
 send_warning() {
     notify_all "System will reboot in 5 minutes" \
-            "To cancel use command: \"ujust cancel_nightly_reboot\""
+            "To cancel run command: \"ujust cancel_nightly_reboot\""
 }
 
 monitor_cancel_file() {
@@ -46,7 +46,7 @@ main() {
     {
         sleep ${REBOOT_DELAY}
         log "INFO" "Performing system reboot"
-        wall "System reboot imminent. Stopping all process."
+        wall "System reboot imminent. Stopping all processes."
         notify_all "Nightly Reboot Imminent" "Rebooting now..."
         sleep 2
         /usr/bin/reboot -f
