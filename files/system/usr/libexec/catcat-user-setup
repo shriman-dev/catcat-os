@@ -190,7 +190,7 @@ shell_setup() {
   [[ ! -f "${CONFIG}/fish/fish_variables" ]] && { cp -drf ${SKEL}/.config/fish "${CONFIG}/" || err "Failed to setup fish_variables"; }
 
   local shell_rc='
-[[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "$rc" ]] && . "$rc"; done
+[[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
 unset rc'
   grep -q ".shell.d" "${HOME_DIR}/.bashrc" || echo "${shell_rc}" >> "${HOME_DIR}/.bashrc"
 

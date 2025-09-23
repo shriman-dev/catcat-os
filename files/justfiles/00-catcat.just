@@ -116,7 +116,7 @@ _toggle-updates:
 
 # Turn automatic nightly reboot on or off
 [group("nightly reboot")]
-toggle-nightly-reboot:
+toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/ujust/ujust.sh
     CURRENT_STATE="Disabled"
