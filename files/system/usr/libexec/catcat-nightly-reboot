@@ -7,8 +7,9 @@ notify_all() {
     notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot" "${1}" "${2}"
 }
 
-# Send warning notification
+# Broadcast warning to all users and send warning notification
 send_warning() {
+    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nujust cancel_nightly_reboot')"
     notify_all "System will reboot in 5 minutes" \
             "To cancel run command: \"ujust cancel_nightly_reboot\""
 }
@@ -22,9 +23,9 @@ monitor_cancel_file() {
     chmod -R 666 /tmp/CATCAT_NIGHTLY_REBOOT
     while [[ ${attempts} -lt ${max_attempts} ]]; do
         if [[ -f "${cancel_file}" ]]; then
+            log "INFO" "Cancel file detected: ${cancel_file}"
             local cancel_user="$(cat ${cancel_file})"
             kill -s SIGKILL ${reboot_cmd_pid}
-            log "INFO" "Cancel file detected: ${cancel_file}"
             log "INFO" "Reboot cancelled by user: ${cancel_user}"
             wall "Nightly Reboot was cancelled by user: ${cancel_user}"
             notify_all "Nightly Reboot was cancelled by user: ${cancel_user}"
@@ -54,9 +55,6 @@ main() {
 
     reboot_cmd_pid=$!
     log "INFO" "Reboot command PID: ${reboot_cmd_pid}"
-
-    # Broadcast warning to all users and send warning notification
-    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nujust cancel_nightly_reboot')"
 
     send_warning
     log "INFO" "Reboot warning sent."
