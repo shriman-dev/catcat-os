@@ -78,11 +78,11 @@ fi
 
 # Set ad-malware blocking localdns
 mkdir -pv /tmp/dns-blocklist
-if [[ -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnscrypt-proxy/domains-blocklist.txt ]]; then
+if [[ -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist && ! -f /etc/dnscrypt-proxy/domains-blocklist.txt ]]; then
     rm -vf /etc/dnscrypt-proxy/domains-blocklist.txt
     cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
     cp -vf /tmp/dns-blocklist/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
-elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist ]] && [[ ! -f /etc/dnsmasq.d/domains-blocklist.conf ]]; then
+elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist && ! -f /etc/dnsmasq.d/domains-blocklist.conf ]]; then
     rm -vf /etc/dnsmasq.d/domains-blocklist*
     cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
     cp -vf /tmp/dns-blocklist/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf

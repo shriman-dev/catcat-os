@@ -1,6 +1,4 @@
 #!/usr/bin/bash
-sync; echo 3 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a
-
 KILLP='gnome-software
 evolution-alarm-notify
 evolution-source-registry
@@ -9,8 +7,8 @@ evolution-addressbook-factory
 gsd-wacom
 gsd-printer
 updatedb
-tracker-miner-fs-3
-setroubleshootd'
+tracker-miner-fs-3'
+#setroubleshootd
 #sssd_kcm
 #gvfsd-http
 #avahi-daemon
@@ -44,8 +42,10 @@ setroubleshootd'
 #gsd-xsettings
 
 for II in ${KILLP[*]}
-do 
+do
   pkill -KILL -fe ${II}
 done
+
+sync; echo 3 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a
 
 exit 0

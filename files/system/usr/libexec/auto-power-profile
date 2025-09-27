@@ -48,7 +48,7 @@ while true; do
   else
     if [[ $(echo "${system_load} < ${SYSTEM_LOAD_THRESHOLD_LOW}" | bc -l) -eq 1 ]]; then
       target_profile="powersave"
-    elif [[ $(echo "${system_load} > ${SYSTEM_LOAD_THRESHOLD_LOW}" | bc -l) -eq 1 ]] && [[ $(echo "${system_load} < ${SYSTEM_LOAD_THRESHOLD_HIGH}" | bc -l) -eq 1 ]]; then
+    elif [[ $(echo "${system_load} > ${SYSTEM_LOAD_THRESHOLD_LOW}" | bc -l) -eq 1 && $(echo "${system_load} < ${SYSTEM_LOAD_THRESHOLD_HIGH}" | bc -l) -eq 1 ]]; then
       target_profile="balanced"
     else
       target_profile="performance"

@@ -20,6 +20,13 @@ log-selinux:
     #!/usr/bin/bash
     sudo journalctl -t setroubleshoot
 
+# Analyze system boot time
+system-boot-time:
+    #!/usr/bin/bash
+    systemd-analyze critical-chain
+    echo ""
+    systemd-analyze time
+
 # Check for local overrides
 check-local-overrides:
     #!/usr/bin/bash

@@ -11,7 +11,8 @@ services_enable() {
     catcat-os-update.timer \
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
-    catcat-flatpak-manager.timer \
+    catcat-flatpak-installer.timer \
+    catcat-flatpak-perms.service \
     coolercontrold.service \
     waydroid-container.service
 

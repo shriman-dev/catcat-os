@@ -1,5 +1,5 @@
 [Unit]
-Description=Timer for catcat-flatpak-manager
+Description=Timer for installing system flatpaks
 
 [Timer]
 OnBootSec=120
