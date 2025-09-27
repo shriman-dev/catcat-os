@@ -1,7 +1,7 @@
 [Unit]
 Description=Configure CatCat OS for current system
-After=rpm-ostreed.service
-Before=systemd-user-sessions.service bazzite-hardware-setup.service
+After=rpm-ostreed.service bazzite-hardware-setup.service
+Before=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
