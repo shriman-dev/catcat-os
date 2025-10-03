@@ -19,12 +19,18 @@ dump-info-luks DEVICE_PATH:
 # Enable luks discard for better health of ssd
 [group("Disk Management")]
 enable-luks-discard DEVICE_NAME:
-    #!/usr/bin/bash
-    echo 'Add "discard" option for the device entry in /etc/crypttab'
-    sudo sed -i "s|.*issue_discards =.*|issue_discards = 1|"
-    sudo rpm-ostree kargs --append-if-missing=rd.luks.options=discard --append-if-missing=luks.options=discard
-    sudo cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent refresh {{ DEVICE_NAME }}
-    echo -e 'Regenerate initramfs using:\nsudo rpm-ostree initramfs --enable'
+    #!/usr/bin/env -S sudo -- /bin/bash
+    echo 'Note: Add "discard" option for the device entry in /etc/crypttab'
+    if [[ $(rpm-ostree kargs) =~ "luks.options=discard" ]]; then
+        rpm-ostree kargs --append-if-missing=rd.luks.options=discard \
+                --append-if-missing=luks.options=discard
+    fi
+    cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue \
+            --persistent refresh {{ DEVICE_NAME }}
+    if ! grep -q "^issue_discards = 1" /etc/lvm/lvm.conf; then
+        sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
+        echo -e 'To enable discard regenerate initramfs using:\nsudo rpm-ostree initramfs --enable'
+    fi
 
 # Reencrypt luks device with sector size 4096 for some performance gain (Caution: backup data before proceeding)
 [group("Disk Management")]
@@ -69,10 +75,11 @@ restore-luks-header DEVICE_PATH HEADER_FILE:
 [group("Disk Management")]
 auto-unlock-encrypted-root KEY_FILE DEVICE_PATH:
     #!/usr/bin/env -S sudo -- /bin/bash
+    root_luks_uuid="$(basename $(findmnt -n -o SOURCE -T "/sysroot" | cut -d '[' -f 1))"
     echo "Presuming {{ KEY_FILE }} is correctly added as a keyfile for the LUKS root encryption"
     echo "If not, please add it using command: ujust add-keyfile-luks"
-    if grep -q 'none' /etc/crypttab; then
-        sed -i 's/none.*/{{ KEY_FILE }} luks,discard,keyfile-timeout=5s/' /etc/crypttab
+    if grep -qE "${root_luks_uuid}.*none" /etc/crypttab; then
+        sed -i 's/none.*/{{ KEY_FILE }} luks,discard,no-read-workqueue,no-write-workqueue,keyfile-timeout=5s/' /etc/crypttab
         echo "install_items=\"{{ KEY_FILE }} /etc/crypttab\"" | tee /etc/dracut.conf.d/99-root-luks-key.conf
         rpm-ostree initramfs --disable ; rpm-ostree initramfs --enable
     else
