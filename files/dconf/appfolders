@@ -59,7 +59,7 @@ name='Tweaks'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/ProdDevel]
-apps=['codium.desktop', 'dev.zed.Zed.desktop', 'com.logseq.Logseq.desktop', 'io.github.efogdev.mpris-timer.desktop', 'com.jeffser.Alpaca.desktop', 'se.sjoerd.Graphs.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'org.gnome.Boxes.desktop', 'virt-manager.desktop', 'com.vixalien.sticky.desktop', 'me.iepure.devtoolbox.desktop', 'io.github.mrvladus.List.desktop', 'nvim.desktop', 'micro.desktop']
+apps=['codium.desktop', 'dev.zed.Zed.desktop', 'com.logseq.Logseq.desktop', 'io.github.efogdev.mpris-timer.desktop', 'com.jeffser.Alpaca.desktop', 'se.sjoerd.Graphs.desktop', 'io.github.dvlv.boxbuddyrs.desktop', 'org.gnome.Boxes.desktop', 'virt-manager.desktop', 'io.github.mrvladus.List.desktop', 'me.iepure.devtoolbox.desktop', 'com.vixalien.sticky.desktop', 'nvim.desktop', 'micro.desktop']
 name='Prod & Devel'
 translate=false
 

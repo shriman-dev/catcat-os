@@ -167,6 +167,10 @@
         {
             "wmClass": "Waydroid",
             "mode": "float"
+        },
+        {
+            "wmClass": "io.github.mrvladus.List",
+            "mode": "float"
         }
     ]
 }
