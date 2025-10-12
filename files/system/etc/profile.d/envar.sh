@@ -1,3 +1,6 @@
+export HISTSIZE=-1
+export HISTFILESIZE=-1
+
 #export EDITOR="micro"
 export MICRO_TRUECOLOR=1
 

@@ -106,29 +106,29 @@ exit_if_root() {
 }
 
 run_as_users() {
-  local running_user
-  for running_user in /run/user/*; do
-    local some_user_id=$(basename "${running_user}")
-    local some_user="$(id -u -n $(basename "${some_user_id}"))"
-    if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-      log "INFO" "Running given command as user: ${some_user}"
-      sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
-    fi
-  done
+    local running_user
+    for running_user in /run/user/*; do
+        local some_user_id=$(basename "${running_user}")
+        local some_user="$(id -u -n $(basename "${some_user_id}"))"
+        if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
+            log "INFO" "Running given command as user: ${some_user}"
+            sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
+        fi
+    done
 }
 
 notify_users() {
-  local running_user
-  for running_user in /run/user/*; do
-    local some_user_id=$(basename "${running_user}")
-    local some_user="$(id -u -n $(basename "${some_user_id}"))"
-    if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-        log "INFO" "Sending notification to user: ${some_user}"
-        sudo -u "${some_user}"  \
-            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
-            notify-send -i "${1}" -a "${2}" "${3}" "${4}"
-    fi
-  done
+    local running_user
+    for running_user in /run/user/*; do
+        local some_user_id=$(basename "${running_user}")
+        local some_user="$(id -u -n $(basename "${some_user_id}"))"
+        if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
+            log "INFO" "Sending notification to user: ${some_user}"
+            sudo -u "${some_user}"  \
+                DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
+                notify-send -i "${1}" -a "${2}" "${3}" "${4}"
+        fi
+    done
 }
 
 # Check if a file is older than a specified number of seconds
@@ -157,14 +157,15 @@ check_network_connection() {
 }
 
 is_network_metered() {
-    /usr/bin/busctl get-property org.freedesktop.NetworkManager /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
+    /usr/bin/busctl get-property org.freedesktop.NetworkManager \
+        /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
 }
 
 replace_add() {
-  grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+    grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
 bak_before() {
-  [[ ! -d ${1}.bak.og ]] && cp -drvf ${1} ${1}.bak.og || err "Backup failed for orignal ${1}"
-  cp -drvf ${1} ${1}.bak || err "Backup failed for ${1}"
+    [[ ! -e ${1}.og.bak ]] && { cp -drvf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"; }
+    cp -drvf ${1} ${1}.bak || err "Backup failed for ${1}"
 }

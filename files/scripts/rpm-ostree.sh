@@ -48,6 +48,28 @@ curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/bu
 chmod +x /usr/bin/buttersnap.sh
 }
 
+llama_cpp() {
+curl -Lo /tmp/llama_cccppp.zip $(curl -s -X GET https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
+
+mkdir -vp /tmp/llama_cccppp /usr/libexec/llama_cpp_vulkan
+cd /tmp/llama_cccppp
+unzip /tmp/llama_cccppp.zip
+
+mv -v /tmp/llama_cccppp/build/bin /usr/libexec/llama_cpp_vulkan/
+
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-batched-bench /usr/bin/
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-bench /usr/bin/
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-cli /usr/bin/
+#ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-imatrix /usr/bin/
+#ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-gguf-split /usr/bin/
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-mtmd-cli /usr/bin/
+#ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-quantize /usr/bin/
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-run /usr/bin/
+ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-server /usr/bin/
+#ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-tokenize /usr/bin/
+#ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-tts /usr/bin/
+}
+
 yazi() {
 curl -Lo /tmp/yazi.zip https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip
 curl -Lo /usr/share/applications/yazi.desktop https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/assets/yazi.desktop
@@ -149,7 +171,8 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watch
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 #lazygit
-devTools='criu ptyxis ghostty git micro neovim sassc codium'
+devTools='criu criu-amdgpu-plugin ptyxis ghostty git micro neovim sassc codium'
+llama_cpp
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
@@ -170,6 +193,7 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 #corectrl
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol'
 mfancontrol
+rpm-ostree install $(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
