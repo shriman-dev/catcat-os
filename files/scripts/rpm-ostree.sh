@@ -149,10 +149,9 @@ add_repos
 # debloat
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
 sed -i 's|gnome-software ||' /etc/dnf/repos.override.d/99-config_manager.repo
-dnf5 -y remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop
-#sunshine gnome-browser-connector
+dnf5 -y remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perfection gnome-shell-extension-appindicator gnome-shell-extension-blur-my-shell gnome-shell-extension-caffeine gnome-shell-extension-compiz-alike-magic-lamp-effect gnome-shell-extension-compiz-windows-effect openssh-askpass nvtop tailscale libvirt-libs libvirt sunshine steamdeck-backgrounds stress-ng webapp-manager fedora-workstation-backgrounds uupd yelp gnome-browser-connector gnome-initial-setup $(rpm -E %fedora)-backgrounds-base btrfs-assistant
 
-security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier pam_mount'
+security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier pam_mount lynis'
 hblock
 #rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
@@ -195,7 +194,7 @@ gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsyn
 mfancontrol
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)
 rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
+#rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 # virt-manager gnome-boxes
 virtualization='edk2-ovmf genisoimage qemu qemu-img qemu-kvm quickemu socat spice-gtk-tools swtpm'

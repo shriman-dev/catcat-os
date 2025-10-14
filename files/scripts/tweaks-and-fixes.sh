@@ -12,8 +12,8 @@ sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
 
 # libvirt setup
-sed -i 's|.*unix_sock_group =.*|unix_sock_group = "libvirt"|' /etc/libvirt/libvirtd.conf
-sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/libvirtd.conf
+sed -i 's|.*unix_sock_group =.*|unix_sock_group = "libvirt"|' /etc/libvirt/libvirtd.conf || true
+sed -i 's|.*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' /etc/libvirt/libvirtd.conf || true
 
 # Fix issues caused by ID no longer being fedora
 sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
@@ -24,7 +24,7 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 
 # Ignore inhabitors for suspend and set suspend to deep sleep
 sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/lib/systemd/logind.conf
-sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
+#sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
 # copy over logind.conf and sleep.con for ease of access
 mkdir -vp /etc/systemd/logind.conf.d/ /etc/systemd/sleep.conf.d/
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/

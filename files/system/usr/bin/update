@@ -1,17 +1,21 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
 
+heading_top() {
+    symmetric_heading "${1}" "="
+}
+
 update_flatpak() {
   local scope="--user"
   [[ $(id -u) -eq 0 ]] && scope="--system"
 
-  echo -e "\n----------Flatpak ${scope:2} update----------\n"
+  heading_top "Flatpak ${scope:2} update"
 
   /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
   /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
   /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
 
-  echo -e "\nRunning flatpak repair"
+  log "INFO" "Running flatpak repair"
   /usr/bin/flatpak repair ${scope}
 }
 
@@ -25,7 +29,7 @@ update_nixpkg() {
   }
 
   if [[ -x "${cmdpath}/nix-env" ]]; then
-    echo -e "\n----------Nixpkg ${scope} update----------\n"
+    heading_top "Nixpkg ${scope} update"
 
     ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
     ${cmdpath}/nix-store --optimise >/dev/null 2>&1
@@ -34,12 +38,12 @@ update_nixpkg() {
 }
 
 update_dns_blocklist() {
-  echo -e "\n----------DNS blocklist update----------\n"
+  heading_top "DNS blocklist update"
   /usr/bin/localdnsctl -v -u
 }
 
 update_firmware() {
-  echo -e "\n----------Firmware update----------\n"
+  heading_top "Firmware update"
 
   sudo sh -c '
     /usr/bin/fwupdmgr refresh -y --force
@@ -49,7 +53,7 @@ update_firmware() {
 }
 
 update_system() {
-  echo -e "\n----------System update----------\n"
+  heading_top "System update"
 
   if [[ $(id -u) -eq 0 ]]; then
     rpm-ostree upgrade --quiet

@@ -13,13 +13,13 @@ runtimes() {
     flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch ${rr} | awk '{print $1 "//" $2}')
   done
 
-  # Get lsfg-vk runtimes
-  cd /tmp/
-  for url in $(curl -s https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.flatpak"' | cut -d'"' -f4); do
-    curl -LO ${url}
-    flatpak install --system -y --noninteractive "$(basename "${url}")" && rm "$(basename "${url}")"
-  done
-  cd -
+#  # Get lsfg-vk runtimes
+#  cd /tmp/
+#  for url in $(curl -s https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.flatpak"' | cut -d'"' -f4); do
+#    curl -LO ${url}
+#    flatpak install --system -y --noninteractive "$(basename "${url}")" && rm "$(basename "${url}")"
+#  done
+#  cd -
 }
 
 install_flatpaks() {

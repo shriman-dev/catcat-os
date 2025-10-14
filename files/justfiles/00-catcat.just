@@ -18,6 +18,8 @@ log-errors:
 # Log all the errors
 log-selinux:
     #!/usr/bin/bash
+    sudo sestatus
+    echo ""
     sudo journalctl -t setroubleshoot
 
 # Analyze system boot time
@@ -65,22 +67,38 @@ check-local-overrides:
 # Dump debug info
 debug-info:
     #!/usr/bin/bash
-    sudo fpaste --sysinfo --printonly
-    echo -e "\n===System flatpaks history===\n"
-    sudo flatpak --system history
-    echo -e "\n===User flatpaks history===\n"
-    flatpak --user history
-    echo -e "\n=== Recent System Events ===\n"
-    sudo journalctl -b -p err..alert --since "1 day ago"
-    echo -e "\n=== Sys+Hardware Information ===\n"
+    source /usr/lib/catcat/funcvar.sh
+    fastfetch
+    symmetric_heading "Detailed Sys+Hardware Information" "="
     sudo inxi --basic --expanded -xxxa --verbosity 8
-    echo -e "\n=== Listing Local Overrides ===\n"
+    symmetric_heading "System Package history" "="
+    sudo rpm -qa --nodigest --nosignature --last | tac
+    symmetric_heading "System flatpaks history" "="
+    sudo flatpak --system history
+    symmetric_heading "User flatpaks history" "="
+    flatpak --user history
+    symmetric_heading "System Package by Size" "="
+    sudo rpm -qa --queryformat '%10{size} - %-25{name} \t %{version} \t %{os} \n' | \
+            sort -h | awk '{print $1/1024/1024 " MB", $2, $3, $4}'
+    symmetric_heading "System flatpaks by Size" "="
+    sudo flatpak --system  list --columns=size,application | \
+            awk '{gsub("[^[:alnum:]]","",$1); print $1 " - " $2}' | sort -h
+    symmetric_heading "User flatpaks by Size" "="
+    flatpak --user  list --columns=size,application | \
+            awk '{gsub("[^[:alnum:]]","",$1); print $1 " - " $2}' | sort -h
+    symmetric_heading "Recent System Events" "="
+    sudo journalctl -b -p err..alert --since "1 day ago"
+    symmetric_heading "Selinux Info with Logs" "="
+    sudo ujust log-selinux
+    symmetric_heading "Listing Local Overrides" "="
     sudo ujust check-local-overrides
-    echo -e "\n=== Failed Services ===\n"
+    symmetric_heading "Failed Services" "="
     sudo systemctl list-units --state=failed
-    echo -e "\n=== Rpm-Ostree Status ===\n"
+    symmetric_heading "Last 50 Logins, Reboots and Shutdowns" "="
+    last -x -n50
+    symmetric_heading "Rpm-Ostree Status" "="
     sudo rpm-ostree status --verbose
-    echo -e "\n=== CatCat OS Changelog ===\n"
+    symmetric_heading "CatCat OS Changelog" "="
     sudo rpm-ostree db diff --changelogs
 
 # Update system, flatpaks, and nixpkgs all at once

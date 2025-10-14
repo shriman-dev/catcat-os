@@ -2,6 +2,11 @@
 set -oue pipefail
 echo -e "\n$0\n"
 
+# Make all repos to use https protocol
+for repo in /etc/yum.repos.d/*.repo; do
+    sed -i 's/metalink?/metalink?protocol=https\&/g' "$repo"
+done
+
 # Disable coredump
 # Add a line to disable core dumps in limits.conf
 echo "* hard core 0" | tee -a /etc/security/limits.conf
@@ -17,6 +22,7 @@ echo "[Manager]" | tee /etc/systemd/{system.conf.d,user.conf.d}/60-disable-cored
 echo "DumpCore=no" | tee -a /etc/systemd/{system.conf.d,user.conf.d}/60-disable-coredump.conf > /dev/null
 
 # Create a xdg autostart file to mute microphone on boot
+mkdir -pv /etc/xdg/autostart
 cat > /etc/xdg/autostart/mute-mic.desktop << EOF
 [Desktop Entry]
 Type=Application
@@ -53,6 +59,7 @@ sh -c "echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf"
 /usr/bin/localdnsctl --switch-blocklist-backend dnscrypt
 systemctl -f enable dnscrypt-proxy.service
 systemctl disable systemd-resolved.service
+systemctl mask systemd-resolved.service
 
 # get dns blocklist archive
 mkdir -p /usr/share/dnscrypt-proxy /usr/share/dnsmasq/dns-blocklist-archive

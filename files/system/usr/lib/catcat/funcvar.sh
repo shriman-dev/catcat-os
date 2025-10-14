@@ -59,10 +59,27 @@ function Bg (){
 
 # Function to generate a clickable link, you can call this using
 function Urllink (){
-    URL=${1}
-    TEXT=${2}
+    URL="${1}"
+    TEXT="${2}"
     # Generate a clickable hyperlink
     printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
+}
+
+# Function to generates a centered text header with customizable padding character, width, and symmetrical padding.
+symmetric_heading() {
+    local text="${1}"
+    local padding_char="${2:-#}"
+    local output_width=${3:-75}  # Total width of the output
+    local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
+    local left_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
+    local right_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
+    
+    # Adjust for odd-length texts
+    if (( (output_width - ${#text} - 2) % 2 != 0 )); then
+        right_padding+="${padding_char}"
+    fi
+    
+    printf "%s %s %s\n" "${left_padding}" "${text}" "${right_padding}"
 }
 
 # Quiet mode handling function
@@ -162,7 +179,7 @@ is_network_metered() {
 }
 
 replace_add() {
-    grep -qi ''${1}'' ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
 bak_before() {

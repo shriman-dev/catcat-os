@@ -22,6 +22,8 @@ desktopFiles() {
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
   sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
+  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/amdgpu_top.desktop || true
+  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/amdgpu_top-tui.desktop || true
 
   sed -i 's|^Icon=.*|Icon=appgrid|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true

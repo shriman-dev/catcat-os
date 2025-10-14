@@ -70,6 +70,7 @@ services_disable() {
     uupd.timer
 
   systemctl mask \
+    flatpak-add-fedora-repos.service \
     geoclue.service \
     gssproxy.service \
     httpd.service \
