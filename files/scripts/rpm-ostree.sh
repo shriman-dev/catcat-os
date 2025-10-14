@@ -68,6 +68,7 @@ ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-run /usr/bin/
 ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-server /usr/bin/
 #ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-tokenize /usr/bin/
 #ln -svf /usr/libexec/llama_cpp_vulkan/bin/llama-tts /usr/bin/
+cd -
 }
 
 yazi() {
@@ -197,7 +198,8 @@ dnf5 -y install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LA
 #dnf5 -y install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 # virt-manager gnome-boxes
-virtualization='edk2-ovmf genisoimage qemu qemu-img qemu-kvm quickemu socat spice-gtk-tools swtpm'
+virtualization='edk2-ovmf genisoimage qemu qemu-img qemu-kvm socat spice-gtk-tools swtpm'
+rpm-ostree install quickemu
 
 extras='bleachbit gnome-system-monitor gnome-software uresourced irqbalance xed'
 
