@@ -153,10 +153,10 @@ dnf5 -y remove bazaar topgrade fastfetch plocate gnome-shell-extension-just-perf
 
 security='firejail firewall-config usbguard usbguard-selinux usbguard-notifier pam_mount lynis'
 hblock
-#rpm-ostree install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
+#dnf5 -y install $(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
 shellSetup='nu fish bat lsd starship fzf fd-find ripgrep zoxide tmux eza zellij'
-rpm-ostree install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
+dnf5 -y install https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm
 
 monitoringTools='lm_sensors s-tui powertop htop btop nethogs procs wireshark bandwhich'
 
@@ -165,14 +165,14 @@ diskFileMan='compsize dua-cli gdu ncdu fio duf dosfstools exfatprogs zstd gpart 
 buttersnap; yazi
 
 terminalTools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer inxi hwinfo memtester nvme-cli kpcli zenity parallel tealdeer which wmctrl ydotool poppler wl-clipboard hyperfine jq zsync'
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)
+dnf5 -y install $(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)
 
 funTerminalTools='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod'
 
 #lazygit
 devTools='criu criu-amdgpu-plugin ptyxis ghostty git micro neovim sassc codium'
 llama_cpp
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
+dnf5 -y install $(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 encryptionAndBackupTools='rsync rclone cryfs borgbackup archivemount syncthing'
 
@@ -192,9 +192,9 @@ gnomeShellExtensions='gnome-shell-extension-gsconnect'
 #corectrl
 gaming='antimicrox lutris goverlay gamescope gamemode mangohud vkBasalt fluidsynth openrgb liquidctl coolercontrol'
 mfancontrol
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)
-rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
-#rpm-ostree install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
+dnf5 -y install $(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)
+dnf5 -y install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)
+#dnf5 -y install $(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
 # virt-manager gnome-boxes
 virtualization='edk2-ovmf genisoimage qemu qemu-img qemu-kvm quickemu socat spice-gtk-tools swtpm'
@@ -220,4 +220,4 @@ all_pkgs=(
     "${extras[@]}"
 )
 
-rpm-ostree install ${all_pkgs[@]}
+dnf5 -y install ${all_pkgs[@]}
