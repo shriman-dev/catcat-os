@@ -1,5 +1,6 @@
 #!/bin/bash
 set -oue pipefail
+source /usr/lib/catcat/funcvar.sh
 echo -e "\n$0\n"
 
 desktopFiles() {
@@ -19,17 +20,18 @@ desktopFiles() {
   sed -i 's/^Icon=.*/Icon=np2/' /usr/share/applications/oneko.desktop
   sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' /usr/share/applications/yazi.desktop
 
-  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/nvtop.desktop || true
-  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/btop.desktop || true
-  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/yad-icon-browser.desktop || true
-  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/amdgpu_top.desktop || true
-  sed -i 's/^NoDisplay=.*/NoDisplay=false/' /usr/share/applications/amdgpu_top-tui.desktop || true
-
   sed -i 's|^Icon=.*|Icon=appgrid|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|--auto-service||' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
 
   sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' /usr/share/applications/Waydroid.desktop
+
+  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/nvtop.desktop || true
+  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/btop.desktop || true
+  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/yad-icon-browser.desktop || true
+  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/amdgpu_top.desktop || true
+  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/amdgpu_top-tui.desktop || true
+
 }
 
 icons() {
