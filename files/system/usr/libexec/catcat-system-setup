@@ -64,10 +64,11 @@ if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
   monitor_id="${monitor_vendor_serial_id[0]}-${monitor_vendor_serial_id[1]}"
   etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
   usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
-  sed "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" ${usr_dconf_ext} > ${etc_dconf_ext}
-  sed "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" ${usr_dconf_ext} > ${etc_dconf_ext}
-  sed "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" ${usr_dconf_ext} > ${etc_dconf_ext}
-  sed "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" ${usr_dconf_ext} > ${etc_dconf_ext}
+  sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
+      -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
+      -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
+      -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
+               "${usr_dconf_ext}" > "${etc_dconf_ext}"
 
   /usr/bin/dconf update
 

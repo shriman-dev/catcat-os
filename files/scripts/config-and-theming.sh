@@ -5,7 +5,7 @@ echo -e "\n$0\n"
 
 desktopFiles() {
   # to use catcat update
-  sed -i "s|Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" /usr/share/applications/system-update.desktop
+  sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" /usr/share/applications/system-update.desktop
 
   sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
   sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
@@ -22,15 +22,13 @@ desktopFiles() {
 
   sed -i 's|^Icon=.*|Icon=appgrid|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
   sed -i 's|^Name.*=.*|Name=Software Store|' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
-  sed -i 's|--auto-service||' /usr/share/applications/io.github.kolunmi.Bazaar.desktop || true
 
   sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' /usr/share/applications/Waydroid.desktop
 
-  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/nvtop.desktop || true
-  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/btop.desktop || true
-  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/yad-icon-browser.desktop || true
-  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/amdgpu_top.desktop || true
-  replace_add 'NoDisplay=' 'NoDisplay=false' /usr/share/applications/amdgpu_top-tui.desktop || true
+  sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/nvtop.desktop || true
+  sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/yad-icon-browser.desktop || true
+  sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/amdgpu_top.desktop || true
+  sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/amdgpu_top-tui.desktop || true
 
 }
 
