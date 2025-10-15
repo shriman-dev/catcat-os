@@ -221,4 +221,5 @@ all_pkgs=(
     "${extras[@]}"
 )
 
-rpm-ostree install ${all_pkgs[@]}
+echo "${all_pkgs[@]}"
+rpm-ostree install "${all_pkgs[@]}"
