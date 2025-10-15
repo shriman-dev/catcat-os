@@ -46,9 +46,9 @@ update_firmware() {
   heading_top "Firmware update"
 
   sudo sh -c '
-    /usr/bin/fwupdmgr refresh -y --force
-    /usr/bin/fwupdmgr -y get-updates
-    /usr/bin/fwupdmgr -y update
+    /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
+    /usr/bin/fwupdmgr --no-device-prompt -y get-updates
+    /usr/bin/fwupdmgr --no-reboot-check -y update
   '
 }
 
@@ -56,7 +56,7 @@ update_system() {
   heading_top "System update"
 
   if [[ $(id -u) -eq 0 ]]; then
-    rpm-ostree upgrade --quiet
+    rpm-ostree upgrade
     rpm-ostree db diff --changelogs
     rpm-ostree cleanup -bm >/dev/null 2>&1
     ostree prune >/dev/null 2>&1

@@ -68,18 +68,18 @@ check-local-overrides:
 debug-info:
     #!/usr/bin/bash
     source /usr/lib/catcat/funcvar.sh
-    fastfetch
+    sudo fastfetch
     symmetric_heading "Detailed Sys+Hardware Information" "="
     sudo inxi --basic --expanded -xxxa --verbosity 8
-    symmetric_heading "System Package history" "="
-    sudo rpm -qa --nodigest --nosignature --last | tac
+    symmetric_heading "50 System Package history" "="
+    sudo rpm -qa --nodigest --nosignature --last | tac | tail -n50
     symmetric_heading "System flatpaks history" "="
     sudo flatpak --system history
     symmetric_heading "User flatpaks history" "="
     flatpak --user history
-    symmetric_heading "System Package by Size" "="
+    symmetric_heading "50 System Package by Size" "="
     sudo rpm -qa --queryformat '%10{size} - %-25{name} \t %{version} \t %{os} \n' | \
-            sort -h | awk '{print $1/1024/1024 " MB", $2, $3, $4}'
+            awk '{print $1/1024/1024 " MB", $2, $3, $4}' | sort -h | tail -n50
     symmetric_heading "System flatpaks by Size" "="
     sudo flatpak --system  list --columns=size,application | \
             awk '{gsub("[^[:alnum:]]","",$1); print $1 " - " $2}' | sort -h
@@ -87,7 +87,7 @@ debug-info:
     flatpak --user  list --columns=size,application | \
             awk '{gsub("[^[:alnum:]]","",$1); print $1 " - " $2}' | sort -h
     symmetric_heading "Recent System Events" "="
-    sudo journalctl -b -p err..alert --since "1 day ago"
+    sudo journalctl --no-pager -b -p err..alert --since "1 day ago"
     symmetric_heading "Selinux Info with Logs" "="
     sudo ujust log-selinux
     symmetric_heading "Listing Local Overrides" "="
