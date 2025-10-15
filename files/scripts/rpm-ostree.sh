@@ -220,6 +220,6 @@ all_pkgs=(
     "${virtualization[@]}"
     "${extras[@]}"
 )
-echo "all_pkgs"
-echo "${all_pkgs[@]}"
-rpm-ostree install "${all_pkgs[@]}"
+
+echo "all_pkgs: ${all_pkgs[@]}"
+rpm-ostree install ${all_pkgs[@]}
