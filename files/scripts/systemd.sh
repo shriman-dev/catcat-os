@@ -5,7 +5,7 @@ echo -e "\n$0\n"
 #sddm.service
 services_enable() {
 #command -v hhdctl || systemctl -f enable auto-power-profile.service
-# fstrim.time libvirtd.service lactd.service
+# fstrim.time libvirtd.service lactd.service coolercontrold.service \
   systemctl -f enable \
     nix.mount \
     catcat-os-update.timer \
@@ -13,7 +13,6 @@ services_enable() {
     catcat-system-maintenance.timer \
     catcat-flatpak-installer.timer \
     catcat-flatpak-perms.service \
-    coolercontrold.service \
     waydroid-container.service
 
 #dualsense-catppuccin-rainbow.service

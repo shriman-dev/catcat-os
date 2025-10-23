@@ -107,11 +107,10 @@ log() {
     echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
 }
 
-# Show error message
-err() { log "ERROR" "${1}"; return 1; }
-
 # Error handling with optional function call
 die() { log "ERROR" "${1}"; [[ -n "${2}" ]] && ${2}; exit 1; }
+
+err() { log "ERROR" "${1}"; return 1; }
 
 need_root() {
     [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
@@ -141,7 +140,7 @@ notify_users() {
         local some_user="$(id -u -n $(basename "${some_user_id}"))"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "INFO" "Sending notification to user: ${some_user}"
-            sudo -u "${some_user}"  \
+            sudo -u "${some_user}" \
                 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
                 notify-send -i "${1}" -a "${2}" "${3}" "${4}"
         fi

@@ -40,12 +40,14 @@ echo -e "\n$0\n"
 
 hblock() {
 curl -Lo /usr/bin/hblock https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master/hblock
-chmod +x /usr/bin/hblock 
+chmod +x /usr/bin/hblock
 }
 
 buttersnap() {
 curl -Lo /usr/bin/buttersnap.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttersnap.sh
+curl -Lo /usr/bin/buttercopy.sh https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main/buttercopy.sh
 chmod +x /usr/bin/buttersnap.sh
+chmod +x /usr/bin/buttercopy.sh
 }
 
 llama_cpp() {

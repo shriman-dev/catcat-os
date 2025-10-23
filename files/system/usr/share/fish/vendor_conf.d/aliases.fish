@@ -80,7 +80,7 @@ alias psmem='procs --sortd rss'
 alias ps-tree='procs --tree'
 
 # flatpak alias
-alias flup="flatpak update"
+alias flup="flatpak update --assumeyes --noninteractive"
 alias flin="flatpak install"
 alias flre="flatpak install --reinstall"
 alias flrn="flatpak run"
