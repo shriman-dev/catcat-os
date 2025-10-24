@@ -11,6 +11,7 @@ DNSMASQDIR='/etc/dnsmasq.d'
 DNSCRYPTLOGDIR='/var/log/dnscrypt-proxy'
 DNSMASQLOGDIR='/var/log'
 VERBOSE=
+SYSTEMCTL="systemctl"
 
 update_blocklist() {
     need_root
@@ -54,7 +55,6 @@ toggle_localdns() {
     need_root
     [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf is missing"
 
-    SYSTEMCTL="systemctl"
     case "${1}" in
         enable)
             log "INFO" "Enabling local DNS..."

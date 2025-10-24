@@ -13,6 +13,8 @@ if is_file_older ${one_week} "${cleanup_log_file}"; then
         /usr/bin/podman image prune -af
         /usr/bin/podman volume prune -f
         /usr/bin/systemd-tmpfiles --clean
+        /usr/bin/rpm-ostree cleanup -bm
+        /usr/bin/dnf5 clean all
         /usr/bin/flatpak --system uninstall --unused --assumeyes --noninteractive
 
         # Delete DNS logs older than 3 months (default}
