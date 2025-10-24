@@ -122,6 +122,7 @@ exit_if_root() {
 }
 
 run_as_users() {
+    source /usr/lib/catcat/funcvar.sh
     local running_user
     for running_user in /run/user/*; do
         local some_user_id=$(basename "${running_user}")

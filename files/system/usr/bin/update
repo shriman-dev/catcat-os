@@ -1,15 +1,11 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
 
-heading_top() {
-    symmetric_heading "${1}" "="
-}
-
 update_flatpak() {
   local scope="--user"
   [[ $(id -u) -eq 0 ]] && scope="--system"
 
-  heading_top "Flatpak ${scope:2} update"
+  symmetric_heading "Flatpak ${scope:2} update" "="
 
   /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
   /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
@@ -29,7 +25,7 @@ update_nixpkg() {
   }
 
   if [[ -x "${cmdpath}/nix-env" ]]; then
-    heading_top "Nixpkg ${scope} update"
+    symmetric_heading "Nixpkg ${scope} update" "="
 
     ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
     ${cmdpath}/nix-store --optimise >/dev/null 2>&1
@@ -38,12 +34,12 @@ update_nixpkg() {
 }
 
 update_dns_blocklist() {
-  heading_top "DNS blocklist update"
+  symmetric_heading "DNS blocklist update" "="
   /usr/bin/localdnsctl -v -u
 }
 
 update_firmware() {
-  heading_top "Firmware update"
+  symmetric_heading "Firmware update" "="
 
   sudo sh -c '
     /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
@@ -53,7 +49,7 @@ update_firmware() {
 }
 
 update_system() {
-  heading_top "System update"
+  symmetric_heading "System update" "="
 
   if [[ $(id -u) -eq 0 ]]; then
     rpm-ostree upgrade
