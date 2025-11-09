@@ -1,0 +1,12 @@
+[Unit]
+Description=Configure CatCat OS for current system
+After=rpm-ostreed.service bazzite-hardware-setup.service
+Before=systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/catcat-system-setup
+
+[Install]
+WantedBy=multi-user.target

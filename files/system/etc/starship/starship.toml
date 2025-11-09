@@ -1,0 +1,740 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+#right_format = """[╌╯](bold fg:blue)"""
+format = """
+$memory_usage\
+[](bold)
+[╭](bold fg:bright-white)\
+[](bold fg:bright-black)\
+$os\
+[](bold fg:bright-black)\
+[─](bold)\
+[](bold fg:bright-black)\
+$username\
+[](bold fg:bright-black)\
+[─](bold)\
+[](bold fg:bright-black)\
+$hostname\
+[](bold fg:bright-black)\
+[─](bold)\
+[](bold)\
+$directory\
+[](bold)\
+(bold fg:bright-white)\
+$time\
+$aws\
+$azure\
+$gcloud\
+$openstack\
+$kubernetes\
+$docker_context\
+$container\
+$opa\
+$pulumi\
+$singularity\
+$terraform\
+$vagrant\
+$bun\
+$c\
+$cobol\
+$crystal\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$fennel\
+$golang\
+$haskell\
+$haxe\
+$java\
+$julia\
+$kotlin\
+$lua\
+$nim\
+$nodejs\
+$ocaml\
+$perl\
+$php\
+$purescript\
+$python\
+$raku\
+$red\
+$rlang\
+$ruby\
+$rust\
+$scala\
+$swift\
+$vlang\
+$zig\
+$package\
+$buf\
+$cmake\
+$conda\
+$gradle\
+$helm\
+$meson\
+$spack\
+$guix_shell\
+$nix_shell\
+[](bold fg:bright-white)\
+$cmd_duration\
+[ ](bold fg:bright-white)\
+$status\
+\n$character\
+"""
+right_format = """
+$vcsh\
+$fossil_branch\
+$hg_branch\
+$pijul_channel\
+${custom.giturl}\
+$git_branch\
+$git_commit\
+$git_status\
+$git_state\
+$git_metrics
+"""
+
+
+
+
+#𐰢
+#░▒▓
+#᚛᚛
+# First param ─┌﹎﹎﹎﹊﹊﹊
+#     ╱╲
+#$fill\
+#[](bold fg:bright-white)\
+#[](bold bg:bright-white fg:blue)\
+#[ ](bold bg:blue)\
+#[╮](bold fg:blue)\
+
+# Disable the blank line at the start of the prompt
+add_newline = false
+
+
+command_timeout = 2000
+
+[fill]
+symbol = ' '
+style = 'bold'
+
+[os]
+style = 'bold bg:bright-black fg:bright-white'
+format = '[$symbol ]($style)'
+disabled = false
+
+[os.symbols]
+Alpine = "" # nf-linux-alpine
+Amazon = "" # nf-fa-amazon
+Android = "" # nf-dev-android
+Arch = "" # nf-linux-archlinux
+CentOS = "" # nf-linux-centos
+Debian = "" # nf-linux-debian
+DragonFly = "" # nf-fae-butterfly
+Emscripten = "" # nf-fa-toggle_on
+EndeavourOS = "" # nf-linux-endeavour
+Fedora = "󰣛" # 
+FreeBSD = "" # nf-linux-freebsd
+Garuda = "󰛓" # nf-md-feather
+Gentoo = "" # nf-linux-gentoo
+HardenedBSD = "󰔇" # nf-md-tennis_ball
+Illumos = "" # nf-linux-illumos
+Linux = "" # nf-linux-tux  󰄛 
+Macos = "" # nf-linux-apple
+Manjaro = "" # nf-linux-manjaro
+Mariner = "" # nf-fa-life_saver
+MidnightBSD = "" # nf-fa-moon_o
+Mint = "󰣭" # nf-md-linux_mint
+NetBSD = "" # nf-fa-flag
+NixOS = "" # nf-linux-nixos
+OpenBSD = " " # nf-linux-openbsd
+OpenCloudOS = "" # nf-fa-cloud
+openEuler = "󰏒" # nf-md-owl
+openSUSE = "" # nf-linux-opensuse
+OracleLinux = "󰌷" # nf-md-link
+Pop = "" # nf-linux-pop_os
+Raspbian = "" # nf-linux-raspberry_pi
+Redhat = "󱄛" # nf-md-redhat
+RedHatEnterprise = "" # nf-linux-redhat
+Redox = "󰀘" # nf-md-orbit
+Solus = "" # nf-linux-solus
+SUSE = "" # nf-linux-opensuse
+Ubuntu = "" # nf-linux-ubuntu
+Unknown = "" # nf-fa-question_circle
+Windows = "" # nf-fa-windows
+
+
+[username]
+show_always = true
+style_root = "bold fg:bright-red bg:bright-black"
+style_user = "fg:yellow bg:bright-black"
+format = "[$user]($style)"
+disabled = false
+
+# Second param
+[hostname]
+disabled = false
+ssh_only = false
+ssh_symbol = "SSH::"
+style = "fg:#eba0ac bg:bright-black"
+format = "[$ssh_symbol](bold fg:bright-blue bg:bright-black)[$hostname]($style)"
+trim_at = "-"
+
+[directory]
+style = "fg:cyan"
+read_only = "󰣮 "
+read_only_style = "bold red"
+format = "[ $path ]($style)[$read_only]($read_only_style)"
+truncation_length = 4
+truncation_symbol = "../"
+truncate_to_repo = true
+
+#🕉
+#❖
+[directory.substitutions]
+"Me" = "  " #  󱂵
+"Backups" = " 󰝉 " #󰪺 󰝉
+"Desktop" = " 󱁽 " #󱁾 󰐞 󱂩
+"Devel" = " 󱁿 " #󱁿    󰘦 󰈮
+"Documents" = " 󰲂 " #󰈙 󰲂
+"Downloads" = " 󰉍  " #󰇚   󱑢 󰉍
+"Ebooks" = " 󱓷  " #󱓷 󰂾  
+"Games" = "   "
+"Music" = " 󱍙 " #󰎄  󰎈 󱍙
+"Notes" = " 󰣞 " #󰷈 󱚌 󱞁 󰣞  
+"Pictures" = " 󰉏 " #󰲍   󰉏
+"Public" = " 󰉌 " #󰉌  
+"Scripts" = " 󰴉 " #󰴉  
+"Secure" = " 󰉐 " #󰉐  󰌾 󰣮 
+"Syncthing" = " 󰴋 " #󰴋 󱍸  󰓦 
+"Templates" = " 󱋣 " #󱋣   
+"Videos" = " 󱧺 " #󱉺 󱖏  󱧺  󰕧 󰨜
+
+[memory_usage]
+disabled = false
+threshold = 60
+symbol = ''
+style = 'bold fg:bright-white'
+format = '$symbol [${ram} (| ${swap})]($style)'
+
+[cmd_duration]
+disabled = false
+style = "bold fg:bright-yellow"
+format = "[ 󰦖 $duration ]($style)"
+min_time = 1
+#󰦖 
+#󱦟
+
+[sudo]
+disabled = true
+
+[character]
+error_symbol = "[╰→](bold red)"
+success_symbol = "[╰→](bold)"
+#❯
+[status]
+disabled = false
+#success_symbol = '[✔](bold)' #✓ 
+symbol = "[󰅙](bold red)"
+not_executable_symbol = "[󱞌](bold red)"
+not_found_symbol = "[](bold red)"
+sigint_symbol = "[󰋼](bold red)"
+signal_symbol = "[󱐋](bold red)" #󱐌
+format = '[$symbol$status_common_meaning$status_signal_name$status_maybe_int ]($style)'
+map_symbol = true
+pipestatus = true
+
+[time]
+disabled = true
+time_format = "%R" # Hour:Minute Format
+style = "bold"
+format = '[ ✦ $time ]($style)'
+
+
+###  Cloud provider section
+[aws]
+symbol = "󰸏 " # " "
+style = "bold"
+expiration_symbol = '% '
+force_display = true
+format = '[ $symbol$profile(\($region\))(\[$duration\]) ]($style)'
+
+[aws.region_aliases]
+
+[aws.profile_aliases]
+
+[azure]
+symbol = " " # "󰠅 "
+style = "bold"
+format = '[ $symbol($subscription) ]($style)'
+
+[gcloud]
+symbol = "󱇶 "
+style = "bold"
+format = '[ $symbol$account(@$domain)(\($region\)) ]($style)'
+## other variables:
+##   active = The active config name written in ~/.config/gcloud/active_config
+##   project = The current GCP project
+
+[gcloud.region_aliases]
+
+[gcloud.project_aliases]
+
+[openstack]
+symbol = " "
+style = "bold"
+format = '[ $symbol$cloud(\($project\)) ]($style)'
+
+
+###  Container section
+[kubernetes]
+disabled = false
+symbol = "󱃾 " # nf-md-kubernetes
+style = "bold"
+format = '[ $symbol$context(\($namespace\)) ]($style)'
+## other variables:
+##   cluster = contains the current kubernetes cluster
+##   user = contains the current kubernetes user
+
+[kubernetes.context_aliases]
+
+[kubernetes.user_aliases]
+
+[docker_context]
+symbol = " " # " "
+style = "bold"
+format = "[ $symbol$context ]($style)"
+
+[container]
+symbol = "󰏖 "
+style = "bold"
+format = '[ $symbol\[$name\] ]($style)'
+
+[opa]
+symbol = "󱅧 " # "󱢼 "
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[pulumi]
+symbol = " "
+style = "bold"
+search_upwards = true
+# format = '[$symbol($version) ($username@)$stack]($style)'
+## uncomment the format above to also see the version and comment out the line below
+format = "[ $symbol($username@)$stack ]($style)"
+
+[singularity] # now Apptainer
+symbol = "󰰣 "
+style = "bold"
+format = '[ $symbol\[$env\] ]($style)'
+
+[terraform]
+symbol = "󱁢 " # " "
+style = "bold"
+format = '[ $symbol($version)\($workspace\) ]($style)'
+## uncomment the format above to see the version and comment out the line below
+#format = '[$symbol$workspace]($style)'
+
+[vagrant]
+symbol = "⍱ " # apl functional symbol down caret tilde - U+2371
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+
+###  Source control section
+[vcsh]
+symbol = "󰳏 "
+style = "bold"
+format = "[ $symbol$repo ]($style)"
+
+[fossil_branch]
+symbol = "󰘬" # nf-md-source_branch
+style = "bold"
+# truncation_length = 4 # default = 9223372036854775807
+# truncation_symbol = "" # default = "…"
+format = "[ $symbol$branch ]($style) "
+
+# Mercurial
+[hg_branch]
+disabled = false
+symbol = "󰘬" # nf-md-source_branch
+style = "bold"
+# truncation_length = 8 # default = 9223372036854775807
+# truncation_symbol = "" # default = "…"
+format = "[ $symbol$branch ]($style)"
+
+[pijul_channel]
+symbol = "󰘬" # nf-md-source_branch
+style = "bold"
+# truncation_length = 4 # default = 9223372036854775807
+# truncation_symbol = "" # default = "…"
+format = "[ $symbol$channel ]($style) "
+
+[custom.giturl]
+description = "Display icon for remote Git server"
+command = """
+    GIT_REMOTE=$(command git ls-remote --get-url 2> /dev/null)
+    if [[ "$GIT_REMOTE" =~ "github" ]]; then
+        # GIT_REMOTE_SYMBOL="" 
+        GIT_REMOTE_SYMBOL="" 
+    elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then
+        GIT_REMOTE_SYMBOL="" 
+    elif [[ "$GIT_REMOTE" =~ "bitbucket" ]]; then
+        GIT_REMOTE_SYMBOL="" 
+    elif [[ "$GIT_REMOTE" =~ "git" ]]; then
+        GIT_REMOTE_SYMBOL="" 
+    #else
+        #GIT_REMOTE_SYMBOL="󰊢 " 
+        # GIT_REMOTE_SYMBOL="" 
+        # GIT_REMOTE_SYMBOL="󰜛" 
+    fi
+    echo "$GIT_REMOTE_SYMBOL"
+    """
+#require_repo = true
+when = true
+shell = ["bash", "--noprofile", "--norc"]
+format = "[( $output )](bold)"
+
+[git_branch]
+symbol = "" #"󰊢 "
+style = "fg:blue"
+# always_show_remote = true
+# truncation_length = 4 # default = 9223372036854775807
+# truncation_symbol = "" # default = "…"
+# only_attached = true
+# ignore_branches = ["main", "master"]
+format = "[ $symbol $branch(:$remote_name)]($style)"
+## other variables:
+##   remote_branch = The name of the branch tracked on remote_name
+
+[git_commit]
+style = "bold"
+commit_hash_length = 4 # default = 7
+# only_detached = false
+tag_disabled = false
+tag_symbol = "󰓽 "
+# tag_max_candidates = 0
+format = "[  $hash $tag ]($style)" #  = nf-fa-hashtag
+
+[git_status]
+style = "bold"
+staged = "󱤧 ${count} "
+modified = "󰣕 ${count} "
+renamed = "󱞇 ${count} "
+untracked = "󱔢 ${count} "
+deleted = "󰚃 ${count} "
+conflicted = "󰋽 ${count} "
+stashed = " ${count} "
+up_to_date = ""
+ahead = "󰞙 ${count} " # nf-md-arrow_expand_up
+behind = "󰞖 ${count} " # nf-md-arrow_expand_down
+diverged = "󰡏 ${ahead_count} ${behind_count} " # nf-md-arrow_expand_vertical
+# diverged = "󰯎 ${ahead_count} ${behind_count}" # nf-md-swap_vertical_bold
+# ignore_submodules = true
+#format = "[ ($staged$modified$renamed$untracked$deleted$conflicted$stashed$ahead_behind)]($style)"
+format = " [$staged](green)[$modified](yellow)[$renamed](bringht-cyan)[$untracked](cyan)[$deleted](bright-red)[$conflicted](bringht-red)[$stashed](bringht-yellow)[$ahead_behind](purple)"
+
+[git_state]
+style = "bold"
+rebase = "rebasing"
+merge = "merging"
+revert = "reverting"
+cherry_pick = " picking" 
+bisect = "bisecting"
+am = "am'ing"
+am_or_rebase = "am/rebase"
+format = '[$state($progress_current/$progress_total) ]($style)'
+
+[git_metrics]
+disabled = false
+added_style = 'bold'
+deleted_style = 'bold red'
+# only_nonzero_diffs = false
+format = '([󰺪 ](green)[$added](green))([ 󰺨 ](red)[$deleted](red))' # 󰺪 = nf-md-text_box_plus // 󰺨 = nf-md-text_box_minus
+
+
+
+###  Toolchain version section
+[bun]
+symbol = " "
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[c]
+symbol = " "
+style = "bold"
+format = "[ $symbol($version(-$name)) ]($style)"
+
+[cobol]
+symbol = " "
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[crystal]
+symbol = "󰬯" #" "
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[daml]
+symbol = "Λ " # Capital lambda - U+1D726
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[dart]
+symbol = " " # nf-dev-dart
+# symbol = " " # nf-seti-dart
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[deno]
+symbol = " " # nf-dev-javascript_badge
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[dotnet]
+symbol = " " # nf-dev-dotnet
+style = "bold"
+heuristic = true
+format = "[ $symbol($version)( 󰓾 $tfm) ]($style)" # 󰓾 = nf-md-target
+
+[elixir]
+symbol = " " # nf-custom-elixir
+style = "bold"
+format = '[ $symbol($version) (\(OTP:$otp_version\)) ]($style)'
+
+[elm]
+symbol = " " # nf-custom-elm
+# symbol = " " # nf-fae-tree
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[erlang]
+symbol = " " # nf-dev-erlang
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[fennel]
+symbol = "󰬍 " # nf-md-alpha_f_box
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[golang]
+symbol = " " # nf-seti-go
+# symbol = "󰟓 " # nf-md-language_go
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[haskell]
+symbol = " " # nf-seti-haskell
+# symbol = "[λ](bold bold)" # Small greek lambda - U+03BB
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+## other variables:
+##   snapshot = Currently selected Stack snapshot
+##   ghc_version = Currently installed GHC version
+
+[haxe]
+symbol = " " # nf-seti-haxe
+# symbol = "󰐴 " # nf-md-quadcopter
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[java]
+symbol = " " # nf-fae-java
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[julia]
+symbol = " " # nf-seti-julia
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[kotlin]
+symbol = "󱈙 " # nf-md-language_kotlin
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[lua]
+symbol = "󰢱 " # nf-md-language_lua
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[nim]
+symbol = "" # nf-seti-nim
+# symbol = " " # nf-fae-crown
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[nodejs]
+symbol = "󰎙 " # nf-md-nodejs
+style = "bold"
+not_capable_style = "bg:color_toolchain fg:color_foreground_dark"
+format = "[ $symbol($version) ]($style)"
+
+[ocaml]
+symbol = " " # nf-seti-ocaml
+style = "bold"
+format = '[ $symbol($version)( \($switch_indicator$switch_name\)) ]($style)'
+
+[perl]
+symbol = "" # nf-seti-perl
+# symbol = " " # nf-dev-perl
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[php]
+symbol = " " # nf-dev-php
+# symbol = "" # nf-md-language_php
+# symbol = "󰌟" # nf-seti-php
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[purescript]
+symbol = "" # nf-custom-purescript
+# symbol = "⇔ " # left right double arrow - U+21D4
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[python]
+symbol = "󰌠 " # nf-md-language_python
+# symbol = " " # nf-fae-python
+style = "bold"
+version_format = "v${raw}"
+python_binary = [ "python3", "python", "python2" ]
+# pyenv_version_name = true
+# pyenv_prefix = "pyenv " # default
+format = '[ ${symbol}(${pyenv_prefix}${version})(\($virtualenv\)) ]($style)'
+
+[raku]
+symbol = " " # nf-fae-butterfly
+style = "bold"
+format = "[ $symbol($version)(-$vm_version) ]($style)"
+
+[red]
+symbol = "󱥒 " # nf-md-pyramid
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[rlang]
+symbol = "󰟔 " # nf-md-language_r
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[ruby]
+symbol = "󰴭 " # nf-md-language_ruby
+# symbol = " " # nf-fae-ruby
+# symbol = " " # nf-oct-ruby
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[rust]
+symbol = "󱘗 " # nf-md-language_rust
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[scala]
+symbol = " " # nf-dev-scala
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[swift]
+symbol = "󰛥 " # nf-md-language_swift
+# symbol = "" # nf-seti-swift
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[vlang]
+symbol = "󱑹 " # nf-md-cosine_wave
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[zig]
+symbol = "" # nf-seti-zig
+# symbol = '\[Z\] '
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+
+###  Package section
+[package]
+symbol = " " # nf-oct-package
+style = "bold"
+version_format = "v${major}"
+display_private = true
+format = "[ $symbol($version) ]($style)"
+
+[buf]
+symbol = " " # nf-fa-barcode
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[cmake]
+symbol = "󰔷 " # nf-md-triangle_outline
+# symbol = "󰔶 " # nf-md-triangle
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[conda]
+# symbol = " " # nf-fa-circle_o
+symbol = "🅒 " # Negative Circled Latin Capital Letter C
+style = "bold"
+# ignore_base = false
+# truncation_length = 0 # no truncation
+format = "[ $symbol$environment ]($style)"
+
+[gradle]
+symbol = " " # nf-seti-gradle
+# symbol = "󰟆 " # nf-md-elephant
+style = "bold"
+# recursive = true
+format = "[ $symbol($version) ]($style)"
+
+[helm]
+symbol = "󰠳 " # nf-md-ship_wheel
+style = "bold"
+format = "[ $symbol($version) ]($style)"
+
+[meson]
+symbol = "󰔶 " # nf-md-triangle
+# symbol = "▲" # black up-pointing triangle
+style = "bold"
+# truncation_length = 20 # default = 4294967295
+# truncation_symbol = "" # default = "…"
+format = "[ $symbol$project ]($style)"
+
+[spack]
+symbol = "󰦻 " # nf-md-arrow_decision
+style = "bold"
+# truncation_length = 0 # default = 1
+format = '[ $symbol$environment ]($style)'
+
+
+###  Configuration shell section
+[guix_shell]
+symbol = " " # nf-linux-gnu_guix
+# symbol = "󰆚 " # nf-md-cow
+style = "bold"
+format = '[ $symbol]($style)[shell ]($style)'
+
+[nix_shell]
+# disabled = true
+symbol = " " # nf-linux-nixos
+style = "bold"
+impure_msg = '[](bold red)' # nf-weather-gale_warning - personal setting
+pure_msg = '[ ](bold green)' # nf-weather-day_sunny - personal setting
+unknown_msg = '[ ](bold red)' # nf-weather-na
+# heuristic = true
+format = '[ $symbol$name]($style)[\($state\) ](bold)'
+
+
+
+
+
+
+
+

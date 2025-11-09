@@ -1,0 +1,31 @@
+#!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+exit_if_root
+
+sync_libadwaita_theme() {
+  local selected_theme="${1}"
+  local previous_theme="${2}"
+  local theme_path="${3}"
+
+  if [[ ! "${selected_theme}" == "${previous_theme}" ]]; then
+    if [[ -d "${theme_path}/gtk-4.0" ]]; then
+      rm -rf "${HOME}/.config/gtk-4.0"
+      cp -drf "${theme_path}/gtk-4.0" "${HOME}/.config/"
+    else
+      return 1
+    fi
+  else
+    return 0
+  fi
+}
+
+while true; do
+  selected_gtk_theme=$(dconf read /org/gnome/desktop/interface/gtk-theme | tr -d \')
+  theme_path=$(find "${HOME}/.themes/" -maxdepth 1 -mindepth 1 -type d -iname "${selected_gtk_theme}")
+  previous_gtk_theme="${previous_gtk_theme:-}"
+
+  sync_libadwaita_theme "${selected_gtk_theme}" "${previous_gtk_theme}" "${theme_path}"
+
+  previous_gtk_theme="${selected_gtk_theme}"
+  sleep 10s
+done

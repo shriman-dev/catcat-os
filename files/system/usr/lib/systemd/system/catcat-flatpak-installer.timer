@@ -1,0 +1,8 @@
+[Unit]
+Description=Timer for installing system flatpaks
+
+[Timer]
+OnBootSec=120
+
+[Install]
+WantedBy=timers.target

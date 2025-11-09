@@ -1,0 +1,21 @@
+[org/gnome/gedit/plugins]
+active-plugins=['textsize', 'spell', 'sort', 'sessionsaver', 'quickhighlight', 'multiedit', 'filebrowser', 'drawspaces', 'docinfo', 'colorpicker', 'codecomment']
+
+[org/gnome/gedit/preferences/editor]
+style-scheme-for-dark-theme-variant='catppuccin_mocha'
+wrap-last-split-mode='word'
+use-default-font=false
+editor-font='Fira Code 11'
+tabs-size=4
+insert-spaces=true
+auto-save=false
+auto-save-interval=1
+
+[org/gnome/gedit/preferences/ui]
+theme-variant='dark'
+statusbar-visible=true
+side-panel-visible=false
+bottom-panel-visible=false
+
+[org/gnome/gedit/plugins/drawspaces]
+matrix=[11, 8, 9]

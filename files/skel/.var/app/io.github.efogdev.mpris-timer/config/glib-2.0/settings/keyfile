@@ -1,0 +1,12 @@
+[io/github/efogdev/mpris-timer]
+default-preset='05:00'
+progress-color='#FAB387'
+rounded=true
+shadow=true
+low-fps=false
+presets=['00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '05:00', '07:00', '10:00', '15:00', '20:00', '30:00', '01:00:00', '03:00:00', '06:00:00']
+start-preset-on-click=false
+
+[org/gtk/gtk4/settings/color-chooser]
+selected-color=(true, 0.98039215803146362, 0.70196080207824707, 0.52941179275512695, 1.0)
+custom-colors=[(0.98039215803146362, 0.70196080207824707, 0.52941179275512695, 1.0), (0.92941176891326904, 0.35686275362968445, 0.0, 1.0)]
