@@ -83,6 +83,7 @@ jobs:
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           echo "AHHH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "MAJVER_TAG=$(skopeo list-tags docker://${{ matrix.BASE_IMAGE_NAME }} | \
                     jq -r '.Tags[] | select(test("^[0-9]"))' | grep "^${MAJOR_VERSION}" | \
                             sort -nr | head -n1)" >> $GITHUB_ENV
@@ -107,7 +108,7 @@ jobs:
             org.opencontainers.image.description=${{ env.IMAGE_DESC }}
             org.opencontainers.image.title=${{ matrix.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
+            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}-${{ env.TIMESTAMP }}
             containers.bootc=1
           sep-tags: " "
           sep-annotations: " "
@@ -134,35 +135,32 @@ jobs:
 
 #      - name: Remove auxiliary images
 #        run: |
-#          sudo podman image rm ${{ env.PULL_IMAGE_REGISTRY }}/${{ env.BASE_IMAGE_NAME }}${{ env.NVIDIA_FLAVOR }}:${{ env.MAJOR_VERSION }}
+#          sudo podman image rm ${{ env.BASE_IMAGE_NAME }}:${{ env.MAJVER_TAG }}
 
-      # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
-      # https://github.com/macbre/push-to-ghcr/issues/12
-      - name: Lowercase Registry
-        id: registry_case
-        uses: ASzc/change-string-case-action@v6
-        with:
-          string: ${{ env.PUSH_IMAGE_REGISTRY }}
 
-      # Rechunk is a script that we use on Universal Blue to make sure there isnt a single huge layer when your image gets published.
-      # This does not make your image faster to download, just provides better resumability and fixes a few errors.
-      # Documentation for Rechunk is provided on their github repository at https://github.com/hhd-dev/rechunk
-      # You can enable it by uncommenting the following lines
+#      # Rechunk is a script that we use on Universal Blue to make sure there isnt a single huge layer when your image gets published.
+#      # This does not make your image faster to download, just provides better resumability and fixes a few errors.
+#      # Documentation for Rechunk is provided on their github repository at https://github.com/hhd-dev/rechunk
+#      # You can enable it by uncommenting the following lines:
+#      # - name: Run Rechunker
+#      #   id: rechunk
+#      #   uses: hhd-dev/rechunk@f153348d8100c1f504dec435460a0d7baf11a9d2 # v1.1.1
+#      #   with:
+#      #     rechunk: 'ghcr.io/hhd-dev/rechunk:v1.0.1'
+#      #     ref: "localhost/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
+#      #     prev-ref: "${{ env.PUSH_IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
+#      #     skip_compression: true
+#      #     version: ${{ env.CENTOS_VERSION }}
+#      #     labels: ${{ steps.metadata.outputs.labels }} # Rechunk strips out all the labels during build, this needs to be reapplied here with newline separator
 
-#      - name: Run Rechunker
-#        id: rechunk
-#        uses: hhd-dev/rechunk@v1.1.2
-#        with:
-#          rechunk: 'ghcr.io/hhd-dev/rechunk:latest'
-#          ref: 'raw-img'
-#          prev-ref: "${{ steps.registry_case.outputs.lowercase }}/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
-#          version: ${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
-#          labels: ${{ steps.metadata.outputs.labels }}
-#          max-layers: 50
-#          skip_compression: true
-
-       # These `if` statements are so that pull requests for your custom images do not make it publish any packages under your name without you knowing
-       # They also check if the runner is on the default branch so that things like the merge queue (if you enable it), are going to work
+#      # This is necessary so that the podman socket can find the rechunked image on its storage
+#      # - name: Load in podman and tag
+#      #   run: |
+#      #     IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
+#      #     sudo rm -rf ${{ steps.rechunk.outputs.output }}
+#      #     for tag in ${{ steps.metadata.outputs.tags }}; do
+#      #       podman tag $IMAGE ${{ env.IMAGE_NAME }}:$tag
+#      #     done
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -180,7 +178,7 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_PASSWORD: ${{ github.token }}
         with:
-          registry: ${{ steps.registry_case.outputs.lowercase }}
+          registry: ${{ env.PUSH_IMAGE_REGISTRY }}
           image: ${{ matrix.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           username: ${{ env.REGISTRY_USER }}
@@ -201,10 +199,10 @@ jobs:
       - name: Sign container image
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         run: |
-          echo "Digest is $DIGEST"
+          echo "Image Digest: $DIGEST"
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
         env:
-          IMAGE_FULL: ${{ steps.registry_case.outputs.lowercase }}/${{ matrix.IMAGE_NAME }}
+          IMAGE_FULL: ${{ env.PUSH_IMAGE_REGISTRY }}/${{ matrix.IMAGE_NAME }}
           DIGEST: ${{ steps.push.outputs.digest }}
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
