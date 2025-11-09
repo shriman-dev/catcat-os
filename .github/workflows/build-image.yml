@@ -75,7 +75,6 @@ jobs:
           set -eou pipefail
           pwd
           ls -A1
-          zstd -b1 -e22
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           source ${{ github.workspace }}/ENVAR
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
