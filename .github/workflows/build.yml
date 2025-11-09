@@ -24,27 +24,6 @@ concurrency:
   cancel-in-progress: true  # Cancels in-progress runs if a new one is triggered
 
 jobs:
-# Checks if this is the first commit of the day
-#  day-first-commit:
-#    runs-on: ubuntu-latest
-#    outputs:
-#      should_run: ${{ steps.check.outputs.should_run }}  # Output variable other jobs will check
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0  # Gets full git history
-#
-#      - id: check
-#        run: |
-#          TODAY=$(date -u +%Y-%m-%d)
-#          LAST_COMMIT_DATE=$(git log --format=%cd --date=short -1 HEAD^)
-#          # Checks if this is first commit of the day
-#          if [ "$LAST_COMMIT_DATE" != "$TODAY" ] && [ "${{ github.actor }}" == "${{ github.repository_owner }}" ]; then
-#            echo "should_run=true" >> $GITHUB_OUTPUT
-#          else
-#            echo "should_run=false" >> $GITHUB_OUTPUT
-#          fi
-
   build-image:
     name: Build Images
     uses: ./.github/workflows/build-image.yml

@@ -38,8 +38,8 @@ jobs:
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v9
 
-      - name: Pre build configuration
-        id: pre-build-config
+      - name: Prepare environment
+        id: prepare-environment
         shell: bash
         run: |
           set -eou pipefail
