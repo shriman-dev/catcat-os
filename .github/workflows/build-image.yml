@@ -72,7 +72,7 @@ jobs:
           set -eou pipefail
           pwd
           ls -A1
-          lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          df -h
           source ${{ github.workspace }}/ENVAR
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV

@@ -11,9 +11,7 @@ services_enable() {
     catcat-os-update.timer \
     catcat-system-setup.service \
     catcat-system-maintenance.timer \
-    catcat-flatpak-installer.timer \
-    catcat-flatpak-perms.service \
-    waydroid-container.service
+    catcat-flatpak-installer.timer
 
 #dualsense-catppuccin-rainbow.service
   systemctl --global -f enable \
