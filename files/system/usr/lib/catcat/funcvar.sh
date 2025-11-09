@@ -46,52 +46,6 @@ declare -r unhide=$'\033[28m'
 QUIET=false
 VERBOSE=2
 
-# Function to generate background color from foreground color
-# option 38 (foreground) which can be flipped to 48 (background)
-# NOTE: doublequote the color or future calls to bg will error out!
-# option 38 (foreground) which can be flipped to 48 (background)
-# bgblue=$(Bg "$blue")
-# echo "${bgblue}text now has blue background${normal} this text has no background color"
-function Bg (){
-    COLOR="${1}"
-    echo "${COLOR}" | sed -E 's/\[3([0-8]{1,1})/\[4\1/'
-}
-
-# Function to generate a clickable link, you can call this using
-function Urllink (){
-    URL="${1}"
-    TEXT="${2}"
-    # Generate a clickable hyperlink
-    printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
-}
-
-# Function to generates a centered text header with customizable padding character, width, and symmetrical padding.
-symmetric_heading() {
-    local text="${1}"
-    local padding_char="${2:-#}"
-    local output_width=${3:-75}  # Total width of the output
-    local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
-    local left_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
-    local right_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
-    
-    # Adjust for odd-length texts
-    if (( (output_width - ${#text} - 2) % 2 != 0 )); then
-        right_padding+="${padding_char}"
-    fi
-    
-    printf "%s %s %s\n" "${left_padding}" "${text}" "${right_padding}"
-}
-
-# Quiet mode handling function
-_quiet_exec() {
-    local cmd="$@"
-    if [[ ${QUIET} == true ]]; then
-        ${cmd} >/dev/null
-    else
-        ${cmd}
-    fi
-}
-
 # Logging with optional verbose output
 log() {
     local color level="${1}" msg="${@:2}"
@@ -111,6 +65,68 @@ log() {
 die() { log "ERROR" "${1}"; [[ -n "${2}" ]] && ${2}; exit 1; }
 
 err() { log "ERROR" "${1}"; return 1; }
+
+# Function to generate background color from foreground color
+# option 38 (foreground) which can be flipped to 48 (background)
+# NOTE: doublequote the color or future calls to bg will error out!
+# option 38 (foreground) which can be flipped to 48 (background)
+# bgblue=$(Bg "$blue")
+# echo "${bgblue}text now has blue background${normal} this text has no background color"
+function Bg (){
+    COLOR="${1}"
+    echo "${COLOR}" | sed -E 's/\[3([0-8]{1,1})/\[4\1/'
+}
+
+# Function to generate a clickable link, you can call this using
+function Urllink (){
+    URL="${1}"
+    TEXT="${2}"
+    # Generate a clickable hyperlink
+    printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
+}
+
+# Function to generates a centered text header with customizable padding character, width, and symmetrical padding
+symmetric_heading() {
+    local text="${1}"
+    local padding_char="${2:-#}"
+    local output_width=${3:-75}  # Total width of the output
+    local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
+    local left_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
+    local right_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
+
+    if (( ${#text} >= output_width - 3 )); then
+        err "Text is too long for the given output width. Increase value of output width."
+        return 1
+    fi
+    # Adjust for odd-length texts
+    if (( (output_width - ${#text} - 2) % 2 != 0 )); then
+        right_padding+="${padding_char}"
+    fi
+
+    printf "%s %s %s\n" "${left_padding}" "${text}" "${right_padding}"
+}
+
+# Same as above but with upper and lower borders using given character
+enclosed_heading() {
+    local text="${1}"
+    local padding_char="${2:-#}"
+    local output_width=${3:-75}
+    local border=$(printf "%*s" ${output_width} "" | tr ' ' "${padding_char}")
+
+    echo "${border}"
+    symmetric_heading "${text}" "${padding_char}" ${output_width}
+    echo "${border}"
+}
+
+# Quiet mode handling function
+_quiet_exec() {
+    local cmd="$@"
+    if [[ ${QUIET} == true ]]; then
+        ${cmd} >/dev/null
+    else
+        ${cmd}
+    fi
+}
 
 need_root() {
     [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
@@ -161,7 +177,7 @@ check_network_connection() {
     local attempt=1
 
     while (( attempt <= max_attempts )); do
-        if curl --silent --head --fail "https://fedoraproject.org" > /dev/null; then
+        if curl --silent --head --fail "https://fedoraproject.org" >/dev/null; then
           return 0
         else
           log "INFO" "Network connection is not available. Waiting..."

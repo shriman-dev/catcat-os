@@ -139,11 +139,12 @@ set_size() {
 # Log functions
 clean_old_logs() {
     local retention="3 months"
-    [[ ${1} ]] && echo "${1}" > ${CONFIG_DIR}/keep-log-time
-    [[ -f ${CONFIG_DIR}/keep-log-time ]] && retention="$(cat ${CONFIG_DIR}/keep-log-time)"
+    [[ ${1} ]] && echo "${1}" > "${CONFIG_DIR}/keep-log-time"
+    [[ -f "${CONFIG_DIR}/keep-log-time" ]] && retention="$(cat ${CONFIG_DIR}/keep-log-time)"
 
     log "INFO" "Cleaning logs older than ${retention}"
 
+    local date_format log_file line
     local dnscrypt_date_format="$(date -d "-${retention}" +"%Y-%m-%d")"
     local dnsmasq_date_format="$(date -d "-${retention}" +"%b %d")"
 
@@ -151,14 +152,17 @@ clean_old_logs() {
 
     # Clean logs
     for log_file in "${DNSMASQLOGDIR}/dnsmasq.log" "${DNSCRYPTLOGDIR}"/*.log; do
-        [[ ${log_file} == *"${DNSCRYPTLOGDIR}"* ]] && date_format="${dnscrypt_date_format}" || date_format="${dnsmasq_date_format}"
-        local line=$(rg -n "${date_format}" "${log_file}" | cut -d: -f1 | tail -n1)
+        if [[ -f "${log_file}" ]]; then
+            [[ ${log_file} == *"${DNSCRYPTLOGDIR}"* ]] && \
+            date_format="${dnscrypt_date_format}" || date_format="${dnsmasq_date_format}"
 
-        log "DEBUG" "Clean logs before '${date_format}' from line ${line:-0} in log file: ${log_file}"
-        if [[ ! -z ${line} ]]; then
-            sed -i "1,${line} d" "${log_file}" || die "Log cleanup failed for ${log_file}"
-        else
-            log "DEBUG" "No logs before '${date_format}' in log file: ${log_file}"
+            line=$(rg -n "${date_format}" "${log_file}" | cut -d: -f1 | tail -n1)
+            log "DEBUG" "Clean logs before '${date_format}' from line ${line:-0} in log file: ${log_file}"
+            if [[ ! -z ${line} ]]; then
+                sed -i "1,${line} d" "${log_file}" || die "Log cleanup failed for ${log_file}"
+            else
+                log "DEBUG" "No logs before '${date_format}' in log file: ${log_file}"
+            fi
         fi
     done
 

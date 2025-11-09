@@ -1,8 +1,9 @@
 export HISTSIZE=-1
 export HISTFILESIZE=-1
 
-#export EDITOR="micro"
+export LS_COLORS="$(sed '/^$/d; /^#/d' /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach)"
 export MICRO_TRUECOLOR=1
+#export EDITOR="micro"
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_QPA_PLATFORM=xcb

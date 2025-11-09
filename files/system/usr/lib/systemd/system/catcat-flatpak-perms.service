@@ -1,9 +1,0 @@
-[Unit]
-Description=Apply global flatpak permissions
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/catcat-flatpak-manager
-
-[Install]
-WantedBy=multi-user.target

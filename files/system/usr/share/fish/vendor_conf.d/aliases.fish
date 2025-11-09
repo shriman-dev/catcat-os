@@ -35,45 +35,46 @@ function help
   $argv --help 2>&1 | bathelp
 end
 
-if command -v gedit
+if command -v gedit >/dev/null 2>&1
   alias gedit="command gedit"
 else
-  alias gedit="flatpak run --branch=stable --arch=x86_64 --command=gedit --file-forwarding org.gnome.gedit"
+  alias gedit="flatpak run --command=gedit --file-forwarding org.gnome.gedit"
 end
 
 command -vq thefuck && thefuck --alias | source
 alias f='thefuck'
-
-alias c='clear'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
-alias fcc='fc-cache -fvr --really-force'
-alias hw='hwinfo --short'
-alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
-alias killall='killall -vw'
-alias ramcln="sudo /usr/bin/ramclean"
-alias tarnow='tar -acf '
-alias untar='tar -xvf '
-alias wget='wget -c '
-alias tree 'tree -a'
-alias diff='diff --color=auto'
-alias dir='dir --color=always'
-alias egrep='egrep --color=always'
-alias fgrep='fgrep --color=always'
-alias grep='grep --color=always'
+
+alias c='clear'
 alias ip='ip -color=auto'
-alias ls='ls --color=always'
+alias ls='ls --color=auto'
 alias tc='tc -color=auto'
-alias vdir='vdir --color=always'
+alias hw='inxi --expanded -J'
+alias fcc='fc-cache -fvr --really-force'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias tree='tree -a --dirsfirst'
+alias diff='diff --color=auto'
+alias wget='wget -c '
+alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
+alias grep='grep --color=auto'
+alias egrep='grep --color=auto -E'
+alias fgrep='grep --color=auto -F'
+alias untar='tar -xvf '
+alias tarnow='tar -acf '
+alias ramcln="sudo /usr/bin/ramclean"
+alias killall='killall -vw'
+
 # Use some more things with better alternatives
+alias l.='eza -A1'
+alias la='eza -A  --color=auto --icons=auto --hyperlink --group-directories-first'
+alias ll='eza -Al --color=auto --icons=auto --hyperlink --group-directories-first --git --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
+alias lt='eza -AT --color=auto --icons=auto --hyperlink --group-directories-first --git'
 alias bat='bat --style="header,snip,changes" --paging=never'
-alias l.='eza -a1'
-alias la='eza -a --color=always --hyperlink --group-directories-first --icons=always'
-alias ll='eza -alob -SH --git --color=always --hyperlink --group-directories-first --icons=always --time-style="+%a %b %d %H:%M:%S %Y"'
-alias lt='eza -aT --git --color=always --hyperlink --group-directories-first --icons=always'
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias pscpu='procs --sortd cpu'
 alias psmem='procs --sortd rss'
@@ -98,19 +99,18 @@ alias flrp="flatpak repair"
 
 # distrobox alias
 alias arch-btw="distrobox enter arch-btw -- fish"
-alias gaming-box="distrobox enter fedora-box-gaming -- fish"
 alias uwubun="distrobox enter uwubuntu -- fish"
 
 alias boxhoex="distrobox-host-exec"
-alias boxexpoa="distrobox-export -a"
+alias boxexpo_a="distrobox-export -a"
 
-function boxunexpoa
+function boxunexpo_a
   distrobox-export -a $argv --delete
 end
-function boxexpob
+function boxexpo_b
   distrobox-export --bin $argv --export-path $HOME/.local/bin/bim
 end
-function boxunexpob
+function boxunexpo_b
   distrobox-export --bin $argv --export-path $HOME/.local/bin/bim --delete
 end
 

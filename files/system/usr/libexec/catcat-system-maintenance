@@ -26,5 +26,5 @@ fi
 twenty_days=1728000
 buttercare_log_file="/etc/catcat-os/log/buttercare.log"
 if is_file_older ${twenty_days} "${buttercare_log_file}"; then
-    /usr/bin/buttercare -vv balance trim > "${buttercare_log_file}"
+    /usr/bin/buttercare -v balance trim > "${buttercare_log_file}"
 fi

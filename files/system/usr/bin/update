@@ -2,65 +2,65 @@
 source /usr/lib/catcat/funcvar.sh
 
 update_flatpak() {
-  local scope="--user"
-  [[ $(id -u) -eq 0 ]] && scope="--system"
+    local scope="--user"
+    [[ $(id -u) -eq 0 ]] && scope="--system"
 
-  symmetric_heading "Flatpak ${scope:2} update" "="
+    enclosed_heading "Flatpak ${scope:2} update" "="
 
-  /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
-  /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
-  /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
+    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
+    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
+    /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
 
-  log "INFO" "Running flatpak repair"
-  /usr/bin/flatpak repair ${scope}
+    log "INFO" "Running flatpak repair"
+    /usr/bin/flatpak repair ${scope}
 }
 
 update_nixpkg() {
-  local scope="user"
-  local cmdpath="${HOME}/.local/state/nix/profile/bin"
+    local scope="user"
+    local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
-  [[ $(id -u) -eq 0 ]] && {
-    scope="global"
-    cmdpath="/nix/var/nix/profiles/default/bin"
-  }
+    [[ $(id -u) -eq 0 ]] && {
+        scope="global"
+        cmdpath="/nix/var/nix/profiles/default/bin"
+    }
 
-  if [[ -x "${cmdpath}/nix-env" ]]; then
-    symmetric_heading "Nixpkg ${scope} update" "="
+    if [[ -x "${cmdpath}/nix-env" ]]; then
+        enclosed_heading "Nixpkg ${scope} update" "="
 
-    ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
-    ${cmdpath}/nix-store --optimise >/dev/null 2>&1
-    ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
-  fi
+        ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
+        ${cmdpath}/nix-store --optimise >/dev/null 2>&1
+        ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
+    fi
 }
 
 update_dns_blocklist() {
-  symmetric_heading "DNS blocklist update" "="
-  /usr/bin/localdnsctl -v -u
+    enclosed_heading "DNS blocklist update" "="
+    /usr/bin/localdnsctl -v -u
 }
 
 update_firmware() {
-  symmetric_heading "Firmware update" "="
+    enclosed_heading "Firmware update" "="
 
-  sudo sh -c '
-    /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
-    /usr/bin/fwupdmgr --no-device-prompt -y get-updates
-    /usr/bin/fwupdmgr --no-reboot-check -y update
-  '
+    sudo sh -c '
+        /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
+        /usr/bin/fwupdmgr --no-device-prompt -y get-updates
+        /usr/bin/fwupdmgr --no-reboot-check -y update
+    '
 }
 
 update_system() {
-  symmetric_heading "System update" "="
+    enclosed_heading "System update" "="
 
-  if [[ $(id -u) -eq 0 ]]; then
-    rpm-ostree upgrade
-    rpm-ostree db diff --changelogs
-    rpm-ostree cleanup -bm >/dev/null 2>&1
-    ostree prune >/dev/null 2>&1
-    systemd-tmpfiles --clean >/dev/null 2>&1
-    /usr/bin/grubup
-  else
-    rpm-ostree upgrade
-  fi
+    if [[ $(id -u) -eq 0 ]]; then
+        rpm-ostree upgrade
+        rpm-ostree db diff --changelogs
+        rpm-ostree cleanup -bm >/dev/null 2>&1
+        ostree prune >/dev/null 2>&1
+        systemd-tmpfiles --clean >/dev/null 2>&1
+        /usr/bin/grubup
+    else
+        rpm-ostree upgrade
+    fi
 }
 
 show_help() {
@@ -96,7 +96,7 @@ EOF
 
 process_command() {
     case "${1}" in
-        "all")
+        all)
             need_root
             update_system
             update_firmware
@@ -106,31 +106,31 @@ process_command() {
             run_as_users update_flatpak
             run_as_users update_nixpkg
             ;;
-        "extra")
+        extra)
             update_flatpak
             update_nixpkg
             [[ $(id -u) -eq 0 ]] && run_as_users update_flatpak
             [[ $(id -u) -eq 0 ]] && run_as_users update_nixpkg
             [[ $(id -u) -eq 0 ]] && { update_firmware; update_dns_blocklist; }
             ;;
-        "flat-nix")
+        flat-nix)
             update_flatpak
             update_nixpkg
             ;;
-        "flatpak")
+        flatpak)
             update_flatpak
             ;;
-        "nixpkg")
+        nixpkg)
             update_nixpkg
             ;;
-        "dns-blocklist")
+        dns-blocklist)
             need_root
             update_dns_blocklist
             ;;
-        "system")
+        system)
             update_system
             ;;
-        "help")
+        help)
             show_help
             ;;
         *)

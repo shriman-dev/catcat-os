@@ -24,7 +24,7 @@ sync_default_configs() {
     rm -rf "${LOCALSHARE}/themes/"*{Catppuccin,Lavanda}*
     cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes/" || err "Theme update failed"
 
-    bat cache --build
+    /usr/bin/bat cache --build
     cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
     log "INFO" "Configs updated"
   fi

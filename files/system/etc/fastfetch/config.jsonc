@@ -2,7 +2,7 @@
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
     "type": "file",
-    "source": "/etc/catcat-os/catcat-ascii-logo",
+    "source": "/usr/share/catcat-os/logo/catcat-ascii-logo",
     "padding": {
       "top": 4,
       "right": 1

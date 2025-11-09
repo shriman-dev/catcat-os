@@ -2,175 +2,107 @@
 source /usr/lib/catcat/funcvar.sh
 U1000="$(id -un 1000)"
 
-# selinux fix
-#restorecon  -vR /home/${U1000}/.local/share/icc
-#restorecon -vR /etc/dnsmasq.d/
-#restorecon -vR /var/log/usbguard
-#restorecon -vR /var/lib/waydroid
-
 # copy main user monitors.xml to gdm
-if ! diff -q "/home/${U1000}/.config/monitors.xml" "/var/lib/gdm/.config/monitors.xml"  &>/dev/null; then
-  cp -vf /home/${U1000}/.config/monitors.xml /var/lib/gdm/.config/monitors.xml
-  restorecon  -vR /home/${U1000}/.local/share/icc
+monitors_xml=".config/monitors.xml"
+if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"  &>/dev/null; then
+    cp -vf "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"
+    restorecon -vR "/home/${U1000}/.local/share/icc"
 fi
 
 # setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do
-  if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
-    sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup" &
-  fi
+    if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
+        sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup" &
+    fi
 done
 
-# Support to run nix commands with sudo for user 1000
-nix_user_path="/home/${U1000}/.local/state/nix/profile"
-sudoersd_file="/etc/sudoers.d/nix-sudo-env"
-grep "${nix_user_path}" ${sudoersd_file} || sed -i "/secure_path = /s|$|:${nix_user_path}|" ${sudoersd_file}
-# Proper sudoers.d perms
-chmod --recursive 644 /etc/sudoers.d/
-
-# first boot setup
+# First boot setup
 if [[ ! -f /etc/catcat-os/first-boot ]]; then
-  # Setup grub
-  mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
-  replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
-  replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
-  replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=console' /etc/default/grub
-  replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
-  replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
-  replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
-  #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
-  #GRUB_TERMINAL_OUTPUT=gfxterm
-  #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
-  /usr/bin/grubup
+    # Setup grub
+    mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
+    replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+    replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
+    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=console' /etc/default/grub
+    replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+    replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+    #GRUB_TERMINAL_OUTPUT=gfxterm
+    #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
 
-  hostnamectl set-hostname --static "catcat"
+    # Update grubup
+    /usr/bin/grubup
 
-  # Permit main user
-  usermod -aG input ${U1000}
-  usermod -aG libvirt ${U1000}
+    # Show grub screen for desktop devices
+    inxi -M | grep "Type:.*Desktop" && grub2-editenv - unset menu_auto_hide
 
-  mkdir -p /etc/catcat-os/
-  echo 'first boot' > /etc/catcat-os/first-boot
+    # Set default hostname
+    hostnamectl set-hostname --static "catcat"
+
+    # Permit main user
+    #usermod -aG libvirt ${U1000}
+
+    mkdir -p /etc/catcat-os/
+    echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
 # Sync configs on update
-if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/previous_update_sha; then
-  [[ ! -d /root/.config/bat ]] && { mkdir -p /root/.config/ ; ln -sf /etc/bat /root/.config/; }
-  /usr/bin/bat cache --build
+catcat_update_sha="/etc/catcat-os/update_sha"
+if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
+    [[ ! -d /root/.config/bat ]] && { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
+    /usr/bin/bat cache --build
 
-  # Set primary monitor for dash to panel
-  monitor_vendor_serial_id=($(hwinfo --monitor | grep -E "Vendor:|Serial ID:" | cut -d':' -f2 | tr -d '"' | tr -d "'"))
-  monitor_id="${monitor_vendor_serial_id[0]}-${monitor_vendor_serial_id[1]}"
-  etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
-  usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
-  sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
-      -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
-      -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
-      -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
-               "${usr_dconf_ext}" > "${etc_dconf_ext}"
+    # Set primary monitor for dash to panel
+    [[ -f "${usr_dconf_ext}" ]] && {
+        etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
+        usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
+        monitor_vendor_serial_id=(
+            $(hwinfo --monitor | grep -E "Vendor:|Serial ID:" | cut -d':' -f2 | tr -d '"' | tr -d "'")
+        )
+        monitor_id="${monitor_vendor_serial_id[0]}-${monitor_vendor_serial_id[1]}"
+        sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
+            -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
+            -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
+            -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
+                "${usr_dconf_ext}" > "${etc_dconf_ext}"
+    }
 
-  /usr/bin/dconf update
+    /usr/bin/dconf update
 
-  [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
+    [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
 
-  cat /etc/catcat-os/update_sha > /etc/catcat-os/previous_update_sha
+    cat "${catcat_update_sha}" > "${catcat_update_sha}_previous"
 fi
-
-# Set ad-malware blocking localdns
-mkdir -pv /tmp/dns-blocklist
-if [[ -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist && ! -f /etc/dnscrypt-proxy/domains-blocklist.txt ]]; then
-    rm -vf /etc/dnscrypt-proxy/domains-blocklist.txt
-    cat /usr/share/dnscrypt-proxy/domains-filtered-subdomains.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -vf /tmp/dns-blocklist/domains-filtered-subdomains /etc/dnscrypt-proxy/domains-blocklist.txt
-elif [[ ! -f /etc/catcat-os/localdns.d/only-dnscrypt-blocklist && ! -f /etc/dnsmasq.d/domains-blocklist.conf ]]; then
-    rm -vf /etc/dnsmasq.d/domains-blocklist*
-    cat /usr/share/dnsmasq/dns-blocklist-archive/blocklist.conf.tar.zst* | tar -C /tmp/dns-blocklist/ --zstd -xvf -
-    cp -vf /tmp/dns-blocklist/blocklist.conf /etc/dnsmasq.d/domains-blocklist.conf
-    restorecon -vR /etc/dnsmasq.d/
-fi
-rm -rvf /tmp/dns-blocklist/
-
-if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
-    if ! diff -q /etc/resolv.conf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf; then
-        mkdir -p /etc/catcat-os/localdns.d /var/log/dnscrypt-proxy /var/cache/dnscrypt-proxy #/var/log/dnsmasq
-        ln -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf
-    fi
-fi
-
-# Set kargs
-KARGS=$(rpm-ostree kargs)
-NEEDED_KARGS=()
-KARGS_TO_ADD=(
-  "rd.luks.options=discard"
-  "luks.options=discard"
-  "rd.udev.log_priority=3"
-  "loglevel=3"
-  "processor.ignore_ppc=1"
-  "split_lock_detect=off"
-  "bluetooth.disable_ertm=1"
-  "preempt=full"
-)
-# "sysrq_always_enabled=1"
-# "pci=noats"
-# "amdgpu.ppfeaturemask=0xffffffff"
-# "mem_sleep_default=deep"
-
-if command -v nvidia-smi; then
-  KARGS_TO_ADD+=(
-    "nvidia-drm.modeset=1"
-    "nvidia-drm.fbdev=1"
-    "rd.driver.blacklist=nouveau"
-    "modprobe.blacklist=nouveau"
-    )
-fi
-
-for karg in "${KARGS_TO_ADD[@]}"; do
-  if [[ ! ${KARGS} =~ ${karg} ]]; then
-    echo "Adding needed kargs for ${karg}"
-    NEEDED_KARGS+=("--append-if-missing=${karg}")
-  fi
-done
-
-if [[ ${KARGS} =~ "nomodeset" ]]; then
-  echo "Removing nomodeset"
-  NEEDED_KARGS+=("--delete-if-present=nomodeset")
-fi
-
-if [[ -n "${NEEDED_KARGS}" ]]; then
-  echo "Found needed karg changes, applying the following: ${NEEDED_KARGS[*]}"
-  rpm-ostree kargs ${NEEDED_KARGS[*]} &
-else
-  echo "No karg changes needed"
-fi
-
 
 # Nvidia specific
 if command -v nvidia-smi; then
-  sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
-  sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
-  # enable nvidia optimus if device is laptop and has nvidia dgpu
-#  if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
-#    if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
-#      echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
-#      echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
-#    fi
-#  fi
+    sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
+    sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
+    # enable nvidia optimus if device is laptop and has nvidia dgpu
+#   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
+#       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
+#           echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
+#       fi
+#   fi
 fi
 
 # Enable i2c-dev support to configure monitors via ddcutil
-if [[ ! -f /etc/modules-load.d/i2c-dev.conf ]]; then
-  echo "i2c-dev" > /etc/modules-load.d/i2c-dev.conf
-  # enable i2c support for nvidia cards
-  if command -v nvidia-smi; then
-    echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > /etc/modprobe.d/nvidia-i2c-support.conf
-  fi
+i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
+if [[ ! -f "${i2c_dev_conf}"f ]]; then
+    echo "i2c-dev" > "${i2c_dev_conf}"
+    # enable i2c support for nvidia cards
+    if command -v nvidia-smi; then
+        echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > \
+                "${i2c_dev_conf/.conf/_nvidia_support.conf}"
+    fi
 fi
 
 # Configure systemd services
 if ! inxi -M | grep -i "Type:.*Laptop" | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
-  systemctl disable --force --now mcontrolcenter.helper.service
-  systemctl --global disable mcontrolcenter.helper.service
+    systemctl disable --force --now mcontrolcenter.helper.service
+    systemctl --global disable mcontrolcenter.helper.service
 fi
 
 
@@ -178,27 +110,14 @@ fi
 # If the hostname is too long Distrobox will fail during setup
 # Let's check the length and reset it to something sensible if that happens.
 if (( $(hostname | wc -m) > 20 )); then
-  hostnamectl set-hostname catcat
+    hostnamectl set-hostname catcat
 fi
 
-# Set default target to graphical, fixes rebase from base image
-if grep -qv "graphical.target" <<< "$(systemctl get-default)"; then
-  systemctl set-default graphical.target
+# Set default target to graphical on base images, fixes rebase
+if ! grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
+    systemctl get-default | grep multi-user.target ||
+    systemctl set-default multi-user.target
+else
+    systemctl get-default | grep graphical.target ||
+    systemctl set-default graphical.target
 fi
-
-# Usbguard setup
-#if [[ ! -d /var/log/usbguard ]]; then
-#  usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
-#  mkdir -p /var/log/usbguard
-#  mkdir -p /etc/usbguard
-#  chmod 755 /etc/usbguard
-#  restorecon -vR /var/log/usbguard
-#  sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
-
-#  sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
-#  sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
-#  sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
-#  usbguard add-user $U1000
-
-#  systemctl enable --force --now usbguard.service
-#fi

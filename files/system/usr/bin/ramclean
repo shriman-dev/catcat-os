@@ -7,7 +7,8 @@ evolution-addressbook-factory
 gsd-wacom
 gsd-printer
 updatedb
-tracker-miner-fs-3'
+tracker-miner-fs-3
+localsearch'
 #setroubleshootd
 #sssd_kcm
 #gvfsd-http
