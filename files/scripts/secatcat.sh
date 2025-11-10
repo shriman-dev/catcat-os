@@ -26,7 +26,7 @@ echo "# Disable coredump
 * soft core 0" > "/etc/security/limits.d/${no_coredump_conf}"
 
 echo "[Manager]
-DumpCore=no" > ${systemd_dir}/{system,user}.conf.d/${no_coredump_conf}
+DumpCore=no" | tee ${systemd_dir}/{system,user}.conf.d/${no_coredump_conf}
 
 sed -i -Ee "/#?Storage=/d;/\[Coredump\]/a Storage=none"
         -e "/#?ProcessSizeMax=/d;/\[Coredump\]/a ProcessSizeMax=0"

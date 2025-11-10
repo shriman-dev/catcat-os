@@ -37,16 +37,16 @@ ${SETUP_DIR}/extra-extrn-pkgs.sh
 enclosed_heading_this "Refining System With Tweaks And Fixes"
 ${SETUP_DIR}/tweaks-and-fixes.sh
 
-enclosed_heading_this "Applying Themes On Various Components Of System"
+enclosed_heading_this "Applying Themes On Various System Components"
 ${SETUP_DIR}/config-themes.sh
 
-enclosed_heading_this "Enhance Security With Secatcat"
+enclosed_heading_this "Enhancing Security With Secatcat"
 ${SETUP_DIR}/secatcat.sh
 
 enclosed_heading_this "Configuring Systemd Services"
 ${SETUP_DIR}/systemd.sh
 
-enclosed_heading_this "Regenerate Initramfs"
+enclosed_heading_this "Regenerating Initramfs"
 ${SETUP_DIR}/initramfs.sh
 
 enclosed_heading_this "Configuring Signing Policy"
