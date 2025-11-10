@@ -28,8 +28,8 @@ echo "# Disable coredump
 echo "[Manager]
 DumpCore=no" | tee ${systemd_dir}/{system,user}.conf.d/${no_coredump_conf}
 
-sed -i -Ee "/#?Storage=/d;/\[Coredump\]/a Storage=none"
-        -e "/#?ProcessSizeMax=/d;/\[Coredump\]/a ProcessSizeMax=0"
+sed -i -Ee "/#?Storage=/d;/\[Coredump\]/a Storage=none" \
+        -e "/#?ProcessSizeMax=/d;/\[Coredump\]/a ProcessSizeMax=0" \
         -e "/#?ExternalSizeMax=/d;/\[Coredump\]/a ExternalSizeMax=0" \
             "${systemd_dir}/coredump.conf"
 
