@@ -10,8 +10,7 @@ systemd_dir="/usr/lib/systemd"
 log "INFO" "Configuring avahi daemon to stop when uneeded"
 mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
 echo "[Manager]
-DumpCore=no" > \
-    ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
+DumpCore=no" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
 
 # Disable coredump for better security and performance
 log "INFO" "Disabling coredump for better security and performance"
