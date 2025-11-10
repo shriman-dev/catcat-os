@@ -42,9 +42,10 @@ jobs:
         id: prepare-environment
         shell: bash
         run: |
-          set -eou pipefail
+          set -ouex pipefail
           pwd
           ls -A1
+          lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           source ${{ github.workspace }}/ENVAR
           echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
@@ -55,7 +56,8 @@ jobs:
         id: flatpak_dependencies
         shell: bash
         run: |
-          set -ex
+          set -ouex pipefail
+          pwd
           IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           # Make temp space
           TEMP_FLATPAK_INSTALL_DIR=$(mktemp -d -p ${{ github.workspace }} flatpak.XXX)

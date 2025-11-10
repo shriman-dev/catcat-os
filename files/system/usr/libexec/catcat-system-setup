@@ -79,7 +79,7 @@ fi
 if command -v nvidia-smi; then
     sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
     sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
-    # enable nvidia optimus if device is laptop and has nvidia dgpu
+    # Enable nvidia optimus if device is laptop and has nvidia dgpu
 #   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
 #       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
 #           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
@@ -92,7 +92,7 @@ fi
 i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
 if [[ ! -f "${i2c_dev_conf}"f ]]; then
     echo "i2c-dev" > "${i2c_dev_conf}"
-    # enable i2c support for nvidia cards
+    # Enable i2c support for nvidia cards
     if command -v nvidia-smi; then
         echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > \
                 "${i2c_dev_conf/.conf/_nvidia_support.conf}"
