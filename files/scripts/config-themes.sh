@@ -177,7 +177,7 @@ apply_default_configs() {
     log "INFO" "Done."
 
     mkdir -vp /etc/skel/.config/dconf
-    log "INFO" "Directory tree of: /etc/dconf"
+    log "INFO" "Tree of: /etc/dconf"
     tree /etc/dconf/
 }
 

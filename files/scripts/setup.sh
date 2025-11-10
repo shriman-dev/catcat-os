@@ -41,7 +41,7 @@ enclosed_heading_this "Applying Themes On Various Components Of System"
 ${SETUP_DIR}/config-themes.sh
 
 enclosed_heading_this "Enhance Security With Secatcat"
-$SCRIPT_DIR/secatcat.sh
+${SETUP_DIR}/secatcat.sh
 
 enclosed_heading_this "Configuring Systemd Services"
 ${SETUP_DIR}/systemd.sh
