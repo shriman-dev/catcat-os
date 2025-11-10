@@ -21,5 +21,5 @@ for key in "${!pairs[@]}"; do
 done
 log "INFO" "Applied."
 
-log "INFO" "Full output of os-release file: ${IMPORT_FILE}"
+log "INFO" "Full output of os-release file: /usr/lib/os-release"
 cat /usr/lib/os-release
