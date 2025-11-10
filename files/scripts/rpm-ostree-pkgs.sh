@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ouex pipefail
+set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Adding extra RPM repos"

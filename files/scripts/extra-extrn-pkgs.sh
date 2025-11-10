@@ -89,7 +89,7 @@ llama_cpp() {
     mv -v "${llama_cpp_zip}.extract/build/bin" "${ulibexec_llama_cpp}"/
     chmod -v +x "${ulibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
     ln -svf "${ulibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
-    rm -rf "${llama_cpp_tar}" "${llama_cpp_tar}.extract"
+    rm -rf "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
     log "INFO" "Done."
 }
 llama_cpp
