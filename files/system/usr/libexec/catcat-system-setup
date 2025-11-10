@@ -2,14 +2,14 @@
 source /usr/lib/catcat/funcvar.sh
 U1000="$(id -un 1000)"
 
-# copy main user monitors.xml to gdm
+# Copy main user monitors.xml to gdm
 monitors_xml=".config/monitors.xml"
 if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"  &>/dev/null; then
     cp -vf "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"
     restorecon -vR "/home/${U1000}/.local/share/icc"
 fi
 
-# setup user home configs
+# Setup user home configs
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do
     if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then

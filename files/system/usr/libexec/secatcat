@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
 
-# selinux fix
+# Selinux fix
 #restorecon  -vR /home/${U1000}/.local/share/icc
 #restorecon -vR /etc/dnsmasq.d/
 #restorecon -vR /var/log/usbguard
