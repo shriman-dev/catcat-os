@@ -2,6 +2,8 @@
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
+cat /usr/lib/os-release
+
 log "INFO" "Applying custom OS labels"
 declare -A pairs=(
     ["NAME"]="CatCat OS"
