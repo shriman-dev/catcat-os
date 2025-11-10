@@ -3,7 +3,6 @@ set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Applying custom OS labels"
-
 declare -A pairs=(
     ["NAME"]="CatCat OS"
     ["PRETTY_NAME"]="CatCat OS ${MAJOR_VERSION}"
@@ -20,5 +19,7 @@ for key in "${!pairs[@]}"; do
     log "DEBUG" "${key}=${value}"
     replace_add "${key}=" "${key}=\"${value}\"" /usr/lib/os-release
 done
-
 log "INFO" "Applied."
+
+log "INFO" "Full output of os-release file: ${IMPORT_FILE}"
+cat /usr/lib/os-release

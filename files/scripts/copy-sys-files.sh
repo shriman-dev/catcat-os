@@ -27,8 +27,7 @@ if [[ -f "${IMPORT_FILE}" ]]; then
         }
     done
 fi
+log "INFO" "All Justfile imports are done."
 
 log "INFO" "Full output of just import file: ${IMPORT_FILE}"
 cat "${IMPORT_FILE}"
-
-log "INFO" "All Justfile imports are done."
