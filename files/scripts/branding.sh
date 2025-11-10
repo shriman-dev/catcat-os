@@ -19,9 +19,7 @@ for key in "${!pairs[@]}"; do
     value="${pairs[${key}]}"
     sed -i "s/^${key}=.*/${key}=\"${value}\"/" "${OS_RELEASE_FILE}"
     # If the key does not exist, append it to the os-release file
-    if ! grep -q "^${key}=" "${OS_RELEASE_FILE}"; then
-        echo "${key}=\"${value}\"" | tee -a "${OS_RELEASE_FILE}" >/dev/null
-    fi
+    grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" > "${OS_RELEASE_FILE}"
 done
 log "INFO" "Applied."
 
