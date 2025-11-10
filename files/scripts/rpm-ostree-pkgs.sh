@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -oue pipefail
+set -ouex pipefail
 source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Adding extra RPM repos"
@@ -8,10 +8,8 @@ cd /etc/yum.repos.d/
 log "DEBUG" "Repos before changes"
 ls -A1
 
-cat /etc/yum.repos.d/terra*
-
 #sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/terra.repo
-dnf5 -y copr enable kylegospo/unl0kr
+#dnf5 -y copr enable kylegospo/unl0kr
 dnf5 -y copr enable pgdev/ghostty
 dnf5 -y copr enable atim/starship
 dnf5 -y copr enable zeno/scrcpy
