@@ -6,11 +6,11 @@ source /usr/lib/catcat/funcvar.sh
 # Boot, Services and System #
 #############################
 systemd_dir="/usr/lib/systemd"
-# Avahi daemon to stop when uneeded
-log "INFO" "Configuring avahi daemon to stop when uneeded"
+# Avahi daemon to stop when unneeded
+log "INFO" "Configuring avahi daemon to stop when unneeded"
 mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
-echo "[Manager]
-DumpCore=no" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
+echo "[Unit]
+StopWhenUnneeded=true" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
 
 # Disable coredump for better security and performance
 log "INFO" "Disabling coredump for better security and performance"
