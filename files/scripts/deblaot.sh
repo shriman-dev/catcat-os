@@ -5,7 +5,7 @@ source ${SETUP_DIR}/funcvar.sh
 
 log "INFO" "Debloating image"
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-sudo dnf5 -y remove \
+dnf5 -y remove \
                 bazaar \
                 btrfs-assistant \
                 fastfetch \
