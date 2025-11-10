@@ -111,7 +111,7 @@ enclosed_heading() {
     local text="${1}"
     local padding_char="${2:-#}"
     local output_width=${3:-75}
-    local border=$(printf "%*s" ${output_width} "" | tr ' ' "${padding_char}")
+    local border=$(printf "%*s" ${output_width} | tr ' ' "${padding_char}")
 
     echo "${border}"
     symmetric_heading "${text}" "${padding_char}" ${output_width}

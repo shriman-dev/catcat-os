@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-DCONF_DIR="$( dirname $SCRIPT_DIR )/dconf"
+SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+DCONF_DIR="$(dirname $(dirname $SCRIPT_DIR))/files/dconf"
 
 dconfDump() {
     local path=$1

@@ -95,7 +95,7 @@ jobs:
             type=raw,value=${{ env.DEFAULT_TAG }}
             type=raw,value=${{ env.MAJOR_VERSION }}
             type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
-            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}-${{ env.TIMESTAMP }}
+            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
             type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
@@ -105,7 +105,7 @@ jobs:
             org.opencontainers.image.description=${{ env.IMAGE_DESC }}
             org.opencontainers.image.title=${{ matrix.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}-${{ env.TIMESTAMP }}
+            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
             containers.bootc=1
           sep-tags: " "
           sep-annotations: " "

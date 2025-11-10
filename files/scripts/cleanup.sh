@@ -1,66 +1,85 @@
 #!/usr/bin/env bash
 set -oue pipefail
-echo -e "\n$0\n"
+SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+source ${SETUP_DIR}/funcvar.sh
 
-#rm -vf /usr/share/pixmaps/fedora*
-#rm -vf /usr/share/pixmaps/bootloader/fedora.icns
+log "INFO" "Cleaning image"
 
-###
+log "INFO" "Disabling unneeded executables"
+# Disable ibus (causes input lag when selected)
+#chmod -v 000 /usr/bin/ibus
+#chmod -v 000 /usr/bin/ibus-daemon
+#chmod -v 000 /usr/bin/ibus-setup
+#chmod -v 000 /usr/libexec/evolution-source-registry
+#chmod -v 000 /usr/libexec/evolution-addressbook-factory
+#chmod -v 000 /usr/libexec/evolution-calendar-factory
+#chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
+chmod -v 000 /usr/libexec/goa-daemon
+chmod -v 000 /usr/libexec/goa-identity-service
 
-# disable ibus (causes input lag)
-#chmod 000 /usr/bin/ibus
-#chmod 000 /usr/bin/ibus-daemon
-#chmod 000 /usr/bin/ibus-setup
+if [[ -d /usr/share/ublue-os ]]; then
+    log "INFO" "Removing homebrew"
+    rm -rf /home/linuxbrew
+    rm -vf /usr/lib/systemd/system/brew-dir-fix.service
+    rm -vf /usr/lib/systemd/system/brew-setup.service
+    rm -vf /usr/lib/systemd/system/brew-update.timer
+    rm -vf /usr/lib/systemd/system/brew-update.service
+    rm -vf /usr/lib/systemd/system/brew-upgrade.timer
+    rm -vf /usr/lib/systemd/system/brew-upgrade.service
+    rm -vf /usr/lib/systemd/system-preset/01-homebrew.preset
+    rm -vf /usr/lib/tmpfiles.d/homebrew.conf
+    rm -vf /usr/share/homebrew.tar.zst
+    rm -vf /usr/share/fish/vendor_conf.d/brew.fish
+    rm -rf /usr/share/ublue-os/homebrew
 
-chmod 000 /usr/libexec/evolution-source-registry
-chmod 000 /usr/libexec/evolution-addressbook-factory
-chmod 000 /usr/libexec/evolution-calendar-factory
-chmod 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
+    log "INFO" "Removing ublue/bazzite defaults"
+    [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/share/glib-2.0/schemas/zz*
+    [[ ! -d /etc/catcat-os ]] && rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
+    rm -vf  /usr/libexec/topgrade/mozilla-gnome-theme-update
+    rm -vf  /usr/share/applications/bazzite-steam-bpm.desktop
+    rm -vf  /usr/share/applications/gnome-ssh-askpass.desktop
+    rm -vf  /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
+    rm -vf  /usr/share/fish/vendor_conf.d/ublue-brew.fish
+    rm -vf  /usr/share/fish/vendor_conf.d/nano-default-editor.fish
+    rm -vf  /usr/share/fish/functions/fish_greeting.fish
+    rm -rvf /usr/share/ublue-os/bazaar/blocklist.txt
+    rm -rvf /usr/share/ublue-os/dconfs
+    rm -rvf /usr/share/ublue-os/flatpak-blocklist
+    rm -rvf /usr/share/ublue-os/motd
 
-chmod 000 /usr/libexec/goa-daemon
-chmod 000 /usr/libexec/goa-identity-service
+    log "INFO" "Removing ublue/bazzite defaults in /etc/profile.d"
+    rm -vf /etc/profile.d/askpass.sh
+    rm -vf /etc/profile.d/bazzite-neofetch.sh
+    rm -vf /etc/profile.d/brew.sh
+    rm -vf /etc/profile.d/brew-bash-completion.sh
+    rm -vf /etc/profile.d/user-motd.sh
+fi
 
-rm -rf /home/linuxbrew
-rm -rf /usr/share/ublue-os/homebrew
-rm -vf /usr/lib/systemd/system/brew-dir-fix.service
-rm -vf /usr/lib/systemd/system/brew-setup.service
-rm -vf /usr/lib/systemd/system/brew-update.service
-rm -vf /usr/lib/systemd/system/brew-upgrade.service
-rm -vf /usr/lib/tmpfiles.d/homebrew.conf
-
+log "INFO" "Removing localsearch db miner"
 rm -vf /usr/lib/systemd/user/tracker-miner-fs-3.service
 rm -vf /usr/lib/systemd/user/tracker-miner-fs-control-3.service
 rm -vf /usr/lib/systemd/user/tracker-miner-rss-3.service
 rm -vf /usr/lib/systemd/user/tracker-writeback-3.service
 rm -vf /usr/lib/systemd/user/tracker-xdg-portal-3.service
+rm -vf /usr/lib/systemd/user/localsearch-3.service
+rm -vf /usr/lib/systemd/user/localsearch-control-3.service
+rm -vf /usr/lib/systemd/user/localsearch-writeback-3.service
 
-[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/skel/*
-[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/share/glib-2.0/schemas/zz*
-[[ ! -d /etc/catcat-os ]] && rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
-rm -vf  /usr/libexec/topgrade/mozilla-gnome-theme-update
-rm -vf  /usr/share/applications/bazzite-steam-bpm.desktop
-rm -vf  /usr/share/applications/gnome-ssh-askpass.desktop
-rm -vf  /usr/share/fish/vendor_conf.d/bazzite-neofetch.fish
-rm -vf  /usr/share/fish/vendor_conf.d/brew.fish
-rm -vf  /usr/share/fish/vendor_conf.d/ublue-brew.fish
-rm -vf  /usr/share/fish/vendor_conf.d/nano-default-editor.fish
-rm -vf  /usr/share/fish/functions/fish_greeting.fish
-rm -rvf /usr/share/ublue-os/bazaar/blocklist.txt
-rm -rvf /usr/share/ublue-os/dconfs
-rm -rvf /usr/share/ublue-os/motd
-
+log "INFO" "Removing dconf and skel defaults"
 [[ ! -d /etc/catcat-os ]] && rm -rvf /etc/skel/*
 [[ ! -d /etc/catcat-os ]] && rm -rvf /etc/dconf/db/distro.d/*
-rm -vf  /etc/profile.d/askpass.sh
-rm -vf  /etc/profile.d/bazzite-neofetch.sh
-rm -vf  /etc/profile.d/brew.sh
-rm -vf  /etc/profile.d/brew-bash-completion.sh
-rm -vf  /etc/profile.d/user-motd.sh
+[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/skel/*
+[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/dconf/db/distro.d/*
 
-rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
-rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
-rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
-rm -vf  /etc/xdg/autostart/tracker-miner-fs-3.desktop
-rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
-rm -vf  /etc/xdg/autostart/steam.desktop
-rm -vf  /etc/yum.repos.d/google-chrome.repo
+log "INFO" "Removing desktop files in /etc/xdg/autostart"
+rm -vf /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
+rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
+rm -vf /etc/xdg/autostart/nvidia-settings-load.desktop
+rm -vf /etc/xdg/autostart/tracker-miner-fs-3.desktop
+rm -vf /etc/xdg/autostart/tracker-miner-rss-3.desktop
+rm -vf /etc/xdg/autostart/steam.desktop
+
+log "INFO" "Removing unneeded repos"
+rm -vf /etc/yum.repos.d/google-chrome.repo
+
+log "INFO" "Cleanup done."

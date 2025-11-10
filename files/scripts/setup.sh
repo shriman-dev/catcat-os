@@ -1,51 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -oue pipefail
-echo -e "\n$0\n"
+SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+source ${SETUP_DIR}/funcvar.sh
 
-echo ${COMMIT_SHA}
-echo ${IMAGE_NAME} ${MAJOR_VERSION}
-echo ${COMMIT_SHA}
+enclosed_heading "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP}, From Commit: ${COMMIT_SHA}" "" "120"
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+enclosed_heading "Cleaning Up"
+${SETUP_DIR}/cleanup.sh
 
-$SCRIPT_DIR/cleanup.sh
+enclosed_heading "Debloating"
+${SETUP_DIR}/deblaot.sh
 
-# copy system files
-FILESDIR="$(dirname $SCRIPT_DIR)"
-mkdir -p /var/lib/alternatives
-mkdir -p /usr/etc/dconf/db/distro.d/
-mkdir -p /nix
-cp -drf  ${FILESDIR}/system/* /
-cp -drvf ${FILESDIR}/dconf/*  /etc/dconf/db/distro.d/
-cp -drvf ${FILESDIR}/dconf/*  /usr/etc/dconf/db/distro.d/
-cp -drf  ${FILESDIR}/skel     /etc/
+enclosed_heading "Preparing System Environment"
+${SETUP_DIR}/prep-sys-env.sh
 
-# Setup justfiles
-IMPORT_FILE="/usr/share/ublue-os/justfile"
-for JUSTFILE in ${FILESDIR}/justfiles/*.just; do
-  cp -dvf "${JUSTFILE}" /usr/share/ublue-os/just/
-  IMPORT_LINE="import \"/usr/share/ublue-os/just/$(basename ${JUSTFILE})\""
-  # Add import line if it does not exists already
-  grep -w "${IMPORT_LINE}" "${IMPORT_FILE}" || {
-    sed -i "/# Imports/a\\${IMPORT_LINE}" "${IMPORT_FILE}"
-    cat "${IMPORT_FILE}"
-    echo "Added: '${IMPORT_LINE}' to ${IMPORT_FILE}"
-  }
-done
+enclosed_heading "Copying Over System Default Files"
+${SETUP_DIR}/copy-sys-files.sh
 
-# last commit sha
-mkdir -p /etc/catcat-os/
-echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
+enclosed_heading "Applying Branding"
+${SETUP_DIR}/branding.sh
 
-$SCRIPT_DIR/rpm-ostree.sh
-$SCRIPT_DIR/branding.sh
-$SCRIPT_DIR/tweaks-and-fixes.sh
-$SCRIPT_DIR/config-and-theming.sh
-$SCRIPT_DIR/nerd-fonts.sh
-$SCRIPT_DIR/security.sh
-$SCRIPT_DIR/systemd.sh
-$SCRIPT_DIR/initramfs.sh
-$SCRIPT_DIR/signing.sh
+enclosed_heading "Installing RPM Packages"
+${SETUP_DIR}/rpm-ostree-pkgs.sh
+
+enclosed_heading "Installing Extra External Packages"
+${SETUP_DIR}/extra-extrn-pkgs.sh
+
+enclosed_heading "Refining System With Tweaks And Fixes"
+${SETUP_DIR}/tweaks-and-fixes.sh
+
+enclosed_heading "Applying Themes On Various Components Of System"
+${SETUP_DIR}/config-themes.sh
+
+enclosed_heading "Enhance Security With Secatcat"
+$SCRIPT_DIR/secatcat.sh
+
+enclosed_heading "Configuring Systemd Services"
+${SETUP_DIR}/systemd.sh
+
+enclosed_heading "Regenerate Initramfs"
+${SETUP_DIR}/initramfs.sh
+
+enclosed_heading "Configuring Signing Policy"
+${SETUP_DIR}/signing.sh
 
 
 

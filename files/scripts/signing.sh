@@ -1,40 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -oue pipefail
-echo -e "\n$0\n"
+source /usr/lib/catcat/funcvar.sh
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+TEMPLATE_POLICY="${SETUP_DIR}/setup-files/policy.json"
+CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
+POLICY_FILE="/etc/containers/policy.json"
 
-mkdir -p /etc/containers
-mkdir -p /etc/pki/containers
-mkdir -p /etc/containers/registries.d/
+log "INFO" "Configuring container image signing policy and placing catcat-os pub key"
 
-TEMPLATE_POLICY="${SCRIPT_DIR}/setup-files/policy.json"
+mkdir -vp /etc/pki/containers /etc/containers/registries.d
 
-
-if [[ ! -f "/etc/pki/containers/catcat-os.pub" ]]; then
-  echo "ERROR: Cannot find 'catcat-os.pub' image key in '/etc/pki/containers/'"
-  exit 1
-fi
-
-if rpm -q ublue-os-signing &>/dev/null; then
-  if [[ ! -d "/usr/etc/containers/" ]]; then
-    mkdir -p "/usr/etc/containers/"
-  fi
-  POLICY_FILE="/usr/etc/containers/policy.json"
-else
-  POLICY_FILE="/etc/containers/policy.json"
-fi
+[[ ! -f "${CATCAT_PUB}" ]] &&
+    die "Cannot find '$(basename ${CATCAT_PUB})' image key in: $(dirname ${CATCAT_PUB})"
 
 # If there is no policy.json file, then copy the template policy
-if [[ ! -f "${POLICY_FILE}" ]]; then
-  cp "${TEMPLATE_POLICY}" "${POLICY_FILE}"
-fi
-
+[[ ! -f "${POLICY_FILE}" ]] && cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 # If the already existing policy.json file doesn't have 'reject' as default policy,
-# then signing is effectively disabled & template policy.json should be copied in that case also
-if [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]]; then
-  cp "${TEMPLATE_POLICY}" "${POLICY_FILE}"
-fi
+# then signing is effectively disabled and template policy.json should be copied in that case also
+[[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]] &&
+    cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 
 # ${IMAGE_NAME} is exported by build-image.yml file
 jq --arg image_name "${IMAGE_NAME}" \
@@ -42,19 +27,19 @@ jq --arg image_name "${IMAGE_NAME}" \
     { ("ghcr.io/shriman-dev/" + $image_name): [
         {
             "type": "sigstoreSigned",
-            "keyPath": "/etc/pki/containers/catcat-os.pub",
+            "keyPath": "'${CATCAT_PUB}'",
             "signedIdentity": {
                 "type": "matchRepository"
             }
         }
     ] } + .' "${POLICY_FILE}" > "/tmp/POLICY.tmp"
 
-cat /tmp/POLICY.tmp
-
 mv "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
 echo 'docker:
   ghcr.io/shriman-dev:
     use-sigstore-attachments: true' > /etc/containers/registries.d/catcat-os.yaml
+
+log "INFO" "Done."
 
 

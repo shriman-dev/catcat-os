@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
 set -oue pipefail
-echo -e "\n$0\n"
+source /usr/lib/catcat/funcvar.sh
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+log "INFO" "Applying custom OS labels"
 
-# remove stuffs
-rm -rvf /etc/skel/.config/autostart /etc/skel/.mozilla /etc/skel/.config/user-tmpfiles.d
+declare -A pairs=(
+    ["NAME"]="CatCat OS"
+    ["PRETTY_NAME"]="CatCat OS ${MAJOR_VERSION}"
+    ["ID"]="catcat"
+    ["ID_LIKE"]="fedora"
+    ["IMAGE_ID"]="${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP}"
+    ["VARIANT_ID"]="${IMAGE_NAME}"
+    ["BOOTLOADER_NAME"]="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"
+    ["DEFAULT_HOSTNAME"]="catcat"
+)
 
-# os naming
-sed -i 's/^ID=.*/ID=catcat/' /usr/lib/*release
-sed -i 's/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME="catcat"/' /usr/lib/*release
-sed -i 's/^NAME=.*/NAME="CatCat OS"/' /usr/lib/*release
-sed -i 's/Bazzite/CatCat OS/' /usr/lib/*release
-sed -i '/^VARIANT_ID=/s/bazzite.\+/catcat/' /usr/lib/*release
+for key in "${!pairs[@]}"; do
+    value="${pairs[${key}]}"
+    log "DEBUG" "${key}=${value}"
+    replace_add "${key}=" "${key}=\"${value}\"" /usr/lib/os-release
+done
 
-cp -dvf /usr/share/pixmaps/fedora-logo-sprite.png /usr/share/plymouth/themes/spinner/watermark.png
+log "INFO" "Applied."

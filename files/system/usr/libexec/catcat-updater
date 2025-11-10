@@ -25,7 +25,7 @@ FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/)"
 
 if check_network_connection; then
     for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
-        [[ "${FLATPAK_APPS}" =~ "${APP}" ]] && \
+        [[ "${FLATPAK_APPS}" =~ "${APP}" ]] &&
             /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
     done
 fi
@@ -46,7 +46,7 @@ if check_network_connection && [[ $(is_network_metered) -lt 3 ]]; then
 
         /usr/bin/update extra >> "${autoupdate_log_file}"
 
-        is_file_older ${one_week} "/etc/catcat-os/update_sha" && \
+        is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
             /usr/bin/update >> "${autoupdate_log_file}"
 
         notify_all "Weekly automatic update is done."

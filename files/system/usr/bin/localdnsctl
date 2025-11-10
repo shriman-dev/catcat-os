@@ -153,7 +153,7 @@ clean_old_logs() {
     # Clean logs
     for log_file in "${DNSMASQLOGDIR}/dnsmasq.log" "${DNSCRYPTLOGDIR}"/*.log; do
         if [[ -f "${log_file}" ]]; then
-            [[ ${log_file} == *"${DNSCRYPTLOGDIR}"* ]] && \
+            [[ ${log_file} == *"${DNSCRYPTLOGDIR}"* ]] &&
             date_format="${dnscrypt_date_format}" || date_format="${dnsmasq_date_format}"
 
             line=$(rg -n "${date_format}" "${log_file}" | cut -d: -f1 | tail -n1)
@@ -347,7 +347,7 @@ while [[ $# -gt 0 ]]; do
 #            ;;
         --flush-logs)
             shift
-            [[ $# -eq 0 ]] && { log "INFO" "Using default retention period"; clean_old_logs; } || \
+            [[ $# -eq 0 ]] && { log "INFO" "Using default retention period"; clean_old_logs; } ||
             if [[ $# -ge 2 ]]; then
                 clean_old_logs "${1} ${2}"; shift 2
             else
