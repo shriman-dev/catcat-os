@@ -1,26 +1,21 @@
 #!/usr/bin/env bash
-set -ouex pipefail
+set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Adding extra RPM repos"
+sed -i 's|enabled=0|enabled=1|g' /etc/yum.repos.d/terra.repo
 
-cd /etc/yum.repos.d/
-log "DEBUG" "Repos before changes"
-ls -A1
-
-#sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/terra.repo
 #dnf5 -y copr enable kylegospo/unl0kr
-dnf5 -y copr enable pgdev/ghostty
-dnf5 -y copr enable atim/starship
-dnf5 -y copr enable zeno/scrcpy
+#dnf5 -y copr enable scottames/ghostty
+#dnf5 -y copr enable atim/starship
+#dnf5 -y copr enable zeno/scrcpy
 #dnf5 -y copr enable atim/lazygit
 
+#cd /etc/yum.repos.d/
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/starship/repo/fedora-$(rpm -E %fedora)/atim-starship-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -E %fedora)/zeno-scrcpy-fedora-$(rpm -E %fedora).repo
-log "DEBUG" "Repos after changes"
-ls -A1
-cd -
+#cd -
 
 security='firewalld firewall-config usbguard usbguard-selinux usbguard-notifier' # hblock
 #opensnitch
@@ -111,3 +106,6 @@ log "INFO" "Done."
 log "INFO" "Installing RPM Packages"
 rpm-ostree install ${all_pkgs[@]}
 log "INFO" "Done."
+
+log "INFO" "Disabling copr repos no longer needed"
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
