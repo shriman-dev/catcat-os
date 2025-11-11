@@ -4,10 +4,7 @@ SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source ${SETUP_DIR}/funcvar.sh
 
 enclosed_heading_this() {
-    local text="${1}"
-    local padding_char="${2:-=}"
-    local output_width=${3:-120}
-
+    local text="${1}" padding_char="${2:-=}" output_width=${3:-120}
     enclosed_heading "${text}" "${padding_char}" ${output_width}
 }
 

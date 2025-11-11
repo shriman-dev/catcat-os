@@ -181,7 +181,7 @@ authselect current
 log "INFO" "Enabling needed authselect features"
 authselect enable-feature without-nullok # Blocks empty password logins
 authselect enable-feature with-faillock # Enables account locking on failure
-#authselect apply-changes
+authselect apply-changes
 log "DEBUG" "Authselect profile after changes"
 authselect current
 

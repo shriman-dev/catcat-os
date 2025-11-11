@@ -87,9 +87,7 @@ function Urllink (){
 
 # Function to generates a centered text header with customizable padding character, width, and symmetrical padding
 symmetric_heading() {
-    local text="${1}"
-    local padding_char="${2:-#}"
-    local output_width=${3:-75}  # Total width of the output
+    local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
     local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
     local left_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
     local right_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
@@ -108,9 +106,7 @@ symmetric_heading() {
 
 # Same as above but with upper and lower borders using given character
 enclosed_heading() {
-    local text="${1}"
-    local padding_char="${2:-#}"
-    local output_width=${3:-75}
+    local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
     local border=$(printf "%*s" ${output_width} | tr ' ' "${padding_char}")
 
     echo "${border}"
@@ -172,9 +168,7 @@ is_file_older() {
 }
 
 check_network_connection() {
-    local max_attempts=3
-    local sleep_time=2
-    local attempt=1
+    local max_attempts=3 sleep_time=2 attempt=1
 
     while (( attempt <= max_attempts )); do
         if curl --silent --head --fail "https://fedoraproject.org" >/dev/null; then
