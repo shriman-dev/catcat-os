@@ -42,7 +42,7 @@ EOF
 for qual_kernel in "${QUALIFIED_KERNEL[@]}"; do
     INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${qual_kernel}/initramfs.img"
     log "INFO" "Starting initramfs regeneration for kernel version: ${qual_kernel}"
-    "${DRACUT}" -v --kver "${qual_kernel}" \
+    "${DRACUT}" --kver "${qual_kernel}" \
                 --no-hostonly --reproducible --add ostree --force "${INITRAMFS_IMAGE}"
     chmod -v 0600 "${INITRAMFS_IMAGE}"
 done
