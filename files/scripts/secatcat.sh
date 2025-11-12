@@ -192,7 +192,7 @@ authselect current
 ###############
 # Create a xdg autostart file to mute microphone at login
 mute_mic_file="/etc/xdg/autostart/mute-mic.desktop"
-log "INFO" "Adding autostart desktop file to mutes mic after user login"
+log "INFO" "Adding autostart desktop file that mutes mic on user login"
 mkdir -pv "$(dirname ${mute_mic_file})"
 cat > "${mute_mic_file}" << EOF
 [Desktop Entry]

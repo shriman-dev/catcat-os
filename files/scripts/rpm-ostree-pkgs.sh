@@ -2,6 +2,8 @@
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
+rpm-ostree upgrade
+
 log "INFO" "Adding extra RPM repos"
 sed -i 's|enabled=0|enabled=1|g' /etc/yum.repos.d/terra.repo
 
@@ -104,6 +106,7 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev
 log "INFO" "Done."
 
 log "INFO" "Installing RPM Packages"
+rpm-ostree refresh-md
 rpm-ostree install ${all_pkgs[@]}
 log "INFO" "Done."
 
