@@ -19,7 +19,7 @@ mkdir -vp ${systemd_dir}/{system,user}.conf.d
 #echo 'ulimit -S -c 0' >> /etc/profile
 echo "# Disable coredump
 fs.suid_dumpable=0
-kernel.core_pattern=|/bin/false" > "/etc/sysctl.d/${no_coredump_conf}"
+kernel.core_pattern=|/bin/false" > "/etc/sysctl.d/99-${no_coredump_conf}"
 
 echo "# Disable coredump
 * hard core 0
@@ -49,7 +49,10 @@ cat "${tmp_chrony}/LICENSE_temp" > "${chrony_conf}"
 cat "${tmp_chrony}/chrony.conf" >> "${chrony_conf}"
 # Update chronyd
 sed -i 's/^OPTIONS=.*$/OPTIONS="-F 1 -r"/' /etc/sysconfig/chronyd
+
+# 30 days retention period for files in directory: /var/lib/chrony
 echo "d /var/lib/chrony 0755 chrony chrony 30d" > /etc/tmpfiles.d/chrony.conf
+
 # Clear tmp
 rm -rvf "${tmp_chrony}"
 
@@ -189,7 +192,7 @@ authselect current
 ###############
 # Create a xdg autostart file to mute microphone at login
 mute_mic_file="/etc/xdg/autostart/mute-mic.desktop"
-log "INFO" "Adding desktop file to autostart that mutes mic after user login"
+log "INFO" "Adding autostart desktop file to mutes mic after user login"
 mkdir -pv "$(dirname ${mute_mic_file})"
 cat > "${mute_mic_file}" << EOF
 [Desktop Entry]

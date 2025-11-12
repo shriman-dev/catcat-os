@@ -90,7 +90,7 @@ fi
 
 # Enable i2c-dev support to configure monitors via ddcutil
 i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
-if [[ ! -f "${i2c_dev_conf}"f ]]; then
+if [[ ! -f "${i2c_dev_conf}" ]]; then
     echo "i2c-dev" > "${i2c_dev_conf}"
     # Enable i2c support for nvidia cards
     if command -v nvidia-smi; then
@@ -114,6 +114,7 @@ if (( $(hostname | wc -m) > 20 )); then
 fi
 
 # Set default target to graphical on base images, fixes rebase
+systemd_default_target="$(systemctl get-default)"
 if ! grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
     systemctl get-default | grep multi-user.target ||
     systemctl set-default multi-user.target

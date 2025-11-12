@@ -6,6 +6,8 @@ NEEDED_KARGS=()
 COMMON_KARGS_TO_ADD=(
     "rd.udev.log_priority=3"
     "loglevel=3"
+    "rd.shell=0"
+    "rd.emergency=halt"
 )
 
 for karg in "${COMMON_KARGS_TO_ADD[@]}"; do
