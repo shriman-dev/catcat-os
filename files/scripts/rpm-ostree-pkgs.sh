@@ -17,7 +17,7 @@ sed -i 's|enabled=0|enabled=1|g' /etc/yum.repos.d/terra.repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -E %fedora)/zeno-scrcpy-fedora-$(rpm -E %fedora).repo
 #cd -
 
-log "INFO" "Performing update"
+log "INFO" "Performing updates"
 dnf5 upgrade --refresh --assumeyes
 
 security='firewalld firewall-config usbguard usbguard-selinux usbguard-notifier' # hblock
@@ -107,7 +107,6 @@ rpm-ostree install $(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev
 log "INFO" "Done."
 
 log "INFO" "Installing RPM Packages"
-rpm-ostree refresh-md
 rpm-ostree install ${all_pkgs[@]}
 log "INFO" "Done."
 
