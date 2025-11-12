@@ -2,8 +2,6 @@
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
-rpm-ostree upgrade
-
 log "INFO" "Adding extra RPM repos"
 sed -i 's|enabled=0|enabled=1|g' /etc/yum.repos.d/terra.repo
 
@@ -18,6 +16,9 @@ sed -i 's|enabled=0|enabled=1|g' /etc/yum.repos.d/terra.repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/atim/lazygit/repo/fedora-$(rpm -E %fedora)/atim-lazygit-fedora-$(rpm -E %fedora).repo
 #curl -LO https://copr.fedorainfracloud.org/coprs/zeno/scrcpy/repo/fedora-$(rpm -E %fedora)/zeno-scrcpy-fedora-$(rpm -E %fedora).repo
 #cd -
+
+log "INFO" "Performing update"
+dnf5 upgrade --refresh --assumeyes
 
 security='firewalld firewall-config usbguard usbguard-selinux usbguard-notifier' # hblock
 #opensnitch
