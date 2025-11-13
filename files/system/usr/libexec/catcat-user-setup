@@ -9,12 +9,17 @@ CATCAT_CONF="${LOCALSHARE}/catcat-os"
 
 FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ${LOCALSHARE}/flatpak/app/)"
 
+if [[ ! -f "${CATCAT_CONF}/first-boot" ]]; then
+  dconf reset /org/gnome/Ptyxis
+  echo 'first boot' > "${CATCAT_CONF}/first-boot"
+fi
+
 # sync default configs for user home
 sync_default_configs() {
   local update_sha="/etc/catcat-os/update_sha"
-  local prev_sha="${CATCAT_CONF}/previous_update_sha"
+  local prev_sha="${CATCAT_CONF}/update_sha_previous"
 
-  if ! diff -q "${update_sha}" "${prev_sha}" &>/dev/null; then
+  if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
     log "INFO" "Updating configs..."
     mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
 
@@ -41,6 +46,11 @@ gnome_shell_setup() {
 #    do
 #    dconf load / < $i &
 #    done
+  }
+
+  [[ -d /run/user/1000 ]] && {
+    local primary_monitor="$(gdbus call --session --dest org.gnome.Mutter.DisplayConfig --object-path /org/gnome/Mutter/DisplayConfig --method org.gnome.Mutter.DisplayConfig.GetCurrentState | grep -o "\[((.*), \[(" | tr -cd '[:alnum:],' | cut -d "," -f2,4 | tr "," "-")"
+    echo "${primary_monitor}" > "${CATCAT_CONF}/primary-monitor"
   }
 
   log "INFO" "Styling up GNOME Shell Extensions..."

@@ -47,20 +47,29 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
     echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
+# Set primary monitor for dash to panel
+monitor_id="$(cat /home/${U1000}/.local/share/catcat-os/primary-monitor)"
+etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
+usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
+if ! grep "panel-positions.*${monitor_id}" "${etc_dconf_ext}" && [[ -f "${monitor_id}" ]]; then
+    sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
+        -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
+        -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
+        -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
+            "${usr_dconf_ext}" > "${etc_dconf_ext}"
+fi
+
 # Sync configs on update
 catcat_update_sha="/etc/catcat-os/update_sha"
 if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
-    [[ ! -d /root/.config/bat ]] && { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
+    [[ ! -d /root/.config/bat ]] &&
+            { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
     /usr/bin/bat cache --build
 
-    # Set primary monitor for dash to panel
-    [[ -f "${usr_dconf_ext}" ]] && {
-        etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
-        usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
-        monitor_vendor_serial_id=(
-            $(hwinfo --monitor | grep -E "Vendor:|Serial ID:" | cut -d':' -f2 | tr -d '"' | tr -d "'")
-        )
-        monitor_id="${monitor_vendor_serial_id[0]}-${monitor_vendor_serial_id[1]}"
+    [[ ! -f /root/.config/fish/fish_variables ]] &&
+            ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
+
+    [[ -f "${monitor_id}" ]] {
         sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
             -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
             -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
@@ -114,11 +123,9 @@ if (( $(hostname | wc -m) > 20 )); then
 fi
 
 # Set default target to graphical on base images, fixes rebase
-systemd_default_target="$(systemctl get-default)"
+default_target="$(systemctl get-default)"
 if ! grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
-    systemctl get-default | grep multi-user.target ||
-    systemctl set-default multi-user.target
+    [[ ! "${default_target}" == "multi-user.target" ]] && systemctl set-default multi-user.target
 else
-    systemctl get-default | grep graphical.target ||
-    systemctl set-default graphical.target
+    [[ ! "${default_target}" == "graphical.target" ]] && systemctl set-default graphical.target
 fi

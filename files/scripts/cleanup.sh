@@ -35,6 +35,7 @@ if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Removing ublue/bazzite defaults"
     [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/share/glib-2.0/schemas/zz*
     [[ ! -d /etc/catcat-os ]] && rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
+    rm -vf  /usr/libexec/bazzite-user-setup
     rm -vf  /usr/libexec/topgrade/mozilla-gnome-theme-update
     rm -vf  /usr/share/applications/bazzite-steam-bpm.desktop
     rm -vf  /usr/share/applications/gnome-ssh-askpass.desktop
@@ -72,12 +73,14 @@ log "INFO" "Removing dconf and skel defaults"
 [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/dconf/db/distro.d/*
 
 log "INFO" "Removing desktop files in /etc/xdg/autostart"
-rm -vf /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
-rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
-rm -vf /etc/xdg/autostart/nvidia-settings-load.desktop
-rm -vf /etc/xdg/autostart/tracker-miner-fs-3.desktop
-rm -vf /etc/xdg/autostart/tracker-miner-rss-3.desktop
-rm -vf /etc/xdg/autostart/steam.desktop
+rm -rvf /etc/skel/.config/autostart
+rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
+rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
+rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
+rm -vf  /etc/xdg/autostart/localsearch-3.desktop
+rm -vf  /etc/xdg/autostart/tracker-miner-fs-3.desktop
+rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
+rm -vf  /etc/xdg/autostart/steam.desktop
 
 log "INFO" "Removing unneeded repos"
 rm -vf /etc/yum.repos.d/google-chrome.repo

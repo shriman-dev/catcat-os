@@ -142,8 +142,10 @@ ascii_image_converter() {
 ascii_image_converter
 
 extras() {
+    log "INFO" "Getting extra confs"
     curl -Lo /usr/share/applications/micro.desktop \
         https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
+    log "INFO" "Done."
 }
 extras
 
