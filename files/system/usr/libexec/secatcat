@@ -57,6 +57,15 @@ if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.s
     fi
 fi
 
+# TODO: Log unsuccessful login attempts
+log "INFO" "Enabling needed authselect features"
+authselect current | grep "without-nullok" | grep "with-faillock" || {
+    #authselect select sssd
+    authselect enable-feature without-nullok # Blocks empty password logins
+    authselect enable-feature with-faillock # Enables account locking on failure
+    authselect apply-changes
+}
+
 # Usbguard setup
 #if [[ ! -d /var/log/usbguard ]]; then
 #   usbguard_conf="/etc/usbguard/usbguard-daemon.conf"

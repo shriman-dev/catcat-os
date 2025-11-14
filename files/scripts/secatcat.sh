@@ -177,17 +177,6 @@ sed -i -Ee 's|^(#?[[:space:]]*minlen =.*)|minlen = 12|' \
         -e 's|^(#?[[:space:]]*usersubstr =.*)|usersubstr = 5|' \
         -e 's|^(#?[[:space:]]*enforcing =.*)|enforcing = 0|' "${pwquality_conf}"
 
-# TODO: Log unsuccessful login attempts
-#authselect select sssd
-log "DEBUG" "Authselect profile before changes"
-authselect current
-log "INFO" "Enabling needed authselect features"
-authselect enable-feature without-nullok # Blocks empty password logins
-authselect enable-feature with-faillock # Enables account locking on failure
-authselect apply-changes
-log "DEBUG" "Authselect profile after changes"
-authselect current
-
 # After User Login
 ###############
 # Create a xdg autostart file to mute microphone at login

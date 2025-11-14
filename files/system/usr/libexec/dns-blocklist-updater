@@ -1,13 +1,13 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
-one_week=604800
+four_days=345600
 blocklist_autoupdate_log="/etc/catcat-os/log/auto-dns-blocklist-update.log"
 
 while true; do
-  if is_file_older ${one_week} "${blocklist_autoupdate_log}"; then
+  if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then
     date "+%a %b %d %H:%M:%S %Y" > "${blocklist_autoupdate_log}"
     localdnsctl --update >> "${blocklist_autoupdate_log}"
-    localdnsctl --restart >> "${blocklist_autoupdate_log}"
+    systemctl restart dnscrypt-proxy.service >> "${blocklist_autoupdate_log}"
   fi
-  sleep ${one_week}s
+  sleep ${four_days}s
 done
