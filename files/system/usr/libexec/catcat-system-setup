@@ -77,8 +77,8 @@ if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
                 "${usr_dconf_ext}" > "${etc_dconf_ext}"
     }
 
-    chmod -c -R 755 /etc/dconf/
     /usr/bin/dconf update
+    chmod -c -R 755 /etc/dconf/
 
     [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
 

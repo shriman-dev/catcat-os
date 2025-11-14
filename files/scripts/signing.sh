@@ -34,7 +34,7 @@ jq --arg image_name "${IMAGE_NAME}" \
         }
     ] } + .' "${POLICY_FILE}" > "/tmp/POLICY.tmp"
 
-mv "/tmp/POLICY.tmp" "${POLICY_FILE}"
+mv -v "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
 echo 'docker:
   ghcr.io/shriman-dev:
