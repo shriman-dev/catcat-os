@@ -62,11 +62,11 @@ fi
 # Sync configs on update
 catcat_update_sha="/etc/catcat-os/update_sha"
 if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
-    [[ ! -L /root/.config/bat ]] &&
+    [[ ! -e /root/.config/bat ]] &&
             { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
     /usr/bin/bat cache --build
 
-    [[ ! -L /root/.config/fish/fish_variables ]] &&
+    [[ ! -e /root/.config/fish/fish_variables ]] &&
             ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
 
     [[ -f "${monitor_id}" ]] {

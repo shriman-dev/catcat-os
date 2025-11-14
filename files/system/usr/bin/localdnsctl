@@ -40,7 +40,6 @@ update_blocklist() {
     log "INFO" "Extracting blocklist..."
     tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
         die "Failed to extract blocklist"
-    rm ${VERBOSE:+-v} -f "${DNSMASQDIR}/domains-blocklist.conf" "${DNSCRYPTDIR}/domains-blocklist.txt"
     cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
     rm -rf "${TMPDIR}"
     { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
@@ -60,9 +59,11 @@ toggle_localdns() {
             log "INFO" "Enabling local DNS..."
             ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+                 touch "${DNSCRYPTDIR}/domains-blocklist.txt"
                  ${SYSTEMCTL} disable --force --now dnsmasq.service
                  ${SYSTEMCTL} enable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
+                 touch "${DNSMASQDIR}/domains-blocklist.conf"
                  ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
                  ${SYSTEMCTL} enable --force --now dnsmasq.service
               fi } ||
@@ -76,7 +77,7 @@ toggle_localdns() {
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                 ${SYSTEMCTL} disable --force --now dnsmasq.servic
+                 ${SYSTEMCTL} disable --force --now dnsmasq.service
               fi } &&
                 ${SYSTEMCTL} restart NetworkManager.service ||
                 die "Failed to disable DNS services"
@@ -84,9 +85,13 @@ toggle_localdns() {
         restart)
             log "INFO" "Restarting DNS services..."
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-                 ${SYSTEMCTL} restart dnscrypt-proxy.service
+                ${SYSTEMCTL} is-enabled dnsmasq.service &&
+                    ${SYSTEMCTL} disable --force --now dnsmasq.service
+                ${SYSTEMCTL} restart dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                 ${SYSTEMCTL} restart dnsmasq.service
+                ${SYSTEMCTL} is-enabled dnscrypt-proxy.service &&
+                    ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+                ${SYSTEMCTL} restart dnsmasq.service
               fi } ||
                 die "Failed to restart DNS services"
             ;;
@@ -111,7 +116,7 @@ switch_blocklist() {
             log "INFO" "Switched to DNSMasq backend"
             log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
             ;;
-        *) 
+        *)
             die "Invalid backend. Use 'dnscrypt' or 'dnsmasq'"
             ;;
     esac
