@@ -34,7 +34,7 @@ stressers_testers='memtester hyperfine parallel'
 
 info_fetchers='inxi hwinfo nvme-cli tealdeer which'
 
-terminal_tools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer kpcli zenity wmctrl ydotool poppler wl-clipboard jq zsync' # watchexec
+terminal_tools='aria2 asciinema brightnessctl ffmpeg ffmpegthumbnailer kpcli zenity wmctrl ydotool poppler wl-clipboard jq zsync croc' # watchexec
 
 fun_trerminal='asciiquarium cmatrix cava neo oneko sl cbonsai cowsay fortune-mod' # pipes.sh ascii_image_converter
 

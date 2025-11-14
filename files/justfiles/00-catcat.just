@@ -8,7 +8,7 @@ start-ssh:
 [group("network")]
 stop-ssh:
     #!/usr/bin/bash
-    sudo systemctl mask sshd.service ; sudo systemctl stop sshd
+    sudo systemctl stop sshd ; sudo systemctl mask sshd.service
 
 # Log all the errors
 log-errors:

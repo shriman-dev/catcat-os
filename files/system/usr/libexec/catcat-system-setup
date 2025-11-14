@@ -62,11 +62,11 @@ fi
 # Sync configs on update
 catcat_update_sha="/etc/catcat-os/update_sha"
 if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
-    [[ ! -d /root/.config/bat ]] &&
+    [[ ! -L /root/.config/bat ]] &&
             { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
     /usr/bin/bat cache --build
 
-    [[ ! -f /root/.config/fish/fish_variables ]] &&
+    [[ ! -L /root/.config/fish/fish_variables ]] &&
             ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
 
     [[ -f "${monitor_id}" ]] {
@@ -77,6 +77,7 @@ if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
                 "${usr_dconf_ext}" > "${etc_dconf_ext}"
     }
 
+    chmod -c -R 755 /etc/dconf/
     /usr/bin/dconf update
 
     [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
