@@ -1,0 +1,9 @@
+[Unit]
+Description=Update dns blocklist
+
+[Service]
+ExecStart=/usr/libexec/dns-blocklist-updater
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
