@@ -72,7 +72,7 @@ alias killall='killall -vw'
 # Use some more things with better alternatives
 alias l.='eza -A1'
 alias la='eza -A  --color=auto --icons=auto --hyperlink --group-directories-first'
-alias ll='eza -Al --color=auto --icons=auto --hyperlink --group-directories-first --git --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
+alias ll='eza -Al --color=auto --icons=auto --hyperlink --group-directories-first --git --octal-permissions --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
 alias lt='eza -AT --color=auto --icons=auto --hyperlink --group-directories-first --git'
 alias bat='bat --style="header,snip,changes" --paging=never'
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
