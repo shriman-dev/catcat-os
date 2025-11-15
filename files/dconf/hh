@@ -18,7 +18,7 @@ landscape-height-percent=35
 landscape-width-percent=90
 layout-landscape=3
 layout-portrait=3
-outer-spacing-px=4
+outer-spacing-px=2
 play-sound=true
 portrait-height-percent=35
 portrait-width-percent=100
@@ -26,12 +26,4 @@ round-key-corners=true
 show-icons=false
 snap-spacing-px=5
 system-accent-col=false
-
-[org/gnome/shell/extensions/screen-rotate]
-orientation-offset=3
-
-[org/gnome/shell/extensions/touchup]
-navigation-bar-enabled=true
-navigation-bar-gestures-reserve-space=false
-preferences-initial-page='default'
 
