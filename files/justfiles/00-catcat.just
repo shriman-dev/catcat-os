@@ -1,15 +1,3 @@
-# Start SSH
-[group("network")]
-start-ssh:
-    #!/usr/bin/bash
-    sudo systemctl unmask sshd.service ; sudo systemctl start sshd
-
-# Stop SSH
-[group("network")]
-stop-ssh:
-    #!/usr/bin/bash
-    sudo systemctl stop sshd ; sudo systemctl mask sshd.service
-
 # Show all logs from this boot
 [group("logging")]
 logs-this-boot:
@@ -297,7 +285,7 @@ restore-gnome-de-settings:
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome settings..."
-    dconf reset /
+    dconf reset -f /
     echo "Done."
     echo "You may need to log out and log in again for the changes to take effect."
 
@@ -309,8 +297,8 @@ restore-gnome-folders:
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome folders..."
-    dconf reset /org/gnome/desktop/app-folders/
-    dconf reset /org/gnome/shell/
+    dconf reset -f /org/gnome/desktop/app-folders/
+    dconf reset -f /org/gnome/shell/
     echo "Done."
     echo "You may need to log out and log in again for the changes to take effect."
 
