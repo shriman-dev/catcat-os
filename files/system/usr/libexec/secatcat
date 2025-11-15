@@ -51,7 +51,11 @@ fi
 rm -rvf "${tmp_localdns}"
 
 if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
-    if ! diff -q "${resolv_conf}" "/usr${localdns_confd}/localdns-resolv.conf"; then
+    if [[ ! $(grep "nameserver" "${resolv_conf}" | wc -l) -eq 2 ]]; then
+        mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
+        ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
+    fi
+    if ! { grep "nameserver.*127\.0\.0\.1" "${resolv_conf}" && grep "nameserver.*::1" "${resolv_conf}"; }; then
         mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
         ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
     fi
