@@ -63,12 +63,12 @@ fi
 
 # TODO: Log unsuccessful login attempts
 log "INFO" "Enabling needed authselect features"
-authselect current | grep "without-nullok" | grep "with-faillock" || {
+if ! { authselect current | grep "without-nullok" && authselect current | grep "with-faillock"; }; then
     #authselect select sssd
     authselect enable-feature without-nullok # Blocks empty password logins
     authselect enable-feature with-faillock # Enables account locking on failure
     authselect apply-changes
-}
+fi
 
 # Usbguard setup
 #if [[ ! -d /var/log/usbguard ]]; then
