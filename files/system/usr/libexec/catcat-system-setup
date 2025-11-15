@@ -47,18 +47,6 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
     echo 'first boot' > /etc/catcat-os/first-boot
 fi
 
-# Set primary monitor for dash to panel
-monitor_id="$(cat /home/${U1000}/.local/share/catcat-os/primary-monitor)"
-etc_dconf_ext="/etc/dconf/db/distro.d/extensions"
-usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
-if ! grep "panel-positions.*${monitor_id}" "${etc_dconf_ext}"; then
-    sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
-        -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
-        -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
-        -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
-            "${usr_dconf_ext}" > "${etc_dconf_ext}"
-fi
-
 # Sync configs on update
 catcat_update_sha="/etc/catcat-os/update_sha"
 if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
@@ -68,12 +56,6 @@ if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
 
     [[ ! -e /root/.config/fish/fish_variables ]] &&
             ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
-
-    sed -e "s|panel-anchors='{\".*\":|panel-anchors='{\"${monitor_id}\":|" \
-        -e "s|panel-element-positions='{\".*\":\[{\"|panel-element-positions='{\"${monitor_id}\":\[{\"|" \
-        -e "s|panel-positions='{\".*\":|panel-positions='{\"${monitor_id}\":|" \
-        -e "s|panel-sizes='{\".*\":|panel-sizes='{\"${monitor_id}\":|" \
-            "${usr_dconf_ext}" > "${etc_dconf_ext}"
 
     /usr/bin/dconf update
 #    chmod -c -R 755 /etc/dconf/
