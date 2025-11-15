@@ -1,23 +1,23 @@
 # Create partition table
-[group("Disk Management")]
+[group("disk management")]
 create-partition-table TABLE_TYPE DEVICE_PATH:
     #!/usr/bin/bash
     sudo parted {{ DEVICE_PATH }} mktable {{ TABLE_TYPE }}
 
 # Create luks partition
-[group("Disk Management")]
+[group("disk management")]
 create-luks-part DEVICE_PATH:
     #!/usr/bin/bash
     sudo cryptsetup luksFormat --type luks2 --sector-size 4096 {{ DEVICE_PATH }}
 
 # Dump info of luks device
-[group("Disk Management")]
+[group("disk management")]
 dump-info-luks DEVICE_PATH:
     #!/usr/bin/bash
     sudo cryptsetup luksDump {{ DEVICE_PATH }}
 
 # Enable luks discard for better health of ssd
-[group("Disk Management")]
+[group("disk management")]
 enable-luks-discard DEVICE_NAME:
     #!/usr/bin/env -S sudo -- /bin/bash
     echo 'Note: Add "discard" option for the device entry in /etc/crypttab'
@@ -33,13 +33,13 @@ enable-luks-discard DEVICE_NAME:
     fi
 
 # Reencrypt luks device with sector size 4096 for some performance gain (Caution: backup data before proceeding)
-[group("Disk Management")]
+[group("disk management")]
 reencrypt-4096 DEVICE_PATH:
     #!/usr/bin/bash
     sudo cryptsetup reencrypt --sector-size=4096 {{ DEVICE_PATH }}
 
 # Add keyfile to luks device
-[group("Disk Management")]
+[group("disk management")]
 add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
     #!/usr/bin/env -S sudo -- /bin/bash
     if [[ ! -f {{ KEY_FILE }} ]]; then
@@ -54,25 +54,25 @@ add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
     cryptsetup luksAddKey {{ DEVICE_PATH }} {{ KEY_FILE }} --pbkdf-force-iterations {{ ITER_VALUE }}
 
 # Delete luks keyslot
-[group("Disk Management")]
+[group("disk management")]
 delete-luks-keyslot DEVICE_PATH SLOT:
     #!/usr/bin/bash
     sudo cryptsetup luksKillSlot {{ DEVICE_PATH }} {{ SLOT }}
 
 # Backup luks header
-[group("Disk Management")]
+[group("disk management")]
 backup-luks-header DEVICE_PATH BACKUP_FILE:
     #!/usr/bin/bash
     sudo cryptsetup luksHeaderBackup {{ DEVICE_PATH }} --header-backup-file {{ BACKUP_FILE }}
 
 # Restore luks header
-[group("Disk Management")]
+[group("disk management")]
 restore-luks-header DEVICE_PATH HEADER_FILE:
     #!/usr/bin/bash
     sudo cryptsetup luksHeaderRestore {{ DEVICE_PATH }} --header-backup-file {{ HEADER_FILE }}
 
 # Auto unlock encrypted root
-[group("Disk Management")]
+[group("disk management")]
 auto-unlock-encrypted-root KEY_FILE DEVICE_PATH:
     #!/usr/bin/env -S sudo -- /bin/bash
     root_luks_uuid="$(basename $(findmnt -n -o SOURCE -T "/sysroot" | cut -d '[' -f 1))"
