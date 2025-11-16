@@ -60,7 +60,7 @@ alias vdir='vdir --color=auto'
 alias tree='tree -a --dirsfirst'
 alias diff='diff --color=auto'
 alias wget='wget -c '
-alias jctl="journalctl -p 3 -xb" # Get the error messages from journalctl
+alias jctl="journalctl -xe" # Get the error messages from journalctl
 alias grep='grep --color=auto'
 alias egrep='grep --color=auto -E'
 alias fgrep='grep --color=auto -F'

@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 # Set primary monitor for dash to panel
 usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
 primary_monitor="$(gdbus call --session --dest org.gnome.Mutter.DisplayConfig --object-path /org/gnome/Mutter/DisplayConfig --method org.gnome.Mutter.DisplayConfig.GetCurrentState | grep -o "\[((.*), \[(" | tr -cd '[:alnum:],' | cut -d "," -f2,4 | tr "," "-")"

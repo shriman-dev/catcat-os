@@ -28,25 +28,11 @@ logs-dmesg:
     #!/usr/bin/bash
     sudo dmesg --color=auto --decode --human --level warn,err,crit,alert,emerg
 
-# Get logs for this boot and last boot, cleanly output in terminal
+# SHow all the logs
 [group("logging")]
 get-logs:
     #!/usr/bin/bash
-    set -euo pipefail
-    source /usr/lib/ujust/ujust.sh
-    # Get system status information
-    echo -e "${bold}System Information:${normal}"
-    echo " "
-    rpm-ostree status
-    echo " "
-    # Get logs for this boot
-    echo -e "${bold}Logs This Boot:${normal}"
-    ujust logs-this-boot
-    echo " "
-    # Get logs for last boot
-    echo -e "${bold}Logs Last Boot:${normal}"
-    ujust logs-last-boot
-    echo " "
+    sudo journalctl --no-hostname --merge
 
 
 # Analyze system boot time
@@ -202,7 +188,7 @@ toggle-ssh ACTION="":
       OPTION=$(ugum choose "Start SSH Till Next Reboot" "Enable SSH Persistently" "Disable SSH" "Exit Without Saving")
     fi
     case "${OPTION}" in
-      "Start SSH Till Next Reboot"|enable)
+      "Start SSH Till Next Reboot"|start)
         echo "Starting SSH till next reboot..."
         sudo systemctl unmask sshd.service
         sudo systemctl start sshd.service
