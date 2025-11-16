@@ -105,7 +105,7 @@ fi
 
 # Set default target to graphical on base images, fixes rebase
 default_target="$(systemctl get-default)"
-if ! grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
+if grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
     [[ ! "${default_target}" == "multi-user.target" ]] && systemctl set-default multi-user.target
 else
     [[ ! "${default_target}" == "graphical.target" ]] && systemctl set-default graphical.target

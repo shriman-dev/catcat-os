@@ -4,7 +4,7 @@ primary_monitor="$(gdbus call --session --dest org.gnome.Mutter.DisplayConfig --
 
 
 
-if ! dconf read /org/gnome/shell/extensions/dash-to-panel/panel-positions | grep ${primary_monitor}; then
+if ! dconf read /org/gnome/shell/extensions/dash-to-panel/panel-positions | grep -q ${primary_monitor}; then
 
 dconf write /org/gnome/shell/extensions/dash-to-panel/panel-sizes $(grep -E "^.*panel-sizes=.*$" "${usr_dconf_ext}" | sed "s|panel-sizes='{\".*\":|panel-sizes='{\"${primary_monitor}\":|" | sed "s|panel-sizes=||")
 
