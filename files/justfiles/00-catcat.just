@@ -12,21 +12,21 @@ logs-last-boot:
 [group("logging")]
 logs-errors:
     #!/usr/bin/bash
-    sudo journalctl -p err
+    sudo journalctl --no-hostname --merge --priority=3..0
 
 # Show selinux related logs
 [group("logging")]
 logs-selinux:
     #!/usr/bin/bash
     sudo sestatus
-    echo ""
-    sudo journalctl -t setroubleshoot
+    echo " "
+    sudo journalctl --no-hostname -t setroubleshoot
 
 # Show warnings, errors and critical kernel/dmesg logs
 [group("logging")]
 logs-dmesg:
     #!/usr/bin/bash
-    sudo dmesg -H -l warn,err,crit,alert,emerg
+    sudo dmesg --color=auto --decode --human --level warn,err,crit,alert,emerg
 
 # Get logs for this boot and last boot, cleanly output in terminal
 [group("logging")]
@@ -53,7 +53,7 @@ get-logs:
 boot-time-analyze:
     #!/usr/bin/bash
     systemd-analyze critical-chain
-    echo ""
+    echo " "
     systemd-analyze time
 
 # Check for local overrides
