@@ -13,7 +13,7 @@ fi
 REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
 for SOME_USER in ${REAL_USERS[@]}; do
     if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
-        sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup" &
+        sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup"
     fi
 done
 
