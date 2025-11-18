@@ -83,6 +83,8 @@ rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
 rm -vf  /etc/xdg/autostart/steam.desktop
 
 log "INFO" "Removing unneeded repos"
+rm -vf /etc/yum.repos.d/charm.repo
 rm -vf /etc/yum.repos.d/google-chrome.repo
+rm -vf /etc/yum.repos.d/tailscale.repo
 
 log "INFO" "Cleanup done."
