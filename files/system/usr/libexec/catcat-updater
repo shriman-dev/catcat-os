@@ -38,7 +38,7 @@ one_week=604800
 two_week=1209600
 autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
 # Auto update if system is one weeks old
-if check_network_connection && [[ $(is_network_metered) -lt 3 ]]; then
+if check_network_connection; then
     if is_file_older ${one_week} "${autoupdate_log_file}"; then
         notify_all "Weekly automatic update has started."
 

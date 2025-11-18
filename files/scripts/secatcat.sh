@@ -108,7 +108,7 @@ log "DEBUG" "Done."
 # Enable dnscrypt-proxy
 log "DEBUG" "Enabling dnscrypt-proxy service"
 /usr/bin/localdnsctl --switch-blocklist-backend dnscrypt
-systemctl -f enable dnscrypt-proxy.service
+systemctl -f enable dnscrypt-proxy.service dns-blocklist-updater.timer
 systemctl disable systemd-resolved.service
 systemctl mask systemd-resolved.service
 log "DEBUG" "Done."

@@ -9,16 +9,16 @@ if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"  &>
     restorecon -vR "/home/${U1000}/.local/share/icc"
 fi
 
-# Setup user home configs
-REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
-for SOME_USER in ${REAL_USERS[@]}; do
-    if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
-        sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup"
-    fi
-done
-
 # First boot setup
 if [[ ! -f /etc/catcat-os/first-boot ]]; then
+    # Setup user home configs
+    REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
+    for SOME_USER in ${REAL_USERS[@]}; do
+        if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
+            sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup"
+        fi
+    done
+
     # Setup grub
     mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
     replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
@@ -35,7 +35,7 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
     /usr/bin/grubup
 
     # Show grub screen for desktop devices
-    inxi -M | grep "Type:.*Desktop" && grub2-editenv - unset menu_auto_hide
+    hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
 
     # Set default hostname
     hostnamectl set-hostname --static "catcat"
@@ -90,7 +90,7 @@ if [[ ! -f "${i2c_dev_conf}" ]]; then
 fi
 
 # Configure systemd services
-if ! inxi -M | grep -i "Type:.*Laptop" | grep -qE "System:.*Micro-Star|System:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; then
+if ! { hostnamectl | grep -i "Chassis:.*laptop" && hostnamectl | grep -E ":.*Micro-Star|:.*MSI" && systemctl --global is-enabled mcontrolcenter.helper.service; }; then
     systemctl disable --force --now mcontrolcenter.helper.service
     systemctl --global disable mcontrolcenter.helper.service
 fi

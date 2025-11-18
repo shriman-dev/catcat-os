@@ -3,11 +3,12 @@ source /usr/lib/catcat/funcvar.sh
 four_days=345600
 blocklist_autoupdate_log="/etc/catcat-os/log/auto-dns-blocklist-update.log"
 
-while true; do
-  if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then
+if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then
     date "+%a %b %d %H:%M:%S %Y" > "${blocklist_autoupdate_log}"
-    localdnsctl --update >> "${blocklist_autoupdate_log}"
-    systemctl restart dnscrypt-proxy.service >> "${blocklist_autoupdate_log}"
-  fi
-  sleep ${four_days}s
-done
+    localdnsctl -v --update | tee -a "${blocklist_autoupdate_log}"
+    localdnsctl -v --restart | tee -a "${blocklist_autoupdate_log}"
+else
+    log "INFO" "Nothing to do."
+    log "INFO" "DNS blocklist will be updated after $((four_days / 86400)) days."
+    log "INFO" "Use 'localdnsctl' command to update DNS blocklist manually."
+fi

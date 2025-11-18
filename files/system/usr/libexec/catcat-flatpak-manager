@@ -27,7 +27,7 @@ install_flatpaks() {
   if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
     # Install flatpaks in list
     INSTALL_LIST=($(sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install))
-    if check_network_connection && [[ $(is_network_metered) -lt 3 && $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]; then
+    if check_network_connection && [[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]; then
       log "INFO" "Installing system flatpaks from config list (requires internet)"
       # Add and set flathub
       flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system

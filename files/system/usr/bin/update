@@ -2,6 +2,7 @@
 source /usr/lib/catcat/funcvar.sh
 
 update_flatpak() {
+    source /usr/lib/catcat/funcvar.sh
     local scope="--user"
     [[ $(id -u) -eq 0 ]] && scope="--system"
 
@@ -16,6 +17,7 @@ update_flatpak() {
 }
 
 update_nixpkg() {
+    source /usr/lib/catcat/funcvar.sh
     local scope="user"
     local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
@@ -35,7 +37,7 @@ update_nixpkg() {
 
 update_dns_blocklist() {
     enclosed_heading "DNS blocklist update" "="
-    /usr/bin/localdnsctl -v -u
+    /usr/libexec/dns-blocklist-updater
 }
 
 update_firmware() {
