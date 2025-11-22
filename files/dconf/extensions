@@ -135,7 +135,7 @@ preview-custom-opacity=30
 preview-use-custom-opacity=true
 progress-show-count=true
 scroll-icon-action='PASS_THROUGH'
-scroll-panel-delay=600
+scroll-panel-delay=500
 scroll-panel-show-ws-popup=false
 secondarymenu-contains-showdetails=true
 shift-click-action='MINIMIZE'
@@ -270,9 +270,9 @@ ctrl=true
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-0]
 action='disabled'
-barrier-size-h=50
+barrier-size-h=25
 barrier-size-v=1
-pressure-threshold=200
+pressure-threshold=500
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-1]
 action='toggle-applications'

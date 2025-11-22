@@ -65,6 +65,7 @@ preserve-container='never'
 preserve-directory='never'
 scrollback-lines=2147483647
 use-custom-command=true
+use-proxy=false
 
 [org/gnome/Ptyxis/Profiles/db8703c64d752ad6daf64e776707763b]
 custom-command='fish'
@@ -78,6 +79,7 @@ preserve-container='never'
 preserve-directory='never'
 scrollback-lines=2147483647
 use-custom-command=true
+use-proxy=false
 
 [org/gnome/Ptyxis/Shortcuts]
 copy-clipboard='<Control>c'

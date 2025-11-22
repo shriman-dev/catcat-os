@@ -24,7 +24,8 @@ sync_default_configs() {
 
   if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
     log "INFO" "Updating configs..."
-    mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
+    mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR" || err "${CATCAT_CONF} creation failed"
+    cp -drf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach "${CATCAT_CONF}/LS_COLORS_DIR"/
 
     rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ &&
     rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/ ||

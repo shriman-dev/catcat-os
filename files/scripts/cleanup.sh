@@ -57,14 +57,8 @@ if [[ -d /usr/share/ublue-os ]]; then
 fi
 
 log "INFO" "Removing localsearch db miner"
-rm -vf /usr/lib/systemd/user/tracker-miner-fs-3.service
-rm -vf /usr/lib/systemd/user/tracker-miner-fs-control-3.service
-rm -vf /usr/lib/systemd/user/tracker-miner-rss-3.service
-rm -vf /usr/lib/systemd/user/tracker-writeback-3.service
-rm -vf /usr/lib/systemd/user/tracker-xdg-portal-3.service
-rm -vf /usr/lib/systemd/user/localsearch-3.service
-rm -vf /usr/lib/systemd/user/localsearch-control-3.service
-rm -vf /usr/lib/systemd/user/localsearch-writeback-3.service
+rm -vf /usr/lib/systemd/user/tracker*3.service
+rm -vf /usr/lib/systemd/user/localsearch*3.service
 
 log "INFO" "Removing dconf and skel defaults"
 [[ ! -d /etc/catcat-os ]] && rm -rvf /etc/skel/*
@@ -77,9 +71,8 @@ rm -rvf /etc/skel/.config/autostart
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
-rm -vf  /etc/xdg/autostart/localsearch-3.desktop
-rm -vf  /etc/xdg/autostart/tracker-miner-fs-3.desktop
-rm -vf  /etc/xdg/autostart/tracker-miner-rss-3.desktop
+rm -vf  /etc/xdg/autostart/localsearch*3.desktop
+rm -vf  /etc/xdg/autostart/tracker*3.desktop
 rm -vf  /etc/xdg/autostart/steam.desktop
 
 log "INFO" "Removing unneeded repos"

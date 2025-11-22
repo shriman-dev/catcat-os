@@ -19,9 +19,9 @@ show-hidden=true
 show-size-column=true
 show-type-column=true
 sidebar-width=186
-sort-column='modified'
+sort-column='name'
 sort-directories-first=true
-sort-order='descending'
+sort-order='ascending'
 startup-mode='recent'
 type-format='category'
 
