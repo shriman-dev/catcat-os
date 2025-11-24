@@ -24,8 +24,8 @@ fi
 fstab_file="/etc/fstab"
 if ! grep -E "^tmpfs.*/var/tmp.*tmpfs" "${fstab_file}"; then
     log "INFO" "Adding fstab entry to mount tmpfs on /var/tmp"
-    printf "%-10s %-10s %-10s %-20s %s\n" "tmpfs" "/var/tmp" "tmpfs" "defaults,noatime" "0 0" >> \
-                "${fstab_file}"
+    printf "%-10s %-10s %-10s %-20s %s\n" "tmpfs" "/var/tmp" "tmpfs" \
+        "defaults,noatime,mode=1777" "0 0" >> "${fstab_file}"
     systemctl daemon-reload && mount -a
 fi
 

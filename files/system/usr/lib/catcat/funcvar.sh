@@ -66,6 +66,31 @@ die() { log "ERROR" "${1}"; [[ -n "${2}" ]] && ${2}; exit 1; }
 
 err() { log "ERROR" "${1}"; return 1; }
 
+
+########
+## Function to generate a choice selection and return the selected choice
+########
+# CHOICE=$(Choice option1 option2 "option 3")
+# *user selects "option 3"*
+# echo "$CHOICE" will return "option 3"
+function Choose (){
+    CHOICE=$(ugum choose "$@")
+    echo "$CHOICE"
+}
+
+########
+## Function to generate a confirm dialog and return the selected choice
+########
+# CHOICE=$(Confirm "Are you sure you want to do this?")
+# *user selects "No"*
+# echo "$CHOICE" will return "1"
+# 0 = Yes
+# 1 = No
+function Confirm (){
+    ugum confirm "$@"
+    echo $?
+}
+
 # Function to generate background color from foreground color
 # option 38 (foreground) which can be flipped to 48 (background)
 # NOTE: doublequote the color or future calls to bg will error out!

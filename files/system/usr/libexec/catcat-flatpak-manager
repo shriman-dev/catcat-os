@@ -2,7 +2,7 @@
 source /usr/lib/catcat/funcvar.sh
 
 runtimes() {
-  runtimes=(
+  local runtimes=(
     'org.kde.KStyle.Kvantum'
     'org.freedesktop.Platform.VulkanLayer.vkBasalt'
     'org.freedesktop.Platform.VulkanLayer.gamescope'
@@ -12,18 +12,10 @@ runtimes() {
   for rr in "${runtimes[@]}"; do
     flatpak install --system -y --noninteractive flathub $(flatpak search --columns=application,branch ${rr} | awk '{print $1 "//" $2}')
   done
-
-#  # Get lsfg-vk runtimes
-#  cd /tmp/
-#  for url in $(curl -s https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.flatpak"' | cut -d'"' -f4); do
-#    curl -LO ${url}
-#    flatpak install --system -y --noninteractive "$(basename "${url}")" && rm "$(basename "${url}")"
-#  done
-#  cd -
 }
 
 install_flatpaks() {
-# Install or remove flatpaks if system is updated
+# Install flatpaks if system is updated
   if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
     # Install flatpaks in list
     INSTALL_LIST=($(sed '/^$/d; /^#/d' /etc/catcat-os/flatpak-list/install))

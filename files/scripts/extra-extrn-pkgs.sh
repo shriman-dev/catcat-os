@@ -1,109 +1,67 @@
 #!/usr/bin/env bash
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
-
 TMP_DIR="/tmp/catcat_extra_pkgs"
-mkdir -vp "${TMP_DIR}"
+
+starship() {
+    local starship_repo="https://api.github.com/repos/starship/starship"
+    local starship_tar="${TMP_DIR}/starship.tar.gz"
+    log "INFO" "Installing starship"
+    mkdir -vp "${starship_tar}.extract"
+
+    curl -Lo "${starship_tar}" $(curl -s -X GET "${starship_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
+
+    tar -xvf "${starship_tar}" -C "${starship_tar}.extract"
+    cp -dvf "${starship_tar}.extract/starship" "/usr/bin"/
+    chmod -v +x /usr/bin/starship
+    rm -rf "${starship_tar}" "${starship_tar}.extract"
+
+    log "INFO" "Done."
+}
 
 eza() {
     local eza_repo="https://github.com/eza-community/eza"
     local eza_tar="${TMP_DIR}/eza.tar.gz"
-    curl -Lo "${eza_tar}" "${eza_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
     log "INFO" "Installing eza"
     mkdir -vp "${eza_tar}.extract"
+
+    curl -Lo "${eza_tar}" "${eza_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+
     tar -xvf "${eza_tar}" -C "${eza_tar}.extract"
     cp -dvf "${eza_tar}.extract/eza" /usr/bin/
     chmod -v +x /usr/bin/eza
     rm -rf "${eza_tar}" "${eza_tar}.extract"
-    log "INFO" "Done."
-}
-eza
 
-btdu() {
-    local btdu_repo="https://github.com/CyberShadow/btdu"
-    log "INFO" "Installing btdu"
-    curl -Lo "/usr/bin/btdu" "${btdu_repo}/releases/latest/download/btdu-static-x86_64"
-    chmod -v +x "/usr/bin/btdu"
     log "INFO" "Done."
 }
-btdu
 
-buttersnap() {
-    local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
-    log "INFO" "Installing btdu"
-    curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
-    chmod -v +x "/usr/bin/buttersnap.sh"
-    curl -Lo "/usr/bin/buttercopy.sh" "${buttersnap_repo}/buttercopy.sh"
-    chmod -v +x "/usr/bin/buttercopy.sh"
-    log "INFO" "Done."
-}
-buttersnap
+grex() {
+    local grex_repo="https://api.github.com/repos/pemistahl/grex"
+    local grex_tar="${TMP_DIR}/grex.tar.gz"
+    log "INFO" "Installing grex"
+    mkdir -vp "${grex_tar}.extract"
 
-hblock() {
-    local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
-    log "INFO" "Installing hblock"
-    curl -Lo "/usr/bin/hblock" "${hblock_repo}/hblock"
-    chmod -v +x "/usr/bin/hblock"
-    log "INFO" "Done."
-}
-hblock
+    curl -Lo "${grex_tar}" $(curl -s -X GET "${grex_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
 
-bandwhich() {
-    local bandwhich_repo="https://api.github.com/repos/imsnif/bandwhich"
-    local bandwhich_tar="${TMP_DIR}/bandwhich.tar.gz"
-    log "INFO" "Installing bandwhich"
-    curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
-    mkdir -vp "${bandwhich_tar}.extract"
-    tar -xvf "${bandwhich_tar}" -C "${bandwhich_tar}.extract"
-    cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
-    chmod -v +x /usr/bin/bandwhich
-    rm -rf "${bandwhich_tar}" "${bandwhich_tar}.extract"
-    log "INFO" "Done."
-}
-bandwhich
+    tar -xvf "${grex_tar}" -C "${grex_tar}.extract"
+    cp -dvf "${grex_tar}.extract/grex" "/usr/bin"/
+    chmod -v +x /usr/bin/grex
+    rm -rf "${grex_tar}" "${grex_tar}.extract"
 
-gocryptfs() {
-    local gocryptfs_repo="https://api.github.com/repos/rfjakob/gocryptfs"
-    local gocryptfs_tar="${TMP_DIR}/gocryptfs.tar.gz"
-    log "INFO" "Installing gocryptfs"
-    curl -Lo "${gocryptfs_tar}" $(curl -s -X GET "${gocryptfs_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)
-    mkdir -vp "${gocryptfs_tar}.extract"
-    tar -xvf "${gocryptfs_tar}" -C "${gocryptfs_tar}.extract"
-    cp -dvf "${gocryptfs_tar}.extract/gocryptfs" "/usr/bin"/
-    chmod -v +x /usr/bin/gocryptfs
-    rm -rf "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
     log "INFO" "Done."
 }
-gocryptfs
-
-llama_cpp() {
-    local llama_cpp_repo="https://api.github.com/repos/ggml-org/llama.cpp"
-    local llama_cpp_zip="${TMP_DIR}/llama-cpp-vulkan.zip"
-    local ulibexec_llama_cpp="/usr/libexec/llama_cpp_vulkan"
-    log "INFO" "Installing llama_cpp"
-    curl -Lo "${llama_cpp_zip}" $(curl -s -X GET "${llama_cpp_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
-    mkdir -vp "${llama_cpp_zip}.extract" "${ulibexec_llama_cpp}"
-    cd "${llama_cpp_zip}.extract"
-    unzip "${llama_cpp_zip}"
-    cd -
-    mv -v "${llama_cpp_zip}.extract/build/bin" "${ulibexec_llama_cpp}"/
-    chmod -v +x "${ulibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
-    ln -svf "${ulibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
-    rm -rf "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
-    log "INFO" "Done."
-}
-llama_cpp
 
 yazi() {
     local yazi_repo="https://github.com/sxyazi/yazi"
     local yazi_repo_raw="https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main"
     local yazi_zip="${TMP_DIR}/yazi.zip"
     log "INFO" "Installing yazi"
+    mkdir -vp "${yazi_zip}.extract"
+
     curl -Lo "${yazi_zip}" "${yazi_repo}/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip"
     curl -Lo /usr/share/applications/yazi.desktop "${yazi_repo_raw}/assets/yazi.desktop"
     curl -Lo /usr/share/icons/yazi.png "${yazi_repo_raw}/assets/logo.png"
 
-    mkdir -vp "${yazi_zip}.extract"
     cd "${yazi_zip}.extract"
     unzip "${yazi_zip}"
     cd -
@@ -114,39 +72,253 @@ yazi() {
     cp -dvf "${yazi_zip}.extract/yazi-x86_64-unknown-linux-gnu/completions/yazi.fish" \
                     /usr/share/fish/completions/
     rm -rf "${yazi_zip}" "${yazi_zip}.extract"
+
     log "INFO" "Done."
 }
-yazi
+
+hblock() {
+    local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
+    log "INFO" "Installing hblock"
+
+    curl -Lo "/usr/bin/hblock" "${hblock_repo}/hblock"
+    chmod -v +x "/usr/bin/hblock"
+
+    log "INFO" "Done."
+}
+
+bandwhich() {
+    local bandwhich_repo="https://api.github.com/repos/imsnif/bandwhich"
+    local bandwhich_tar="${TMP_DIR}/bandwhich.tar.gz"
+    log "INFO" "Installing bandwhich"
+    mkdir -vp "${bandwhich_tar}.extract"
+
+    curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
+
+
+    tar -xvf "${bandwhich_tar}" -C "${bandwhich_tar}.extract"
+    cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
+    chmod -v +x /usr/bin/bandwhich
+    rm -rf "${bandwhich_tar}" "${bandwhich_tar}.extract"
+
+    log "INFO" "Done."
+}
+
+buttersnap() {
+    local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
+    log "INFO" "Installing btdu"
+
+    curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
+    chmod -v +x "/usr/bin/buttersnap.sh"
+
+    curl -Lo "/usr/bin/buttercopy.sh" "${buttersnap_repo}/buttercopy.sh"
+    chmod -v +x "/usr/bin/buttercopy.sh"
+
+    log "INFO" "Done."
+}
+
+btdu() {
+    local btdu_repo="https://github.com/CyberShadow/btdu"
+    log "INFO" "Installing btdu"
+
+    curl -Lo "/usr/bin/btdu" "${btdu_repo}/releases/latest/download/btdu-static-x86_64"
+
+    chmod -v +x "/usr/bin/btdu"
+    log "INFO" "Done."
+}
+
+gocryptfs() {
+    local gocryptfs_repo="https://api.github.com/repos/rfjakob/gocryptfs"
+    local gocryptfs_tar="${TMP_DIR}/gocryptfs.tar.gz"
+    log "INFO" "Installing gocryptfs"
+    mkdir -vp "${gocryptfs_tar}.extract"
+
+    curl -Lo "${gocryptfs_tar}" $(curl -s -X GET "${gocryptfs_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)
+
+    tar -xvf "${gocryptfs_tar}" -C "${gocryptfs_tar}.extract"
+    cp -dvf "${gocryptfs_tar}.extract/gocryptfs" "/usr/bin"/
+    chmod -v +x /usr/bin/gocryptfs
+    rm -rf "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
+
+    log "INFO" "Done."
+}
+
+scrcpy() {
+    local scrcpy_repo="https://api.github.com/repos/Genymobile/scrcpy"
+    local scrcpy_tar="${TMP_DIR}/scrcpy.tar.gz"
+    local usrlibexec_scrcpy="/usr/libexec/scrcpy"
+    log "INFO" "Installing scrcpy"
+    mkdir -vp "${scrcpy_tar}.extract" "${usrlibexec_scrcpy}"
+
+    curl -Lo "${scrcpy_tar}" $(curl -s -X GET "${scrcpy_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)
+
+    tar -xvf "${scrcpy_tar}" -C "${scrcpy_tar}.extract"
+    cp -dvf "${scrcpy_tar}.extract"/*/* "${usrlibexec_scrcpy}"/
+    ln -svf /usr/bin/adb "${usrlibexec_scrcpy}/adb"
+    ln -svf "${usrlibexec_scrcpy}/scrcpy" /usr/bin/scrcpy
+    chmod -v +x "${usrlibexec_scrcpy}/scrcpy"
+    rm -rf "${scrcpy_tar}" "${scrcpy_tar}.extract"
+
+    log "INFO" "Done."
+}
+
+llama_cpp() {
+    local llama_cpp_repo="https://api.github.com/repos/ggml-org/llama.cpp"
+    local llama_cpp_zip="${TMP_DIR}/llama-cpp-vulkan.zip"
+    local usrlibexec_llama_cpp="/usr/libexec/llama_cpp_vulkan"
+    log "INFO" "Installing llama_cpp"
+    mkdir -vp "${llama_cpp_zip}.extract" "${usrlibexec_llama_cpp}"
+
+    curl -Lo "${llama_cpp_zip}" $(curl -s -X GET "${llama_cpp_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
+
+    cd "${llama_cpp_zip}.extract"
+    unzip "${llama_cpp_zip}"
+    cd -
+    mv -v "${llama_cpp_zip}.extract/build/bin" "${usrlibexec_llama_cpp}"/
+    chmod -v +x "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
+    ln -svf "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
+    rm -rf "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
+
+    log "INFO" "Done."
+}
 
 pipes_sh() {
     local pipes_sh_repo="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
     log "INFO" "Installing pipes.sh"
-    curl -Lo "/usr/bin/pipes.sh" "${pipes_sh_repo}/pipes.sh"
+
+#    curl -Lo "/usr/bin/pipes.sh" "${pipes_sh_repo}/pipes.sh"
     chmod -v +x "/usr/bin/pipes.sh"
+
     log "INFO" "Done."
 }
-pipes_sh
 
 ascii_image_converter() {
     local ascii_ic_repo="https://github.com/TheZoraiz/ascii-image-converter"
     local ascii_ic_tar="${TMP_DIR}/ascii_ic.tar.gz"
     log "INFO" "Installing ascii-image-converter"
-    curl -Lo "${ascii_ic_tar}" "${ascii_ic_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
-    mkdir -vp "${ascii_ic_tar}.extract"
-    tar -xvf "${ascii_ic_tar}" -C "${ascii_ic_tar}.extract"
-    cp -dvf "${ascii_ic_tar}.extract"/*/ascii-image-converter "/usr/bin"/
+#    mkdir -vp "${ascii_ic_tar}.extract"
+
+#    curl -Lo "${ascii_ic_tar}" "${ascii_ic_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
+
+#    tar -xvf "${ascii_ic_tar}" -C "${ascii_ic_tar}.extract"
+#    cp -dvf "${ascii_ic_tar}.extract"/*/ascii-image-converter "/usr/bin"/
     chmod -v +x /usr/bin/ascii-image-converter
-    rm -rf "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
+#    rm -rf "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
+
     log "INFO" "Done."
 }
-ascii_image_converter
+
+ujust_setup() {
+    local ujust_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages/ublue-os-just/src"
+    local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
+    local import_file="/usr/share/ublue-os/justfile"
+    local justfile_dir="$(dirname ${SETUP_DIR})/justfiles"
+
+    log "INFO" "Installing ujust and ugum"
+
+    mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
+    curl -Lo "/usr/bin/ujust" "${ujust_repo}/ujust"
+    curl -Lo "/usr/bin/ugum" "${ujust_repo}/ugum"
+    curl -Lo "/usr/share/ublue-os/justfile" "${ujust_repo}/header.just"
+    chmod -v +x /usr/bin/{ujust,ugum}
+
+    log "INFO" "Done."
+
+    # Import justfiles to ujust
+    log "INFO" "Importing justfiles to ujust"
+    rpm -q waydroid && {
+        curl -Lo "${justfile_dir}/82-bazzite-waydroid.just" "${bazzite_repo}/82-bazzite-waydroid.just"
+        sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
+                "${justfile_dir}/82-bazzite-waydroid.just"
+    }
+
+    if [[ -f "${import_file}" ]]; then
+        local justfile import_line
+        for justfile in ${justfile_dir}/*.just; do
+            # Copy justfiles to ujust default directory
+            cp -dvf "${justfile}" /usr/share/ublue-os/just/
+            # Add import line if it does not exists already
+            import_line="import \"/usr/share/ublue-os/just/$(basename ${justfile})\""
+            grep -w "${import_line}" "${import_file}" || {
+                sed -i "/# Imports/a\\${import_line}" "${import_file}"
+                log "DEBUG" "Added: '${import_line}' to ${import_file}"
+            }
+        done
+    fi
+    log "INFO" "All Justfile imports are done."
+
+    log "INFO" "Full output of: ${import_file}"
+    cat "${import_file}"
+}
 
 extras() {
     log "INFO" "Getting extra confs"
+
     curl -Lo /usr/share/applications/micro.desktop \
         https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
+
     log "INFO" "Done."
 }
-extras
 
-rm -rf "${TMP_DIR}"
+# TODO: add ujust and ugum and ls-iommu
+# TODO: do the waydroid setup stuff
+#systemctl disable waydroid-container.service
+
+process_command() {
+    mkdir -vp "${TMP_DIR}"
+    case "${1}" in
+        eza)
+            eza
+            ;;
+        starship)
+            starship
+            ;;
+        grex)
+            grex
+            ;;
+        yazi)
+            yazi
+            ;;
+        hblock)
+            hblock
+            ;;
+        bandwhich)
+            bandwhich
+            ;;
+        buttersnap)
+            buttersnap
+            ;;
+        btdu)
+            btdu
+            ;;
+        gocryptfs)
+            gocryptfs
+            ;;
+        scrcpy)
+            scrcpy
+            ;;
+        llama_cpp)
+            llama_cpp
+            ;;
+        pipes_sh)
+            pipes_sh
+            ;;
+        ascii_image_converter)
+            ascii_image_converter
+            ;;
+        ujust_setup)
+            ujust_setup
+            ;;
+        extras)
+            extras
+            ;;
+        *)
+            die "Error: Unknown argument ${1}"
+            ;;
+    esac
+    rm -rf "${TMP_DIR}"
+}
+
+# Process all provided arguments
+for arg in "$@"; do
+    process_command "${arg}" || exit 1
+done

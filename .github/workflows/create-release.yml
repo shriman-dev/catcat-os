@@ -34,14 +34,14 @@ jobs:
         id: prepare-release
         shell: bash
         run: |
-          set -eou pipefail
-          pwd
+          set -ouex pipefail
           source ${{ github.workspace }}/ENVAR
+          pwd
           TITLE="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"
           TAG="${MAJOR_VERSION}.${DATESTAMP}"
           echo -e '### ISOs to Download\n' > release.md
           echo -e '\n| ISO |\n| --- |' >> release.md
-          for artifact in $(find url-catcat*); do
+          for artifact in $(ls -r1 url-catcat*.txt); do
             cat $artifact >> release.md
           done
           ls -A1

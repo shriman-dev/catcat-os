@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -oue pipefail
-SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source ${SETUP_DIR}/funcvar.sh
 
 log "INFO" "Cleaning image"
@@ -56,6 +55,9 @@ if [[ -d /usr/share/ublue-os ]]; then
     rm -vf /etc/profile.d/user-motd.sh
 fi
 
+log "INFO" "Removing profile.d scripts"
+rm -vf /etc/profile.d/toolbox.sh
+
 log "INFO" "Removing localsearch db miner"
 rm -vf /usr/lib/systemd/user/tracker*3.service
 rm -vf /usr/lib/systemd/user/localsearch*3.service
@@ -69,6 +71,7 @@ log "INFO" "Removing dconf and skel defaults"
 log "INFO" "Removing desktop files in /etc/xdg/autostart"
 rm -rvf /etc/skel/.config/autostart
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
+rm -vf  /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
 rm -vf  /etc/xdg/autostart/localsearch*3.desktop

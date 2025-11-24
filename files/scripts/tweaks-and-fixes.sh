@@ -10,6 +10,9 @@ if [[ -d /usr/share/ublue-os ]]; then
     sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 fi
 
+# Rpm-ostreed auto update policy to be none
+sed -i 's|AutomaticUpdatePolicy=.*|AutomaticUpdatePolicy=none|g' /etc/rpm-ostreed.conf
+
 # Enable disk discard
 log "INFO" "Enabling support for disk discard"
 sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf

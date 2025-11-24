@@ -27,7 +27,9 @@ desktop_files() {
 
     sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' ${desktopfile_dir}/Waydroid.desktop
 
+    # Remove desktop entries
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/nvtop.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/fish.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/yad-icon-browser.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top-tui.desktop || true

@@ -67,6 +67,7 @@ DISABLE_SERVICES=(
     "rpcbind.target"
     "rpm-ostree-countme.service"
     "rpm-ostree-countme.timer"
+    "rpm-ostreed-automatic.timer"
     "sshd.service"
     "sshd.socket"
     "sshd-unix-local.socket"

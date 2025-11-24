@@ -202,6 +202,7 @@ abbr chown 'chown -v'
 abbr rmdir 'rmdir -v'
 abbr mkdir 'mkdir -v'
 abbr mount 'mount -vm'
+abbr nethogs 'sudo nethogs -a -C -b -v 4'
 abbr bandwhich 'sudo bandwhich --processes --connections'
 
 # Help wrapper with bat

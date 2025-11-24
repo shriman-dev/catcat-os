@@ -1,3 +1,22 @@
+# Measure Idle Power Draw
+[group("utilities")]
+check-idle-power-draw:
+    #!/usr/bin/bash
+    sudo powerstat -a -r
+
+# Clean up old and unused podman images, volumes, flatpak packages and rpm-ostree content
+[group("utilities")]
+clean-system:
+    #!/usr/bin/bash
+    podman image prune -af
+    podman volume prune -f
+    flatpak uninstall --unused --assumeyes --noninteractive
+    rpm-ostree cleanup -bm
+    if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+        brew autoremove
+        brew cleanup
+    fi
+
 # Show all logs from this boot
 [group("logging")]
 logs-this-boot:
@@ -34,8 +53,16 @@ get-logs:
     #!/usr/bin/bash
     sudo journalctl --no-hostname --merge
 
+# Show BIOS info
+[group("system info")]
+bios-info:
+    #!/usr/bin/bash
+    echo "Manufacturer: $(sudo dmidecode -s baseboard-manufacturer)"
+    echo "Product Name: $(sudo dmidecode -s baseboard-product-name)"
+    echo "Version: $(sudo dmidecode -s bios-version)"
 
 # Analyze system boot time
+[group("system info")]
 boot-time-analyze:
     #!/usr/bin/bash
     systemd-analyze critical-chain
@@ -43,6 +70,7 @@ boot-time-analyze:
     systemd-analyze time
 
 # Check for local overrides
+[group("system info")]
 check-local-overrides:
     #!/usr/bin/bash
     sudo ostree admin config-diff
@@ -75,9 +103,20 @@ check-local-overrides:
              --exclude="cdi" \
              --exclude="default.target" \
              --exclude="domains-blocklist.*" \
-             /usr/etc /etc 2>/dev/null | sed '/Binary\ files\ /d' | rg --color=always --colors 'match:fg:yellow' --passthru 'Only in.*'
+             /usr/etc /etc 2>/dev/null | sed '/Binary\ files\ /d' | \
+                rg --color=always --colors 'match:fg:yellow' --passthru 'Only in.*'
+
+
+# Get device info
+[group("system info")]
+device-info:
+    #!/usr/bin/bash
+    sudo fastfetch
+    symmetric_heading "Detailed Sys+Hardware Information" "="
+    sudo inxi --basic --expanded -xxxa --verbosity 8
 
 # Dump debug info
+[group("system info")]
 debug-info:
     #!/usr/bin/bash
     source /usr/lib/catcat/funcvar.sh
@@ -124,7 +163,7 @@ update:
 [group("system")]
 toggle-updates ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/ujust/ujust.sh
+    source /usr/lib/catcat/funcvar.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled catcat-os-update.timer | grep -q enabled; then
       CURRENT_STATE="Enabled"
@@ -156,7 +195,7 @@ _toggle-updates:
 [group("network")]
 toggle-ssh ACTION="":
     #!/usr/bin/bash
-    source /usr/lib/ujust/ujust.sh
+    source /usr/lib/catcat/funcvar.sh
     # Get hostname and IP address
     HOSTNAME=$(hostname)
     IP_ADDRESS=$(hostname -I | awk '{print $1}') # First IP address
@@ -222,7 +261,7 @@ toggle-ssh ACTION="":
 [group("nightly reboot")]
 toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/ujust/ujust.sh
+    source /usr/lib/catcat/funcvar.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled catcat-nightly-reboot.timer | grep -q enabled; then
       CURRENT_STATE="Enabled"
@@ -247,7 +286,7 @@ toggle-nightly-reboot ACTION="prompt":
 
 # Cancel automatic nightly reboot sequence
 [group("nightly reboot")]
-cancel_nightly_reboot:
+cancel-nightly-reboot:
     #!/usr/bin/bash
     if [[ ! -d /tmp/CATCAT_NIGHTLY_REBOOT ]]; then
         echo "Nightly reboot was not sequenced correctly"
@@ -263,7 +302,7 @@ toggle-gnome-extension EXTENSION_ID:
     EXTENSION_ID={{ EXTENSION_ID }}
     gnome-extensions $(gnome-extensions show ${EXTENSION_ID} | grep -qow 'ACTIVE' && echo "disable" || echo "enable") ${EXTENSION_ID}
 
-# Restore Gnome Desktop Environment settings
+# Restore Gnome DE settings
 [group("gnome desktop environment")]
 restore-gnome-de-settings:
     #!/usr/bin/bash
