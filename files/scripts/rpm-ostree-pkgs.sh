@@ -298,13 +298,13 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
 #    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
 #    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
-    dnf5 -y copr enable bazzite-org/bazzite
-    dnf5 -y copr enable bazzite-org/bazzite-multilib
-    dnf5 -y copr enable bazzite-org/rom-properties
-    dnf5 -y copr enable bazzite-org/obs-vkcapture
-    dnf5 -y copr enable hhd-dev/hhd
-    dnf5 -y copr enable ublue-os/staging
-    dnf5 -y copr enable ublue-os/packages
+#    dnf5 -y copr enable bazzite-org/bazzite
+#    dnf5 -y copr enable bazzite-org/bazzite-multilib
+#    dnf5 -y copr enable bazzite-org/rom-properties
+#    dnf5 -y copr enable bazzite-org/obs-vkcapture
+#    dnf5 -y copr enable hhd-dev/hhd
+#    dnf5 -y copr enable ublue-os/staging
+#    dnf5 -y copr enable ublue-os/packages
     log "INFO" "Done."
     log "INFO" "Performing updates"
     dnf5 -y remove unrar rar

@@ -68,8 +68,8 @@ jobs:
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
-          extra_boot_params: "rd.udev.log_priority=3 loglevel=3 processor.ignore_ppc=1 sysrq_always_enabled=1"
-#          additional_templates: /github/workspace/files/scripts/setup-files/installer_defaults.tmpl
+          extra_boot_params: "rd.udev.log_priority=3 loglevel=3 rd.shell=0 rd.emergency=halt"
+          additional_templates: /github/workspace/files/scripts/setup_files/remove_root_password_prompt.tmpl
 
       - name: Move ISO to Upload Directory
         id: upload-directory
@@ -82,7 +82,7 @@ jobs:
           tree ${ISO_UPLOAD_DIR}
           echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
 
-      - name: Upload ISOs and Checksum to Job Artifacts
+      - name: Upload ISOs and Checksum as artifacts
         id: upload
         uses: actions/upload-artifact@v4
         with:
