@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -oue pipefail
-SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-export ${SETUP_DIR}
+export SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source ${SETUP_DIR}/funcvar.sh
 
 enclosed_heading_this() {
