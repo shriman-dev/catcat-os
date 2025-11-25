@@ -7,20 +7,20 @@ desktop_files() {
 
     log "INFO" "Configuring desktop files"
     # To use catcat update
-    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" ${desktopfile_dir}/system-update.desktop
+    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" ${desktopfile_dir}/system-update.desktop || true
 
     sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
     sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
     #cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop ${desktopfile_dir}/ || true
     sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' ${desktopfile_dir}/autostart.desktop || true
 
-    sed -i 's|^Name=.*|Name=Nemo File Manager|' ${desktopfile_dir}/nemo.desktop
+    sed -i 's|^Name=.*|Name=Nemo File Manager|' ${desktopfile_dir}/nemo.desktop || true
     sed -i 's/^Icon=.*/Icon=user-home/' ${desktopfile_dir}/org.gnome.Nautilus.desktop
     sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' ${desktopfile_dir}/org.gnome.Nautilus.desktop
     sed -i 's/^Icon=.*/Icon=fish/' ${desktopfile_dir}/org.gnome.Ptyxis.desktop
     sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' ${desktopfile_dir}/org.gnome.Settings.desktop
     sed -i 's/^Icon=.*/Icon=np2/' ${desktopfile_dir}/oneko.desktop
-    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' ${desktopfile_dir}/yazi.desktop
+    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' ${desktopfile_dir}/yazi.desktop || true
 
     sed -i 's|^Icon=.*|Icon=appgrid|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
     sed -i 's|^Name.*=.*|Name=Software Store|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true

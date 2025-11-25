@@ -335,7 +335,7 @@ elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y --setopt=install_weak_deps=False install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
-    dnf5 -y install --skip-broken \
+    rpm-ostree install \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
 log "INFO" "Done."
