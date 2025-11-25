@@ -9,16 +9,16 @@ DESKTOP_EXTRAS=(
     # Graphics and Video Editors
     "app/org.upscayl.Upscayl/x86_64/stable"
     "app/org.gnome.gitlab.YaLTeR.Identity/x86_64/stable"
-    "app/io.gitlab.adhami3310.Footage/x86_64/stable"
+#    "app/io.gitlab.adhami3310.Footage/x86_64/stable"
 
     # Document Viewers and Editors
-    "app/org.onlyoffice.desktopeditors/x86_64/stable"
+#    "app/org.onlyoffice.desktopeditors/x86_64/stable"
 
     # Disk Analyze, Backup and Encryption
     "app/io.github.mpobaschnig.Vaults/x86_64/stable"
 
     # System Apps
-    "app/org.gnome.ColorViewer/x86_64/stable"
+#    "app/org.gnome.ColorViewer/x86_64/stable"
 
     # Productivity and Development
     "app/dev.zed.Zed/x86_64/stable"
@@ -38,7 +38,6 @@ DESKTOP_EXTRAS=(
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/24.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/23.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/22.08"
-    "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/21.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/25.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/24.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/23.08"
@@ -47,12 +46,10 @@ DESKTOP_EXTRAS=(
     "runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/23.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/22.08"
-    "runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/21.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.OBSVkCapture/x86_64/25.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.OBSVkCapture/x86_64/24.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.OBSVkCapture/x86_64/23.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.OBSVkCapture/x86_64/22.08"
-    "runtime/org.freedesktop.Platform.VulkanLayer.OBSVkCapture/x86_64/21.08"
 
 )
 
@@ -152,6 +149,5 @@ DESKTOP_COMMON=(
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-24.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-23.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-22.08"
-    "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-21.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15"
 )
