@@ -12,7 +12,7 @@ DESKTOP_EXTRAS=(
 #    "app/io.gitlab.adhami3310.Footage/x86_64/stable"
 
     # Document Viewers and Editors
-#    "app/org.onlyoffice.desktopeditors/x86_64/stable"
+    "app/org.onlyoffice.desktopeditors/x86_64/stable"
 
     # Disk Analyze, Backup and Encryption
     "app/io.github.mpobaschnig.Vaults/x86_64/stable"
@@ -127,7 +127,7 @@ DESKTOP_COMMON=(
     "app/com.toolstack.Folio/x86_64/stable"
     "app/se.sjoerd.Graphs/x86_64/stable"
     "app/re.sonny.Eloquent/x86_64/stable"
-    "dev.bragefuglseth.Keypunch"
+    "app/dev.bragefuglseth.Keypunch/x86_64/stable"
     "app/me.iepure.devtoolbox/x86_64/stable"
 
     # Gaming Apps

@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image_name: ["catcat-os", "catcat-os-nv", "catcat-os-hh"]
+        image_name: ["catcat-os", "catcat-os-mi", "catcat-os-nv", "catcat-os-hh"]
 
     steps:
       - name: Checkout Repo
