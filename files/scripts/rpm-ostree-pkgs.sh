@@ -155,6 +155,7 @@ DESKTOP_COMMON=(
     "git"
     "micro"
     "neovim"
+    "waydroid"
     "python3-pip"
     "inotify-tools"
     #vscodium
@@ -210,9 +211,7 @@ DESKTOP_COMMON=(
 
     # Needed Deps
     "i2c-tools"
-    "libadwaita"
     "alsa-firmware"
-    "xdg-user-dirs"
     "grub2-tools-extra"
     "google-noto-fonts-all"
 )
@@ -308,6 +307,7 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr enable ublue-os/packages
     log "INFO" "Done."
     log "INFO" "Performing updates"
+    dnf5 versionlock add unrar rar
     rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
     dnf5 upgrade --refresh --assumeyes
     log "INFO" "Done."
@@ -335,7 +335,7 @@ elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y --setopt=install_weak_deps=False install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
-    rpm-ostree install \
+    dnf5 -y install --skip-broken \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
 log "INFO" "Done."
@@ -359,6 +359,20 @@ else
     dnf5 -y copr disable bazzite-org/rom-properties
 fi
 log "INFO" "Done."
+
+
+# Remove things that doesn't work well with NVIDIA
+if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
+    log "INFO" "Removeing packages unneeded on NVIDIA image"
+    #nvidia-gpu-firmware
+    dnf5 -y remove \
+        rocm-hip \
+        rocm-opencl \
+        rocm-clinfo \
+        rocm-smi
+    log "INFO" "Done."
+fi
+
 
 
 log "INFO" "Installing External Packages"

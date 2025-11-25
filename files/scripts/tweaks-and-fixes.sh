@@ -6,7 +6,7 @@ source /usr/lib/catcat/funcvar.sh
 if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Tweaking ublue/bazzite defaults"
     sed -i 's|/usr/bin/topgrade.*|/usr/bin/topgrade --no-self-update --yes --cleanup --only flatpak nix firmware|' \
-        /usr/share/ublue-os/just/10-update.just
+        /usr/share/ublue-os/just/10-update.just || true
     sed -i 's/"pip3", //g' /usr/share/ublue-os/topgrade.toml || true
 fi
 

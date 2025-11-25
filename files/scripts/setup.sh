@@ -22,7 +22,7 @@ ${SETUP_DIR}/prep-sys-env.sh
 enclosed_heading_this "Copying Over System Default Files"
 ${SETUP_DIR}/copy-sys-files.sh
 
-enclosed_heading_this "Installing Packages"
+enclosed_heading_this "Updating And Installing Packages"
 ${SETUP_DIR}/rpm-ostree-pkgs.sh
 
 enclosed_heading_this "Refining System With Tweaks And Fixes"

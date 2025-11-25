@@ -95,15 +95,4 @@ if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
         yelp
 fi
 
-# Remove things that doesn't work well with NVIDIA
-if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
-    log "INFO" "Removeing packages unneeded on NVIDIA image"
-    #nvidia-gpu-firmware
-    dnf5 -y remove \
-        rocm-hip \
-        rocm-opencl \
-        rocm-clinfo \
-        rocm-smi
-fi
-
 log "INFO" "Done."
