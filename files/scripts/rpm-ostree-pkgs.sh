@@ -140,6 +140,7 @@ DESKTOP_COMMON=(
     "sl"
     "neo"
     "cava"
+    "oneko"
     "cowsay"
     "cbonsai"
     "cmatrix"
@@ -306,7 +307,7 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr enable ublue-os/packages
     log "INFO" "Done."
     log "INFO" "Performing updates"
-    dnf5 versionlock add unrar rar
+    dnf5 -y remove unrar rar
     rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
     dnf5 upgrade --refresh --assumeyes
     log "INFO" "Done."
