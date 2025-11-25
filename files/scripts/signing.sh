@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ouex pipefail
 source /usr/lib/catcat/funcvar.sh
-TEMPLATE_POLICY="${SETUP_DIR}/setup-files/policy.json"
+TEMPLATE_POLICY="${SETUP_DIR}/setup_files/policy.json"
 CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
@@ -11,8 +11,6 @@ mkdir -vp /etc/pki/containers /etc/containers/registries.d
 
 [[ ! -f "${CATCAT_PUB}" ]] &&
     die "Cannot find '$(basename ${CATCAT_PUB})' image key in: $(dirname ${CATCAT_PUB})"
-
-ls -a "${SETUP_DIR}/setup-files"
 
 # If there is no policy.json file, then copy the template policy
 [[ ! -f "${POLICY_FILE}" ]] && cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"
