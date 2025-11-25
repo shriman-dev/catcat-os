@@ -17,6 +17,12 @@ clean-system:
         brew cleanup
     fi
 
+# Install default and extra flatpak apps
+[group("apps")]
+install-catcat-flatpaks:
+    #!/usr/bin/bash
+    sudo /usr/libexec/catcat-flatpak-manager --install-all
+
 # Show all logs from this boot
 [group("logging")]
 logs-this-boot:

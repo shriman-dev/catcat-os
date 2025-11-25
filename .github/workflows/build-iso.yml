@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image_name: ["catcat-os", "catcat-os-nv"]
+        image_name: ["catcat-os", "catcat-os-mi", "catcat-os-nv"]
 
     steps:
       - name: Checkout Repo
@@ -65,8 +65,9 @@ jobs:
           FLATPAK_REFS_DIR=./flatpak-refs
           FLATPAK_REFS_DIR_ABS=$(realpath "${FLATPAK_REFS_DIR}")
           mkdir -p "${FLATPAK_REFS_DIR}"
-          sed '/^$/d; /^#/d' ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/install > ${FLATPAK_REFS_DIR_ABS}/install
-          FLATPAK_REFS_DIR_LIST=$(cat ${FLATPAK_REFS_DIR_ABS}/* | tr '\n' ' ' )
+          source ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/flatpak-pkg-list.sh
+          FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}"
+          [[ "${{ matrix.image_name }}" =~ "-mi" ]] && FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]}"
           # Generate install script
           cat << EOF > ${TEMP_FLATPAK_INSTALL_DIR}/script.sh
           cat /temp_flatpak_install_dir/script.sh

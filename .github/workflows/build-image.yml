@@ -38,6 +38,9 @@ jobs:
           - IMAGE_NAME: catcat-os
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome
 
+          - IMAGE_NAME: catcat-os-mi
+            BASE_IMAGE_NAME: quay.io/fedora-ostree-desktops/silverblue
+
           - IMAGE_NAME: catcat-os-nv
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
 
