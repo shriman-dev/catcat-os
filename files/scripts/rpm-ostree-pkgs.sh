@@ -288,14 +288,13 @@ COMMON=(
     "fwupd-plugin-uefi-capsule-data"
 )
 
-
-log "INFO" "Adding extra RPM repos"
 #dnf5 -y copr enable kylegospo/unl0kr
 #dnf5 -y copr enable atim/starship
 #dnf5 -y copr enable zeno/scrcpy
 #dnf5 -y copr enable scottames/ghostty
 #dnf5 -y copr enable atim/lazygit
 if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
+    log "INFO" "Adding extra RPM repos"
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
 #    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
@@ -307,19 +306,24 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr enable hhd-dev/hhd
     dnf5 -y copr enable ublue-os/staging
     dnf5 -y copr enable ublue-os/packages
+    log "INFO" "Done."
+    log "INFO" "Performing updates"
+    rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
+    dnf5 upgrade --refresh --assumeyes
+    log "INFO" "Done."
 else
+    log "INFO" "Performing updates"
+    rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
+    dnf5 upgrade --refresh --assumeyes
+    log "INFO" "Done."
+    log "INFO" "Adding extra RPM repos"
 #    dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
     dnf5 -y copr enable bazzite-org/bazzite
     dnf5 -y copr enable bazzite-org/rom-properties
+    log "INFO" "Done."
 fi
-
-
-log "INFO" "Performing updates"
-rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
-dnf5 upgrade --refresh --assumeyes
-log "INFO" "Done."
 
 log "INFO" "Installing RPM Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
@@ -331,10 +335,11 @@ elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y --setopt=install_weak_deps=False install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
-    dnf5 -y install \
+    rpm-ostree install \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
 log "INFO" "Done."
+
 
 log "INFO" "Disabling repos no longer needed"
 if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
@@ -353,6 +358,8 @@ else
     dnf5 -y copr disable bazzite-org/bazzite
     dnf5 -y copr disable bazzite-org/rom-properties
 fi
+log "INFO" "Done."
+
 
 log "INFO" "Installing External Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
