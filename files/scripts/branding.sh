@@ -20,7 +20,7 @@ for key in "${!pairs[@]}"; do
     log "DEBUG" "${key}=${value}"
     sed -i "s|^${key}=.*|${key}=\"${value}\"|" "${OS_RELEASE_FILE}"
     # If the key does not exist, append it to the os-release file
-    grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" > "${OS_RELEASE_FILE}"
+    grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" >> "${OS_RELEASE_FILE}"
 done
 log "INFO" "Applied."
 
