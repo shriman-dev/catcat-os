@@ -43,8 +43,6 @@ DESKTOP_EXTRAS=(
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
-    "glow"
-    "++vscodium"
     "++llama_cpp"
 
     # Rocm libs
@@ -153,6 +151,7 @@ DESKTOP_COMMON=(
 
     # Dev Tools
     "git"
+    "glow"
     "micro"
     "neovim"
     "waydroid"
