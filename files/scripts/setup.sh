@@ -40,8 +40,8 @@ ${SETUP_DIR}/systemd.sh
 enclosed_heading_this "Applying Branding"
 ${SETUP_DIR}/branding.sh
 
-enclosed_heading_this "Regenerating Initramfs"
-${SETUP_DIR}/initramfs.sh
-
 enclosed_heading_this "Configuring Signing Policy"
 ${SETUP_DIR}/signing.sh
+
+enclosed_heading_this "Regenerating Initramfs"
+${SETUP_DIR}/initramfs.sh

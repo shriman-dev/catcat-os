@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
+set -ouex pipefail
 source /usr/lib/catcat/funcvar.sh
-
-SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TEMPLATE_POLICY="${SETUP_DIR}/setup-files/policy.json"
 CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
 POLICY_FILE="/etc/containers/policy.json"
