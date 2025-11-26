@@ -53,7 +53,7 @@ jobs:
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
 
       - name: Build ISO
-        uses: jasonn3/build-container-installer@v1.3.0
+        uses: jasonn3/build-container-installer@v1.4.0
         id: build-iso
         with:
           arch: x86_64
@@ -70,6 +70,7 @@ jobs:
           enable_flatpak_dependencies: "false"
           extra_boot_params: "rd.udev.log_priority=3 loglevel=3 rd.shell=0 rd.emergency=halt"
           additional_templates: /github/workspace/files/scripts/setup_files/remove_root_password_prompt.tmpl
+          repos: '/etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
 
       - name: Move ISO to Upload Directory
         id: upload-directory
@@ -88,7 +89,7 @@ jobs:
         with:
           name: ${{ matrix.image_name }}-iso
           path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 0
           compression-level: 0
           overwrite: true
