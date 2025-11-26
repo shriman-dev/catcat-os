@@ -354,8 +354,8 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr disable ublue-os/staging
     dnf5 -y copr disable ublue-os/packages
 else
-    dnf5 -y copr disable bazzite-org/bazzite
-    dnf5 -y copr disable bazzite-org/rom-properties
+    dnf5 -y copr disable bazzite-org/bazzite || true
+    dnf5 -y copr disable bazzite-org/rom-properties || true
 fi
 log "INFO" "Done."
 
