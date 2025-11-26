@@ -117,10 +117,10 @@ jobs:
         shell: bash
         run: |
           ISO_UPLOAD_DIR=${{ github.workspace }}/upload
-          mkdir ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }} ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
-          tree ${ISO_UPLOAD_DIR}
+          mkdir -vp ${ISO_UPLOAD_DIR}
+          mv -v ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }} ${ISO_UPLOAD_DIR}
+          mv -v ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          tree -a ${ISO_UPLOAD_DIR}
           echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
 
       - name: Upload ISOs and Checksum as artifacts
