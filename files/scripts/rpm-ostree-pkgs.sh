@@ -126,7 +126,7 @@ DESKTOP_COMMON=(
     #wlr-randr
     "wmctrl"
     "wl-clipboard"
-    "gnome-randr-rust" # from bazzite-org/bazzite
+#    "gnome-randr-rust" # from bazzite-org/bazzite
 
     # More Terminal Tools
     ##poppler # pdf rendering library
@@ -175,7 +175,7 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-    "rom-properties-gtk3" # from bazzite-org/rom-properties
+#    "rom-properties-gtk3" # from bazzite-org/rom-properties
 
     # Gnome Apps and Extensions
     "xed"
@@ -184,7 +184,7 @@ DESKTOP_COMMON=(
     "dconf-editor"
     "gnome-software"
     "gnome-system-monitor"
-    "gnome-shell-extension-hanabi" # from bazzite-org/bazzite
+#    "gnome-shell-extension-hanabi" # from bazzite-org/bazzite
     "gnome-shell-extension-gsconnect"
 
     # Themeing and Extension Deps
@@ -319,8 +319,8 @@ else
 #    dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-    dnf5 -y copr enable bazzite-org/bazzite
-    dnf5 -y copr enable bazzite-org/rom-properties
+#    dnf5 -y copr enable bazzite-org/bazzite
+#    dnf5 -y copr enable bazzite-org/rom-properties
     log "INFO" "Done."
 fi
 
