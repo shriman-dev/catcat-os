@@ -269,7 +269,6 @@ COMMON=(
     # More Terminal Tools
     "jq"
     "gum"
-    "just"
 
     # Exrtas
     "++ujust_setup"

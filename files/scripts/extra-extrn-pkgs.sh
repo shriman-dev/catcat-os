@@ -208,10 +208,25 @@ ascii_image_converter() {
 }
 
 ujust_setup() {
+    local just_repo="https://api.github.com/repos/casey/just"
+    local just_tar="${TMP_DIR}/just.tar.gz"
     local ujust_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages/ublue-os-just/src"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
     local import_file="/usr/share/ublue-os/justfile"
     local justfile_dir="$(dirname ${SETUP_DIR})/justfiles"
+
+    log "INFO" "Installing just"
+    mkdir -vp "${just_tar}.extract"
+
+    curl -Lo "${just_tar}" $(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
+
+    tar -xvf "${just_tar}" -C "${just_tar}.extract"
+    cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
+    cp -dvf "${just_tar}.extract/just" "/usr/bin"/
+    chmod -v +x /usr/bin/just
+    rm -rf "${just_tar}" "${just_tar}.extract"
+
+    log "INFO" "Done."
 
     log "INFO" "Installing ujust and ugum"
 
