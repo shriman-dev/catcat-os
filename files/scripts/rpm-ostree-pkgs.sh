@@ -20,7 +20,7 @@ DESKTOP_EXTRAS=(
     "wireshark"
     "++bandwhich"
     #amdgpu_top
-    #"$(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)"
+    "$(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)"
 
     # Backup, Archive, Encryption and Compression
     ##borgbackup zsync
@@ -126,7 +126,7 @@ DESKTOP_COMMON=(
     #wlr-randr
     "wmctrl"
     "wl-clipboard"
-#    "gnome-randr-rust" # from bazzite-org/bazzite
+    "gnome-randr-rust" # from bazzite-org/bazzite
 
     # More Terminal Tools
     ##poppler # pdf rendering library
@@ -175,7 +175,7 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-#    "rom-properties-gtk3" # from bazzite-org/rom-properties
+    "rom-properties-gtk3" # from bazzite-org/rom-properties
 
     # Gnome Apps and Extensions
     "xed"
@@ -184,7 +184,7 @@ DESKTOP_COMMON=(
     "dconf-editor"
     "gnome-software"
     "gnome-system-monitor"
-#    "gnome-shell-extension-hanabi" # from bazzite-org/bazzite
+    "gnome-shell-extension-hanabi" # from bazzite-org/bazzite
     "gnome-shell-extension-gsconnect"
 
     # Themeing and Extension Deps
@@ -319,8 +319,8 @@ else
 #    dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-#    dnf5 -y copr enable bazzite-org/bazzite
-#    dnf5 -y copr enable bazzite-org/rom-properties
+    dnf5 -y copr enable bazzite-org/bazzite
+    dnf5 -y copr enable bazzite-org/rom-properties
     log "INFO" "Done."
 fi
 
@@ -346,13 +346,13 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
 #    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
 #    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
-    dnf5 -y copr disable bazzite-org/bazzite
-    dnf5 -y copr disable bazzite-org/bazzite-multilib
-    dnf5 -y copr disable bazzite-org/rom-properties
-    dnf5 -y copr disable bazzite-org/obs-vkcapture
-    dnf5 -y copr disable hhd-dev/hhd
-    dnf5 -y copr disable ublue-os/staging
-    dnf5 -y copr disable ublue-os/packages
+    dnf5 -y copr disable bazzite-org/bazzite || true
+    dnf5 -y copr disable bazzite-org/bazzite-multilib || true
+    dnf5 -y copr disable bazzite-org/rom-properties || true
+    dnf5 -y copr disable bazzite-org/obs-vkcapture || true
+    dnf5 -y copr disable hhd-dev/hhd || true
+    dnf5 -y copr disable ublue-os/staging || true
+    dnf5 -y copr disable ublue-os/packages || true
 else
     dnf5 -y copr disable bazzite-org/bazzite || true
     dnf5 -y copr disable bazzite-org/rom-properties || true

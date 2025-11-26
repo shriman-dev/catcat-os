@@ -235,6 +235,7 @@ toggle-ssh ACTION="":
     case "${OPTION}" in
       "Start SSH Till Next Reboot"|start)
         echo "Starting SSH till next reboot..."
+        ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
         sudo systemctl unmask sshd.service
         sudo systemctl start sshd.service
         echo -e "SSH is now ${green}Started${normal}. You can SSH using:"
@@ -251,6 +252,7 @@ toggle-ssh ACTION="":
         ;;
       "Enable SSH Persistently"|persist-enable)
         echo "Enabling SSH on boot..."
+        ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
         sudo systemctl unmask sshd.service
         sudo systemctl enable sshd
         sudo systemctl start sshd
