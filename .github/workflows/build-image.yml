@@ -143,7 +143,7 @@ jobs:
 #       Documentation for Rechunk is provided on their github repository at https://github.com/hhd-dev/rechunk
 #       You can enable it by uncommenting the following lines:
        - name: Run Rechunker
-       if: ${{ ! contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
+       if: ${{ contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
          id: rechunk
          uses: hhd-dev/rechunk@v1.2.4
          with:
@@ -157,7 +157,7 @@ jobs:
 
 #       This is necessary so that the podman socket can find the rechunked image on its storage
        - name: Load in podman and tag
-       if: ${{ ! contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
+       if: ${{ contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
          run: |
            IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
            sudo rm -rf ${{ steps.rechunk.outputs.output }}
