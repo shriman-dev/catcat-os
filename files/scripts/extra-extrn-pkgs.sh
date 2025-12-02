@@ -356,6 +356,7 @@ process_command() {
             ;;
         waydroid_setup)
             waydroid_setup
+            ;;
         extras)
             extras
             ;;
