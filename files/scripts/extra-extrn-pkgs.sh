@@ -227,7 +227,7 @@ ls_iommu() {
 ujust_setup() {
     local just_repo="https://api.github.com/repos/casey/just"
     local just_tar="${TMP_DIR}/just.tar.gz"
-    local ujust_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages/ublue-os-just/src"
+    local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
     local import_file="/usr/share/ublue-os/justfile"
     local justfile_dir="$(dirname ${SETUP_DIR})/justfiles"
@@ -248,23 +248,35 @@ ujust_setup() {
     log "INFO" "Installing ujust and ugum"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
-    curl -Lo "/usr/bin/ujust" "${ujust_repo}/ujust"
-    curl -Lo "/usr/bin/ugum" "${ujust_repo}/ugum"
+    curl -Lo "/usr/bin/ujust" "${ublue_repo}/ublue-os-just/src/ujust"
+    curl -Lo "/usr/bin/ugum" "${ublue_repo}/ublue-os-just/src/ugum"
     chmod -v +x /usr/bin/{ujust,ugum}
 
     [[ ! -f "/usr/share/ublue-os/justfile" ]] &&
-        curl -Lo "/usr/share/ublue-os/justfile" "${ujust_repo}/header.just"
+        curl -Lo "/usr/share/ublue-os/justfile" "${ublue_repo}/ublue-os-just/src/header.just"
 
     log "INFO" "Done."
 
-    # Import justfiles to ujust
-    log "INFO" "Importing justfiles to ujust"
+    # Needed files for luks tpm2 autounlock recipe
+    [[ ! -f /usr/libexec/luks-enable-tpm2-autounlock ]] && {
+        mkdir -vp /usr/lib/dracut/dracut.conf.d
+        curl -Lo "/usr/lib/dracut/dracut.conf.d/90-ublue-luks.conf" \
+                    "${ublue_repo}/ublue-os-luks/src/90-ublue-luks.conf"
+        curl -Lo "/usr/libexec/luks-enable-tpm2-autounlock" \
+                    "${ublue_repo}/ublue-os-luks/src/luks-enable-tpm2-autounlock"
+        curl -Lo "/usr/libexec/luks-disable-tpm2-autounlock" \
+                    "${ublue_repo}/ublue-os-luks/src/luks-disable-tpm2-autounlock"
+    }
+
+    # Waydroid setup recipe
     rpm -q waydroid && {
         curl -Lo "${justfile_dir}/82-bazzite-waydroid.just" "${bazzite_repo}/82-bazzite-waydroid.just"
         sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
                 "${justfile_dir}/82-bazzite-waydroid.just"
     }
 
+    # Import justfiles to ujust
+    log "INFO" "Importing justfiles to ujust"
     if [[ -f "${import_file}" ]]; then
         local justfile import_line
         for justfile in ${justfile_dir}/*.just; do
