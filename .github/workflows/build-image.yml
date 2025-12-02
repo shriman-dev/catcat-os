@@ -157,7 +157,7 @@ jobs:
 
 #       This is necessary so that the podman socket can find the rechunked image on its storage
        - name: Load in podman and tag
-       if: ${{ !contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
+       if: ${{ ! contains(matrix.BASE_IMAGE_NAME, 'bazzite') }}
          run: |
            IMAGE=$(podman pull ${{ steps.rechunk.outputs.ref }})
            sudo rm -rf ${{ steps.rechunk.outputs.output }}
