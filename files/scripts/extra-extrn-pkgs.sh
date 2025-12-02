@@ -354,6 +354,8 @@ process_command() {
         ujust_setup)
             ujust_setup
             ;;
+        waydroid_setup)
+            waydroid_setup
         extras)
             extras
             ;;

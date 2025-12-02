@@ -321,7 +321,8 @@ else
 #    dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-    dnf5 -y copr enable atim/starship
+    dnf5 -y install --nogpgcheck --repofrompath \
+            'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
     dnf5 -y copr enable bazzite-org/bazzite
     dnf5 -y copr enable bazzite-org/rom-properties
     log "INFO" "Done."
@@ -357,8 +358,8 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr disable ublue-os/staging || true
     dnf5 -y copr disable ublue-os/packages || true
 else
-    dnf5 -y copr disable atim/starship || true
-    dnf5 -y copr disable bazzite-org/bazzite || true
+    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
+    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
     dnf5 -y copr disable bazzite-org/rom-properties || true
 fi
 log "INFO" "Done."
