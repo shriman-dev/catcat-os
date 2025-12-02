@@ -2,7 +2,46 @@
 source /usr/lib/catcat/funcvar.sh
 U1000="$(id -un 1000)"
 
-plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
+# First boot setup
+if [[ ! -f /etc/catcat-os/first-boot ]]; then
+    plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
+
+    # Setup user home configs
+    REAL_USERS=$(grep '/home' /etc/passwd | cut -d: -f1)
+    for SOME_USER in ${REAL_USERS[@]}; do
+        if [[ ! "${SOME_USER}" =~ ^(gdm|root)$ ]]; then
+            sudo -u "${SOME_USER}" bash -c "/usr/libexec/catcat-user-setup"
+        fi
+    done
+
+    # Setup grub
+    mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
+    replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+    replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
+    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=console' /etc/default/grub
+    replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+    replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+    #GRUB_TERMINAL_OUTPUT=gfxterm
+    #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+
+    # Update grubup
+    /usr/bin/grubup
+
+    # Show grub screen for desktop devices
+    hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
+
+    # Set default hostname
+    hostnamectl set-hostname --static "catcat"
+
+    # Permit main user
+    #usermod -aG libvirt ${U1000}
+
+    mkdir -p /etc/catcat-os/
+    echo 'first boot' > /etc/catcat-os/first-boot
+fi
+
 /usr/libexec/secatcat
 /usr/libexec/catcat-kargs
 /usr/libexec/catcat-flatpak-manager
