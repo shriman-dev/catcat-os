@@ -5,6 +5,8 @@ TEMPLATE_POLICY="${SETUP_DIR}/setup_files/policy.json"
 CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
+# TODO: Add secure boot signing in non ublue images
+
 log "INFO" "Configuring container image signing policy and placing catcat-os pub key"
 
 mkdir -vp /etc/pki/containers /etc/containers/registries.d

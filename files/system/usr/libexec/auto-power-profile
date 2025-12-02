@@ -4,8 +4,6 @@ source /usr/lib/catcat/funcvar.sh
 SYSTEM_LOAD_THRESHOLD_LOW=1.5
 SYSTEM_LOAD_THRESHOLD_HIGH=3
 
-# TODO: remove deps on ppd and tuned
-
 set_power_profile() {
   echo "Setting power profile to: ${1}"
   local profile="${1}"

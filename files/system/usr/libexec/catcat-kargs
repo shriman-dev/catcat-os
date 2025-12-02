@@ -8,6 +8,8 @@ COMMON_KARGS_TO_ADD=(
     "loglevel=3"
     "rd.shell=0"
     "rd.emergency=halt"
+    "rd.luks.options=discard"
+    "luks.options=discard"
 )
 
 for karg in "${COMMON_KARGS_TO_ADD[@]}"; do
@@ -16,24 +18,6 @@ for karg in "${COMMON_KARGS_TO_ADD[@]}"; do
         NEEDED_KARGS+=("--append-if-missing=${karg}")
     fi
 done
-
-BASE_IMAGE_KARGS_TO_ADD=(
-    "rd.luks.options=discard"
-    "luks.options=discard"
-    "processor.ignore_ppc=1"
-    "split_lock_detect=off"
-    "bluetooth.disable_ertm=1"
-    "preempt=full"
-)
-
-if ! grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
-    for karg in "${BASE_IMAGE_KARGS_TO_ADD[@]}"; do
-        if [[ ! ${KARGS} =~ ${karg} ]]; then
-            log "INFO" "Adding needed kargs: ${karg}"
-            NEEDED_KARGS+=("--append-if-missing=${karg}")
-        fi
-    done
-fi
 
 if command -v nvidia-smi; then
     NEEDED_KARGS+=(

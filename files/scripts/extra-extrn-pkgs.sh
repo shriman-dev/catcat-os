@@ -207,6 +207,23 @@ ascii_image_converter() {
     log "INFO" "Done."
 }
 
+ls_iommu() {
+    local ls_iommu_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
+    local ls_iommu_tar="${TMP_DIR}/ls_iommu.tar.gz"
+    log "INFO" "Installing ls-iommu"
+    mkdir -vp "${ls_iommu_tar}.extract"
+
+    curl -Lo "${ls_iommu_tar}" $(curl -s -X GET "${ls_iommu_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)
+
+
+    tar -xvf "${ls_iommu_tar}" -C "${ls_iommu_tar}.extract"
+    cp -dvf "${ls_iommu_tar}.extract/ls-iommu" "/usr/bin"/
+    chmod -v +x /usr/bin/ls-iommu
+    rm -rf "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
+
+    log "INFO" "Done."
+}
+
 ujust_setup() {
     local just_repo="https://api.github.com/repos/casey/just"
     local just_tar="${TMP_DIR}/just.tar.gz"
@@ -233,8 +250,10 @@ ujust_setup() {
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
     curl -Lo "/usr/bin/ujust" "${ujust_repo}/ujust"
     curl -Lo "/usr/bin/ugum" "${ujust_repo}/ugum"
-    curl -Lo "/usr/share/ublue-os/justfile" "${ujust_repo}/header.just"
     chmod -v +x /usr/bin/{ujust,ugum}
+
+    [[ ! -f "/usr/share/ublue-os/justfile" ]] &&
+        curl -Lo "/usr/share/ublue-os/justfile" "${ujust_repo}/header.just"
 
     log "INFO" "Done."
 
@@ -265,18 +284,27 @@ ujust_setup() {
     cat "${import_file}"
 }
 
+waydroid_setup() {
+    log "INFO" "Waydroid setup"
+    curl -Lo /usr/bin/waydroid-choose-gpu \
+        "https://raw.githubusercontent.com/bazzite-org/waydroid-scripts/main/waydroid-choose-gpu.sh"
+    chmod -v +x /usr/bin/waydroid-choose-gpu
+
+    [[ ! -f "/usr/lib/waydroid/data/scripts/waydroid-net.sh~" ]] &&
+            sed -i~ -E 's/=.\$\(command -v (nft|ip6?tables-legacy).*/=/g' \
+                    /usr/lib/waydroid/data/scripts/waydroid-net.sh
+
+    systemctl disable waydroid-container.service
+    log "INFO" "Done."
+}
+
 extras() {
     log "INFO" "Getting extra confs"
 
     curl -Lo /usr/share/applications/micro.desktop \
         https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
-
     log "INFO" "Done."
 }
-
-# TODO: add ujust and ugum and ls-iommu
-# TODO: do the waydroid setup stuff
-#systemctl disable waydroid-container.service
 
 process_command() {
     mkdir -vp "${TMP_DIR}"
@@ -319,6 +347,9 @@ process_command() {
             ;;
         ascii_image_converter)
             ascii_image_converter
+            ;;
+        ls_iommu)
+            ls_iommu
             ;;
         ujust_setup)
             ujust_setup

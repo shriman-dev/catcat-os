@@ -5,10 +5,7 @@ Before=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/secatcat
-ExecStart=/usr/libexec/catcat-kargs
 ExecStart=/usr/libexec/catcat-system-setup
-ExecStart=/usr/libexec/catcat-flatpak-manager
 
 [Install]
 WantedBy=multi-user.target

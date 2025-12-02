@@ -45,7 +45,7 @@ DESKTOP_EXTRAS=(
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
     "++llama_cpp"
 
-    # Rocm libs
+    # Rocm lib
     #rocm-hip
     #rocm-opencl
     #rocm-clinfo
@@ -75,6 +75,7 @@ DESKTOP_EXTRAS=(
     "spice-gtk-tools"
     "swtpm"
     "swtpm-tools"
+    "++ls_iommu"
 
     # Gaming Stuff
     ##coolercontrol mfancontrol liquidctl lsfg-vk
@@ -156,6 +157,7 @@ DESKTOP_COMMON=(
     "micro"
     "neovim"
     "waydroid"
+    "++waydroid_setup"
     "python3-pip"
     "inotify-tools"
     #vscodium
@@ -221,7 +223,7 @@ COMMON=(
     "fish"
     #fastfetch
     "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm"
-    "++starship"
+    "starship"
     "fzf"
     "bat"
     "++eza"
@@ -319,6 +321,7 @@ else
 #    dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+    dnf5 -y copr enable atim/starship
     dnf5 -y copr enable bazzite-org/bazzite
     dnf5 -y copr enable bazzite-org/rom-properties
     log "INFO" "Done."
@@ -354,6 +357,7 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     dnf5 -y copr disable ublue-os/staging || true
     dnf5 -y copr disable ublue-os/packages || true
 else
+    dnf5 -y copr disable atim/starship || true
     dnf5 -y copr disable bazzite-org/bazzite || true
     dnf5 -y copr disable bazzite-org/rom-properties || true
 fi

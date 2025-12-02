@@ -1,3 +1,15 @@
+# TODO: Add msi fancontrol installer in ujust app section
+
+# Boot into this device's BIOS/UEFI screen
+[group("utilities")]
+bios:
+    #!/usr/bin/bash
+    if [ -d /sys/firmware/efi ]; then
+      systemctl reboot --firmware-setup
+    else
+      echo "Rebooting to legacy BIOS from OS is not supported."
+    fi
+
 # Measure Idle Power Draw
 [group("utilities")]
 check-idle-power-draw:

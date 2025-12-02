@@ -45,3 +45,6 @@ ${SETUP_DIR}/signing.sh
 
 enclosed_heading_this "Regenerating Initramfs"
 ${SETUP_DIR}/initramfs.sh
+
+enclosed_heading_this "Post Build Cleaning"
+${SETUP_DIR}/post-cleanup.sh
