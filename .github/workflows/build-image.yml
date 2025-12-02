@@ -133,11 +133,6 @@ jobs:
             COMMIT_SHA=${{ env.COMMIT_SHA }}
           oci: false
 
-#      - name: Remove auxiliary images
-#        run: |
-#          sudo podman image rm ${{ matrix.BASE_IMAGE_NAME }}:${{ env.MAJVER_TAG }}
-
-
 #       Rechunk is a script that we use on Universal Blue to make sure there isnt a single huge layer when your image gets published.
 #       This does not make your image faster to download, just provides better resumability and fixes a few errors.
 #       Documentation for Rechunk is provided on their github repository at https://github.com/hhd-dev/rechunk
@@ -151,7 +146,7 @@ jobs:
            ref: "localhost/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
            prev-ref: "${{ env.PUSH_IMAGE_REGISTRY }}/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
            skip_compression: true
-           version: ${{ env.CENTOS_VERSION }}
+#           version: ${{ env.CENTOS_VERSION }}
 #          # Rechunk strips out labels during build, needs to be reapplied with newline separator
            labels: ${{ steps.metadata.outputs.labels }}
 
