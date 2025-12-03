@@ -78,8 +78,8 @@ cat > "${privacy_ext_conf}" << EOF
 ipv6.ip6-privacy=2
 EOF
 
-# Ad/Malware blocking with dnscrypt-proxy
-log "INFO" "Adding support for Ad/Malware blocking with dnscrypt-proxy"
+# Ad/Malware blocking
+log "INFO" "Adding support for Ad/Malware blocking"
 # Install dnscrypt-proxy
 tmp_localdns="/tmp/localdns.d"
 localdns_confd="/etc/catcat-os/localdns.d"
@@ -106,7 +106,6 @@ curl -Lo "${dnscrypt_confd}/public-resolvers.md.minisig" \
 rm -rf "${dnscrypt_tar}" "${dnscrypt_tar}.extract"
 log "DEBUG" "Done."
 
-# Enable dnscrypt-proxy
 log "DEBUG" "Enabling localdns"
 systemctl disable systemd-resolved.service
 systemctl mask systemd-resolved.service
@@ -134,7 +133,7 @@ mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
 }
 
 # Dnsmasq blocklist
-[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+[[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
     log "DEBUG" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
     echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
     curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
