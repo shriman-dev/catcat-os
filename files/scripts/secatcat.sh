@@ -82,6 +82,7 @@ EOF
 log "INFO" "Adding support for Ad/Malware blocking with dnscrypt-proxy"
 # Install dnscrypt-proxy
 tmp_localdns="/tmp/localdns.d"
+localdns_confd="/etc/catcat-os/localdns.d"
 dnscrypt_resolver_repo="https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master"
 dnscrypt_repo="https://api.github.com/repos/DNSCrypt/dnscrypt-proxy"
 dnscrypt_tar="${tmp_localdns}/dnscrypt-proxy.tar.gz"
@@ -106,11 +107,18 @@ rm -rf "${dnscrypt_tar}" "${dnscrypt_tar}.extract"
 log "DEBUG" "Done."
 
 # Enable dnscrypt-proxy
-log "DEBUG" "Enabling dnscrypt-proxy service"
-/usr/bin/localdnsctl --switch-blocklist-backend dnscrypt
-systemctl -f enable dnscrypt-proxy.service dns-blocklist-updater.timer
+log "DEBUG" "Enabling localdns"
 systemctl disable systemd-resolved.service
 systemctl mask systemd-resolved.service
+systemctl -f enable dns-blocklist-updater.timer
+
+if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+    /usr/bin/localdnsctl -v --switch-blocklist-backend dnsmasq
+    systemctl -f enable dnsmasq.service
+else
+    /usr/bin/localdnsctl -v --switch-blocklist-backend dnscrypt
+    systemctl -f enable dnscrypt-proxy.service
+fi
 log "DEBUG" "Done."
 
 # Get DNS blocklist archive
@@ -118,27 +126,23 @@ log "DEBUG" "Get DNS Ad and Malware blocklist"
 mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
 
 # Dnscrypt blocklist
-curl -Lo "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
+[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+    curl -Lo "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${dns_blocklist_repo}/domains.d/domains-filtered-subdomains.tar.zst"
-split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
+    split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst"
-log "DEBUG" "Done."
+}
 
 # Dnsmasq blocklist
-log "DEBUG" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
-echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
-#curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
-#                "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
-#split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
-#                "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
-
-# Get hblock config
-hblock_confd="/etc/hblock"
-log "DEBUG" "Get hblock configuration"
-mkdir -vp "${hblock_confd}"
-curl -Lo "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
-curl -Lo "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
-curl -Lo "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
+[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+    log "DEBUG" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
+    echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
+    curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
+                "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
+    split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
+                "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
+}
+log "DEBUG" "Done."
 
 # Clear tmp
 rm -rvf "${tmp_localdns}"

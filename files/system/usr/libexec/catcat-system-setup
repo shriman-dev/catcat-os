@@ -135,9 +135,16 @@ fi
 
 
 # FIXES
+# Set default target to graphical on base images, fixes rebase
+current_default_target=$(systemctl get-default)
+variant_id=$(grep '^VARIANT_ID' /usr/lib/os-release | cut -d= -f2-)
+default_target=$([[ ${variant_id} =~ catcat-os-sv ]] && echo "multi-user.target" || echo "graphical.target")
+
+[[ ! "${current_default_target}" == "${default_target}" ]] && systemctl set-default "${default_target}"
+
 # Waydroid fix
 if [[ -f "/var/lib/waydroid/lxc/waydroid/config" ]]; then
-  echo "Removing unneeded apparmor entry from Waydroid LXC"
+  # Removing unneeded apparmor entry from Waydroid LXC
   sed -i '/lxc\.apparmor\.profile\s*=\s*unconfined/d' "/var/lib/waydroid/lxc/waydroid/config"
 fi
 
@@ -148,14 +155,6 @@ if (( $(hostname | wc -m) > 20 )); then
     hostnamectl set-hostname catcat
 fi
 # Fix missing hostname file breaking distrobox
-if [ ! -f /etc/hostname ]; then
+if [[ ! -f /etc/hostname ]]; then
   touch /etc/hostname
-fi
-
-# Set default target to graphical on base images, fixes rebase
-default_target="$(systemctl get-default)"
-if grep '^VARIANT_ID.*catcat-os-sv' /usr/lib/os-release; then
-    [[ ! "${default_target}" == "multi-user.target" ]] && systemctl set-default multi-user.target
-else
-    [[ ! "${default_target}" == "graphical.target" ]] && systemctl set-default graphical.target
 fi

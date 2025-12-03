@@ -95,6 +95,8 @@ GLOBAL_DISABLE_SERVICES=(
     "localsearch-3.service"
     "localsearch-control-3.service"
     "localsearch-writeback-3.service"
+    "org.gnome.SettingsDaemon.Sharing.service"
+    "org.gnome.SettingsDaemon.Wacom.service"
     "tracker-miner-fs-3.service"
     "tracker-miner-fs-control-3.service"
     "tracker-miner-rss-3.service"

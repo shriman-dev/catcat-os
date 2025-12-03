@@ -35,7 +35,6 @@ sync_default_configs() {
     cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/ ||
         err "Theme update failed"
 
-    /usr/bin/bat cache --build
     cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
     log "INFO" "Configs updated"
   fi
@@ -219,6 +218,8 @@ remove_unnecessary_directories() {
 
 shell_setup() {
   log "INFO" "Setting up shell..."
+  /usr/bin/bat cache --build
+
   [[ ! -f "${CONFIG}/fish/fish_variables" ]] && {
     cp -drf ${SKEL}/.config/fish "${CONFIG}/" || err "Failed to setup fish_variables"
   }

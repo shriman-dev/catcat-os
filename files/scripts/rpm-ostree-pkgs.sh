@@ -272,6 +272,9 @@ COMMON=(
     "jq"
     "gum"
 
+    # Performance Tuning
+    "tuned"
+
     # Exrtas
     "++ujust_setup"
 
@@ -293,20 +296,25 @@ COMMON=(
 #dnf5 -y copr enable zeno/scrcpy
 #dnf5 -y copr enable scottames/ghostty
 #dnf5 -y copr enable atim/lazygit
+#dnf5 -y copr enable bazzite-org/bazzite
+#dnf5 -y copr enable bazzite-org/bazzite-multilib
+#dnf5 -y copr enable bazzite-org/rom-properties
+#dnf5 -y copr enable bazzite-org/obs-vkcapture
+#dnf5 -y copr enable hhd-dev/hhd
+#dnf5 -y copr enable ublue-os/staging
+#dnf5 -y copr enable ublue-os/packages
+#sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
+#sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
+#dnf5 -y install \
+#        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
+#        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+
 if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     log "INFO" "Adding extra RPM repos"
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
-#    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
-#    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
-#    dnf5 -y copr enable bazzite-org/bazzite
-#    dnf5 -y copr enable bazzite-org/bazzite-multilib
-#    dnf5 -y copr enable bazzite-org/rom-properties
-#    dnf5 -y copr enable bazzite-org/obs-vkcapture
-#    dnf5 -y copr enable hhd-dev/hhd
-#    dnf5 -y copr enable ublue-os/staging
-#    dnf5 -y copr enable ublue-os/packages
     log "INFO" "Done."
+
     log "INFO" "Performing updates"
     dnf5 -y remove unrar rar
     rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
@@ -317,10 +325,8 @@ else
     rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
     dnf5 upgrade --refresh --assumeyes
     log "INFO" "Done."
+
     log "INFO" "Adding extra RPM repos"
-#    dnf5 -y install \
-#        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
-#        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
     dnf5 -y copr enable bazzite-org/bazzite
@@ -345,23 +351,17 @@ log "INFO" "Done."
 
 
 log "INFO" "Disabling repos no longer needed"
-if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
-    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
-    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
-#    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
-#    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
-    dnf5 -y copr disable bazzite-org/bazzite || true
-    dnf5 -y copr disable bazzite-org/bazzite-multilib || true
-    dnf5 -y copr disable bazzite-org/rom-properties || true
-    dnf5 -y copr disable bazzite-org/obs-vkcapture || true
-    dnf5 -y copr disable hhd-dev/hhd || true
-    dnf5 -y copr disable ublue-os/staging || true
-    dnf5 -y copr disable ublue-os/packages || true
-else
-    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
-    sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
-    dnf5 -y copr disable bazzite-org/rom-properties || true
-fi
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo || true
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo || true
+dnf5 -y copr disable bazzite-org/bazzite || true
+dnf5 -y copr disable bazzite-org/bazzite-multilib || true
+dnf5 -y copr disable bazzite-org/rom-properties || true
+dnf5 -y copr disable bazzite-org/obs-vkcapture || true
+dnf5 -y copr disable hhd-dev/hhd || true
+dnf5 -y copr disable ublue-os/staging || true
+dnf5 -y copr disable ublue-os/packages || true
 log "INFO" "Done."
 
 
@@ -376,7 +376,6 @@ if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
         rocm-smi
     log "INFO" "Done."
 fi
-
 
 
 log "INFO" "Installing External Packages"

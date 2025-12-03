@@ -107,6 +107,7 @@ toggle_localdns() {
 
 switch_blocklist() {
     need_root
+    [[ ! -d "${CONFIG_DIR}" ]] && mkdir ${VERBOSE:+-v} -p "${CONFIG_DIR}"
     case "${1,,}" in
         dnscrypt)
             touch "${CONFIG_DIR}/only-dnscrypt-blocklist"

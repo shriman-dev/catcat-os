@@ -46,6 +46,14 @@ if [[ -f /etc/xdg/autostart/org.gnome.Software.desktop ]]; then
     rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
 fi
 
+# Minimal catcat specific tweaks
+if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+    systemctl --global disable org.freedesktop.IBus.session.GNOME.service \
+                               org.freedesktop.IBus.session.generic.service
+    systemctl --global mask org.freedesktop.IBus.session.GNOME.service \
+                            org.freedesktop.IBus.session.generic.service
+fi
+
 # Handheld specific tweaks
 if command -v hhdctl; then
     log "INFO" "Applying handheld specific tweaks"

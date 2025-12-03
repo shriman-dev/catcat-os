@@ -72,6 +72,8 @@ log "INFO" "Removing desktop files in /etc/xdg/autostart"
 rm -rvf /etc/skel/.config/autostart
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop
+rm -vf  /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop
+rm -vf  /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
 rm -vf  /etc/xdg/autostart/localsearch*3.desktop

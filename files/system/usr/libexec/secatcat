@@ -10,7 +10,7 @@ source /usr/lib/catcat/funcvar.sh
 
 # Support to run nix commands with sudo for user 1000
 U1000="$(id -un 1000)"
-nix_user_path="/home/${U1000}/.local/state/nix/profile"
+nix_user_path="/home/${U1000}/.local/state/nix/profile/bin"
 sudoersd_file="/etc/sudoers.d/nix-sudo-env"
 if ! grep "${nix_user_path}" "${sudoersd_file}"; then
     log "INFO" "Adding support to run nix commands with sudo for user 1000"

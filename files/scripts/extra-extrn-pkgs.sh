@@ -77,11 +77,20 @@ yazi() {
 }
 
 hblock() {
+    local hblock_confd="/etc/hblock"
     local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
+    local dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
     log "INFO" "Installing hblock"
 
     curl -Lo "/usr/bin/hblock" "${hblock_repo}/hblock"
     chmod -v +x "/usr/bin/hblock"
+
+    # Get hblock config
+    log "DEBUG" "Getting hblock configuration"
+    mkdir -vp "${hblock_confd}"
+    curl -Lo "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
+    curl -Lo "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
+    curl -Lo "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
 
     log "INFO" "Done."
 }
