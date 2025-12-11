@@ -119,7 +119,7 @@ allow_home() {
 
   echo ''
   for app in "${allowhome_for_apps[@]}"; do
-    echo "Allowing home access for app: ${app}"
+    log "INFO" "Allowing home access for app: ${app}"
     flatpak override ${SCOPE} --unshare=network --filesystem=home ${app}
   done
 }
@@ -164,7 +164,7 @@ allow_gpu_acceleration() {
 
   echo ''
   for app in "${gpu_acceleration_for_apps[@]}"; do
-    echo "Allowing gpu acceleration for app: ${app}"
+    log "INFO" "Allowing gpu acceleration for app: ${app}"
     flatpak override ${SCOPE} --device=dri ${app}
   done
 }
