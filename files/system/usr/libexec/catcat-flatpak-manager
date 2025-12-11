@@ -89,40 +89,6 @@ remove_filesystem_access() {
   done
 }
 
-#disable_network() {
-#  nonet_for_apps=(
-#    "app.fotema.Fotema"
-#    "com.boxy_svg.BoxySVG"
-#    "com.calibre_ebook.calibre"
-#    "com.dec05eba.gpu_screen_recorder"
-#    "com.github.johnfactotum.Foliate"
-#    "com.github.neithern.g4music"
-#    "com.github.PintaProject.Pinta"
-#    "com.github.rafostar.Clapper"
-#    "com.github.tenderowl.frog"
-#    "io.github.mrvladus.List"
-#    "me.iepure.devtoolbox"
-#    "org.gimp.GIMP"
-#    "org.gnome.clocks"
-#    "org.gnome.World.Iotas"
-#    "org.gnome.World.PikaBackup"
-#    "org.inkscape.Inkscape"
-#    "org.kde.krita"
-#    "org.keepassxc.KeePassXC"
-#    "org.libreoffice.LibreOffice"
-#    "org.onlyoffice.desktopeditors"
-#    "org.shotcut.Shotcut"
-#    "org.upscayl.Upscayl"
-#    "org.videolan.VLC"
-#  )
-
-#  echo ''
-#  for app in "${nonet_for_apps[@]}"; do
-#    echo "Remove existing network permissions for app: $app"
-#    flatpak override ${SCOPE} --unshare=network $app
-#  done
-#}
-
 # secure flatpak apps
 apply_global_restrictions() {
   log "INFO" "\nRestricting unnecessary permissions and allowing read-only permissions"
