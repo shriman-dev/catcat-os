@@ -220,8 +220,26 @@ shell_setup() {
   log "INFO" "Setting up shell..."
   /usr/bin/bat cache --build
 
+  # Fish shell
   [[ ! -f "${CONFIG}/fish/fish_variables" ]] && {
     cp -drf ${SKEL}/.config/fish "${CONFIG}/" || err "Failed to setup fish_variables"
+  }
+
+  # To access CatCat OS fish shell setup inside containers
+    local -a execlist=(
+    "/usr/bin/fish"
+    "/usr/bin/fastfetch"
+    "/usr/bin/starship"
+    "/usr/bin/bat"
+    "/usr/bin/eza"
+  )
+
+  local exc
+  [[ ! -x "${HOME_DIR}/.local/bin/fish" ]] && {
+    log "INFO" "Making executables available in user local bin needed for fish shell setup"
+    for exc in "${execlist[@]}"; do
+      ln -svf ${exc} "${HOME_DIR}/.local/bin"
+    done
   }
 
   local shell_rc='

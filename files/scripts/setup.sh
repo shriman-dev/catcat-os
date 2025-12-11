@@ -25,9 +25,6 @@ ${SETUP_DIR}/copy-sys-files.sh
 enclosed_heading_this "Updating And Installing Packages"
 ${SETUP_DIR}/rpm-ostree-pkgs.sh
 
-enclosed_heading_this "Refining System With Tweaks And Fixes"
-${SETUP_DIR}/tweaks-and-fixes.sh
-
 enclosed_heading_this "Applying Themes On Various System Components"
 ${SETUP_DIR}/config-themes.sh
 
@@ -36,6 +33,9 @@ ${SETUP_DIR}/secatcat.sh
 
 enclosed_heading_this "Configuring Systemd Services"
 ${SETUP_DIR}/systemd.sh
+
+enclosed_heading_this "Refining System With Tweaks And Fixes"
+${SETUP_DIR}/tweaks-and-fixes.sh
 
 enclosed_heading_this "Applying Branding"
 ${SETUP_DIR}/branding.sh

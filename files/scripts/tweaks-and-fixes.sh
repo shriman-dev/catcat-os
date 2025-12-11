@@ -31,27 +31,36 @@ sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/li
 
 # Copy over logind.conf and sleep.conf for ease of access
 log "INFO" "Copying over logind.conf and sleep.conf for ease of access"
-mkdir -vp /etc/systemd/logind.conf.d/ /etc/systemd/sleep.conf.d/
+mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
-# Remove stuffs
-#/etc/skel/.config/autostart
-log "INFO" "Removing stuffs"
-rm -rvf /etc/skel/.mozilla /etc/skel/.config/user-tmpfiles.d
-# Disable gnome software running in background
-if [[ -f /etc/xdg/autostart/org.gnome.Software.desktop ]]; then
-    log "INFO" "Disabling gnome software from running in background"
-    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
-    rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
-fi
+log "INFO" "Add things to catcat restore-point directory"
+restore_point="/etc/catcat-os/restore-point"
+mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
+
+mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop "${restore_point}/xdg-autostart"
+mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point}/xdg-autostart"
+
+mv -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.* "${restore_point}/systemd-user"
+mv -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.* "${restore_point}/systemd-user"
+
+mv -v /usr/share/dbus-1/services/org.gnome.OnlineAccounts.* "${restore_point}/dbus-services"
+mv -v /usr/share/dbus-1/services/org.gnome.Identity.* "${restore_point}/dbus-services"
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+    log "INFO" "Applying handheld specific tweaks"
+#    systemctl disable systemd-nsresourced.service systemd-nsresourced.socket systemd-userdbd.service systemd-userdbd.socket
     systemctl --global disable org.freedesktop.IBus.session.GNOME.service \
                                org.freedesktop.IBus.session.generic.service
     systemctl --global mask org.freedesktop.IBus.session.GNOME.service \
                             org.freedesktop.IBus.session.generic.service
+
+    mv -v /usr/lib/systemd/user/org.freedesktop.IBus.session.generic.* "${restore_point}/systemd-user"
+    mv -v /usr/lib/systemd/user/org.freedesktop.IBus.session.GNOME.* "${restore_point}/systemd-user"
+    mv -v /usr/share/dbus-1/services/org.freedesktop.IBus.* "${restore_point}/dbus-services"
+    mv -v /usr/share/dbus-1/services/org.freedesktop.portal.IBus.* "${restore_point}/dbus-services"
 fi
 
 # Handheld specific tweaks

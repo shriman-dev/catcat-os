@@ -13,8 +13,11 @@ log "INFO" "Disabling unneeded executables"
 #chmod -v 000 /usr/libexec/evolution-addressbook-factory
 #chmod -v 000 /usr/libexec/evolution-calendar-factory
 #chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
-chmod -v 000 /usr/libexec/goa-daemon
-chmod -v 000 /usr/libexec/goa-identity-service
+#chmod -v 000 /usr/libexec/gsd-printer
+rpm -q gnome-shell && {
+    chmod -v 000 /usr/libexec/goa-daemon
+    chmod -v 000 /usr/libexec/goa-identity-service
+}
 
 if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Removing homebrew"
@@ -72,8 +75,6 @@ log "INFO" "Removing desktop files in /etc/xdg/autostart"
 rm -rvf /etc/skel/.config/autostart
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop
-rm -vf  /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop
-rm -vf  /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
 rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
 rm -vf  /etc/xdg/autostart/localsearch*3.desktop

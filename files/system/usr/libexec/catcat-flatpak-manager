@@ -33,7 +33,7 @@ install_flatpaks() {
 }
 
 
-FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ~/.local/share/flatpak/app/)"
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ $([[ $(id -u) -ne 0 ]] && echo '~/.local/share/flatpak/app/'))"
 SCOPE='--user'
 
 remove_filesystem_access() {
@@ -83,7 +83,7 @@ remove_filesystem_access() {
           perms+=("--nofilesystem=${perm}")
         done
         log "INFO" "Removing permissions: '${permitted_filesystem}'"
-        flatpak override ${SCOPE} "${perms[@]}" "${app}" && echo 'Done' || echo 'Error occurred'
+        flatpak override ${SCOPE} "${perms[@]}" "${app}"
       }
     }
   done
@@ -119,7 +119,7 @@ remove_filesystem_access() {
 #  echo ''
 #  for app in "${nonet_for_apps[@]}"; do
 #    echo "Remove existing network permissions for app: $app"
-#    flatpak override ${SCOPE} --unshare=network $app && echo 'Done' || echo 'Error occurred'
+#    flatpak override ${SCOPE} --unshare=network $app
 #  done
 #}
 
@@ -133,34 +133,20 @@ apply_global_restrictions() {
     --disallow={devel,multiarch,bluetooth,canbus,per-app-dev-shm} \
     --nofilesystem={host,host-{etc,os},home} \
     --filesystem={~/.{themes,icons}:ro,xdg-data/{icons,themes,fonts}:ro,xdg-config/{gtk-{3,4}.0,Kvantum,qt5ct}:ro} \
-    --env=QT_STYLE_OVERRIDE=kvantum && echo 'Done' || echo 'Error occurred'
+    --env=QT_STYLE_OVERRIDE=kvantum
 #    --nofilesystem={~/.bash{rc,_profile},/home,/var,/var/{home,mnt,run,media},/run,/run/{media,udev},/media,/mnt}
 }
 
 allow_home() {
   allowhome_for_apps=(
     "app.fotema.Fotema"
-    "com.calibre_ebook.calibre"
-    "com.github.flxzt.rnote"
-    "com.github.johnfactotum.Foliate"
     "com.github.neithern.g4music"
     "com.github.PintaProject.Pinta"
-    "com.github.qarmin.czkawka"
-    "com.github.rafostar.Clapper"
-    "org.gnome.World.Iotas"
-    "dev.geopjr.Collision"
-    "garden.jamie.Morphosis"
     "io.github.celluloid_player.Celluloid"
-    "io.github.mpobaschnig.Vaults"
-    "org.gimp.GIMP"
-    "org.gnome.Evince"
     "org.gnome.FileRoller"
     "org.gnome.Loupe"
     "org.gnome.meld"
-    "org.gnome.Music"
-    "org.gnome.Papers"
     "org.gnome.Showtime"
-    "org.kde.krita"
     "org.libreoffice.LibreOffice"
     "org.onlyoffice.desktopeditors"
   )
@@ -168,7 +154,7 @@ allow_home() {
   echo ''
   for app in "${allowhome_for_apps[@]}"; do
     echo "Allowing home access for app: ${app}"
-    flatpak override ${SCOPE} --unshare=network --filesystem=home ${app} && echo 'Done' || echo 'Error occurred'
+    flatpak override ${SCOPE} --unshare=network --filesystem=home ${app}
   done
 }
 
@@ -213,7 +199,7 @@ allow_gpu_acceleration() {
   echo ''
   for app in "${gpu_acceleration_for_apps[@]}"; do
     echo "Allowing gpu acceleration for app: ${app}"
-    flatpak override ${SCOPE} --device=dri ${app} && echo 'Done' || echo 'Error occurred'
+    flatpak override ${SCOPE} --device=dri ${app}
   done
 }
 
@@ -223,7 +209,7 @@ app_specific_perms() {
   for app in org.gnome.Cheese \
              org.gnome.Snapshot; do
     log "INFO" "Permitting cam for app ${app}"
-    flatpak override ${SCOPE} --unshare=network --device=all ${app} && echo 'Done' || echo 'Error occurred'
+    flatpak override ${SCOPE} --unshare=network --device=all ${app}
   done
 
   # Enable kvm and gpu acceleration for virtualization apps
@@ -231,7 +217,7 @@ app_specific_perms() {
   for app in org.gnome.Boxes \
              org.virt_manager.virt-manager; do
     log "INFO" "Enabling virtualization for app ${app}"
-    flatpak override ${SCOPE} --device={dri,kvm} ${app} && echo 'Done' || echo 'Error occurred'
+    flatpak override ${SCOPE} --device={dri,kvm} ${app}
   done
 
   # Fix qt apps on wayland
@@ -243,7 +229,7 @@ app_specific_perms() {
              net.rpcs3.RPCS3 \
              org.libretro.RetroArch; do
     log "INFO" "Disabling wayland socket for app ${app}"
-    flatpak override ${SCOPE} --nosocket=wayland ${app} && echo 'Done' || echo 'Error occurred'
+    flatpak override ${SCOPE} --nosocket=wayland ${app}
   done
 
   # Allow host for GPU screen recorder
@@ -251,7 +237,7 @@ app_specific_perms() {
 
   # Allow gedit to edit files all over system
   log "INFO" "\nAllow gedit to edit files all over system"
-  flatpak override ${SCOPE} --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit && echo 'Done' || echo 'Error occurred'
+  flatpak override ${SCOPE} --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit
 }
 
 # perms for gaming apps
@@ -262,7 +248,7 @@ configure_gaming_apps() {
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
     --env=DXVK_ASYNC=1 \
-  com.usebottles.bottles && echo 'Done' || echo 'Error occurred'
+  com.usebottles.bottles
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.lutris.Lutris"
   flatpak override ${SCOPE} \
@@ -270,7 +256,7 @@ configure_gaming_apps() {
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
     --env=DXVK_ASYNC=1 \
-  net.lutris.Lutris && echo 'Done' || echo 'Error occurred'
+  net.lutris.Lutris
 
   log "INFO" "\nGiving necessary permissions for gaming to: com.valvesoftware.Steam"
   flatpak override ${SCOPE} \
@@ -278,7 +264,7 @@ configure_gaming_apps() {
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=xdg-config/{MangoHud:ro,vkBasalt:ro} \
     --env=DXVK_ASYNC=1 \
-  com.valvesoftware.Steam && echo 'Done' || echo 'Error occurred'
+  com.valvesoftware.Steam
 
 
   log "INFO" "\nGiving necessary permissions for gaming to: com.heroicgameslauncher.hgl"
@@ -287,17 +273,18 @@ configure_gaming_apps() {
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam,xdg-run/gamescope-0:ro} \
     --env=DXVK_ASYNC=1 \
-  com.heroicgameslauncher.hgl && echo 'Done' || echo 'Error occurred'
+  com.heroicgameslauncher.hgl
 
   log "INFO" "\nGiving necessary permissions for gaming to: io.github.ryubing.Ryujinx"
   flatpak override ${SCOPE} \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-run/gamescope-0:ro} \
-  io.github.ryubing.Ryujinx && echo 'Done' || echo 'Error occurred'
+  io.github.ryubing.Ryujinx
 
   log "INFO" "\nGiving necessary permissions for gaming to: org.libretro.RetroArch"
   flatpak override ${SCOPE} \
+    --nosocket=wayland \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
@@ -305,6 +292,7 @@ configure_gaming_apps() {
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.rpcs3.RPCS3"
   flatpak override ${SCOPE} \
+    --nosocket=wayland \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
@@ -312,6 +300,7 @@ configure_gaming_apps() {
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.pcsx2.PCSX2"
   flatpak override ${SCOPE} \
+    --nosocket=wayland \
     --device={input,dri,kvm} \
     --allow={devel,multiarch,per-app-dev-shm} \
     --filesystem=~/Me/Games \
