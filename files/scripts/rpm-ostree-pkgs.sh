@@ -222,7 +222,7 @@ COMMON=(
     # Shell setup
     "fish"
     #fastfetch
-    "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.rpm"
+    "$(curl -s -X GET https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -i '"browser_download_url": "[^"]*linux-amd64.rpm"' | cut -d'"' -f4)"
     "starship"
     "fzf"
     "bat"
