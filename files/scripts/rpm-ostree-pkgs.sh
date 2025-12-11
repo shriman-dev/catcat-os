@@ -313,7 +313,6 @@ if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
     log "INFO" "Adding extra RPM repos"
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
-    log "INFO" "Done."
 
     log "INFO" "Performing updates"
     dnf5 -y remove unrar rar
@@ -324,7 +323,6 @@ else
     log "INFO" "Performing updates"
     rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
     dnf5 upgrade --refresh --assumeyes
-    log "INFO" "Done."
 
     log "INFO" "Adding extra RPM repos"
     dnf5 -y install --nogpgcheck --repofrompath \
