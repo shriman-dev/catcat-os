@@ -35,6 +35,7 @@ mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
+# CatCat restore-point
 log "INFO" "Add things to catcat restore-point directory"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
@@ -42,11 +43,13 @@ mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
 mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop "${restore_point}/xdg-autostart"
 mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point}/xdg-autostart"
 
-mv -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.* "${restore_point}/systemd-user"
-mv -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.* "${restore_point}/systemd-user"
+cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.* "${restore_point}/systemd-user"
+cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.* "${restore_point}/systemd-user"
 
-mv -v /usr/share/dbus-1/services/org.gnome.OnlineAccounts.* "${restore_point}/dbus-services"
-mv -v /usr/share/dbus-1/services/org.gnome.Identity.* "${restore_point}/dbus-services"
+#sed "s|ExecStart=.*|ExecStart=/usr/bin/true|"
+
+cp -v /usr/share/dbus-1/services/org.gnome.OnlineAccounts.* "${restore_point}/dbus-services"
+cp -v /usr/share/dbus-1/services/org.gnome.Identity.* "${restore_point}/dbus-services"
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
