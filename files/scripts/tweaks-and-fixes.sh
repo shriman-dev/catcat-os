@@ -46,7 +46,9 @@ mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point
 cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.* "${restore_point}/systemd-user"
 cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.* "${restore_point}/systemd-user"
 
-#sed "s|ExecStart=.*|ExecStart=/usr/bin/true|"
+sed -i '/^Restart=/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
+sed -i "s|ExecStart=.*|ExecStart=/usr/bin/true|" \
+            /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
 
 cp -v /usr/share/dbus-1/services/org.gnome.OnlineAccounts.* "${restore_point}/dbus-services"
 cp -v /usr/share/dbus-1/services/org.gnome.Identity.* "${restore_point}/dbus-services"
