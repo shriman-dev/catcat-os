@@ -51,13 +51,11 @@ log "INFO" "Reducing ram consumption by disabling unneeded process"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
 
-mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop "${restore_point}/xdg-autostart"
-mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point}/xdg-autostart"
-
+chmod -v 000 /usr/libexec/gsd-printer
+chmod -v 000 /usr/libexec/gsd-sharing
+chmod -v 000 /usr/libexec/gsd-wacom
 chmod -v 000 /usr/libexec/goa-daemon
 chmod -v 000 /usr/libexec/goa-identity-service
-
-sed -i '/^Restart=/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
