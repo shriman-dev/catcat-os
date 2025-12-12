@@ -77,6 +77,7 @@ if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
         openssh-askpass \
         passim \
         plocate \
+        rar \
         snapper \
         steamdeck-backgrounds \
         stress-ng \
@@ -88,6 +89,7 @@ if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
         topgrade \
         ublue-brew \
         ublue-os-update-services \
+        unrar \
         uupd \
         webapp-manager \
         xdotool \

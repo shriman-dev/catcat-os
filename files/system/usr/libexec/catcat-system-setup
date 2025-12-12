@@ -117,6 +117,7 @@ fi
 if (( $(hostname | wc -m) > 20 )); then
     hostnamectl set-hostname catcat
 fi
+
 # Fix missing hostname file breaking distrobox
 if [[ ! -f /etc/hostname ]]; then
   touch /etc/hostname

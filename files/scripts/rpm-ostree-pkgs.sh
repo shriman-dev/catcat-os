@@ -223,7 +223,7 @@ COMMON=(
     "fish"
     #fastfetch
     "$(curl -s -X GET https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -i '"browser_download_url": "[^"]*linux-amd64.rpm"' | cut -d'"' -f4)"
-    "starship"
+    "starship" # from terra repo
     "fzf"
     "bat"
     "++eza"
@@ -309,27 +309,21 @@ COMMON=(
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 
+
+log "INFO" "Performing updates"
+rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
+dnf5 upgrade --refresh --assumeyes
+log "INFO" "Done."
+
+log "INFO" "Adding extra RPM repos"
 if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
-    log "INFO" "Adding extra RPM repos"
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
-
-    log "INFO" "Performing updates"
-    dnf5 -y remove unrar rar
-    rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
-    dnf5 upgrade --refresh --assumeyes
-    log "INFO" "Done."
 else
-    log "INFO" "Performing updates"
-    rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
-    dnf5 upgrade --refresh --assumeyes
-
-    log "INFO" "Adding extra RPM repos"
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
     dnf5 -y copr enable bazzite-org/bazzite
     dnf5 -y copr enable bazzite-org/rom-properties
-    log "INFO" "Done."
 fi
 
 log "INFO" "Installing RPM Packages"
