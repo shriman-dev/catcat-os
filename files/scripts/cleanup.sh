@@ -4,21 +4,6 @@ source ${SETUP_DIR}/funcvar.sh
 
 log "INFO" "Cleaning image"
 
-log "INFO" "Disabling unneeded executables"
-# Disable ibus (causes input lag when selected)
-#chmod -v 000 /usr/bin/ibus
-#chmod -v 000 /usr/bin/ibus-daemon
-#chmod -v 000 /usr/bin/ibus-setup
-#chmod -v 000 /usr/libexec/evolution-source-registry
-#chmod -v 000 /usr/libexec/evolution-addressbook-factory
-#chmod -v 000 /usr/libexec/evolution-calendar-factory
-#chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
-#chmod -v 000 /usr/libexec/gsd-printer
-rpm -q gnome-shell && {
-    chmod -v 000 /usr/libexec/goa-daemon
-    chmod -v 000 /usr/libexec/goa-identity-service
-}
-
 if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Removing homebrew"
     rm -rf /home/linuxbrew

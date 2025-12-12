@@ -35,23 +35,29 @@ mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
-# CatCat restore-point
-#log "INFO" "Add things to catcat restore-point directory"
-#restore_point="/etc/catcat-os/restore-point"
-#mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
+# Reduce ram consumption by disabling unneeded process
+# Disable ibus (causes input lag when selected)
+#chmod -v 000 /usr/bin/ibus
+#chmod -v 000 /usr/bin/ibus-daemon
+#chmod -v 000 /usr/bin/ibus-setup
+#chmod -v 000 /usr/libexec/evolution-source-registry
+#chmod -v 000 /usr/libexec/evolution-addressbook-factory
+#chmod -v 000 /usr/libexec/evolution-calendar-factory
+#chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
+#chmod -v 000 /usr/libexec/gsd-printer
+log "INFO" "Reducing ram consumption by disabling unneeded process"
+restore_point="/etc/catcat-os/restore-point"
+mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
 
-#mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop "${restore_point}/xdg-autostart"
-#mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point}/xdg-autostart"
+mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Sharing.desktop "${restore_point}/xdg-autostart"
+mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point}/xdg-autostart"
 
-#cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.* "${restore_point}/systemd-user"
-#cp -v /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.* "${restore_point}/systemd-user"
+chmod -v 000 /usr/libexec/goa-daemon
+chmod -v 000 /usr/libexec/goa-identity-service
+chmod -v 000 /usr/libexec/gsd-sharing
+chmod -v 000 /usr/libexec/gsd-wacom
 
-#sed -i '/^Restart=/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
-#sed -i "s|ExecStart=.*|ExecStart=/usr/bin/true|" \
-#            /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
-
-#cp -v /usr/share/dbus-1/services/org.gnome.OnlineAccounts.* "${restore_point}/dbus-services"
-#cp -v /usr/share/dbus-1/services/org.gnome.Identity.* "${restore_point}/dbus-services"
+sed -i '/^Restart=/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then

@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   build_push:
-    name: Image
+    name: Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -84,9 +84,9 @@ jobs:
           echo "AHHH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
-          echo "MAJVER_TAG=$(skopeo list-tags docker://${{ matrix.BASE_IMAGE_NAME }} | \
-                    jq -r '.Tags[] | select(test("^[0-9]"))' | grep "^${MAJOR_VERSION}" | \
-                            sort -nr | head -n1)" >> $GITHUB_ENV
+          echo "MAJVER_TAG=${MAJOR_VERSION}" >> $GITHUB_ENV
+#          #echo "MAJVER_TAG=$([[ ${BASE_IMAGE_NAME} =~ "ublue" ]] && echo "stable-${MAJOR_VERSION}" \
+#                                || echo "${MAJOR_VERSION}")" >> $GITHUB_ENV
           pwd
 
       # Build metadata
