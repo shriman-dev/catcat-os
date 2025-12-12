@@ -6,6 +6,7 @@ evolution-calendar-factory
 evolution-addressbook-factory
 gsd-wacom
 gsd-printer
+gsd-sharing
 updatedb
 tracker-miner-fs-3
 localsearch'

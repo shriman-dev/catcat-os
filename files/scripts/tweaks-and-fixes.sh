@@ -45,6 +45,8 @@ cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 #chmod -v 000 /usr/libexec/evolution-calendar-factory
 #chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
 #chmod -v 000 /usr/libexec/gsd-printer
+#chmod -v 000 /usr/libexec/gsd-sharing
+#chmod -v 000 /usr/libexec/gsd-wacom
 log "INFO" "Reducing ram consumption by disabling unneeded process"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
@@ -54,8 +56,6 @@ mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.Wacom.desktop "${restore_point
 
 chmod -v 000 /usr/libexec/goa-daemon
 chmod -v 000 /usr/libexec/goa-identity-service
-chmod -v 000 /usr/libexec/gsd-sharing
-chmod -v 000 /usr/libexec/gsd-wacom
 
 sed -i '/^Restart=/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.{Sharing,Wacom}.*
 

@@ -41,7 +41,7 @@ install_fonts() {
             "FiraCode"
             "Hack"
             "NerdFontsSymbolsOnly"
-        )
+            )
     local nerd_fonts_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
     local nerd_fonts_dest="/usr/share/fonts/nerd-fonts"
 

@@ -227,13 +227,13 @@ shell_setup() {
 
   # To access catcat fish shell setup inside containers
   local -a execlist=(
-    "fish"
-    "fastfetch"
-    "starship"
-    "bat"
-    "eza"
-    "fzf"
-  )
+                "fish"
+                "fastfetch"
+                "starship"
+                "bat"
+                "eza"
+                "fzf"
+            )
 
   [[ ! -f "${HOME_DIR}/.local/bin/fish" ]] && {
     log "INFO" "Making executables available in user-local-bin to use inside containers, needed for catcat fish shell"
