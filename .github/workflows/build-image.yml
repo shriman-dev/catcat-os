@@ -87,7 +87,6 @@ jobs:
           echo "MAJVER_TAG=${MAJOR_VERSION}" >> $GITHUB_ENV
 #          #echo "MAJVER_TAG=$([[ ${BASE_IMAGE_NAME} =~ "ublue" ]] && echo "stable-${MAJOR_VERSION}" \
 #                                || echo "${MAJOR_VERSION}")" >> $GITHUB_ENV
-          pwd
 
       # Build metadata
       - name: Image Metadata
