@@ -311,7 +311,7 @@ COMMON=(
 
 
 log "INFO" "Performing updates"
-rpm -q dnf5 || rpm-ostree install dnf5 dnf5-plugins
+rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
 dnf5 upgrade --refresh --assumeyes
 log "INFO" "Done."
 
