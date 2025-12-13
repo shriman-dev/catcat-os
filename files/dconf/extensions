@@ -68,6 +68,7 @@ window-type-hint='normal'
 name='Catppuccin-Orange-Dark'
 
 [org/gnome/shell/extensions/caffeine]
+cli-toggle=true
 countdown-timer=0
 duration-timer=2
 duration-timer-list=[900, 1800, 3600]
@@ -101,12 +102,16 @@ dot-position='BOTTOM'
 dot-size=2
 dot-style-focused='METRO'
 enter-peek-mode-timeout=100
-extension-version=68
+extension-version=72
 focus-highlight=true
 focus-highlight-dominant=true
 focus-highlight-opacity=30
 global-border-radius=5
 group-apps=true
+group-apps-label-max-width=150
+group-apps-underline-unfocused=true
+group-apps-use-fixed-width=false
+group-apps-use-launchers=false
 highlight-appicon-hover-border-radius=0
 hotkeys-overlay-combo='TEMPORARILY'
 intellihide=false

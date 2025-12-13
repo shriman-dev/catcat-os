@@ -237,6 +237,7 @@ shell_setup() {
 
   [[ ! -f "${HOME_DIR}/.local/bin/fish" ]] && {
     log "INFO" "Making executables available in user-local-bin to use inside containers, needed for catcat fish shell"
+    mkdir -vp "${HOME_DIR}/.local/bin"
     local exc
     for exc in "${execlist[@]}"; do
       ln -svf "/run/host/usr/bin/${exc}" "${HOME_DIR}/.local/bin"

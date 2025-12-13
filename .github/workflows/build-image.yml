@@ -48,7 +48,7 @@ jobs:
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-deck-gnome
 
 #          - IMAGE_NAME: catcat-os-sv
-#            BASE_IMAGE_NAME: quay.io/fedora/fedora-coreos
+#            BASE_IMAGE_NAME: ghcr.io/ublue-os/ucore-minimal:stable
 
     steps:
       - name: Checkout Repo
