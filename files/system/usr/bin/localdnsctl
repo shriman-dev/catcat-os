@@ -13,43 +13,6 @@ DNSMASQLOGDIR='/var/log'
 VERBOSE=
 SYSTEMCTL="systemctl"
 
-update_blocklist() {
-    need_root
-    mkdir -p "${CONFIG_DIR}" "${TMPDIR}" || die "Failed to create directories"
-
-    local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
-
-    log "INFO" "Updating DNS blocklist (Backend: ${BACKEND_TYPE})"
-    #, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
-    
-    local src_file dst_file subdir
-    if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-        src_file="domains-filtered-subdomains${mini}"
-        dst_file="${DNSCRYPTDIR}/domains-blocklist.txt"
-        subdir="domains.d"
-    else
-        src_file="blocklist${mini}.conf"
-        dst_file="${DNSMASQDIR}/domains-blocklist.conf"
-        subdir="dnsmasq.d"
-    fi
-
-    log "INFO" "Downloading blocklist..."
-    curl -sLo "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
-        die "Failed to download blocklist"
-
-    log "INFO" "Extracting blocklist..."
-    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
-        die "Failed to extract blocklist"
-    cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
-    rm -rf "${TMPDIR}"
-    { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-            ${SYSTEMCTL} restart dnscrypt-proxy.service
-      elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-            ${SYSTEMCTL} restart dnsmasq.service
-      fi } || die "Failed to restart DNS services"
-    log "INFO" "Blocklist update completed successfully"
-}
-
 toggle_localdns() {
     need_root
     [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf is missing"
@@ -104,6 +67,41 @@ toggle_localdns() {
     ${SYSTEMCTL} daemon-reload
     log "INFO" "Operation completed successfully"
 }
+
+update_blocklist() {
+    need_root
+    mkdir -p "${CONFIG_DIR}" "${TMPDIR}" || die "Failed to create directories"
+
+    local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
+
+    log "INFO" "Updating DNS blocklist (Backend: ${BACKEND_TYPE})"
+    #, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
+    
+    local src_file dst_file subdir
+    if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+        src_file="domains-filtered-subdomains${mini}"
+        dst_file="${DNSCRYPTDIR}/domains-blocklist.txt"
+        subdir="domains.d"
+    else
+        src_file="blocklist${mini}.conf"
+        dst_file="${DNSMASQDIR}/domains-blocklist.conf"
+        subdir="dnsmasq.d"
+    fi
+
+    log "INFO" "Downloading blocklist..."
+    curl -sLo "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
+        die "Failed to download blocklist"
+
+    log "INFO" "Extracting blocklist..."
+    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
+        die "Failed to extract blocklist"
+    cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
+    rm -rf "${TMPDIR}"
+
+    toggle_localdns restart
+    log "INFO" "Blocklist update completed successfully"
+}
+
 
 switch_blocklist() {
     need_root

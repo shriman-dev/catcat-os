@@ -156,8 +156,6 @@ DESKTOP_COMMON=(
     "glow"
     "micro"
     "neovim"
-    "waydroid"
-    "++waydroid_setup"
     "python3-pip"
     "inotify-tools"
     #vscodium
@@ -166,6 +164,12 @@ DESKTOP_COMMON=(
     # Android Tools
     "++scrcpy"
     "android-tools"
+
+    # waydroid stuff
+    "cage" # runs a single, maximized application
+    "waydroid"
+    "wlr-randr"
+    "++waydroid_setup"
 
     # Containers
     "distrobox"
@@ -279,6 +283,7 @@ COMMON=(
     "++ujust_setup"
 
     # Needed Deps
+    #cosign
     "bootc"
     "gettext"
     "openssl"

@@ -88,6 +88,8 @@ Available commands:
 
     system         Update system packages (default if no command is provided)
 
+    firmware       Update device firmware (requires root privileges)
+
     help           Display this help message
 
 Note: Multiple commands can be provided and will be executed in sequence.
@@ -131,6 +133,9 @@ process_command() {
             ;;
         system)
             update_system
+            ;;
+        firmware)
+            update_firmware
             ;;
         help)
             show_help

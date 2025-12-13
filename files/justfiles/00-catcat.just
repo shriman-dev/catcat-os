@@ -29,6 +29,15 @@ clean-system:
         brew cleanup
     fi
 
+# Add user to "input" group required by certain controller drivers
+[group("utilities")]
+add-user-to-input-group:
+    #!/usr/bin/bash
+    if ! grep -q "input" /etc/group; then
+      sudo bash -c 'grep "input" /lib/group >> /etc/group'
+    fi
+    sudo usermod -a -G input ${USER}
+
 # Install default and extra flatpak apps
 [group("apps")]
 install-catcat-flatpaks:
@@ -86,6 +95,11 @@ boot-time-analyze:
     systemd-analyze critical-chain
     echo " "
     systemd-analyze time
+
+# Show the changelog
+[group("system info")]
+changelogs:
+    rpm-ostree db diff --changelogs
 
 # Check for local overrides
 [group("system info")]
@@ -171,12 +185,19 @@ debug-info:
     symmetric_heading "CatCat OS Changelog" "="
     sudo rpm-ostree db diff --changelogs
 
+alias upgrade := update
 # Update system, flatpaks, and nixpkgs all at once
 [group("system")]
 update:
     #!/usr/bin/bash
     sudo /usr/bin/update all
 
+# Update device firmware
+[group("system")]
+update-firmware:
+    sudo /usr/bin/update firmware
+
+alias auto-update := toggle-updates
 # Turn automatic updates on or off
 [group("system")]
 toggle-updates ACTION="prompt":
@@ -316,14 +337,14 @@ cancel-nightly-reboot:
     touch /tmp/CATCAT_NIGHTLY_REBOOT/cancelled_by_user_"${USER}"
 
 # Enable or Disable Gnome Extension
-[group("gnome desktop environment")]
+[group("gnome desktop")]
 toggle-gnome-extension EXTENSION_ID:
     #!/usr/bin/bash
     EXTENSION_ID={{ EXTENSION_ID }}
     gnome-extensions $(gnome-extensions show ${EXTENSION_ID} | grep -qow 'ACTIVE' && echo "disable" || echo "enable") ${EXTENSION_ID}
 
 # Restore Gnome DE settings
-[group("gnome desktop environment")]
+[group("gnome desktop")]
 restore-gnome-de-settings:
     #!/usr/bin/bash
     source /usr/lib/catcat/funcvar.sh
@@ -335,7 +356,7 @@ restore-gnome-de-settings:
     echo "You may need to log out and log in again for the changes to take effect."
 
 # Restore applications grid folders
-[group("gnome desktop environment")]
+[group("gnome desktop")]
 restore-gnome-folders:
     #!/usr/bin/bash
     source /usr/lib/catcat/funcvar.sh
@@ -348,7 +369,7 @@ restore-gnome-folders:
     echo "You may need to log out and log in again for the changes to take effect."
 
 # Revert any Gnome restoration made using "ujust restore-gnome-*"
-[group("gnome desktop environment")]
+[group("gnome desktop")]
 revert-gnome-restoration:
     #!/usr/bin/bash
     if [[ -d "${HOME}/.config/dconf.bak" ]]; then

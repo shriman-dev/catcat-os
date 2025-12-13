@@ -241,33 +241,31 @@ ujust_setup() {
     local import_file="/usr/share/ublue-os/justfile"
     local justfile_dir="$(dirname ${SETUP_DIR})/justfiles"
 
-    log "INFO" "Installing just"
-    mkdir -vp "${just_tar}.extract"
-
-    curl -Lo "${just_tar}" $(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
-
-    tar -xvf "${just_tar}" -C "${just_tar}.extract"
-    cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
-    cp -dvf "${just_tar}.extract/just" "/usr/bin"/
-    chmod -v +x /usr/bin/just
-    rm -rf "${just_tar}" "${just_tar}.extract"
-
-    log "INFO" "Done."
-
-    log "INFO" "Installing ujust and ugum"
-
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
-    curl -Lo "/usr/bin/ujust" "${ublue_repo}/ublue-os-just/src/ujust"
-    curl -Lo "/usr/bin/ugum" "${ublue_repo}/ublue-os-just/src/ugum"
-    chmod -v +x /usr/bin/{ujust,ugum}
+    [[ ! -f "/usr/bin/just" ]] && {
+        log "INFO" "Installing just"
+        mkdir -vp "${just_tar}.extract"
 
-    [[ ! -f "/usr/share/ublue-os/justfile" ]] &&
-        curl -Lo "/usr/share/ublue-os/justfile" "${ublue_repo}/ublue-os-just/src/header.just"
+        curl -Lo "${just_tar}" $(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
 
-    log "INFO" "Done."
+        tar -xvf "${just_tar}" -C "${just_tar}.extract"
+        cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
+        cp -dvf "${just_tar}.extract/just" "/usr/bin"/
+        chmod -v +x /usr/bin/just
+        rm -rf "${just_tar}" "${just_tar}.extract"
+        log "INFO" "Done."
+    }
+
+    [[ ! -f "/usr/bin/ujust" ]] && {
+        log "INFO" "Installing ujust and ugum"
+        curl -Lo "/usr/bin/ujust" "${ublue_repo}/ublue-os-just/src/ujust"
+        curl -Lo "/usr/bin/ugum" "${ublue_repo}/ublue-os-just/src/ugum"
+        chmod -v +x /usr/bin/{ujust,ugum}
+        log "INFO" "Done."
+    }
 
     # Needed files for luks tpm2 autounlock recipe
-    [[ ! -f /usr/libexec/luks-enable-tpm2-autounlock ]] && {
+    [[ ! -f "/usr/libexec/luks-enable-tpm2-autounlock" ]] && {
         mkdir -vp /usr/lib/dracut/dracut.conf.d
         curl -Lo "/usr/lib/dracut/dracut.conf.d/90-ublue-luks.conf" \
                     "${ublue_repo}/ublue-os-luks/src/90-ublue-luks.conf"
@@ -278,14 +276,31 @@ ujust_setup() {
     }
 
     # Waydroid setup recipe
-    rpm -q waydroid && {
+    rpm -q waydroid && [[ ! -f "${justfile_dir}/82-bazzite-waydroid.just" ]] && {
         curl -Lo "${justfile_dir}/82-bazzite-waydroid.just" "${bazzite_repo}/82-bazzite-waydroid.just"
+        sed -i '/waydroid-container-restart.desktop/d' "${justfile_dir}/82-bazzite-waydroid.just"
         sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
                 "${justfile_dir}/82-bazzite-waydroid.just"
     }
 
+    # Organize ujust
+#    sed '/^\[group/d' /usr/share/ublue-os/just/*.just
+    sed -i -E '/^configure-broadcom-wl/i [group\("hardware"\)]' \
+                            /usr/share/ublue-os/just/50-akmods.just || true
+    sed -i -E '/^enroll-secure-boot-key/i [group\("utilities"\)]' \
+                            /usr/share/ublue-os/just/00-default.just || true
+    sed -i -E '/^(toggle-nvk|configure-(nvidia|nvidia-optimus))/i [group\("nvidia"\)]' \
+                            /usr/share/ublue-os/just/40-nvidia.just || true
+    sed -i -E '/^install-resolve/i [group\("apps"\)]' \
+                            /usr/share/ublue-os/just/30-distrobox.just || true
+    sed -i 's|^toggle-user-motd|_toggle-user-motd|' \
+                            /usr/share/ublue-os/just/00-default.just || true
+
     # Import justfiles to ujust
     log "INFO" "Importing justfiles to ujust"
+    [[ ! -f "${import_file}" ]] &&
+        curl -Lo "${import_file}" "${ublue_repo}/ublue-os-just/src/header.just"
+
     if [[ -f "${import_file}" ]]; then
         local justfile import_line
         for justfile in ${justfile_dir}/*.just; do
@@ -307,6 +322,12 @@ ujust_setup() {
 
 waydroid_setup() {
     log "INFO" "Waydroid setup"
+#    /usr/libexec/waydroid-container-restart
+#    /usr/libexec/waydroid-container-start
+#    /usr/libexec/waydroid-container-stop
+#    /usr/libexec/waydroid-fix-controllers
+#    /usr/share/applications/waydroid-container-restart.desktop
+#    /etc/default/waydroid-launcher
     curl -Lo /usr/bin/waydroid-choose-gpu \
         "https://raw.githubusercontent.com/bazzite-org/waydroid-scripts/main/waydroid-choose-gpu.sh"
     chmod -v +x /usr/bin/waydroid-choose-gpu

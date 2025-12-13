@@ -44,9 +44,6 @@ cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 #chmod -v 000 /usr/libexec/evolution-addressbook-factory
 #chmod -v 000 /usr/libexec/evolution-calendar-factory
 #chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
-#chmod -v 000 /usr/libexec/gsd-printer
-#chmod -v 000 /usr/libexec/gsd-sharing
-#chmod -v 000 /usr/libexec/gsd-wacom
 log "INFO" "Reducing ram consumption by disabling unneeded process"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}

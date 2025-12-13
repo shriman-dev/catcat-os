@@ -39,7 +39,7 @@ jobs:
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome
 
           - IMAGE_NAME: catcat-os-mi
-            BASE_IMAGE_NAME: quay.io/fedora-ostree-desktops/silverblue
+            BASE_IMAGE_NAME: ghcr.io/ublue-os/silverblue-main
 
           - IMAGE_NAME: catcat-os-nv
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
@@ -65,8 +65,9 @@ jobs:
         # Fallback to the remove-unwanted-software-action if github doesn't allocate enough space
         continue-on-error: true
         with:
-          target-dir: /var/lib/containers
           mount-opts: compress-force=zstd:3
+          target-dir: /var/lib/containers
+#          loopback-free: '1'
 
       - name: Prepare environment
         id: prepare-environment
