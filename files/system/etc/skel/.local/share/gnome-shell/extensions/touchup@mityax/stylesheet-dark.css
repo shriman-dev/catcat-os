@@ -1,0 +1,53 @@
+.touchup-navbar--visible.touchup-navbar--gestures #dashtodockContainer #dash {
+  padding-bottom: 20px !important;
+}
+.touchup-navbar--visible.touchup-navbar--gestures #keyboard {
+  padding-bottom: 20px !important;
+}
+.touchup-navbar--visible.touchup-navbar--buttons #dashtodockContainer #dash {
+  padding-bottom: 41px !important;
+}
+.touchup-navbar--visible.touchup-navbar--buttons #keyboard {
+  padding-bottom: 41px !important;
+}
+
+.touchup-navbar {
+  transition: background-color;
+  transition-duration: 0.5s;
+  background-color: #191919;
+}
+.touchup-navbar .touchup-navbar__pill {
+  transition: background-color;
+  transition-duration: 0.5s;
+  background-color: whitesmoke;
+  border-radius: 20px;
+}
+.touchup-navbar .touchup-navbar__button {
+  color: whitesmoke;
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  margin: 4px 12px 4px 12px;
+  transition: background-color;
+  transition-duration: 250ms;
+}
+.touchup-navbar .touchup-navbar__button:hover {
+  background-color: rgba(245, 245, 245, 0.2);
+}
+.touchup-navbar.touchup-navbar--transparent {
+  background-color: rgba(0, 0, 0, 0);
+}
+.touchup-navbar.touchup-navbar--transparent .touchup-navbar__pill {
+  background-color: whitesmoke;
+}
+.touchup-navbar.touchup-navbar--transparent .touchup-navbar__pill--dark {
+  background-color: #191919;
+}
+
+.touchup-floating-screen-rotation-button {
+  border-radius: 50px;
+  padding: 12px;
+  background-color: #191919;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0 15px;
+}
