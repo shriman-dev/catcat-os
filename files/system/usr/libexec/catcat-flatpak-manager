@@ -150,6 +150,7 @@ allow_gpu_acceleration() {
     "re.sonny.Tangram"
     "com.jeffser.Alpaca"
     "io.github.celluloid_player.Celluloid"
+    "io.github.ilya_zlobintsev.LACT"
     "com.github.rafostar.Clapper"
     "org.gnome.Cheese"
     "org.gnome.Snapshot"
