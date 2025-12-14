@@ -315,6 +315,11 @@ ujust_setup() {
                             /usr/share/ublue-os/just/*.just || true
     sed -i 's|^configure-snapshots|_configure-snapshots|' \
                             /usr/share/ublue-os/just/*.just || true
+    sed -i '/^alias.*distrobox-assemble/d' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i '/^alias.*distrobox-new/d' \
+                            /usr/share/ublue-os/just/*.just || true
+
 
     # Import justfiles to ujust
     log "INFO" "Importing justfiles to ujust"
