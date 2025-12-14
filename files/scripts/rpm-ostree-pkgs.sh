@@ -321,15 +321,15 @@ COMMON=(
 #log "INFO" "Done."
 
 log "INFO" "Adding extra RPM repos"
-if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then
+if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
 else
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
-    dnf5 -y copr enable bazzite-org/bazzite
-    dnf5 -y copr enable bazzite-org/rom-properties
 fi
+dnf5 -y copr enable bazzite-org/bazzite
+dnf5 -y copr enable bazzite-org/rom-properties
 
 log "INFO" "Installing RPM Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then

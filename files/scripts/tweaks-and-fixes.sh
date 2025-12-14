@@ -48,11 +48,11 @@ log "INFO" "Reducing ram consumption by disabling unneeded process"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
 
-chmod -v 000 /usr/libexec/gsd-printer
-chmod -v 000 /usr/libexec/gsd-sharing
-chmod -v 000 /usr/libexec/gsd-wacom
-chmod -v 000 /usr/libexec/goa-daemon
-chmod -v 000 /usr/libexec/goa-identity-service
+chmod -v 000 /usr/libexec/gsd-printer || true
+chmod -v 000 /usr/libexec/gsd-sharing || true
+chmod -v 000 /usr/libexec/gsd-wacom || true
+chmod -v 000 /usr/libexec/goa-daemon || true
+chmod -v 000 /usr/libexec/goa-identity-service || true
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
