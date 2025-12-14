@@ -185,7 +185,6 @@ debug-info:
     symmetric_heading "CatCat OS Changelog" "="
     sudo rpm-ostree db diff --changelogs
 
-alias upgrade := update
 # Update system, flatpaks, and nixpkgs all at once
 [group("system")]
 update:
@@ -197,7 +196,6 @@ update:
 update-firmware:
     sudo /usr/bin/update firmware
 
-alias auto-update := toggle-updates
 # Turn automatic updates on or off
 [group("system")]
 toggle-updates ACTION="prompt":
