@@ -50,11 +50,11 @@ toggle_localdns() {
         restart)
             log "INFO" "Restarting DNS services..."
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-                ${SYSTEMCTL} is-enabled dnsmasq.service &&
+                ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnsmasq.service
                 ${SYSTEMCTL} restart dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                ${SYSTEMCTL} is-enabled dnscrypt-proxy.service &&
+                ${SYSTEMCTL} is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
                 ${SYSTEMCTL} restart dnsmasq.service
               fi } ||
@@ -279,7 +279,7 @@ dnscrypt_logs() {
 
 # Execute the appropriate function based on log type
 log_types() {
-    bat /etc/dnscrypt-proxy/allowed-ips.txt >/dev/null 2>&1 || bat cache --build >/dev/null 2>&1
+    bat /etc/dnsmasq.d/defaults.conf >/dev/null 2>&1 || bat cache --build >/dev/null 2>&1
     case ${LOG_TYPE} in
         "dnsmasq-"*) dnsmasq_logs "${LOG_TYPE#dnsmasq-}" ;;
         "dnscrypt-"*) dnscrypt_logs "${LOG_TYPE#dnscrypt-}" ;;
