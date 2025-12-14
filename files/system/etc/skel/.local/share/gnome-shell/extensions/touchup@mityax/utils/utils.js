@@ -45,5 +45,11 @@ function filterObject(obj, fn) {
     //@ts-ignore
     Object.entries(obj).filter(fn));
 }
+function oneOf(v, filter, orElse) {
+    if (filter.includes(v)) {
+        return v;
+    }
+    return orElse;
+}
 
-export { clamp, filterObject, findActorBy, findAllActorsBy, randomChoice };
+export { clamp, filterObject, findActorBy, findAllActorsBy, oneOf, randomChoice };

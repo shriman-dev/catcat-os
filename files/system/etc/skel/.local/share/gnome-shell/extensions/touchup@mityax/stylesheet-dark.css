@@ -1,19 +1,22 @@
-.touchup-navbar--visible.touchup-navbar--gestures #dashtodockContainer #dash {
-  padding-bottom: 20px !important;
+.touchup-navbar--visible.touchup-navbar--gestures #keyboard,
+.touchup-navbar--visible.touchup-navbar--gestures #dash,
+.touchup-navbar--visible.touchup-navbar--gestures #dashtodockContainer #dash,
+.touchup-navbar--visible.touchup-navbar--gestures #panelBox.dashtopanel {
+  padding-bottom: 22px !important;
 }
-.touchup-navbar--visible.touchup-navbar--gestures #keyboard {
-  padding-bottom: 20px !important;
+.touchup-navbar--visible.touchup-navbar--buttons #keyboard,
+.touchup-navbar--visible.touchup-navbar--buttons #dash,
+.touchup-navbar--visible.touchup-navbar--buttons #dashtodockContainer #dash,
+.touchup-navbar--visible.touchup-navbar--buttons #panelBox.dashtopanel {
+  padding-bottom: 43px !important;
 }
-.touchup-navbar--visible.touchup-navbar--buttons #dashtodockContainer #dash {
-  padding-bottom: 41px !important;
-}
-.touchup-navbar--visible.touchup-navbar--buttons #keyboard {
-  padding-bottom: 41px !important;
+.touchup-navbar--visible.touchup-navbar #panelBox.dashtopanel {
+  background: #191919;
 }
 
 .touchup-navbar {
   transition: background-color;
-  transition-duration: 0.5s;
+  transition-duration: 0.3s;
   background-color: #191919;
 }
 .touchup-navbar .touchup-navbar__pill {

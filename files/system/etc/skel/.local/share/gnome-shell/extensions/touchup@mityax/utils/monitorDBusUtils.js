@@ -1,20 +1,11 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { assert } from './logging.js';
 
 const Methods = Object.freeze({
     verify: 0,
     temporary: 1,
     persistent: 2,
 });
-function callDbusMethod(method, handler, params = null) {
-    if (handler !== null && handler !== undefined) {
-        Gio.DBus.session.call('org.gnome.Mutter.DisplayConfig', '/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', method, params, null, Gio.DBusCallFlags.NONE, -1, null, handler);
-    }
-    else {
-        Gio.DBus.session.call('org.gnome.Mutter.DisplayConfig', '/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', method, params, null, Gio.DBusCallFlags.NONE, -1, null);
-    }
-}
 function setMonitorTransform(transform, targetMonitor) {
     DisplayConfigState.getCurrent()
         .then((state) => {
@@ -175,7 +166,6 @@ class DisplayConfigState {
         return this.logicalMonitors.find((logMonitor) => logMonitor.monitors.some((lmMonitor) => connector === lmMonitor[0])) || null;
     }
     setPrimaryMonitor(monitor) {
-        assert(this.logicalMonitors.includes(monitor));
         this.logicalMonitors.forEach(m => m.primary = false);
         monitor.primary = true;
         callDbusMethod('ApplyMonitorsConfig', null, this.packToApply(Methods.temporary));
@@ -215,5 +205,13 @@ class DisplayConfigState {
         return new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', packing);
     }
 }
+function callDbusMethod(method, handler, params = null) {
+    if (handler !== null && handler !== undefined) {
+        Gio.DBus.session.call('org.gnome.Mutter.DisplayConfig', '/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', method, params, null, Gio.DBusCallFlags.NONE, -1, null, handler);
+    }
+    else {
+        Gio.DBus.session.call('org.gnome.Mutter.DisplayConfig', '/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', method, params, null, Gio.DBusCallFlags.NONE, -1, null);
+    }
+}
 
-export { DisplayConfigState, LogicalMonitor, Methods, Monitor, callDbusMethod, setMonitorTransform };
+export { DisplayConfigState, LogicalMonitor, Methods, Monitor, setMonitorTransform };

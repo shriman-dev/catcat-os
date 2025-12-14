@@ -121,7 +121,9 @@ class PatchManager {
     patchMethod(prototype, methodName, method, debugName) {
         if (Array.isArray(methodName)) {
             return new MultiPatch({
-                patches: methodName.map(m => this.patchMethod(prototype, m, method, `${debugName}#method(${prototype.constructor.name}:${m})`)),
+                patches: methodName.map(m => this.patchMethod(prototype, m, function (originalMethod, ...args) {
+                    method.call(this, originalMethod, m, ...args);
+                }, `${debugName}#method(${prototype.constructor.name}:${m})`)),
                 debugName: this._generatePatchDebugName(debugName),
             });
         }

@@ -4,9 +4,10 @@ import { Row, Bin, Button, Icon } from '../../../utils/ui/widgets.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import Clutter from 'gi://Clutter';
 import { settings } from '../../../settings.js';
-import { log } from '../../../utils/logging.js';
+import { logger } from '../../../utils/logging.js';
 import { navigateBack, moveToWorkspace } from '../navigationBarUtils.js';
 import { AssetIcon } from '../../../utils/ui/assetIcon.js';
+import GLib from 'gi://GLib';
 
 var ActorAlign = Clutter.ActorAlign;
 class ButtonsNavigationBar extends BaseNavigationBar {
@@ -19,7 +20,13 @@ class ButtonsNavigationBar extends BaseNavigationBar {
     _buildActor() {
         return new Row({
             name: 'touchup-navbar',
-            styleClass: 'touchup-navbar bottom-panel',
+            styleClass: 'touchup-navbar',
+            onRealize: () => GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                // Since the navigation bar's button sizes are not yet available before/at realization (at least
+                // in Gnome >= 49), we schedule reallocation here once:
+                this.reallocate();
+                return GLib.SOURCE_REMOVE;
+            }),
             children: [
                 // Left side:
                 new Row({
@@ -67,8 +74,8 @@ class ButtonsNavigationBar extends BaseNavigationBar {
             ]
         });
     }
-    onIsWindowNearChanged(isWindowNear) {
-        if (isWindowNear && !Main.overview.visible) {
+    onUpdateToSurrounding(surrounding) {
+        if (surrounding.isWindowNear && !surrounding.isInOverview) {
             // Make navbar opaque (black or white, based on shell theme brightness):
             this.actor.remove_style_class_name('touchup-navbar--transparent');
         }
@@ -116,7 +123,10 @@ class ButtonsNavigationBar extends BaseNavigationBar {
                     child: new Icon({
                         gicon: new AssetIcon('grid-large-symbolic'),
                     }),
-                    onClicked: () => Main.overview.dash.showAppsButton.checked = !Main.overview.dash.showAppsButton.checked,
+                    onClicked: () => {
+                        Main.overview.show();
+                        Main.overview.dash.showAppsButton.checked = !Main.overview.dash.showAppsButton.checked;
+                    },
                 });
             case "back":
                 return new Button({
@@ -134,7 +144,7 @@ class ButtonsNavigationBar extends BaseNavigationBar {
             case "spacer":
                 return new Bin({ width: 20 });
             default:
-                log(`Unknown button for ButtonNavigationBar: ${buttonType}`);
+                logger.warn(`Unknown button for ButtonNavigationBar: ${buttonType}`);
                 return new St.Bin({}); // fallback to not crash on invalid settings
         }
     }

@@ -2,7 +2,6 @@ import St from 'gi://St';
 import GObject from 'gi://GObject';
 import { filterObject } from '../utils.js';
 import Clutter from 'gi://Clutter';
-import { Delay } from '../delay.js';
 
 /**
  * The [Widgets] module provides subclasses for most St.Widgets, that offer an easier, briefer and more elegant
@@ -23,7 +22,7 @@ import { Delay } from '../delay.js';
  *       }),
  *
  *       // All widget events are translated to callback properties automatically:
- *       onClick: () => debugLog("I've been clicked!")
+ *       onClick: () => logger.debug("I've been clicked!")
  *     }),
  *     new Widgets.Icon({
  *       iconName: 'emblem-ok-symbolic',
@@ -92,7 +91,7 @@ class Ref {
 }
 function filterConfig(config, filterOut) {
     filterOut ??= [
-        'ref', 'children', 'child', 'onCreated', 'constraints', /^(on|notify)[A-Z]/,
+        'ref', 'children', 'child', 'onCreated', 'constraints', /^(on|notify)[A-Z]/, 'styleClass'
     ];
     return filterObject(config, 
     //@ts-ignore
@@ -100,72 +99,56 @@ function filterConfig(config, filterOut) {
         ? filter.test(entry[0])
         : filter === entry[0])));
 }
-function initWidget(w, props) {
+function initWidget(widget, props) {
+    // Setup ref, if given:
     if (props.ref)
-        props.ref.set(w);
-    props.constraints?.forEach(c => w.add_constraint(c));
+        props.ref.set(widget);
+    // Add constraints, if given:
+    props.constraints?.forEach(c => widget.add_constraint(c));
     // Automatically connect signals from the constructor (e.g. `onClicked` or `notifySize`):
     for (const [key, value] of Object.entries(props)) {
         if (/^(on|notify)[A-Z]/.test(key) && typeof value === "function" && key !== "onCreated") {
-            const signalName = key.replace(/^on/, "").replace(/^notify/, 'notify::')
+            const signalName = key
+                .replace(/^notify/, 'notify::')
+                .replace(/^onCapturedEvent/, "captured-event::")
+                .replace(/^onEvent(?=\w)/, "event::")
+                .replace(/^onTransitionStopped/, "transition-stopped::")
+                .replace(/^on/, "")
                 .replace(/(\w)([A-Z])/g, "$1-$2").toLowerCase();
-            w.connect(signalName, value);
+            widget.connect(signalName, value);
         }
     }
-    const onCreatedRes = props.onCreated?.(w);
+    // Transform the given style class (which might be an array or object of classes):
+    if (props.styleClass) {
+        widget.styleClass = Array.isArray(props.styleClass)
+            ? props.styleClass.join(' ')
+            : typeof props.styleClass === 'object'
+                ? Object.keys(props).filter(k => props.styleClass[k]).join(' ')
+                : props.styleClass;
+    }
+    // Call the special `onCreated` callback, if given:
+    const onCreatedRes = props.onCreated?.(widget);
+    // Optionally, `onCreated` may return a function to be called when the widget is destroyed:
     if (onCreatedRes)
-        w.connect('destroy', onCreatedRes);
+        widget.connect('destroy', onCreatedRes);
 }
 class Button extends St.Button {
     static {
         GObject.registerClass(this);
     }
     constructor(config) {
-        super(filterConfig(config));
-        initWidget(this, filterConfig(config, config.onLongPress ? ['onLongPress', 'onClicked'] : []));
-        if (config.onLongPress) {
-            this._setupLongPress(config.onLongPress, config.onClicked);
-        }
+        const filteredConfig = filterConfig(config, config.onLongPress ? ['onLongPress'] : []);
+        super(filterConfig(filteredConfig));
+        initWidget(this, filteredConfig);
+        if (config.onLongPress)
+            this._setupLongPress(config.onLongPress);
         if (config.child)
             this.child = config.child;
     }
-    // A simple long press implementation, that is triggered after holding the button for 500ms
-    // and cancelled when moving up earlier or when moving the finger too much.
-    _setupLongPress(onLongPress, onClicked) {
-        const pressEvents = [Clutter.EventType.TOUCH_BEGIN, Clutter.EventType.BUTTON_PRESS, Clutter.EventType.PAD_BUTTON_PRESS];
-        const releaseEvents = [Clutter.EventType.TOUCH_END, Clutter.EventType.BUTTON_RELEASE, Clutter.EventType.PAD_BUTTON_RELEASE];
-        const cancelEvents = [Clutter.EventType.TOUCH_CANCEL, Clutter.EventType.LEAVE];
-        let downAt;
-        const handleEvent = (_, evt) => {
-            if (pressEvents.includes(evt.type())) {
-                let thisDownAt = downAt = { t: evt.get_time(), x: evt.get_coords()[0], y: evt.get_coords()[1] };
-                Delay.ms(500).then(() => {
-                    if (this.pressed && downAt?.t === thisDownAt.t && downAt?.x === thisDownAt.x && downAt?.y === thisDownAt.y) {
-                        // Long press detected!
-                        onLongPress(this);
-                        downAt = undefined;
-                    }
-                });
-            }
-            else if (releaseEvents.includes(evt.type()) && downAt) {
-                if (evt.get_time() - downAt.t < 500)
-                    onClicked?.(this); // Normal click detected!
-                downAt = undefined;
-            }
-            else if (cancelEvents.includes(evt.type())) {
-                downAt = undefined; // Click/long press cancelled
-            }
-            else if (evt.type() == Clutter.EventType.TOUCH_UPDATE && downAt) {
-                let dist = Math.sqrt((evt.get_coords()[0] - downAt.x) ** 2 + (evt.get_coords()[1] - downAt.y) ** 2);
-                if (dist > 15 * St.ThemeContext.get_for_stage(global.stage).scaleFactor) {
-                    downAt = undefined; // Long press cancelled, finger moved too much
-                }
-            }
-        };
-        this.connect('touch-event', handleEvent);
-        this.connect('button-press-event', handleEvent);
-        this.connect('button-release-event', handleEvent);
-        this.connect('leave-event', handleEvent);
+    _setupLongPress(onLongPress) {
+        const gesture = new Clutter.LongPressGesture();
+        gesture.connect("recognize", () => onLongPress(this));
+        this.add_action(gesture);
     }
 }
 class Icon extends St.Icon {
@@ -254,5 +237,14 @@ class ScrollView extends St.ScrollView {
         }
     }
 }
+class Entry extends St.Entry {
+    static {
+        GObject.registerClass(this);
+    }
+    constructor(config) {
+        super(filterConfig(config));
+        initWidget(this, config);
+    }
+}
 
-export { Bin, Box, Button, Column, Icon, Label, Ref, Row, ScrollView };
+export { Bin, Box, Button, Column, Entry, Icon, Label, Ref, Row, ScrollView };

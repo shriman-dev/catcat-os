@@ -1,4 +1,4 @@
-import { BoolSetting, JSONSetting, EnumSetting, StringListSetting, IntSetting, StringSetting } from './features/preferences/backend.js';
+import { BoolSetting, JSONSetting, EnumSetting, IntSetting, StringListSetting, StringSetting } from './features/preferences/backend.js';
 
 // NOTE: the doc comments in the following structure will be automatically included in the GSettings schema
 // during the build process.
@@ -37,6 +37,11 @@ const settings = {
          * Whether to hide to navigation bar gesture hint entirely.
          */
         gesturesInvisibleMode: new EnumSetting('navigation-bar-gestures-invisible-mode', 'never'),
+        /**
+         * Factor by which the overview gesture base distance is scaled (i.e. the bigger this factor, the
+         * longer the required swipe distance for opening overview/app grid).
+         */
+        gesturesBaseDistFactor: new IntSetting('navigation-bar-gestures-base-dist-factor', 2, 1, 10),
         /**
          * Which buttons to show on the left side of the button navigation bar
          *

@@ -5,12 +5,9 @@
   "name": "Brightness control using ddcutil",
   "settings-schema": "org.gnome.shell.extensions.display-brightness-ddcutil",
   "shell-version": [
-    "45",
-    "46",
-    "47",
-    "48"
+    "49"
   ],
   "url": "https://github.com/daitj/gnome-display-brightness-ddcutil",
   "uuid": "display-brightness-ddcutil@themightydeity.github.com",
-  "version": 55
+  "version": 58
 }

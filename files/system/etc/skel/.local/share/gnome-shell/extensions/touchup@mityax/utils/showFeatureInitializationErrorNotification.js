@@ -14,11 +14,12 @@ function showFeatureInitializationFailedNotification(featureName, error) {
     if (!notificationService)
         return;
     // Show an error notification:
+    let body = `An error occurred while initializing the feature "${featureName}". This is likely due to a ` +
+        `(partially) incompatible environment, for example a modified version of Gnome Shell such as in Ubuntu. ` +
+        `The feature has been disabled for now – unaffected features might continue working.`;
     const notification = notificationService.create({
         title: 'Couldn\'t initialize feature',
-        body: `An error occurred while initializing the feature "${featureName}". This is likely due to a ` +
-            `(partially) incompatible environment, for example a modified version of Gnome Shell such as in Ubuntu. ` +
-            `The feature has been disabled for now – unaffected features might continue working.`
+        body,
     });
     notification.connect('activated', showDetails);
     notification.addAction('See details', showDetails);

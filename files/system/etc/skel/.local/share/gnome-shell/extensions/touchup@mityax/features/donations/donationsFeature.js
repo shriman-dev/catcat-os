@@ -1,4 +1,5 @@
 import ExtensionFeature from '../../utils/extensionFeature.js';
+import Gio from 'gi://Gio';
 import { Delay } from '../../utils/delay.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import { randomChoice } from '../../utils/utils.js';
@@ -9,6 +10,7 @@ import { Button } from '../../utils/ui/widgets.js';
 import { css } from '../../utils/ui/css.js';
 import showToast from '../../utils/ui/toast.js';
 import { NotificationService } from '../../services/notificationService.js';
+import { logger } from '../../utils/logging.js';
 
 class DonationsFeature extends ExtensionFeature {
     // Time to wait before showing a donation; this is to not show the donation immediately upon login because
@@ -96,6 +98,7 @@ class DonationsFeature extends ExtensionFeature {
             settings.donations.installationData.set(JSON.stringify(data));
         }
         catch (e) {
+            logger.error("Error while trying to write installation data: ", e instanceof Gio.IOErrorEnum ? [e.code, e.message] : e);
         }
     }
     _validateInstallationData(data) {

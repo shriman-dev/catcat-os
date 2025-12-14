@@ -103,20 +103,25 @@ class GestureRecognizer extends EventEmitter {
             this.connect('gesture-completed', props.onGestureCompleted);
     }
     push(event) {
+        let rawEvent = null;
+        if (event instanceof Clutter.Event) {
+            rawEvent = event;
+            event = GestureRecognizerEvent.fromClutterEvent(event);
+        }
         if (this._state.hasGestureJustEnded) {
             this._state = GestureState.initial({
                 firstEvent: event,
                 scaleFactor: this._scaleFactor
             });
-            this.emit('gesture-started', this._state);
+            this.emit('gesture-started', this._state, event, rawEvent);
         }
         else {
             this._state = this._state.copyWith(event);
             if (this._state.isDuringGesture) {
-                this.emit('gesture-progress', this._state);
+                this.emit('gesture-progress', this._state, event, rawEvent);
             }
             else {
-                this.emit('gesture-completed', this._state);
+                this.emit('gesture-completed', this._state, event, rawEvent);
             }
         }
         return this._state;
@@ -199,7 +204,7 @@ class GestureState {
                 minTimeUS: 0,
             });
             if (!hold)
-                return false;
+                return true;
             return hold.lastIncludedEventIdx + 1 < this._events.length;
         });
     }

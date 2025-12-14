@@ -8,12 +8,14 @@ import { settings } from './settings.js';
 import { TouchModeService } from './services/touchModeService.js';
 import { DonationsFeature } from './features/donations/donationsFeature.js';
 import { NotificationService } from './services/notificationService.js';
+import { initLogger, logger, uninitLogger } from './utils/logging.js';
 
 class TouchUpExtension extends Extension {
     static instance;
     pm;
     features = [];
     async enable() {
+        initLogger();
         TouchUpExtension.instance = this;
         // This is the root patch manager of which all other patch managers are descendents:
         this.pm = new PatchManager("root");
@@ -86,7 +88,7 @@ class TouchUpExtension extends Extension {
                 this.features.push(f);
             })
                 .catch(e => {
-                log(`Error while activating feature "${featureName}":`, e);
+                logger.error(`Error while activating feature "${featureName}":`, e);
                 setting?.set(false); // Disable the feature for future launches
                 import('./utils/showFeatureInitializationErrorNotification.js')
                     .then(m => m.showFeatureInitializationFailedNotification(featureName, e));
@@ -133,6 +135,7 @@ class TouchUpExtension extends Extension {
         this.features.forEach(f => f.destroy());
         this.features = [];
         TouchUpExtension.instance = undefined;
+        uninitLogger();
     }
     getFeature(type) {
         return this.features.find(f => f instanceof type) ?? null;

@@ -14,10 +14,13 @@ log "INFO" "Removing stuffs"
 rm -rvf /etc/skel/.mozilla /etc/skel/.config/user-tmpfiles.d
 
 # Disable gnome software running in background
-if [[ -f /etc/xdg/autostart/org.gnome.Software.desktop ]]; then
+if rpm -q gnome-software; then
     log "INFO" "Disabling gnome software from running in background"
     rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
     rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /usr/lib/systemd/user/gnome-software.service
+    rm -vf /usr/share/dbus-1/services/org.gnome.Software.service
+    rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
 fi
 
 mkdir -p /var/tmp

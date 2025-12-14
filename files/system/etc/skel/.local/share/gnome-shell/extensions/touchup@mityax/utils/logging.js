@@ -3,37 +3,97 @@ import Gio from 'gi://Gio';
 import { logFile } from '../config.js';
 
 /**
- * Log the given arguments to the console and the logfile (if given), together with a timestamp.
- *
- * Note: This function is **not** optimized for speed (!)
+ * The main logger instance.
  */
-function log(...text) {
-    if (text.length < 1)
-        return '';
-    console.log("[touchup] ", ...text.map(item => {
-        if (item && item instanceof Error) {
-            console.error(item, item.message || '', "\n", item.stack);
+let logger;
+function initLogger() {
+    logger = new Logger('touchup');
+}
+function uninitLogger() {
+    // @ts-ignore
+    logger = undefined;
+}
+/**
+ * The several log methods of this class log text to the console and, if given, to the global
+ * logfile for this extension.
+ *
+ * Note: The logging methods are **not** optimized for speed (!)
+ */
+class Logger {
+    tag;
+    constructor(tag) {
+        this.tag = tag;
+    }
+    /**
+     * Log a debug-level message.
+     *
+     * This is a no-op in release builds.
+     */
+    debug(...text) {
+    }
+    /**
+     * Perform an info-level log.
+     */
+    info(...text) {
+        this._log('info', this._formatTag(), ...text);
+    }
+    /**
+     * Log a warning message.
+     */
+    warn(...text) {
+        this._log('warn', this._formatTag(), 'WARNING:', ...text);
+    }
+    /**
+     * Log an error. The stacktrace is printed if the error instance is given as the last argument, e.g.:
+     *
+     * ```ts
+     * try {
+     *     foo()
+     * } catch (e) {
+     *     logger.error('An error occurred while doing foo:', error);
+     * }
+     * ```
+     */
+    error(...text) {
+        this._log('error', this._formatTag(), 'ERROR:', ...text);
+    }
+    _log(level, tag, ...text) {
+        if (text.length < 1)
+            return '';
+        const consoleLogFn = {
+            debug: console.debug,
+            info: console.log,
+            warn: console.warn,
+            error: console.error,
+        }[level];
+        let msg = text.map(item => {
+            return item && item instanceof Error
+                ? `${item.name}: ${(item.message || '')}`
+                : repr(item);
+        }).join(" ");
+        // If the last item is an error, we append its stack trace to the log message:
+        if (text.at(-1) instanceof Error && text.at(-1).stack) {
+            msg += '\n' + text.at(-1).stack.trim();
         }
-        return repr(item);
-    }));
-    let msg = text.map(item => {
-        return item && item instanceof Error
-            ? `Error (${item}): ` + (item.message || '')
-            : repr(item);
-    }).join(" ");
-    // If the last item is an error, we append its stack trace to the log message:
-    if (text.at(-1) instanceof Error && text.at(-1).stack) {
-        msg += '\n' + text.at(-1).stack.trim();
+        consoleLogFn(tag, msg);
+        if (logFile) {
+            const stream = Gio.File.new_for_path(logFile).append_to(Gio.FileCreateFlags.NONE, null);
+            // @ts-ignore
+            stream.write_bytes(new GLib.Bytes(`${new Date().toISOString()}: ${msg}\n`), null);
+        }
+        for (let cb of logCallbacks.values()) {
+            cb({
+                level: level,
+                tag: tag,
+                formattedMessage: msg,
+                rawArguments: text,
+            });
+        }
+        return msg;
     }
-    if (logFile) {
-        const stream = Gio.File.new_for_path(logFile).append_to(Gio.FileCreateFlags.NONE, null);
-        // @ts-ignore
-        stream.write_bytes(new GLib.Bytes(`${new Date().toISOString()}: ${msg}\n`), null);
+    _formatTag(subtag) {
+        return `[${this.tag}${subtag ? `:${subtag}` : ''}]`;
     }
-    for (let cb of logCallbacks.values()) {
-        cb(msg);
-    }
-    return msg;
 }
 /**
  * Tries to convert anything into a string representation that provides suitable debugging
@@ -70,12 +130,5 @@ function repr(item) {
     return json || `${item}`;
 }
 const logCallbacks = new Map();
-/**
- * Throw an error if the given condition is not true.
- *
- * This is a no-op in release builds.
- */
-function assert(condition, message) {
-}
 
-export { assert, log, repr };
+export { Logger, initLogger, logger, repr, uninitLogger };

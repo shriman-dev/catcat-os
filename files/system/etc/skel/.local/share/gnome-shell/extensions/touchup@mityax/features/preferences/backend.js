@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import { clamp } from '../../utils/utils.js';
-import { assert } from '../../utils/logging.js';
 
 let gioSettings = null;
 /**
@@ -64,8 +63,6 @@ class IntSetting extends Setting {
         return gioSettings.get_int(this.key);
     }
     set(value) {
-        assert(value >= this.min);
-        assert(value <= this.max);
         gioSettings.set_int(this.key, clamp(value, this.min, this.max));
     }
 }

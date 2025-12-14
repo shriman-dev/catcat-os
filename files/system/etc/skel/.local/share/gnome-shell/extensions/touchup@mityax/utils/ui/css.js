@@ -1,4 +1,5 @@
 import Cogl from 'gi://Cogl';
+import { logger } from '../logging.js';
 
 function css(v) {
     let res = null;
@@ -22,7 +23,7 @@ function css(v) {
         }
     }
     else {
-        log(`Warning: cannot convert \`${typeof v}\` to CSS: `, v);
+        logger.warn(`Cannot convert \`${typeof v}\` to CSS: `, v);
         res = v.toString();
     }
     return !!res ? res.trim() : undefined;

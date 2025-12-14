@@ -56,7 +56,7 @@ class BaseNavigationBar extends EventEmitter {
     }
     reallocate() {
         // FIXME: find touch-enabled monitor, keyword: ClutterInputDevice
-        this._monitor ??= Main.layoutManager.primaryMonitor;
+        this._monitor ??= Main.layoutManager.primaryMonitor ?? Main.layoutManager.monitors[0];
         this.onBeforeReallocate();
         this.actor.set_position(this.monitor.x, this.monitor.y + this.monitor.height - this.actor.height);
         this.actor.set_width(this.monitor.width);
@@ -65,7 +65,6 @@ class BaseNavigationBar extends EventEmitter {
         Main.layoutManager.addTopChrome(this.actor, {
             affectsStruts: this.reserveSpace,
             trackFullscreen: true,
-            affectsInputRegion: true,
         });
     }
     _removeActor() {
@@ -73,7 +72,6 @@ class BaseNavigationBar extends EventEmitter {
     }
     onBeforeReallocate() { }
     _createWindowPositionTracker() {
-        let lastIsWindowNear = false;
         this.windowPositionTracker = new WindowPositionTracker(windows => {
             if (this.actor.realized) {
                 // Check if at least one window is near enough to the navigation bar:
@@ -82,10 +80,10 @@ class BaseNavigationBar extends EventEmitter {
                     const windowBottom = metaWindow.get_frame_rect().y + metaWindow.get_frame_rect().height;
                     return windowBottom >= top;
                 });
-                if (isWindowNear !== lastIsWindowNear) {
-                    this.onIsWindowNearChanged(isWindowNear);
-                }
-                lastIsWindowNear = isWindowNear;
+                this.onUpdateToSurrounding({
+                    isWindowNear,
+                    isInOverview: Main.overview.visible,
+                });
             }
         });
     }

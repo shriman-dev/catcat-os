@@ -1,38 +1,46 @@
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import { IntervalRunner } from '../../../utils/intervalRunner.js';
-import { clamp } from '../../../utils/utils.js';
+import { clamp, oneOf } from '../../../utils/utils.js';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { IdleRunner } from '../../../utils/idleRunner.js';
-import { log } from '../../../utils/logging.js';
 import { calculateLuminance } from '../../../utils/colors.js';
 import BaseNavigationBar from './baseNavigationBar.js';
 import { Bin } from '../../../utils/ui/widgets.js';
-import OverviewAndWorkspaceGestureController from '../../../utils/overviewAndWorkspaceGestureController.js';
-import { GestureRecognizer, GestureRecognizerEvent } from '../../../utils/ui/gestureRecognizer.js';
+import { OverviewGestureController, WorkspaceGestureController } from '../../../utils/overviewAndWorkspaceGestureController.js';
+import { GestureRecognizer } from '../../../utils/ui/gestureRecognizer.js';
 import { Delay } from '../../../utils/delay.js';
 import GObject from 'gi://GObject';
 import Mtk from 'gi://Mtk';
+import { logger } from '../../../utils/logging.js';
+import { settings } from '../../../settings.js';
 
-// Area reserved on the left side of the navbar in which a swipe up opens the OSK
-// Note: This is in logical pixels, not physical pixels
+/**
+ * Area reserved on the left side of the navbar in which a swipe up opens the OSK,
+ * in logical pixels
+ */
 const LEFT_EDGE_OFFSET = 100;
+/**
+ * The full height of the navigation bar (not just the pill),
+ * in logical pixels
+ */
+const NAV_BAR_HEIGHT = 22;
 class GestureNavigationBar extends BaseNavigationBar {
     styleClassUpdateInterval;
     _isWindowNear = false;
     gestureManager;
     constructor(props) {
         super({ reserveSpace: props.reserveSpace });
-        this.setInvisibleMode(props.invisibleMode);
         this.styleClassUpdateInterval = new IntervalRunner(500, this.updateStyleClasses.bind(this));
         this.gestureManager = new NavigationBarGestureManager({
             edgeThreshold: this.computeHeight(),
         });
         this.actor.connect('notify::mapped', () => this.gestureManager.setEnabled(this.actor.mapped));
-        this.connect('notify::visible', _ => this._updateStyleClassIntervalActivity());
+        this.setInvisibleMode(props.invisibleMode);
+        this.connect('notify::visible', _ => this._updateStyleClassIntervalEnabled());
         this.connect('notify::reserve-space', _ => {
-            this._updateStyleClassIntervalActivity();
+            this._updateStyleClassIntervalEnabled();
             void this.updateStyleClasses();
         });
     }
@@ -53,14 +61,12 @@ class GestureNavigationBar extends BaseNavigationBar {
             }),
         });
     }
-    onIsWindowNearChanged(isWindowNear) {
-        this._isWindowNear = isWindowNear;
+    onUpdateToSurrounding(surrounding) {
+        this._isWindowNear = surrounding.isWindowNear && !surrounding.isInOverview;
         if (!this.reserveSpace) {
-            let newInterval = Main.overview.visible || !isWindowNear ? 3000 : 500;
-            if (newInterval != this.styleClassUpdateInterval.interval) {
-                // if a window is moved onto/away from the navigation bar or overview is toggled, schedule update soonish:
-                this.styleClassUpdateInterval.scheduleOnce(250);
-            }
+            let newInterval = surrounding.isInOverview || !surrounding.isWindowNear ? 3000 : 500;
+            // if a window is moved onto/away from the navigation bar or overview is toggled, schedule update soonish:
+            this.styleClassUpdateInterval.scheduleOnce(250);
             this.styleClassUpdateInterval.setInterval(newInterval);
         }
         else {
@@ -69,7 +75,7 @@ class GestureNavigationBar extends BaseNavigationBar {
     }
     computeHeight() {
         const sf = St.ThemeContext.get_for_stage(global.stage).scaleFactor;
-        return 22 * sf;
+        return NAV_BAR_HEIGHT * sf;
     }
     computePillSize() {
         const sf = St.ThemeContext.get_for_stage(global.stage).scaleFactor;
@@ -79,16 +85,15 @@ class GestureNavigationBar extends BaseNavigationBar {
         };
     }
     onBeforeReallocate() {
-        this.actor.set_height(this.computeHeight());
-        this.pill.set_width(this.computePillSize().width);
-        this.pill.set_height(this.computePillSize().height);
+        this.actor.set_height(this.isInInvisibleMode ? 0 : this.computeHeight());
+        this.pill.set_size(this.computePillSize().width, this.computePillSize().height);
         this.gestureManager.setEdgeThreshold(this.computeHeight());
     }
     setMonitor(monitorIndex) {
         super.setMonitor(monitorIndex);
         this.gestureManager.setMonitor(monitorIndex);
     }
-    async updateStyleClasses() {
+    updateStyleClasses() {
         if (this.reserveSpace && this._isWindowNear) {
             // Make navbar opaque (black or white, based on shell theme brightness):
             this.actor.remove_style_class_name('touchup-navbar--transparent');
@@ -98,13 +103,18 @@ class GestureNavigationBar extends BaseNavigationBar {
             // Make navbar transparent:
             this.actor.add_style_class_name('touchup-navbar--transparent');
             // Adjust pill brightness:
-            let brightness = await this.findBestPillBrightness();
-            if (brightness == 'dark') {
-                this.pill.add_style_class_name('touchup-navbar__pill--dark');
-            }
-            else {
-                this.pill.remove_style_class_name('touchup-navbar__pill--dark');
-            }
+            this.findBestPillBrightness().then(brightness => {
+                // Avoid doing anything in case the callback has been stopped during the time
+                // `findBestPillBrightness` was running:
+                if (!this.styleClassUpdateInterval.enabled)
+                    return;
+                if (brightness == 'dark') {
+                    this.pill.add_style_class_name('touchup-navbar__pill--dark');
+                }
+                else {
+                    this.pill.remove_style_class_name('touchup-navbar__pill--dark');
+                }
+            });
         }
     }
     /**
@@ -154,17 +164,17 @@ class GestureNavigationBar extends BaseNavigationBar {
             //         //const buf = new Uint8Array(size);
             //         let [buf, size] = subtex.get_data(PixelFormat.ARGB_8888, 0);
             //
-            //         debugLog("Buf length: ", buf.length, " - max: ", Math.max(...buf.values()));
+            //         logger.debug("Buf length: ", buf.length, " - max: ", Math.max(...buf.values()));
             //     } else {
-            //         debugLog("Subtex is null");
+            //         logger.debug("Subtex is null");
             //     }
             // } catch (e) {
-            //     debugLog("Error in updatePillBrightness: ", e);
+            //     logger.debug("Error in updatePillBrightness: ", e);
             // }
             // Mid-level attempt (not working; missing introspection annotations for `Cogl.Framebuffer.read_pixels`):
             // const ctx = Clutter.get_default_backend().get_cogl_context();
             // const subtex = Cogl.SubTexture.new(ctx, wholeScreenTexture, area.x, area.y, area.w, area.h);
-            // debugLog("subtex: ", subtex);
+            // logger.debug("subtex: ", subtex);
             // if (subtex) {
             //     /*(global.stage as Clutter.Stage).paint_to_buffer(
             //         new Mtk.Rectangle({x: area.x, y: area.y, width: area.w, height: area.h}),
@@ -201,17 +211,27 @@ class GestureNavigationBar extends BaseNavigationBar {
             return luminance > 0.5 ? 'dark' : 'light';
         }
         catch (e) {
-            log("Exception during `findBestPillBrightness` (falling back to 'dark' brightness): ", e);
+            logger.error("Exception during `findBestPillBrightness` (falling back to 'dark' brightness): ", e);
             return 'dark';
         }
     }
-    _updateStyleClassIntervalActivity() {
-        this.styleClassUpdateInterval.setActive(this.isVisible && !this.reserveSpace);
+    _updateStyleClassIntervalEnabled() {
+        this.styleClassUpdateInterval.setEnabled(this.isVisible && !this.reserveSpace);
     }
+    /**
+     * In invisible mode, the navigation bars height and opacity are set to 0; this is because
+     * we cannot use the `visible` property since this would infer with the Shell's own handling
+     * of that (in `Main.layoutManager.addTopChrome`)
+     */
     setInvisibleMode(invisible) {
         // We use opacity here instead of the actors `visible` property since [LayoutManager.addTopChrome] uses the
         // `visible` property itself which would interfere with this.
         this.actor.opacity = invisible ? 0 : 255;
+        // Reallocate, to adjust the navbar height to invisible mode:
+        this.reallocate();
+    }
+    get isInInvisibleMode() {
+        return this.actor.opacity === 0;
     }
     destroy() {
         this.styleClassUpdateInterval.stop();
@@ -222,8 +242,9 @@ class GestureNavigationBar extends BaseNavigationBar {
 class NavigationBarGestureManager {
     static _overviewMaxSpeed = 0.005;
     static _workspaceMaxSpeed = 0.0016;
-    action;
-    _controller;
+    _gesture;
+    _overviewController;
+    _wsController;
     _recognizer;
     _idleRunner;
     _targetWorkspaceProgress = 0;
@@ -235,10 +256,13 @@ class NavigationBarGestureManager {
     _scaleFactor;
     _hasStarted = false;
     _isKeyboardGesture = false;
+    _edgeThreshold;
     constructor(props) {
         this._scaleFactor = St.ThemeContext.get_for_stage(global.stage).scaleFactor;
+        this._edgeThreshold = props.edgeThreshold;
         // The controller used to actually perform the navigation gestures:
-        this._controller = new OverviewAndWorkspaceGestureController({
+        this._overviewController = new OverviewGestureController();
+        this._wsController = new WorkspaceGestureController({
             monitorIndex: props.monitor?.index ?? Main.layoutManager.primaryIndex,
         });
         // Use an [IdleRunner] to make the gestures asynchronously follow the users' finger:
@@ -249,30 +273,38 @@ class NavigationBarGestureManager {
             onGestureCompleted: state => this._onGestureCompleted(state),
         });
         // Action that listens to appropriate events on the stage:
-        this.action = new GestureNavigationBarAction({
-            edgeThreshold: props.edgeThreshold,
+        this._gesture = new Clutter.PanGesture({
+            max_n_points: 1,
         });
-        this.action.connect('progress', (_, evt) => {
-            this._recognizer.push(GestureRecognizerEvent.fromClutterEvent(evt));
-        });
-        this.action.connect('end', (_, evt) => {
-            this._recognizer.push(GestureRecognizerEvent.fromClutterEvent(evt));
-        });
-        global.stage.add_action_full('touchup-navigation-bar', Clutter.EventPhase.CAPTURE, this.action);
+        this._gesture.connect('should-handle-sequence', (_, e) => this._shouldHandleSequence(e));
+        this._gesture.connect('pan-update', () => this._recognizer.push(Clutter.get_current_event()));
+        this._gesture.connect('end', () => this._recognizer.push(Clutter.get_current_event()));
+        this._gesture.connect('cancel', () => this._onGestureCancel());
+        global.stage.add_action_full('touchup-navigation-bar', Clutter.EventPhase.CAPTURE, this._gesture);
         // To emit virtual events:
-        this._virtualTouchscreenDevice = Clutter.get_default_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE);
+        this._virtualTouchscreenDevice = Clutter
+            .get_default_backend()
+            .get_default_seat()
+            .create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE);
     }
     setMonitor(monitorIndex) {
-        this._controller.monitorIndex = monitorIndex;
+        this._wsController.monitorIndex = monitorIndex;
     }
     setEdgeThreshold(edgeThreshold) {
-        this.action.setEdgeThreshold(edgeThreshold);
+        this._edgeThreshold = edgeThreshold;
     }
     setEnabled(enabled) {
-        this.action.enabled = enabled;
+        this._gesture.enabled = enabled;
     }
-    destroy() {
-        global.stage.remove_action(this.action);
+    _getMonitorRect(x, y) {
+        const rect = new Mtk.Rectangle({ x: x - 1, y: y - 1, width: 1, height: 1 });
+        const monitorIndex = global.display.get_monitor_index_for_rect(rect);
+        return global.display.get_monitor_geometry(monitorIndex);
+    }
+    _shouldHandleSequence(event) {
+        const [x, y] = event.get_coords();
+        const monitorRect = this._getMonitorRect(x, y);
+        return y > monitorRect.y + monitorRect.height - this._edgeThreshold;
     }
     _onGestureProgress(state) {
         if (state.hasMovement) {
@@ -283,10 +315,11 @@ class NavigationBarGestureManager {
                 Main.keyboard._keyboard.gestureProgress(-state.totalMotionDelta.y);
             }
             else {
-                this._targetWorkspaceProgress = this._controller.initialWorkspaceProgress
-                    - (state.totalMotionDelta.x / this._controller.baseDistX) * 1.6;
-                this._targetOverviewProgress = this._controller.initialOverviewProgress
-                    + (-state.totalMotionDelta.y / (this._controller.baseDistY * 0.2));
+                const baseDistFactor = settings.navigationBar.gesturesBaseDistFactor.get() / 10.0;
+                this._targetOverviewProgress = this._overviewController.initialProgress
+                    + (-state.totalMotionDelta.y / (this._overviewController.baseDist * baseDistFactor));
+                this._targetWorkspaceProgress = this._wsController.initialProgress
+                    - (state.totalMotionDelta.x / this._wsController.baseDist) * 1.6;
             }
         }
     }
@@ -306,9 +339,10 @@ class NavigationBarGestureManager {
         }
         if (!this._isKeyboardGesture) {
             // Start navigation gestures:
-            this._controller.gestureBegin();
-            this._targetOverviewProgress = this._controller.initialOverviewProgress;
-            this._targetWorkspaceProgress = this._controller.initialWorkspaceProgress;
+            this._overviewController.gestureBegin();
+            this._wsController.gestureBegin();
+            this._targetOverviewProgress = this._overviewController.initialProgress;
+            this._targetWorkspaceProgress = this._wsController.initialProgress;
             this._idleRunner.start();
         }
     }
@@ -317,7 +351,8 @@ class NavigationBarGestureManager {
         this._hasStarted = false;
         const direction = state.lastMotionDirection?.direction ?? null;
         if (state.isTap) {
-            this._controller.gestureEnd({ direction: null });
+            this._overviewController.gestureCancel();
+            this._wsController.gestureCancel();
             this._virtualTouchscreenDevice.notify_touch_down(state.events[0].timeUS, 0, state.pressCoordinates.x, state.pressCoordinates.y);
             Delay.ms(45).then(() => {
                 this._virtualTouchscreenDevice.notify_touch_up(state.events.at(-1).timeUS, 0);
@@ -332,14 +367,20 @@ class NavigationBarGestureManager {
             }
         }
         else {
-            this._controller.gestureEnd({ direction });
+            this._overviewController.gestureEnd(oneOf(direction, ['up', 'down']));
+            this._wsController.gestureEnd(oneOf(direction, ['left', 'right']));
         }
         this._targetOverviewProgress = null;
         this._targetWorkspaceProgress = null;
     }
+    _onGestureCancel() {
+        Main.keyboard._keyboard?.gestureCancel();
+        this._overviewController.gestureCancel();
+        this._wsController.gestureCancel();
+    }
     _onIdleRun(dt = 0) {
-        let overviewProg = this._controller.currentOverviewProgress;
-        let workspaceProg = this._controller.currentWorkspaceProgress;
+        let overviewProg = this._overviewController.currentProgress;
+        let workspaceProg = this._wsController.currentProgress;
         if (this._targetOverviewProgress !== null
             && Math.abs(this._targetOverviewProgress - overviewProg) > 5 * NavigationBarGestureManager._overviewMaxSpeed) {
             let d = this._targetOverviewProgress - overviewProg;
@@ -350,10 +391,13 @@ class NavigationBarGestureManager {
             let d = this._targetWorkspaceProgress - workspaceProg;
             workspaceProg += Math.sign(d) * Math.min(Math.abs(d) ** 2, dt * NavigationBarGestureManager._workspaceMaxSpeed);
         }
-        this._controller.gestureUpdate({
-            overviewProgress: overviewProg - this._controller.initialOverviewProgress,
-            workspaceProgress: workspaceProg - this._controller.initialWorkspaceProgress,
-        });
+        this._overviewController.gestureProgress(overviewProg - this._overviewController.initialProgress);
+        this._wsController.gestureProgress(workspaceProg - this._wsController.initialProgress);
+    }
+    destroy() {
+        this._overviewController.destroy();
+        this._wsController.destroy();
+        global.stage.remove_action(this._gesture);
     }
 }
 /**
@@ -368,68 +412,6 @@ class _EventPassthroughActor extends Bin {
         // any actor potentially below it. Therefore, this actor is only a visuals and does not react to
         // events.
         return;
-    }
-}
-/**
- * To handle navigation bar events, we register a [GestureNavigationBarAction] on the stage. This class
- * emit gesture progress and end events when events occur in the lower edge of the screen, i.e. in the
- * lowest area the height of which is defined by [edgeThreshold]. The signals emitted just propagate the
- * raw [Clutter.Event] instances to their listeners, such that they can then analyze them using a
- * [GestureRecognizer] which contains all the logic we need to interprete gestures.
- *
- * Therefore, the task of this class is not recognizing any gestures but instead merely filtering out
- * the events that we want to act on and integrate as an outermost layer with the shell.
- */
-class GestureNavigationBarAction extends Clutter.GestureAction {
-    static {
-        GObject.registerClass({
-            Signals: {
-                'end': { param_types: [Clutter.Event.$gtype] },
-                'progress': { param_types: [Clutter.Event.$gtype] },
-                'begin': { param_types: [Clutter.Event.$gtype] }
-            },
-        }, this);
-    }
-    constructor(props) {
-        // Note: This constructor is only to make typescript happy. DON'T put any logic in here – use `_init` below.
-        // @ts-ignore
-        super(props);
-    }
-    // @ts-ignore
-    _init(props) {
-        super._init();
-        this._allowedModes = props.allowedModes ?? Shell.ActionMode.ALL;
-        this._edgeThreshold = props.edgeThreshold;
-        this.set_n_touch_points(1);
-        this.set_threshold_trigger_edge(Clutter.GestureTriggerEdge.AFTER);
-    }
-    setEdgeThreshold(edgeThreshold) {
-        this._edgeThreshold = edgeThreshold;
-    }
-    _getMonitorRect(x, y) {
-        const rect = new Mtk.Rectangle({ x: x - 1, y: y - 1, width: 1, height: 1 });
-        let monitorIndex = global.display.get_monitor_index_for_rect(rect);
-        return global.display.get_monitor_geometry(monitorIndex);
-    }
-    vfunc_gesture_prepare(actor) {
-        if (this.get_n_current_points() === 0)
-            return false;
-        if (!(this._allowedModes & Main.actionMode))
-            return false;
-        let [x, y] = this.get_press_coords(0);
-        let monitorRect = this._getMonitorRect(x, y);
-        const res = y > monitorRect.y + monitorRect.height - this._edgeThreshold;
-        if (res) {
-            this.emit('begin', this.get_last_event(0));
-        }
-        return res;
-    }
-    vfunc_gesture_progress(actor) {
-        this.emit('progress', this.get_last_event(0));
-        return true;
-    }
-    vfunc_gesture_end(actor) {
-        this.emit('end', this.get_last_event(0));
     }
 }
 // Note: these are potentially needed for some of the approaches in `updatePillBrightness`, should

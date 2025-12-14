@@ -8,7 +8,7 @@ import GLib from 'gi://GLib';
  * @example
  * // Create a new IntervalRunner that executes a callback every 1000 milliseconds
  * const runner = new IntervalRunner(1000, (stop) => {
- *     console.log("Callback executed");
+ *     logger.debug("Callback executed");
  *     // Call stop() to stop the interval if needed
  * });
  *
@@ -71,13 +71,16 @@ class IntervalRunner {
      * Calling this with `active=true` while the timeout is running or with `active=false`
      * while it is not running is a no-op.
      */
-    setActive(active) {
+    setEnabled(active) {
         if (!active && this._timeoutId !== null) {
             this.stop();
         }
         else if (active && this._timeoutId === null) {
             this.start();
         }
+    }
+    get enabled() {
+        return this._timeoutId !== null;
     }
     /**
      * Run the callback once after the given delay (unless `stop()` is called before that)

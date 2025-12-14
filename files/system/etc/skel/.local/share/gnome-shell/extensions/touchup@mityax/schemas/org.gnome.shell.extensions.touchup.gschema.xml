@@ -52,6 +52,13 @@
       </key>
     
 
+      <key name="navigation-bar-gestures-base-dist-factor" type="i">
+        <summary>Factor by which the overview gesture base distance is scaled (i.e. the bigger this factor, the longer the required swipe distance for opening overview/app grid).</summary>
+        <default>2</default>
+        
+      </key>
+    
+
       <key name="navigation-bar-buttons-left" type="s">
         <summary>Which buttons to show on the left side of the button navigation bar * Available choices are: - "keyboard" - keyboard open button - "workspace-previous" - switch to previous workspace - "workspace-next" - switch to next workspace - "overview" - open overview - "apps" - open apps overview - "back" - navigate back - "spacer" - adds a little space between buttons</summary>
         <default>"[\"keyboard\"]"</default>

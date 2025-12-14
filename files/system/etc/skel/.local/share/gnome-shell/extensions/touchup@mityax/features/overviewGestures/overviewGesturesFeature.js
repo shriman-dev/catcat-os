@@ -6,154 +6,144 @@ import Graphene from 'gi://Graphene';
 import { LayoutManager } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtensionFeature from '../../utils/extensionFeature.js';
 import { GestureRecognizer, GestureRecognizerEvent } from '../../utils/ui/gestureRecognizer.js';
-import OverviewAndWorkspaceGestureController from '../../utils/overviewAndWorkspaceGestureController.js';
+import { OverviewGestureController, WorkspaceGestureController } from '../../utils/overviewAndWorkspaceGestureController.js';
 import { Delay } from '../../utils/delay.js';
+import { oneOf } from '../../utils/utils.js';
 
+var PanAxis = Clutter.PanAxis;
 class OverviewGesturesFeature extends ExtensionFeature {
-    overviewAndWorkspaceController;
+    _overviewController;
+    _wsController;
+    _overviewBackgroundGesture;
+    _desktopBackgroundGesture;
     constructor(pm) {
         super(pm);
-        this.overviewAndWorkspaceController = new OverviewAndWorkspaceGestureController();
-        this._setupOverviewBackgroundGestures();
-        this._setupDesktopBackgroundGestures();
+        this._overviewController = new OverviewGestureController();
+        this._wsController = new WorkspaceGestureController({
+            monitorIndex: Main.layoutManager.primaryIndex
+        });
+        this._overviewBackgroundGesture = this._setupOverviewBackgroundGesture();
+        this._desktopBackgroundGesture = this._setupDesktopBackgroundGestures();
         this._setupWindowPreviewGestures();
     }
-    _setupOverviewBackgroundGestures() {
+    _setupOverviewBackgroundGesture() {
         const recognizer = new GestureRecognizer({
             onGestureProgress: state => {
                 if (state.hasMovement) {
                     const d = state.totalMotionDelta;
-                    this.overviewAndWorkspaceController.gestureUpdate({
-                        overviewProgress: -d.y / (this.overviewAndWorkspaceController.baseDistY * 0.25),
-                        workspaceProgress: -d.x / (this.overviewAndWorkspaceController.baseDistX * 0.62),
-                    });
+                    this._overviewController.gestureProgress(-d.y / (this._overviewController.baseDist * 0.25));
+                    this._wsController.gestureProgress(-d.x / (this._wsController.baseDist * 0.62));
                 }
             },
             onGestureCompleted: state => {
-                this.overviewAndWorkspaceController.gestureEnd({
-                    direction: state.firstMotionDirection?.direction ?? null,
-                });
+                this._overviewController.gestureEnd(oneOf(state.finalMotionDirection?.direction, ['up', 'down']));
+                this._wsController.gestureEnd(oneOf(state.finalMotionDirection?.direction, ['left', 'right']));
             }
         });
+        this.pm.setProperty(Main.overview._overview._controls, 'reactive', true);
+        const gesture = new Clutter.PanGesture({ max_n_points: 1 });
+        gesture.connect('pan-update', () => recognizer.push(Clutter.get_current_event()));
+        gesture.connect('end', () => recognizer.push(Clutter.get_current_event()));
+        gesture.connect('cancel', () => recognizer.push(Clutter.get_current_event()));
         this.pm.patch(() => {
-            Main.overview._overview._controls.reactive = true;
-            return () => Main.overview._overview._controls.reactive = false;
+            Main.overview._overview._controls.add_action_full('touchup-overview-background-gesture', Clutter.EventPhase.BUBBLE, gesture);
+            return () => Main.overview._overview._controls.remove_action(gesture);
         });
-        this.pm.connectTo(Main.overview._overview._controls, 'touch-event', (_, e) => {
-            recognizer.push(GestureRecognizerEvent.fromClutterEvent(e));
-        });
+        return gesture;
     }
     _setupWindowPreviewGestures() {
+        // FIXME: when swiping down a window preview, an error appears. This has something to do with the window preview
+        //  attempting ot show its overlay (in its `vfunc_enter_event`), while being destroyed (via `_updateWorkspacesViews`):
+        // The error does not appear to have any consequences.
+        // Stack trace:
+        // (gnome-shell:308033): Gjs-CRITICAL **: 09:47:04.572: JS ERROR: TypeError: this.window_container is null
+        // _hasAttachedDialogs@resource:///org/gnome/shell/ui/windowPreview.js:459:9
+        // _windowCanClose@resource:///org/gnome/shell/ui/windowPreview.js:256:22
+        // showOverlay@resource:///org/gnome/shell/ui/windowPreview.js:328:29
+        // vfunc_enter_event@resource:///org/gnome/shell/ui/windowPreview.js:562:14
+        // removeWindow@resource:///org/gnome/shell/ui/workspace.js:854:29
+        // addWindow/<.destroyId<@resource:///org/gnome/shell/ui/workspace.js:806:22
+        // _updateWorkspacesViews@resource:///org/gnome/shell/ui/workspacesView.js:1032:38
+        // prepareToEnterOverview@resource:///org/gnome/shell/ui/workspacesView.js:999:14
+        // prepareToEnterOverview@resource:///org/gnome/shell/ui/overviewControls.js:710:33
+        // gestureBegin@resource:///org/gnome/shell/ui/overviewControls.js:773:14
+        // _gestureBegin@resource:///org/gnome/shell/ui/overview.js:362:33
+        // _doBegin@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/utils/overviewAndWorkspaceGestureController.js:86:23
+        // gestureProgress@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/utils/overviewAndWorkspaceGestureController.js:48:22
+        // onGestureProgress@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/features/overviewGestures/overviewGesturesFeature.js:79:54
+        // emit/<@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/utils/eventEmitter.js:7:55
+        // emit@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/utils/eventEmitter.js:7:33
+        // push@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/utils/ui/gestureRecognizer.js:123:22
+        // _setupWindowPreviewGestures/patchWindowPreview/<@file:///home/x/.local/share/gnome-shell/extensions/touchup@mityax/features/overviewGestures/overviewGesturesFeature.js:61:60
+        // @resource:///org/gnome/shell/ui/init.js:21:20
         this.pm.appendToMethod(Workspace.prototype, '_addWindowClone', function () {
             patchWindowPreview(this._windows.at(-1));
         });
         const patchWindowPreview = (windowPreview) => {
-            let decidedOnGesture = null;
-            const recognizer = new GestureRecognizer({
-                onGestureCompleted: state => {
-                    if (decidedOnGesture === 'drag') {
-                        // @ts-ignore
-                        windowPreview._onDragEnd();
-                    }
-                    else if (decidedOnGesture === 'swipe-up') {
-                        if (state.finalMotionDirection?.direction === 'up') {
-                            windowPreview.pivotPoint = new Graphene.Point({ x: 0.5, y: 0 });
-                            // @ts-ignore
-                            windowPreview.ease({
-                                translationY: windowPreview.translationY - 120 * this._scaleFactor,
-                                opacity: 0,
-                                scaleX: 0.95,
-                                scaleY: 0.95,
-                                duration: 100,
-                                mode: Clutter.AnimationMode.EASE_OUT,
-                                onComplete: () => {
-                                    // @ts-ignore
-                                    windowPreview._deleteAll(); // same as `windowPreview._closeButton.emit('click')`
-                                    // If the window has not been marked as destroyed after a short delay, undo all
-                                    // transformations and ease the preview back into view:
-                                    Delay.ms(10).then(() => {
-                                        // @ts-ignore
-                                        if (!windowPreview._destroyed) {
-                                            // @ts-ignore
-                                            windowPreview.ease({
-                                                translationY: 0,
-                                                opacity: 255,
-                                                scaleX: 1,
-                                                scaleY: 1,
-                                                duration: 250,
-                                                mode: Clutter.AnimationMode.EASE_OUT,
-                                            });
-                                        }
-                                    });
-                                },
-                            });
-                        }
-                        else {
-                            // @ts-ignore
-                            windowPreview.ease({
-                                translationY: 0,
-                                duration: 150,
-                                mode: Clutter.AnimationMode.EASE_OUT_BACK,
-                            });
-                        }
-                    }
-                    else if (decidedOnGesture === 'swipe-horizontally') {
-                        this.overviewAndWorkspaceController.gestureEnd({
-                            direction: _oneOf(state.finalMotionDirection?.direction, ['left', 'right']) ?? null,
-                        });
-                    }
-                    else if (decidedOnGesture === 'swipe-down') {
-                        this.overviewAndWorkspaceController.gestureEnd({
-                            direction: _oneOf(state.finalMotionDirection?.direction, ['up', 'down']) ?? null,
-                        });
-                    }
-                    else if (state.isTap) {
-                        // @ts-ignore
-                        windowPreview._activate();
-                    }
-                    decidedOnGesture = null;
-                }
+            // Set a 'timeout_threshold' (the time the user needs to hold still before dragging is
+            // initiated) on the windowPreview's DndStartGesture, to allow our own gesture to run:
+            // @ts-ignore
+            this.pm.setProperty(windowPreview._draggable._dndGesture, 'timeout_threshold', 500);
+            // @ts-ignore
+            this._overviewBackgroundGesture.can_not_cancel(windowPreview._draggable._dndGesture);
+            // Construct our PanGesture:
+            const gesture = new Clutter.PanGesture({ max_n_points: 1, panAxis: PanAxis.Y });
+            gesture.connect('pan-update', () => recognizer.push(Clutter.get_current_event()));
+            gesture.connect('end', () => recognizer.push(Clutter.get_current_event()));
+            gesture.connect('cancel', () => recognizer.push(Clutter.get_current_event()));
+            gesture.connect('may-recognize', () => {
+                return (GestureRecognizerEvent.isTouch(gesture.get_point_event(0)) // only respond to touch gestures
+                    && gesture.get_accumulated_delta().get_y() <= 0); // only respond to swipe-down gestures
             });
-            this.pm.connectTo(windowPreview, 'captured-event', (_, raw_event) => {
-                if (!GestureRecognizerEvent.isTouch(raw_event)) {
-                    return Clutter.EVENT_PROPAGATE;
-                }
-                const state = recognizer.push(GestureRecognizerEvent.fromClutterEvent(raw_event));
-                if (state.isDuringGesture) {
-                    if (decidedOnGesture === 'drag' || state.startsWithHold) {
-                        if (decidedOnGesture !== 'drag') {
-                            // @ts-ignore
-                            windowPreview._draggable.startDrag(...raw_event.get_coords(), raw_event.get_time_us(), raw_event.get_event_sequence(), raw_event.get_device());
-                            decidedOnGesture = 'drag';
-                        }
-                        else {
-                            // @ts-ignore
-                            windowPreview._draggable._updateDragPosition.call(windowPreview._draggable, raw_event);
-                        }
+            this.pm.patch(() => {
+                windowPreview.add_action_full('touchup-window-preview-gesture', Clutter.EventPhase.CAPTURE, gesture);
+                return () => windowPreview.remove_action(gesture);
+            });
+            const recognizer = new GestureRecognizer({
+                onGestureProgress: (state) => {
+                    if (state.hasMovement) {
+                        windowPreview.translationY = Math.min(0, state.totalMotionDelta.y);
                     }
-                    else if (state.hasMovement) {
-                        if (decidedOnGesture === 'swipe-up'
-                            || state.firstMotionDirection?.direction === 'up') {
-                            windowPreview.translationY = Math.min(0, state.totalMotionDelta.y);
-                            decidedOnGesture = 'swipe-up';
-                        }
-                        else if (decidedOnGesture === 'swipe-down'
-                            || state.firstMotionDirection?.direction === 'down') {
-                            this.overviewAndWorkspaceController.gestureUpdate({
-                                overviewProgress: -state.totalMotionDelta.y / (this.overviewAndWorkspaceController.baseDistY * 0.35)
-                            });
-                            decidedOnGesture = 'swipe-down';
-                        }
-                        else if (decidedOnGesture === 'swipe-horizontally'
-                            || state.firstMotionDirection?.axis === 'horizontal') {
-                            this.overviewAndWorkspaceController.gestureUpdate({
-                                workspaceProgress: -state.totalMotionDelta.x / (this.overviewAndWorkspaceController.baseDistX * 0.62)
-                            });
-                            decidedOnGesture = 'swipe-horizontally';
-                        }
+                },
+                onGestureCompleted: state => {
+                    if (state.finalMotionDirection?.direction === 'up') {
+                        windowPreview.pivotPoint = new Graphene.Point({ x: 0.5, y: 0 });
+                        windowPreview.ease({
+                            translationY: windowPreview.translationY - 120 * this._scaleFactor,
+                            opacity: 0,
+                            scaleX: 0.95,
+                            scaleY: 0.95,
+                            duration: 100,
+                            mode: Clutter.AnimationMode.EASE_OUT,
+                            onStopped: () => {
+                                // @ts-ignore
+                                windowPreview._deleteAll(); // same as `windowPreview._closeButton.emit('click')`
+                                // If the window has not been marked as destroyed after a short delay, undo all
+                                // transformations and ease the preview back into view:
+                                Delay.ms(10).then(() => {
+                                    // @ts-ignore
+                                    if (!windowPreview._destroyed) {
+                                        windowPreview.ease({
+                                            translationY: 0,
+                                            opacity: 255,
+                                            scaleX: 1,
+                                            scaleY: 1,
+                                            duration: 250,
+                                            mode: Clutter.AnimationMode.EASE_OUT,
+                                        });
+                                    }
+                                });
+                            },
+                        });
+                    }
+                    else {
+                        windowPreview.ease({
+                            translationY: 0,
+                            duration: 150,
+                            mode: Clutter.AnimationMode.EASE_OUT_BACK,
+                        });
                     }
                 }
-                return Clutter.EVENT_STOP;
             });
         };
     }
@@ -161,29 +151,26 @@ class OverviewGesturesFeature extends ExtensionFeature {
         const recognizer = new GestureRecognizer({
             onGestureProgress: state => {
                 if (state.hasMovement) {
-                    this.overviewAndWorkspaceController.gestureUpdate({
-                        overviewProgress: -state.totalMotionDelta.y / (this.overviewAndWorkspaceController.baseDistY * 0.25),
-                        workspaceProgress: -state.totalMotionDelta.x / (this.overviewAndWorkspaceController.baseDistX * 0.62),
-                    });
+                    this._overviewController.gestureProgress(-state.totalMotionDelta.y / (this._overviewController.baseDist * 0.25));
+                    this._wsController.gestureProgress(-state.totalMotionDelta.x / (this._wsController.baseDist * 0.62));
                 }
             },
             onGestureCompleted: state => {
-                this.overviewAndWorkspaceController.gestureEnd({
-                    direction: state.finalMotionDirection?.direction ?? null,
-                });
+                this._overviewController.gestureEnd(oneOf(state.finalMotionDirection?.direction, ['up', 'down']));
+                this._wsController.gestureEnd(oneOf(state.finalMotionDirection?.direction, ['left', 'right']));
             }
         });
-        const patchBgManager = (bgManager) => {
-            this.pm.setProperty(bgManager.backgroundActor, 'reactive', true);
-            this.pm.connectTo(bgManager.backgroundActor, 'touch-event', (_, evt) => {
-                recognizer.push(GestureRecognizerEvent.fromClutterEvent(evt));
-            });
-        };
+        const gesture = new Clutter.PanGesture({ max_n_points: 1 });
+        gesture.connect('pan-update', () => recognizer.push(Clutter.get_current_event()));
+        gesture.connect('end', () => recognizer.push(Clutter.get_current_event()));
+        gesture.connect('cancel', () => recognizer.push(Clutter.get_current_event()));
         // @ts-ignore
-        Main.layoutManager._bgManagers.forEach((m) => patchBgManager(m));
-        this.pm.appendToMethod(LayoutManager.prototype, '_updateBackgrounds', function () {
+        this.pm.setProperty(Main.layoutManager._backgroundGroup, 'reactive', true);
+        this.pm.patch(() => {
             // @ts-ignore
-            this._bgManagers.forEach((m) => patchBgManager(m));
+            Main.layoutManager._backgroundGroup.add_action_full('touchup-background-swipe-gesture', Clutter.EventPhase.BUBBLE, gesture);
+            // @ts-ignore
+            return () => Main.layoutManager._backgroundGroup.remove_action(gesture);
         });
         // We have to overwrite the function responsible for updating the visibility of the several actors
         // managed by the Shell's [LayoutManager] during the overview-opening transition.
@@ -210,15 +197,16 @@ class OverviewGesturesFeature extends ExtensionFeature {
             global.window_group.visible = global.window_group.opacity !== 0;
             global.window_group.opacity = 255;
         });
+        return gesture;
     }
     get _scaleFactor() {
         return St.ThemeContext.get_for_stage(global.stage).scaleFactor;
     }
-}
-function _oneOf(v, allowed, orElse) {
-    if (allowed.includes(v))
-        return v;
-    return orElse;
+    destroy() {
+        this._overviewController.destroy();
+        this._wsController.destroy();
+        super.destroy();
+    }
 }
 
 export { OverviewGesturesFeature };

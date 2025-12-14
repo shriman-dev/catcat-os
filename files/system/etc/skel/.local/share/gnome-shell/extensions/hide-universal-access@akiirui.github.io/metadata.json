@@ -3,9 +3,9 @@
   "description": "Hide Universal Access icon from the status bar",
   "name": "Hide Universal Access",
   "shell-version": [
-    "48"
+    "49"
   ],
   "url": "https://github.com/akiirui/hide-universal-access",
   "uuid": "hide-universal-access@akiirui.github.io",
-  "version": 19
+  "version": 20
 }
