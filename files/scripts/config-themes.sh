@@ -92,13 +92,13 @@ install_gtk_themes() {
     "${lavanda_tar}.extract"/install.sh --color light dark
 
     # Catppuccin-Gtk-Theme
-    log "INFO" "Catppuccin-Gtk-Theme"
-    local catppuccin_theme_repo="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
-    local catppuccin_theme_tmp="/tmp/Catppuccin-Gtk-Theme"
-    git clone "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
-    chmod -v +x "${catppuccin_theme_tmp}"/install.sh
-    "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all --color dark --tweaks catppuccin rimless
-    log "INFO" "All done."
+#    log "INFO" "Catppuccin-Gtk-Theme"
+#    local catppuccin_theme_repo="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
+#    local catppuccin_theme_tmp="/tmp/Catppuccin-Gtk-Theme"
+#    git clone "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
+#    chmod -v +x "${catppuccin_theme_tmp}"/install.sh
+#    "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all --color dark --tweaks catppuccin rimless
+#    log "INFO" "All done."
 }
 
 build_gdm_theme() {
@@ -209,7 +209,7 @@ desktop_files
 install_fonts
 install_icon_themes
 install_gtk_themes
-build_gdm_theme
+#build_gdm_theme
 set_plymouth_theme
 apply_default_configs
 install_vscodium_ext
