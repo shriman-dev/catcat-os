@@ -310,6 +310,7 @@ dnf5 -y copr enable bazzite-org/rom-properties
 if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
+    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-mesa.repo || true
 else
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
@@ -334,6 +335,7 @@ log "INFO" "Done."
 log "INFO" "Disabling repos no longer needed"
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
+sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-mesa.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo || true
 dnf5 -y copr disable bazzite-org/bazzite || true
