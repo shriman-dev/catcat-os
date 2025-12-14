@@ -70,6 +70,7 @@ DESKTOP_EXTRAS=(
     "qemu-kvm"
     "quickemu"
     "edk2-ovmf"
+    "edk2-tools"
     "genisoimage"
     "socat"
     "spice-gtk-tools"
@@ -310,11 +311,12 @@ dnf5 -y copr enable bazzite-org/rom-properties
 if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
-    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-mesa.repo || true
 else
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
 fi
+
+exclude=mesa-*
 
 log "INFO" "Installing RPM Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
@@ -326,6 +328,7 @@ elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y --setopt=install_weak_deps=False install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
+    dnf5 -y --setopt=disable_excludes=* install mesa-demos # need for quickemu
     dnf5 -y install \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
