@@ -64,6 +64,7 @@ declare -A extensionPathsWithSed=(
 s|video-path=.*|video-path='/usr/share/backgrounds/catcat-os/altos-odyssey-live.mp4'|"
     ['/org/gnome/shell/extensions/blur-my-shell/']=""
     ['/org/gnome/shell/extensions/caffeine/']="
+/cli-toggle/d
 /toggle-state/d
 /user-enabled/d
 /indicator-position-max/d"

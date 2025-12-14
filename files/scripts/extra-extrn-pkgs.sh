@@ -295,6 +295,26 @@ ujust_setup() {
                             /usr/share/ublue-os/just/30-distrobox.just || true
     sed -i 's|^toggle-user-motd|_toggle-user-motd|' \
                             /usr/share/ublue-os/just/00-default.just || true
+    sed -i 's|^changelogs-testing|_changelogs-testing|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^distrobox-assemble|_distrobox-assemble|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^distrobox-new|_distrobox-new|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^setup-distrobox-app|_setup-distrobox-app|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^install-coolercontrol|_install-coolercontrol|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^install-scrcpy|_install-scrcpy|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^install-openrgb|_install-openrgb|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^changelogs-testing|_changelogs-testing|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^configure-grub|_configure-grub|' \
+                            /usr/share/ublue-os/just/*.just || true
+    sed -i 's|^configure-snapshots|_configure-snapshots|' \
+                            /usr/share/ublue-os/just/*.just || true
 
     # Import justfiles to ujust
     log "INFO" "Importing justfiles to ujust"

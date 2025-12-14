@@ -65,10 +65,9 @@ window-skip-taskbar=true
 window-type-hint='normal'
 
 [org/gnome/shell/extensions/user-theme]
-name='Catppuccin-Orange-Dark'
+name=''
 
 [org/gnome/shell/extensions/caffeine]
-cli-toggle=true
 countdown-timer=0
 duration-timer=2
 duration-timer-list=[900, 1800, 3600]

@@ -85,9 +85,13 @@ jobs:
           echo "AHHH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
-          echo "MAJVER_TAG=${MAJOR_VERSION}" >> $GITHUB_ENV
-#          #echo "MAJVER_TAG=$([[ ${BASE_IMAGE_NAME} =~ "ublue" ]] && echo "stable-${MAJOR_VERSION}" \
-#                                || echo "${MAJOR_VERSION}")" >> $GITHUB_ENV
+          if [[ ${BASE_IMAGE_NAME} =~ "bazzite" ]]; then
+              echo "MAJVER_TAG=stable-${MAJOR_VERSION}" >> $GITHUB_ENV
+          elif [[ ${BASE_IMAGE_NAME} =~ "ucore" ]]; then
+              echo "MAJVER_TAG=stable" >> $GITHUB_ENV
+          else
+              echo "MAJVER_TAG=${MAJOR_VERSION}" >> $GITHUB_ENV
+          fi
 
       # Build metadata
       - name: Image Metadata
