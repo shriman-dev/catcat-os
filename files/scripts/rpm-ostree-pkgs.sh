@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -oue pipefail
+set -ouex pipefail
 source /usr/lib/catcat/funcvar.sh
 
 DESKTOP_EXTRAS=(
