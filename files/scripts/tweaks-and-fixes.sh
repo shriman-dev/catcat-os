@@ -54,8 +54,8 @@ chmod -v 000 /usr/libexec/gsd-wacom || true
 chmod -v 000 /usr/libexec/goa-daemon || true
 chmod -v 000 /usr/libexec/goa-identity-service || true
 
-sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.service
-sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service
+sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.service || true
+sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service || true
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then

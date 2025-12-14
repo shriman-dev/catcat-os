@@ -23,12 +23,12 @@ toggle_localdns() {
             ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  touch "${DNSCRYPTDIR}/domains-blocklist.txt"
-                 ${SYSTEMCTL} is-enabled dnsmasq.service &&
+                 ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnsmasq.service
                  ${SYSTEMCTL} enable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
                  touch "${DNSMASQDIR}/domains-blocklist.conf"
-                 ${SYSTEMCTL} is-enabled dnscrypt-proxy.service &&
+                 ${SYSTEMCTL} is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
                  ${SYSTEMCTL} enable --force --now dnsmasq.service
               fi } ||
