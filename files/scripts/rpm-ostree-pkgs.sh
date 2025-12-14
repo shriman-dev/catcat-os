@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ouex pipefail
+set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
 DESKTOP_EXTRAS=(
@@ -315,10 +315,10 @@ COMMON=(
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 
 
-log "INFO" "Performing updates"
-rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
-dnf5 upgrade --refresh --assumeyes
-log "INFO" "Done."
+#log "INFO" "Performing updates"
+#rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
+#dnf5 upgrade --refresh --assumeyes
+#log "INFO" "Done."
 
 log "INFO" "Adding extra RPM repos"
 if [[ "${BASE_IMAGE_NAME}" =~ "bazzite" ]]; then

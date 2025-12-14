@@ -36,6 +36,13 @@ desktop_files() {
     log "INFO" "Done."
 }
 
+set_plymouth_theme() {
+    local plymouth_theme="catppuccin-mocha"
+    log "INFO" "Applying plymouth theme: ${plymouth_theme}"
+    plymouth-set-default-theme ${plymouth_theme}
+    log "INFO" "Done."
+}
+
 install_fonts() {
     local -a nerd_fonts=(
             "FiraCode"
@@ -160,13 +167,6 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     log "INFO" "Custom theme has been built and set for GDM."
 }
 
-set_plymouth_theme() {
-    local plymouth_theme="catppuccin-mocha"
-    log "INFO" "Applying plymouth theme: ${plymouth_theme}"
-    plymouth-set-default-theme ${plymouth_theme}
-    log "INFO" "Done."
-}
-
 apply_default_configs() {
     # Set default icon and theme
     log "INFO" "Setting default icon and theme for the OS"
@@ -206,11 +206,11 @@ gnome_shell_ext() {
 }
 
 desktop_files
+set_plymouth_theme
 install_fonts
 install_icon_themes
 install_gtk_themes
 #build_gdm_theme
-set_plymouth_theme
-apply_default_configs
+#apply_default_configs
 install_vscodium_ext
 gnome_shell_ext
