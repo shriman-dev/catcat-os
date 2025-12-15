@@ -150,6 +150,7 @@ s|message-text=.*|message-text='Meow'|"
 /touchscreen/,/^$/d
 /global-shortcuts/,/^$/d
 /sleep-inactive-ac-type/d
+/donation-reminder-last-shown/d
 /sleep-inactive-battery-type/d
 /night-light-enabled/d
 /night-light-temperature/d"
