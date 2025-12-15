@@ -24,9 +24,6 @@ services_enable() {
 #gdm.service
 #setroubleshootd.service
 #packagekitd.service
-#low-memory-monitor.service
-#thermald.service
-#uresourced.service
 DISABLE_SERVICES=(
     "avahi-daemon.service"
     "avahi-daemon.socket"
@@ -44,6 +41,7 @@ DISABLE_SERVICES=(
     "dconf-update.service"
     "flatpak-add-fedora-repos.service"
     "flatpak-system-update.timer"
+    "fstrim.timer"
     "fwupd.service"
     "fwupd-refresh.timer"
     "geoclue.service"

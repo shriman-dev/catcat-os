@@ -316,8 +316,6 @@ else
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
 fi
 
-exclude=mesa-*
-
 log "INFO" "Installing RPM Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
     dnf5 -y install \

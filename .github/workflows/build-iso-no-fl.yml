@@ -85,7 +85,7 @@ jobs:
 
       - name: Upload ISOs and Checksum as artifacts
         id: upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.image_name }}-iso
           path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
