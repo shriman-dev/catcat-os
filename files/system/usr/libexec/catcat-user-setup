@@ -290,15 +290,9 @@ setup_apps() {
   # Handle desktop entries
   # prioritize steam flatpak
   [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam && {
-    [[ ! -f "${apps_dir}/steam.desktop" ]] &&
-    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > \
+    [[ ! -f "${apps_dir}/steam.desktop" ]] || [[ ! -s "${apps_dir}/steam.desktop" ]] &&
+      sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > \
             "${apps_dir}/steam.desktop"
-  }
-
-  { hostnamectl | grep -E ":.*Micro-Star|:.*MSI" && command -v mcontrolcenter; } || {
-    [[ ! -f "${apps_dir}/mcontrolcenter.desktop" ]] &&
-    sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/mcontrolcenter.desktop > \
-            "${apps_dir}/mcontrolcenter.desktop"
   }
 
   # Modify app icons
@@ -309,7 +303,7 @@ setup_apps() {
   )
 
   for app in "${!app_icons[@]}"; do
-    [[ ! -f "${apps_dir}/${app}.desktop" ]] && {
+    [[ ! -f "${apps_dir}/${app}.desktop" ]] || [[ ! -s "${apps_dir}/${app}.desktop" ]] && {
       [[ "${FLATPAK_APPS}" =~ "${app}" ]] &&
         sed "s|^Icon=.*|Icon=${app_icons[${app}]}|" \
           "/var/lib/flatpak/exports/share/applications/${app}.desktop" > "${apps_dir}/${app}.desktop"

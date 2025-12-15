@@ -155,7 +155,7 @@ need_root() {
 
 exit_if_root() {
     [[ $(id -u) -eq 0 ]] && die "Cannot run as root"
-    id | grep 'uid.*gdm' && die "Cannot run as gdm user"
+    [[ $(id -un) == 'gdm' ]] && die "Cannot run as gdm user"
 }
 
 run_as_users() {
