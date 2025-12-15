@@ -53,7 +53,7 @@
 	background-color: rgba(238, 238, 238, 0.1);
 }
 .dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {
-	color: #FFF;
+	color: none;
 }
 .dashtopanelMainPanel .dash-item-container .show-apps:hover .overview-icon {
 	background: none;
