@@ -45,20 +45,22 @@ balance() {
     done
 
     local mounts=("${path}")
-    [[ "${path}" == "all" ]] && {
+    if [[ "${path}" == "all" ]]; then
         log "INFO" "Auto detecting BTRFS mount points"
         mounts=($(get_btrfs_mounts))
         log "INFO" "Mount points detected: ${mounts[@]}"
-    }
+    fi
 
     for mount in ${mounts[@]}; do
         validate_paths "${mount}"
         log "INFO" "Starting balance on ${mount}"
-        [[ -n ${VERBOSE} ]] && { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
-        echo
+        [[ -n ${VERBOSE} ]] &&
+            { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+        echo ""
         ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue ${mount}
-        echo
-        [[ -n ${VERBOSE} ]] && { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+        echo ""
+        [[ -n ${VERBOSE} ]] &&
+            { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
         log "INFO" "Balance completed for ${mount}"
     done
 }

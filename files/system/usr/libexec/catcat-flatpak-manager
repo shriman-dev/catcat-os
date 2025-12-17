@@ -33,7 +33,7 @@ install_flatpaks() {
 }
 
 
-FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ $([[ $(id -u) -ne 0 ]] && echo '~/.local/share/flatpak/app/'))"
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ $([[ $(id -u) -ne 0 ]] && echo "${HOME}/.local/share/flatpak/app"))"
 SCOPE='--user'
 
 remove_filesystem_access() {
@@ -67,16 +67,16 @@ remove_filesystem_access() {
     "com.microsoft.Edge"
     "com.google.Chrome"
     "org.kde.falkon"
-    "org.gnome.Epiphany"
     "re.sonny.Tangram"
   )
 
   for app in "${nofilesystem_for_apps[@]}"; do
-    [[ "${FLATPAK_APPS}" =~ "${app}" && ! -f /var/lib/flatpak/overrides/${app} ]] && {
+    if [[ "${FLATPAK_APPS}" =~ "${app}" && ! -f /var/lib/flatpak/overrides/${app} ]]; then
       log "INFO" "\nRemove existing filesystem permissions for app: ${app}"
       local metadata="/var/lib/flatpak/app/${app}/current/active/metadata"
       local permitted_filesystem=$(grep 'filesystems' "${metadata}" | cut -d '=' -f2- | sed 's/:[^;]*//g' | tr ';' ' ')
-      [[ -z ${permitted_filesystem} ]] || {
+
+      if [[ ! -z ${permitted_filesystem} ]]; then
         local perms=()
         permitted_filesystem=${permitted_filesystem::-1}
         for perm in ${permitted_filesystem}; do
@@ -84,8 +84,8 @@ remove_filesystem_access() {
         done
         log "INFO" "Removing permissions: '${permitted_filesystem}'"
         flatpak override ${SCOPE} "${perms[@]}" "${app}"
-      }
-    }
+      fi
+    fi
   done
 }
 

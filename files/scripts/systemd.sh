@@ -42,8 +42,6 @@ DISABLE_SERVICES=(
     "flatpak-add-fedora-repos.service"
     "flatpak-system-update.timer"
     "fstrim.timer"
-    "fwupd.service"
-    "fwupd-refresh.timer"
     "geoclue.service"
     "gssproxy.service"
     "httpd.service"

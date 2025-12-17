@@ -21,10 +21,10 @@ update_nixpkg() {
     local scope="user"
     local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
-    [[ $(id -u) -eq 0 ]] && {
+    if [[ $(id -u) -eq 0 ]]; then
         scope="global"
         cmdpath="/nix/var/nix/profiles/default/bin"
-    }
+    fi
 
     if [[ -x "${cmdpath}/nix-env" ]]; then
         enclosed_heading "Nixpkg ${scope} update" "="
@@ -43,11 +43,13 @@ update_dns_blocklist() {
 update_firmware() {
     enclosed_heading "Firmware update" "="
 
+#    sudo /usr/libexec/fwupd/fwupd &
     sudo sh -c '
         /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
         /usr/bin/fwupdmgr --no-device-prompt -y get-updates
         /usr/bin/fwupdmgr --no-reboot-check -y update
     '
+#    sudo /usr/bin/pkill -KILL -fe /usr/libexec/fwupd/fwupd
 }
 
 update_system() {
