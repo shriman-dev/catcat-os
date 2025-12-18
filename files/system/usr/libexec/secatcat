@@ -59,6 +59,7 @@ if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.s
         mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
         ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
     fi
+    localdnsctl --restart
 fi
 
 # TODO: Log unsuccessful login attempts
