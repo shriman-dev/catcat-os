@@ -103,7 +103,6 @@ bandwhich() {
 
     curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
 
-
     tar -xvf "${bandwhich_tar}" -C "${bandwhich_tar}.extract"
     cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
     chmod -v +x /usr/bin/bandwhich

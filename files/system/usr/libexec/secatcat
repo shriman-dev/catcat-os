@@ -42,11 +42,13 @@ if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnscrypt_confd}/
     cat ${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
     cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
+    localdnsctl --restart
 elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnsmasq_confd}/domains-blocklist.conf" ]]; then
     cat ${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
     cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
     restorecon -vR "${dnsmasq_confd}"/
+    localdnsctl --restart
 fi
 rm -rvf "${tmp_localdns}"
 
@@ -59,7 +61,6 @@ if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.s
         mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
         ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
     fi
-    localdnsctl --restart
 fi
 
 # TODO: Log unsuccessful login attempts

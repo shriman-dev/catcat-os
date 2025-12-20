@@ -336,12 +336,12 @@ main() {
   done
 }
 
-[[ $# -eq 0 ]] && {
-  SCOPE="--system"
-  grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-    apply_global_restrictions
-  }
-}
+if [[ $# -eq 0 ]]; then
+    SCOPE="--system"
+    grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+        apply_global_restrictions
+    }
+fi
 
 main "$@"
 

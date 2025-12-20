@@ -1,5 +1,3 @@
-# TODO: Add msi fancontrol installer in ujust app section
-
 # Boot into this device's BIOS/UEFI screen
 [group("utilities")]
 bios:
@@ -10,13 +8,40 @@ bios:
       echo "Rebooting to legacy BIOS from OS is not supported."
     fi
 
+# Automatically manage power profiles
+[group("utilities")]
+toggle-auto-power-profile ACTION="prompt":
+    #!/usr/bin/bash
+    source /usr/lib/catcat/funcvar.sh
+    CURRENT_STATE="Disabled"
+    if systemctl is-enabled auto-power-profile.service | grep -q enabled; then
+      CURRENT_STATE="Enabled"
+    fi
+    OPTION={{ ACTION }}
+    if [[ "${OPTION}" == "prompt" ]]; then
+      echo "Automatic power profile management status: ${bold}${CURRENT_STATE}${normal}"
+      echo "Enable or Disable automatic power profile management?"
+      OPTION=$(ugum choose Enable Disable)
+    elif [[ "${OPTION,,}" == "help" ]]; then
+      echo "Usage: ujust toggle-auto-power-profile <option>"
+      echo "  <option>: Specify the quick option - 'enable' or 'disable'"
+      echo "  Use 'enable' to Enable automatic power profile management."
+      echo "  Use 'disable' to Disable automatic power profile management."
+      exit 0
+    fi
+    if [[ "${OPTION,,}" == "enable" ]]; then
+      sudo systemctl enable --force --now auto-power-profile.service
+    elif [[ "${OPTION,,}" == "disable" ]]; then
+      sudo systemctl disable --force --now auto-power-profile.service
+    fi
+
 # Measure Idle Power Draw
 [group("utilities")]
 check-idle-power-draw:
     #!/usr/bin/bash
     sudo powerstat -a -r
 
-# Clean up old and unused podman images, volumes, flatpak packages and rpm-ostree content
+# Clean up unused, unnecessary stuff and optimize podman, flatpaks, brew, nix and rpm-ostree content
 [group("utilities")]
 clean-system:
     #!/usr/bin/bash
@@ -24,7 +49,11 @@ clean-system:
     podman volume prune -f
     flatpak uninstall --unused --assumeyes --noninteractive
     rpm-ostree cleanup -bm
-    if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    if command -v nix-store >/dev/null 2>&1; then
+        nix-store --optimise
+        nix-collect-garbage
+    fi
+    if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
         brew autoremove
         brew cleanup
     fi
@@ -43,6 +72,27 @@ add-user-to-input-group:
 install-catcat-flatpaks:
     #!/usr/bin/bash
     sudo /usr/libexec/catcat-flatpak-manager --install-all
+
+# Install app for controlling fans on msi laptops
+[group("apps")]
+install-mcontrolcenter:
+    #!/usr/bin/env -S sudo -- /bin/bash
+    source /usr/lib/catcat/funcvar.sh
+    mcontrolcenter_repo="https://api.github.com/repos/dmitry-s93/MControlCenter"
+    mcontrolcenter_tar="/tmp/catcat_extra_pkgs/mcontrolcenter.tar.gz"
+    log "INFO" "Installing mcontrolcenter"
+    mkdir -vp "${mcontrolcenter_tar}.extract"
+    curl -Lo "${mcontrolcenter_tar}" $(curl -s -X GET "${mcontrolcenter_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*bin.tar.gz"' | cut -d '"' -f4)
+    tar -xvf "${mcontrolcenter_tar}" -C "${mcontrolcenter_tar}.extract" --strip-components=1
+    sed -i "s|/usr/|/usr/local/|" "${mcontrolcenter_tar}.extract/install.sh"
+    sed -i "s|/usr/|/usr/local/|" "${mcontrolcenter_tar}.extract/app/mcontrolcenter.helper.service"
+    cd "${mcontrolcenter_tar}.extract"
+    ${mcontrolcenter_tar}.extract/install.sh
+    cp -fv /usr/local/share/applications/mcontrolcenter.desktop \
+                ${SUDO_USER}/.config/autostart/mcontrolcenter.desktop
+    cd -
+    rm -rf "${mcontrolcenter_tar}" "${mcontrolcenter_tar}.extract"
+    log "INFO" "All Done."
 
 # Show all logs from this boot
 [group("logging")]
@@ -246,8 +296,8 @@ toggle-ssh ACTION="":
     if [ "${OPTION}" == "help" ]; then
       echo "Usage: ujust toggle-ssh <option>"
       echo "  <option>: Specify the option to skip the interactive prompt"
-      echo "  Use 'start' to enable SSH till next reboot"
-      echo "  Use 'persist-enable' to enable SSH persistently on boot"
+      echo "  Use 'start' to start SSH till next reboot"
+      echo "  Use 'enable' to enable SSH persistently on boot"
       echo "  Use 'disable' to disable SSH"
       exit 0
     elif [ "${OPTION}" == "" ]; then
@@ -281,7 +331,7 @@ toggle-ssh ACTION="":
         echo -e "SSH is now ${yellow}Disabled${normal}."
         echo " "
         ;;
-      "Enable SSH Persistently"|persist-enable)
+      "Enable SSH Persistently"|enable)
         echo "Enabling SSH on boot..."
         ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
         sudo systemctl unmask sshd.service
@@ -349,6 +399,7 @@ restore-gnome-de-settings:
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome settings..."
+    rm -rf "${HOME}/.config/dconf"
     dconf reset -f /
     echo "Done."
     echo "You may need to log out and log in again for the changes to take effect."
@@ -362,7 +413,7 @@ restore-gnome-folders:
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome folders..."
     dconf reset -f /org/gnome/desktop/app-folders/
-    dconf reset -f /org/gnome/shell/
+    dconf reset /org/gnome/shell/app-picker-layout
     echo "Done."
     echo "You may need to log out and log in again for the changes to take effect."
 
