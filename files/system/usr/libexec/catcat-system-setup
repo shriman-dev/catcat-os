@@ -48,15 +48,23 @@ if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
     [[ ! -e /root/.config/fish/fish_variables ]] &&
             ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
 
+    [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
+
+    # GDM
+    # Update it or fall back to orignal GDM theme
+    gdm_shell="share/gnome-shell"
+    gdm_resource="gnome-shell-theme.gresource"
+    if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
+        [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
+        cp -v "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+    fi
     /usr/bin/dconf update
 #    chmod -c -R 755 /etc/dconf/
-
-    [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
 
     cat "${catcat_update_sha}" > "${catcat_update_sha}_previous"
 fi
 
-# Sync main user's monitors.xml with gdm
+# Sync main user's monitors.xml with GDM
 monitors_xml=".config/monitors.xml"
 if [[ -f "/home/${U1000}/${monitors_xml}" ]]; then
     if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}" >/dev/null 2>&1; then

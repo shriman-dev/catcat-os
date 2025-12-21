@@ -55,7 +55,7 @@ install_fonts() {
     log "INFO" "Installing Nerd Fonts"
     rm -rf "${nerd_fonts_dest}"
 
-    mkdir -p /tmp/fonts
+    mkdir -vp /tmp/fonts
     local font
     for font in "${nerd_fonts[@]}"; do
         font=${font// /} # remove spaces
@@ -164,6 +164,10 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     # Default settings for gdm
     log "INFO" "Getting default settings for GDM"
     cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
+
+    # To make GDM re-theme-able
+    mv -v   "${gdm_resource}" "${gdm_resource}.og"
+    ln -svf "/usr/local/share/gnome-shell/$(basename ${gdm_resource})" "${gdm_resource}"
     log "INFO" "Custom theme has been built and set for GDM."
 }
 
