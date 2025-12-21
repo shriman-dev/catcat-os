@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 shopt -s extglob nocasematch
-set -x
 source /usr/lib/catcat/funcvar.sh
 exit_if_root
 HOME_DIR="${HOME}"
@@ -13,6 +12,7 @@ ENABLED_GNOME_EXTENSIONS="$(dconf read /org/gnome/shell/enabled-extensions)"
 
 on_first_boot() {
   if [[ ! -f "${CATCAT_CONF}/first-boot" ]]; then
+    mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
     dconf reset -f /org/gnome/Ptyxis
     echo 'first boot' > "${CATCAT_CONF}/first-boot"
   fi
@@ -26,7 +26,7 @@ sync_default_configs() {
   if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
     log "INFO" "Updating configs..."
     CATCAT_SYSTEM_UPDATED=true
-    mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR" || err "${CATCAT_CONF} creation failed"
+    mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR" || err "${CATCAT_CONF}/LS_COLORS_DIR creation failed"
     cp -drf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach "${CATCAT_CONF}/LS_COLORS_DIR"/
 
     rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
@@ -72,12 +72,12 @@ gnome_shell_setup() {
     local bmw_profile="${CONFIG}/burn-my-windows/profiles/1679372508290696.conf"
     if [[ ! -f "${bmw_profile}" ]]; then
         bak_before "${CONFIG}/burn-my-windows"
-        cp -drv "${SKEL}/.config/burn-my-windows" "${CONFIG}/" &&
+        cp -drv "${SKEL}/.config/burn-my-windows" "${CONFIG}"/ &&
         dconf write /org/gnome/shell/extensions/burn-my-windows/active-profile "'${bmw_profile}'" ||
             err "Burn my windows style setup failed"
     fi
 
-    # Setup forge stylesheet
+    # Setup forge auto tilling
     local forge_stylesheet="forge/stylesheet/forge/stylesheet.css"
     if [[ $(grep -c 'border-width: 1px' "${CONFIG}/${forge_stylesheet}") -lt 6 ]]; then
         bak_before "${CONFIG}/forge"
@@ -95,15 +95,15 @@ gnome_shell_setup() {
     fi
 
     # Make vitals and tophat extension to use resources app as default monitoring app
-    if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
-        local vitals_schema="${LOCALSHARE}/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
-        [[ -f "${vitals_schema}" ]] && grep 'net.nokyan.Resources' "${vitals_schema}" || {
+    local vitals_schema="${LOCALSHARE}/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
+    if [[ -f "${vitals_schema}" ]] && ! grep 'net.nokyan.Resources' "${vitals_schema}"; then
+        if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
             sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' ${vitals_schema} && {
                 glib-compile-schemas $(dirname ${vitals_schema}) &&
                 gnome-extensions disable Vitals@CoreCoding.com &&
                 gnome-extensions enable Vitals@CoreCoding.com
             } || err "Resources app integration with vitals failed"
-        }
+        fi
     fi
 
     # Enable syncthing extension if syncthing is running, disable if not running
@@ -124,7 +124,7 @@ gnome_shell_setup() {
 
 set_folder_icons() {
   # Set folder icons
-  if [[ ${XDG_CURRENT_DESKTOP^^} == "GNOME" ]]; then
+  if command -v gio; then
     if [[ ! "$(gio info -a metadata "${HOME_DIR}/Me")" =~ (custom-icon-name|user-home) ]]; then
         log "INFO" "Setting up folder icons"
         local -A icons=(
@@ -215,7 +215,7 @@ shell_setup() {
 
     # Fish shell
     [[ -n ${CATCAT_SYSTEM_UPDATED} ]] &&
-        { cp -drf ${SKEL}/.config/fish "${CONFIG}/" || err "Failed to setup fish_variables"; }
+        { cp -drfv ${SKEL}/.config/fish "${CONFIG}"/ || err "Failed to setup fish_variables"; }
 
     local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
@@ -232,9 +232,12 @@ unset rc'
 
 theme_flatpak_apps() {
     log "INFO" "Setting theme, icons and permissions for flatpak apps..."
-    mkdir -pv "${LOCALSHARE}/flatpak/overrides"
+
+    [[ ! -d "${LOCALSHARE}/flatpak/overrides" ]] && mkdir -pv "${LOCALSHARE}/flatpak/overrides"
+
     grep 'devices=.*!all' "${LOCALSHARE}/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-        bak_before "${LOCALSHARE}/flatpak/overrides/global"
+        [[ -f "${LOCALSHARE}/flatpak/overrides/global" ]] &&
+            bak_before "${LOCALSHARE}/flatpak/overrides/global"
         /usr/libexec/catcat-flatpak-manager --user --all ||
             err "Failed to configure flatpak permissions"
     }
@@ -262,9 +265,9 @@ setup_apps() {
     mkdir -pv "${apps_dir}"
 
     # Handle desktop entries
-    # prioritize steam flatpak
+    # Prioritize flatpak steam
     if [[ ! -f "${apps_dir}/steam.desktop" ]] || [[ ! -s "${apps_dir}/steam.desktop" ]]; then
-        [[ "${FLATPAK_APPS}" =~ 'steam' ]] && command -v steam &&
+        command -v steam && [[ "${FLATPAK_APPS}" =~ 'steam' ]] &&
             sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > \
                     "${apps_dir}/steam.desktop"
     fi
@@ -287,7 +290,7 @@ setup_apps() {
 
     # Setup additional apps config
     [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette" ]] && {
-        cp -drvf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}/" ||
+        cp -drvf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}"/ ||
             err "Failed to configure Ptyxis"
     }
 
@@ -301,8 +304,8 @@ setup_apps() {
     local vs_extdir="${HOME_DIR}/.vscode-oss/extensions"
     mkdir -pv "${vs_extdir}"
     ls -A1d ${vs_extdir}/*atppuccin* || {
-        cp -drf ${SKEL}/.vscode-oss/extensions/* "${vs_extdir}/" &&
-        cp -drf ${SKEL}/.config/VSCodium "${CONFIG}/" || err "Failed to configure VSCodium"
+        cp -drf ${SKEL}/.vscode-oss/extensions/* "${vs_extdir}"/ &&
+        cp -drf ${SKEL}/.config/VSCodium "${CONFIG}"/ || err "Failed to configure VSCodium"
     }
 
     log "INFO" "Done"

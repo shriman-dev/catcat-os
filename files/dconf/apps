@@ -98,6 +98,13 @@ show-dependencies=true
 show-whose-processes='all'
 update-interval=1000
 
+[org/gnome/gnome-system-monitor/disksview]
+col-available-width=85
+col-device-width=1364
+col-directory-width=553
+col-total-width=97
+col-type-width=111
+
 [org/gnome/gnome-system-monitor/disktreenew]
 col-0-visible=true
 col-0-width=482
@@ -157,7 +164,7 @@ col-6-width=90
 col-8-visible=true
 col-8-width=79
 columns-order=[12, 1, 15, 8, 0, 14, 23, 22, 18, 26, 2, 3, 4, 6, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 7]
-sort-col=15
+sort-col=12
 sort-order=0
 
 [org/gnome/nautilus/compression]

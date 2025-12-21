@@ -87,6 +87,7 @@ GLOBAL_DISABLE_SERVICES=(
     "io.github.kolunmi.Bazaar.service"
     "bazzite-user-setup.service"
     "evolution-addressbook-factory.service"
+    "evolution-alarm-notify.service"
     "evolution-calendar-factory.service"
     "evolution-source-registry.service"
     "evolution-user-prompter.service"

@@ -93,7 +93,7 @@ update_blocklist() {
         die "Failed to download blocklist"
 
     log "INFO" "Extracting blocklist..."
-    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
+    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}"/ ||
         die "Failed to extract blocklist"
     cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
     rm -rf "${TMPDIR}"
