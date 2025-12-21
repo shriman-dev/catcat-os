@@ -62,9 +62,8 @@ rm -rvf "${tmp_chrony}"
 ###########
 # Enable MAC randomization and temporary IPv6 addresses generation
 log "INFO" "Enabling MAC randomization and dynamic IPv6 address generation"
-privacy_ext_conf="/usr/lib/NetworkManager/conf.d/privacy_ext_ipv6.conf"
-mac_randomization_conf="/usr/lib/NetworkManager/conf.d/mac-randomization.conf"
-cat > "${mac_randomization_conf}" << EOF
+networkmanager_confd="/usr/lib/NetworkManager/conf.d"
+cat > "${networkmanager_confd}/mac-randomization.conf" << EOF
 [device]
 wifi.scan-rand-mac-address=yes
 
@@ -73,7 +72,7 @@ wifi.cloned-mac-address=random
 ethernet.cloned-mac-address=random
 EOF
 
-cat > "${privacy_ext_conf}" << EOF
+cat > "${networkmanager_confd}/privacy_ext_ipv6.conf" << EOF
 [connection]
 ipv6.ip6-privacy=2
 EOF
@@ -107,8 +106,14 @@ rm -rf "${dnscrypt_tar}" "${dnscrypt_tar}.extract"
 log "DEBUG" "Done."
 
 log "DEBUG" "Enabling localdns"
+# Set localdns as default dns server for blocking ads/malwares
+cp -vf "${localdns_confd}/localdns-server.conf" /etc/NetworkManager/conf.d/
+
+# Disable and mask systemd-resolved.service
 systemctl disable systemd-resolved.service
 systemctl mask systemd-resolved.service
+
+# Enable blocklist updater
 systemctl -f enable dns-blocklist-updater.timer
 
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
@@ -146,7 +151,6 @@ log "DEBUG" "Done."
 # Clear tmp
 rm -rvf "${tmp_localdns}"
 log "INFO" "All done."
-log "INFO" "Adding support for Ad/Malware blocking."
 
 ######################################################
 # File Permissions, Users, Groups and Authentication #

@@ -20,8 +20,9 @@ toggle_localdns() {
     case "${1}" in
         enable)
             log "INFO" "Enabling local DNS..."
-            ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
-            { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+            { cp ${VERBOSE:+-v} -f "/usr/${CONFIG_DIR}/localdns-server.conf" \
+                            /etc/NetworkManager/conf.d/ &&
+              if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  touch "${DNSCRYPTDIR}/domains-blocklist.txt"
                  ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnsmasq.service
@@ -36,10 +37,8 @@ toggle_localdns() {
             ;;
         disable)
             log "INFO" "Disabling local DNS..."
-            local nm_resolvconf='/run/NetworkManager/resolv.conf'
-            [[ ! -f "${nm_resolvconf}" ]] && die "NetworkManager resolv.conf missing at ${nm_resolvconf}"
-            cp ${VERBOSE:+-v} -f ${nm_resolvconf} /etc/resolv.conf &&
-            { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+            { rm ${VERBOSE:+-v} /etc/NetworkManager/conf.d/localdns-server.conf &&
+              if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
                  ${SYSTEMCTL} disable --force --now dnsmasq.service

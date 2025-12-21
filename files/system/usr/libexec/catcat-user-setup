@@ -34,7 +34,7 @@ sync_default_configs() {
     rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/ ||
         err "Gnome extensions update failed"
 
-    rm -rf "${LOCALSHARE}/themes/"*{Catppuccin,Lavanda}*
+    rm -rf "${LOCALSHARE}/themes"/*{Catppuccin,Lavanda}*
     cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/ ||
         err "Theme update failed"
 
