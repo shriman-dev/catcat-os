@@ -369,13 +369,13 @@ fi
 
 log "INFO" "Installing External Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
-    ${SETUP_DIR}/extra-extrn-pkgs.sh \
+    ${SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | grep "^++" | sed 's|++||')
 elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    ${SETUP_DIR}/extra-extrn-pkgs.sh \
+    ${SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]}" | grep "^++" | sed 's|++||')
 else
-    ${SETUP_DIR}/extra-extrn-pkgs.sh \
+    ${SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep "^++" | sed 's|++||')
 fi
 log "INFO" "All Done."

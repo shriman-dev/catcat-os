@@ -56,7 +56,7 @@ log "INFO" "Removing dconf and skel defaults"
 [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/skel/*
 [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/dconf/db/distro.d/*
 
-log "INFO" "Removing desktop files in /etc/xdg/autostart"
+log "INFO" "Removing desktop files in xdg autostart directory"
 [[ ! -d /etc/catcat-os ]] && rm -rvf /etc/skel/.config/autostart
 rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
 rm -vf  /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop

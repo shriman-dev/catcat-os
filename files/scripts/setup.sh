@@ -11,40 +11,40 @@ enclosed_heading_this() {
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
 
 enclosed_heading_this "Cleaning Up"
-${SETUP_DIR}/cleanup.sh
+${SETUP_DIR}/01-cleanup.sh
 
 enclosed_heading_this "Debloating"
-${SETUP_DIR}/deblaot.sh
+${SETUP_DIR}/02-deblaot.sh
 
 enclosed_heading_this "Preparing System Environment"
-${SETUP_DIR}/prep-sys-env.sh
+${SETUP_DIR}/03-prep-env.sh
 
 enclosed_heading_this "Copying Over System Default Files"
-${SETUP_DIR}/copy-sys-files.sh
+${SETUP_DIR}/04-copy-files.sh
 
 enclosed_heading_this "Updating And Installing Packages"
-${SETUP_DIR}/rpm-ostree-pkgs.sh
+${SETUP_DIR}/05-rpm-pkgs.sh
 
 enclosed_heading_this "Applying Themes On Various System Components"
-${SETUP_DIR}/config-themes.sh
+${SETUP_DIR}/07-theming.sh
 
 enclosed_heading_this "Enhancing Security With Secatcat"
-${SETUP_DIR}/secatcat.sh
+${SETUP_DIR}/08-secatcat.sh
 
 enclosed_heading_this "Configuring Systemd Services"
-${SETUP_DIR}/systemd.sh
+${SETUP_DIR}/09-systemd.sh
 
 enclosed_heading_this "Refining System With Tweaks And Fixes"
-${SETUP_DIR}/tweaks-and-fixes.sh
+${SETUP_DIR}/10-tweaks-and-fixes.sh
 
 enclosed_heading_this "Applying Branding"
-${SETUP_DIR}/branding.sh
+${SETUP_DIR}/11-branding.sh
 
 enclosed_heading_this "Configuring Signing Policy"
-${SETUP_DIR}/signing.sh
+${SETUP_DIR}/12-signing.sh
 
 enclosed_heading_this "Regenerating Initramfs"
-${SETUP_DIR}/initramfs.sh
+${SETUP_DIR}/13-initramfs.sh
 
 enclosed_heading_this "Post Build Cleaning"
-${SETUP_DIR}/post-cleanup.sh
+${SETUP_DIR}/14-post-setup.sh
