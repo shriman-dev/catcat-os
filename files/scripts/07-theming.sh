@@ -165,7 +165,8 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     log "INFO" "Getting default settings for GDM"
     cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
 
-    # To make GDM re-theme-able
+    # To allow GDM re-theming
+    log "INFO" "Allowing GDM re-theming"
     mv -v   "${gdm_resource}" "${gdm_resource}.og"
     ln -svf "/usr/local/share/gnome-shell/$(basename ${gdm_resource})" "${gdm_resource}"
     log "INFO" "Custom theme has been built and set for GDM."

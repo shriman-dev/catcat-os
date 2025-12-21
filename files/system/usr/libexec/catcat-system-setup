@@ -56,7 +56,7 @@ if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
     gdm_resource="gnome-shell-theme.gresource"
     if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
         [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
-        cp -v "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+        cp -av "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
     fi
     /usr/bin/dconf update
 #    chmod -c -R 755 /etc/dconf/
