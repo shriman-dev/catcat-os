@@ -316,8 +316,7 @@ toggle-ssh ACTION="":
     case "${OPTION}" in
       "Start SSH Till Next Reboot"|start)
         echo "Starting SSH till next reboot..."
-        sudo ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
-        sudo systemctl unmask sshd.service
+        sudo systemctl unmask sshd.service sshd.socket sshd-unix-local.socket
         sudo systemctl start sshd.service
         echo -e "SSH is now ${green}Started${normal}. You can SSH using:"
         echo -e "${bold}${USER}@${IP_ADDRESS}${normal}"
@@ -325,18 +324,17 @@ toggle-ssh ACTION="":
         ;;
       "Disable SSH"|disable)
         echo "Disabling SSH on boot..."
-        sudo systemctl disable sshd
-        sudo systemctl stop sshd
-        sudo systemctl mask sshd.service
+        sudo systemctl disable sshd.service
+        sudo systemctl stop sshd.service
+        sudo systemctl mask sshd.service sshd.socket sshd-unix-local.socket
         echo -e "SSH is now ${yellow}Disabled${normal}."
         echo " "
         ;;
       "Enable SSH Persistently"|enable)
         echo "Enabling SSH on boot..."
-        sudo ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
-        sudo systemctl unmask sshd.service
-        sudo systemctl enable sshd
-        sudo systemctl start sshd
+        sudo systemctl unmask sshd.service sshd.socket sshd-unix-local.socket
+        sudo systemctl enable sshd.service
+        sudo systemctl start sshd.service
         echo -e "SSH is now ${green}Enabled${normal}. You can SSH using:"
         echo -e "${bold}${USER}@${IP_ADDRESS}${normal}"
         echo " "

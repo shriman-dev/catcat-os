@@ -2,10 +2,9 @@
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
-#sddm.service
+#sddm.service#gdm.service
 services_enable() {
-#fstrim.time libvirtd.service lactd.service coolercontrold.service \
-#sssd-kcm.service sssd.service
+#libvirtd.service
     log "DEBUG" "Enabling system services"
     systemctl -f enable \
         nix.mount \
@@ -21,9 +20,9 @@ services_enable() {
     log "DEBUG" "Done."
 }
 
-#gdm.service
 #setroubleshootd.service
 #packagekitd.service
+#sshd-keygen.target
 DISABLE_SERVICES=(
     "avahi-daemon.service"
     "avahi-daemon.socket"
@@ -69,7 +68,6 @@ DISABLE_SERVICES=(
     "sshd.service"
     "sshd.socket"
     "sshd-unix-local.socket"
-    "sshd-keygen.target"
     "tailscaled.service"
     "tracker-miner-fs-3.service"
     "tracker-miner-fs-control-3.service"
