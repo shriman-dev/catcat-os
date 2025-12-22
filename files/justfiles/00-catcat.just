@@ -352,7 +352,7 @@ toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/catcat/funcvar.sh
     CURRENT_STATE="Disabled"
-    if systemctl is-enabled catcat-nightly-reboot.timer | grep -q enabled; then
+    if systemctl is-enabled nightly-reboot.timer | grep -q enabled; then
       CURRENT_STATE="Enabled"
     fi
     OPTION={{ ACTION }}
@@ -368,9 +368,9 @@ toggle-nightly-reboot ACTION="prompt":
       exit 0
     fi
     if [[ "${OPTION,,}" == "enable" ]]; then
-      sudo systemctl enable --force --now catcat-nightly-reboot.timer
+      sudo systemctl enable --force --now nightly-reboot.timer
     elif [[ "${OPTION,,}" == "disable" ]]; then
-      sudo systemctl disable --force --now catcat-nightly-reboot.timer
+      sudo systemctl disable --force --now nightly-reboot.timer
     fi
 
 # Cancel automatic nightly reboot sequence

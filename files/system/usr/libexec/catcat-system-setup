@@ -90,7 +90,7 @@ fi
 
 # Enable i2c-dev support to configure monitors via ddcutil
 i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
-if [[ ! -f "${i2c_dev_conf}" ]]; then
+if [[ ! -f "${i2c_dev_conf}" ]] && command -v ddcutil; then
     echo "i2c-dev" > "${i2c_dev_conf}"
     # Enable i2c support for nvidia cards
     if command -v nvidia-smi; then

@@ -3,4 +3,4 @@ Description=Nightly Reboot for CatCat OS
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/catcat-nightly-reboot
+ExecStart=/usr/libexec/nightly-reboot
