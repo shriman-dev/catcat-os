@@ -23,6 +23,8 @@ services_enable() {
 #setroubleshootd.service
 #packagekitd.service
 #sshd-keygen.target
+#sshd.socket
+#sshd-unix-local.socket
 DISABLE_SERVICES=(
     "avahi-daemon.service"
     "avahi-daemon.socket"
@@ -66,8 +68,6 @@ DISABLE_SERVICES=(
     "rpm-ostree-countme.timer"
     "rpm-ostreed-automatic.timer"
     "sshd.service"
-    "sshd.socket"
-    "sshd-unix-local.socket"
     "tailscaled.service"
     "tracker-miner-fs-3.service"
     "tracker-miner-fs-control-3.service"
