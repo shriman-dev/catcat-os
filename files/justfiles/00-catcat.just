@@ -293,18 +293,18 @@ toggle-ssh ACTION="":
       SSH_STATUS="Enabled And ${SSH_STATUS_RUNNING[@]^}"
     fi
     OPTION="{{ ACTION }}"
-    if [ "${OPTION}" == "help" ]; then
+    if [[ "${OPTION}" == "help" ]]; then
       echo "Usage: ujust toggle-ssh <option>"
       echo "  <option>: Specify the option to skip the interactive prompt"
       echo "  Use 'start' to start SSH till next reboot"
       echo "  Use 'enable' to enable SSH persistently on boot"
       echo "  Use 'disable' to disable SSH"
       exit 0
-    elif [ "${OPTION}" == "" ]; then
+    elif [[ "${OPTION}" == "" ]]; then
       # Display current status
       echo -e "\n${bold}Hostname:${normal} ${HOSTNAME}"
       echo -e "${bold}IP Address:${normal} ${IP_ADDRESS}"
-      if [ "${SSH_STATUS}" == "Enabled" ]; then
+      if [[ "${SSH_STATUS}" == "Enabled" ]]; then
         echo -e "${bold}SSH Status:${normal} ${green}${SSH_STATUS}${normal}\n"
       else
         echo -e "${bold}SSH Status:${normal} ${yellow}${SSH_STATUS}${normal}\n"
@@ -316,7 +316,7 @@ toggle-ssh ACTION="":
     case "${OPTION}" in
       "Start SSH Till Next Reboot"|start)
         echo "Starting SSH till next reboot..."
-        ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
+        sudo ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
         sudo systemctl unmask sshd.service
         sudo systemctl start sshd.service
         echo -e "SSH is now ${green}Started${normal}. You can SSH using:"
@@ -333,7 +333,7 @@ toggle-ssh ACTION="":
         ;;
       "Enable SSH Persistently"|enable)
         echo "Enabling SSH on boot..."
-        ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
+        sudo ls /etc/ssh/*.pub >/dev/null 2>&1 || sudo ssh-keygen -A
         sudo systemctl unmask sshd.service
         sudo systemctl enable sshd
         sudo systemctl start sshd
