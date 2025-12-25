@@ -4,14 +4,17 @@ source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Running post build image cleanup"
 dnf5 clean all
-rm -rf /tmp/* || true
 find /var/* -maxdepth 0 -type d -not -name "cache" -exec rm -rf {} \;
 find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rf {} \;
+rm -rf /tmp/*
+rm -rf /boot/*
+rm -rf /boot/.*
 
 # Remove stuffs
 #/etc/skel/.config/autostart
 log "INFO" "Removing stuffs"
-rm -rvf /etc/skel/.mozilla /etc/skel/.config/user-tmpfiles.d
+rm -rvf /etc/skel/.mozilla
+rm -rvf /etc/skel/.config/user-tmpfiles.d
 
 # Disable gnome software running in background
 if rpm -q gnome-software; then

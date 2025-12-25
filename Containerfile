@@ -1,4 +1,3 @@
-## MAJOR_VERSION arg must be a version built for the specific image: eg, 39, 40, gts, latest
 ARG BASE_IMAGE_NAME
 ARG IMAGE_NAME
 ARG MAJOR_VERSION
@@ -7,7 +6,11 @@ ARG DATESTAMP
 ARG TIMESTAMP
 ARG COMMIT_SHA
 
-## this is a standard Containerfile FROM using the build ARGs above to select the right upstream image
+# Allow build scripts to be referenced without being copied into the final image
+FROM scratch AS ctx
+COPY files /
+
+### BASE IMAGE
 FROM ${BASE_IMAGE_NAME}:${MAJVER_TAG} AS catcat-os
 
 ARG BASE_IMAGE_NAME
@@ -23,7 +26,24 @@ ENV DATESTAMP="${DATESTAMP}"
 ENV TIMESTAMP="${TIMESTAMP}"
 ENV COMMIT_SHA="${COMMIT_SHA}"
 
-COPY /files /tmp/files
-COPY cosign.pub /etc/pki/containers/catcat-os.pub
+### [IM]MUTABLE /opt
+## Some bootable images, like Fedora, have /opt symlinked to /var/opt, in order to
+## make it mutable/writable for users. However, some packages write files to this directory,
+## thus its contents might be wiped out when bootc deploys an image, making it troublesome for
+## some packages. Eg, google-chrome, docker-desktop.
+##
+## Uncomment the following line if one desires to make /opt immutable and be able to be used
+## by the package manager.
 
-RUN /tmp/files/scripts/setup.sh && ostree container commit
+# RUN rm /opt && mkdir /opt
+
+### MODIFICATIONS
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+        /ctx/scripts/00-setup.sh
+
+### LINTING
+## Verify final image and contents are correct.
+RUN bootc container lint

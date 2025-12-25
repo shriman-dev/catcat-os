@@ -38,7 +38,7 @@ enclosed_heading_this "Refining System With Tweaks And Fixes"
 ${SETUP_DIR}/10-tweaks-and-fixes.sh
 
 enclosed_heading_this "Applying Branding"
-${SETUP_DIR}/11-branding.sh
+${SETUP_DIR}/11-image-info.sh
 
 enclosed_heading_this "Configuring Signing Policy"
 ${SETUP_DIR}/12-signing.sh
@@ -48,3 +48,5 @@ ${SETUP_DIR}/13-initramfs.sh
 
 enclosed_heading_this "Post Build Cleaning"
 ${SETUP_DIR}/14-post-setup.sh
+
+ostree container commit

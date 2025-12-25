@@ -3,7 +3,6 @@ set -oue pipefail
 source ${SETUP_DIR}/funcvar.sh
 
 log "INFO" "Creating needed directories"
-mkdir -vp /usr/etc/dconf/db/distro.d
 mkdir -vp /etc/dconf/db/distro.d
 mkdir -vp /var/lib/alternatives
 mkdir -vp /etc/catcat-os
