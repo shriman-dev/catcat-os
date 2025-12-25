@@ -84,11 +84,11 @@ jobs:
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           if [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "bazzite" ]]; then
-              echo "MAJVER_TAG=stable-${MAJOR_VERSION}" >> $GITHUB_ENV
+              echo "TAG_VER=stable-${MAJOR_VERSION}" >> $GITHUB_ENV
           elif [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "ucore" ]]; then
-              echo "MAJVER_TAG=stable" >> $GITHUB_ENV
+              echo "TAG_VER=stable" >> $GITHUB_ENV
           else
-              echo "MAJVER_TAG=${MAJOR_VERSION}" >> $GITHUB_ENV
+              echo "TAG_VER=${MAJOR_VERSION}" >> $GITHUB_ENV
           fi
 
       # Build metadata
@@ -129,7 +129,7 @@ jobs:
             IMAGE_NAME=${{ matrix.IMAGE_NAME }}
             BASE_IMAGE_NAME=${{ matrix.BASE_IMAGE_NAME }}
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-            MAJVER_TAG=${{ env.MAJVER_TAG }}
+            TAG_VER=${{ env.TAG_VER }}
             DATESTAMP=${{ env.DATESTAMP }}
             TIMESTAMP=${{ env.TIMESTAMP }}
             COMMIT_SHA=${{ env.COMMIT_SHA }}

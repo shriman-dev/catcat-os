@@ -133,8 +133,6 @@ DESKTOP_COMMON=(
     # More Terminal Tools
     ##poppler # pdf rendering library
     "aria2"
-    "yad"
-    "zenity"
     "ddcutil"
     "brightnessctl"
 
@@ -218,6 +216,8 @@ DESKTOP_COMMON=(
     "yubikey-manager"
 
     # Needed Deps
+    "yad"
+    "zenity"
     "i2c-tools"
     "alsa-firmware"
     "grub2-tools-extra"

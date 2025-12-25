@@ -3,29 +3,14 @@ set -oue pipefail
 source ${SETUP_DIR}/funcvar.sh
 
 log "INFO" "Debloating image"
-
-if [[ ${IMAGE_NAME} =~ "-sv" ]]; then
-    dnf5 -y remove \
-        NetworkManager-cloud-setup \
-        WALinuxAgent-udev \
-        avahi \
-        avahi-libs \
-        azure-vm-utils \
-        coreos-installer \
-        docker-cli \
-        fuse-sshfs \
-        google-compute-engine-guest-configs-udev \
-        irqbalance \
-        moby-engine \
-        toolbox \
-        zincati
-fi
-
-if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
+#avahi avahi-libs fuse-sshfs irqbalance
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
     dnf5 -y remove \
+        azure-vm-utils \
         bazaar \
         btrfs-assistant \
+        coreos-installer \
+        docker-cli \
         fastfetch \
         f"$(rpm -E %fedora)"-backgrounds-base \
         fedora-bookmarks \
@@ -42,15 +27,18 @@ if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
         gnome-software-rpm-ostree \
         gnome-terminal-nautilus \
         gnome-tour \
+        google-compute-engine-guest-configs-udev \
         htop \
         httpd \
         httpd-core \
         libvirt \
         libvirt-libs \
         libvncserver \
+        moby-engine \
         mod_dnssd \
         mod_http2 \
         mod_lua \
+        NetworkManager-cloud-setup \
         nvtop \
         openssh-askpass \
         passim \
@@ -69,10 +57,11 @@ if [[ ! ${IMAGE_NAME} =~ "-sv" ]]; then
         ublue-os-update-services \
         unrar \
         uupd \
+        WALinuxAgent-udev \
         webapp-manager \
         xdotool \
         ydotool \
-        yelp
-fi
+        yelp \
+        zincati
 
 log "INFO" "Done."
