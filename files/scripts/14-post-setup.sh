@@ -9,7 +9,7 @@ find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostre
 rm -rvf /var/log/*
 rm -rvf /boot/.*
 rm -rvf /boot/*
-rm -rf /tmp/*
+rm -rvf /tmp/*
 
 # Remove stuffs
 #/etc/skel/.config/autostart
