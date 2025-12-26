@@ -317,15 +317,15 @@ toggle-ssh ACTION="":
       "Start SSH Till Next Reboot"|start)
         echo "Starting SSH till next reboot..."
         sudo systemctl unmask sshd.service sshd.socket sshd-unix-local.socket
-        sudo systemctl start sshd.service
+        sudo systemctl start  sshd.service sshd-unix-local.socket
         echo -e "SSH is now ${green}Started${normal}. You can SSH using:"
         echo -e "${bold}${USER}@${IP_ADDRESS}${normal}"
         echo " "
         ;;
       "Disable SSH"|disable)
         echo "Disabling SSH on boot..."
-        sudo systemctl disable sshd.service
-        sudo systemctl stop sshd.service
+        sudo systemctl disable sshd.service sshd-unix-local.socket
+        sudo systemctl stop sshd.service sshd-unix-local.socket
         sudo systemctl mask sshd.service sshd.socket sshd-unix-local.socket
         echo -e "SSH is now ${yellow}Disabled${normal}."
         echo " "
@@ -334,7 +334,7 @@ toggle-ssh ACTION="":
         echo "Enabling SSH on boot..."
         sudo systemctl unmask sshd.service sshd.socket sshd-unix-local.socket
         sudo systemctl enable sshd.service
-        sudo systemctl start sshd.service
+        sudo systemctl start  sshd.service sshd-unix-local.socket
         echo -e "SSH is now ${green}Enabled${normal}. You can SSH using:"
         echo -e "${bold}${USER}@${IP_ADDRESS}${normal}"
         echo " "

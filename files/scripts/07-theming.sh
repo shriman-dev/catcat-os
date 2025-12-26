@@ -83,7 +83,7 @@ install_icon_themes() {
     mkdir -vp "${papirus_tar}.extract"
     tar -xf "${papirus_tar}" -C "${papirus_tar}.extract" --strip-components=1
     cp -drf "${papirus_tar}.extract"/Papirus* /usr/share/icons/
-    rm -rf "${papirus_tar}.extract"
+    rm -rf "${papirus_tar}"*
     log "INFO" "Done."
 }
 
@@ -98,7 +98,8 @@ install_gtk_themes() {
     tar -xf "${lavanda_tar}" -C "${lavanda_tar}.extract" --strip-components=1
     chmod -v +x "${lavanda_tar}.extract"/install.sh
     "${lavanda_tar}.extract"/install.sh --color light dark
-    rm -rf "${lavanda_tar}.extract"
+    
+    rm -rf "${lavanda_tar}"*
 
     # Catppuccin-Gtk-Theme
     log "INFO" "Catppuccin-Gtk-Theme"
@@ -163,6 +164,7 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     glib-compile-resources --sourcedir=${gmd_theme_tmp}/theme/ "${gmd_theme_tmp}/theme/${gdm_xml}"
     mv -v "${gmd_theme_tmp}/theme/$(basename ${gdm_resource})" "${gdm_resource}"
 
+    rm -rf "${gmd_theme_tmp}"
     log "INFO" "All done."
 
     # Default settings for gdm
@@ -207,6 +209,7 @@ install_vscodium_ext() {
         codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir \
                             /etc/skel/.vscode-oss/extensions --install-extension ${ext}
     done
+    rm -rf /tmp/vscodiumdata
     log "INFO" "Done."
 }
 
