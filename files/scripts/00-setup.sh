@@ -3,6 +3,8 @@ set -oue pipefail
 export SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source ${SETUP_DIR}/funcvar.sh
 
+echo "$(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
+
 enclosed_heading_this() {
     local text="${1}" padding_char="${2:-=}" output_width=${3:-120}
     enclosed_heading "${text}" "${padding_char}" ${output_width}
