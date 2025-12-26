@@ -4,11 +4,12 @@ source /usr/lib/catcat/funcvar.sh
 
 log "INFO" "Running post setup cleanup"
 dnf5 clean all
-find /var/* -maxdepth 0 -type d -not -name "cache" -exec rm -rf {} \;
-find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rf {} \;
-rm -rf /tmp/*
-rm -rf /boot/*
-rm -rf /boot/.*
+find /var/* -maxdepth 0 -type d -not -name "log" -not -name "cache" -exec rm -rvf {} \;
+find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rvf {} \;
+rm -rvf /var/log/*
+rm -rvf /tmp/*
+rm -rvf /boot/*
+rm -rvf /boot/.*
 
 # Remove stuffs
 #/etc/skel/.config/autostart
@@ -26,5 +27,5 @@ if rpm -q gnome-software; then
     rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
 fi
 
-mkdir -p /var/tmp
-chmod -R 1777 /var/tmp
+mkdir -vp /var/tmp
+chmod -vR 1777 /var/tmp
