@@ -335,12 +335,12 @@ log "INFO" "Done."
 
 
 log "INFO" "Disabling repos no longer needed"
+sed -i 's|enabled_metadata=.*|enabled_metadata=0|g' /etc/yum.repos.d/terra*.repo
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra.repo
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-mesa.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo || true
-sed -i 's|enabled_metadata=.*|enabled_metadata=0|g' /etc/yum.repos.d/terra*.repo
 dnf5 -y copr disable bazzite-org/bazzite || true
 dnf5 -y copr disable bazzite-org/bazzite-multilib || true
 dnf5 -y copr disable bazzite-org/rom-properties || true
