@@ -39,7 +39,7 @@ DESKTOP_EXTRAS=(
     "ffmpegthumbnailer"
     "kpcli"
     #watchexec
-    "$(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*-x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
+    "$(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
