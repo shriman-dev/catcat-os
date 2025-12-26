@@ -22,6 +22,7 @@ toggle_localdns() {
             log "INFO" "Enabling local DNS..."
             { cp ${VERBOSE:+-v} -f "/usr/${CONFIG_DIR}/localdns-server.conf" \
                             /etc/NetworkManager/conf.d/ &&
+              ${SYSTEMCTL} enable --force --now dns-blocklist-updater.timer &&
               if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  touch "${DNSCRYPTDIR}/domains-blocklist.txt"
                  ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
@@ -38,6 +39,7 @@ toggle_localdns() {
         disable)
             log "INFO" "Disabling local DNS..."
             { rm -f ${VERBOSE:+-v} /etc/NetworkManager/conf.d/localdns-server.conf &&
+              ${SYSTEMCTL} disable --force --now dns-blocklist-updater.timer &&
               if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then

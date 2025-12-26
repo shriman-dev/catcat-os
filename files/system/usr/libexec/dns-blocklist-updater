@@ -9,6 +9,6 @@ if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then
     localdnsctl -v --restart | tee -a "${blocklist_autoupdate_log}"
 else
     log "INFO" "Nothing to do."
-    log "INFO" "DNS blocklist will be updated after $((four_days / 86400)) days."
+    log "INFO" "DNS blocklist updates after every $((four_days / 86400)) days."
     log "INFO" "Use 'localdnsctl' command to update DNS blocklist manually."
 fi

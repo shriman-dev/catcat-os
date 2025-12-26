@@ -339,6 +339,7 @@ main() {
 if [[ $# -eq 0 ]]; then
     SCOPE="--system"
     grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+        mkdir -pv /var/lib/flatpak/overrides
         apply_global_restrictions
     }
 fi

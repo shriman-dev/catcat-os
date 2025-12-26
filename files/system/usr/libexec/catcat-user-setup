@@ -233,11 +233,13 @@ unset rc'
 theme_flatpak_apps() {
     log "INFO" "Setting theme, icons and permissions for flatpak apps..."
 
-    [[ ! -d "${LOCALSHARE}/flatpak/overrides" ]] && mkdir -pv "${LOCALSHARE}/flatpak/overrides"
-
     grep 'devices=.*!all' "${LOCALSHARE}/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+        [[ ! -d "${LOCALSHARE}/flatpak/overrides" ]] &&
+            mkdir -vp "${LOCALSHARE}/flatpak/overrides"
+
         [[ -f "${LOCALSHARE}/flatpak/overrides/global" ]] &&
             bak_before "${LOCALSHARE}/flatpak/overrides/global"
+
         /usr/libexec/catcat-flatpak-manager --user --all ||
             err "Failed to configure flatpak permissions"
     }
