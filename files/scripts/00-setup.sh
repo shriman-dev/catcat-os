@@ -46,7 +46,7 @@ ${SETUP_DIR}/12-signing.sh
 enclosed_heading_this "Regenerating Initramfs"
 ${SETUP_DIR}/13-initramfs.sh
 
-enclosed_heading_this "Post Build Cleaning"
+enclosed_heading_this "Post Build Setup"
 ${SETUP_DIR}/14-post-setup.sh
 
 ostree -v container commit

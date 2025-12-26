@@ -83,6 +83,7 @@ install_icon_themes() {
     mkdir -vp "${papirus_tar}.extract"
     tar -xf "${papirus_tar}" -C "${papirus_tar}.extract" --strip-components=1
     cp -drf "${papirus_tar}.extract"/Papirus* /usr/share/icons/
+    rm -rf "${papirus_tar}.extract"
     log "INFO" "Done."
 }
 

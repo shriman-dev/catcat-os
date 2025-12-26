@@ -27,5 +27,8 @@ if rpm -q gnome-software; then
     rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
 fi
 
+log "INFO" "Running post setup configuring"
+touch /etc/resolv.conf
+
 mkdir -vp /var/tmp
 chmod -vR 1777 /var/tmp
