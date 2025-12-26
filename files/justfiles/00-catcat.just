@@ -183,7 +183,8 @@ check-local-overrides:
              --exclude="grub" \
              --exclude="system.control*" \
              --exclude="cdi" \
-             --exclude="default.target" \
+             --exclude="public-resolvers.md*" \
+             --exclude="relays.md*" \
              --exclude="domains-blocklist.*" \
              /usr/etc /etc 2>/dev/null | sed '/Binary\ files\ /d' | \
                 rg --color=always --colors 'match:fg:yellow' --passthru 'Only in.*'
