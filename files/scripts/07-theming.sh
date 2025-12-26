@@ -98,6 +98,7 @@ install_gtk_themes() {
     tar -xf "${lavanda_tar}" -C "${lavanda_tar}.extract" --strip-components=1
     chmod -v +x "${lavanda_tar}.extract"/install.sh
     "${lavanda_tar}.extract"/install.sh --color light dark
+    rm -rf "${lavanda_tar}.extract"
 
     # Catppuccin-Gtk-Theme
     log "INFO" "Catppuccin-Gtk-Theme"
@@ -107,6 +108,7 @@ install_gtk_themes() {
     chmod -v +x "${catppuccin_theme_tmp}"/install.sh
     "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all \
                                             --color dark --tweaks catppuccin rimless
+    rm -rf "${catppuccin_theme_tmp}"
     log "INFO" "All done."
 }
 
