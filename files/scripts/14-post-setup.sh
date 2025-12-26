@@ -7,9 +7,9 @@ dnf5 clean all
 find /var/* -maxdepth 0 -type d -not -name "log" -not -name "cache" -exec rm -rvf {} \;
 find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rvf {} \;
 rm -rvf /var/log/*
-rm -rvf /tmp/*
-rm -rvf /boot/*
 rm -rvf /boot/.*
+rm -rvf /boot/*
+rm -rf /tmp/*
 
 # Remove stuffs
 #/etc/skel/.config/autostart
