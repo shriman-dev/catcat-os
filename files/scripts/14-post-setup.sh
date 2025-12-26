@@ -2,7 +2,7 @@
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
 
-log "INFO" "Running post build image cleanup"
+log "INFO" "Running post setup cleanup"
 dnf5 clean all
 find /var/* -maxdepth 0 -type d -not -name "cache" -exec rm -rf {} \;
 find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rf {} \;
@@ -12,7 +12,7 @@ rm -rf /boot/.*
 
 # Remove stuffs
 #/etc/skel/.config/autostart
-log "INFO" "Removing stuffs"
+log "INFO" "Removing more stuffs"
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
 

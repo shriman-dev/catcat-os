@@ -104,7 +104,8 @@ install_gtk_themes() {
     local catppuccin_theme_tmp="/tmp/Catppuccin-Gtk-Theme"
     git clone "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
     chmod -v +x "${catppuccin_theme_tmp}"/install.sh
-    "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all --color dark --tweaks catppuccin rimless
+    "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all \
+                                            --color dark --tweaks catppuccin rimless
     log "INFO" "All done."
 }
 
@@ -177,7 +178,8 @@ apply_default_configs() {
     log "INFO" "Setting default icon and theme for the OS"
     sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 
-    cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
+    cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} \
+                            /usr/share/themes/Default/
     cp -drf /usr/share/themes/Catppuccin-Orange-Dark/gtk-4.0 /etc/skel/.config/
 
     /usr/bin/dconf update
@@ -199,7 +201,8 @@ install_vscodium_ext() {
     log "INFO" "Install extensions for vscodium"
     mkdir -vp /tmp/vscodiumdata /etc/skel/.vscode-oss/extensions
     for ext in "${vscodium_extlist[@]}"; do
-        codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir /etc/skel/.vscode-oss/extensions --install-extension ${ext}
+        codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir \
+                            /etc/skel/.vscode-oss/extensions --install-extension ${ext}
     done
     log "INFO" "Done."
 }

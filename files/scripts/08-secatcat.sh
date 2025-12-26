@@ -63,13 +63,13 @@ rm -rvf "${tmp_chrony}"
 # Enable MAC randomization and temporary IPv6 addresses generation
 log "INFO" "Enabling MAC randomization and dynamic IPv6 address generation"
 networkmanager_confd="/usr/lib/NetworkManager/conf.d"
+#ethernet.cloned-mac-address=random
 cat > "${networkmanager_confd}/mac-randomization.conf" << EOF
 [device]
 wifi.scan-rand-mac-address=yes
 
 [connection]
 wifi.cloned-mac-address=random
-ethernet.cloned-mac-address=random
 EOF
 
 cat > "${networkmanager_confd}/privacy_ext_ipv6.conf" << EOF

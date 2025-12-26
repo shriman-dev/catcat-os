@@ -49,4 +49,4 @@ ${SETUP_DIR}/13-initramfs.sh
 enclosed_heading_this "Post Build Cleaning"
 ${SETUP_DIR}/14-post-setup.sh
 
-ostree container commit
+ostree -v container commit
