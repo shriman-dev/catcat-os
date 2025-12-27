@@ -376,12 +376,12 @@ toggle-nightly-reboot ACTION="prompt":
 [group("nightly reboot")]
 cancel-nightly-reboot:
     #!/usr/bin/bash
-    if [[ ! -d /tmp/CATCAT_NIGHTLY_REBOOT ]]; then
+    if [[ ! -d /run/NIGHTLY_REBOOT ]]; then
         echo "Nightly reboot was not sequenced correctly"
         exit 1
     fi
-    echo "${USER}" | tee /tmp/CATCAT_NIGHTLY_REBOOT/user
-    touch /tmp/CATCAT_NIGHTLY_REBOOT/cancelled_by_user_"${USER}"
+    echo "${USER}" | tee /run/NIGHTLY_REBOOT/user
+    echo "Nightly reboot was cancelled by user: ${USER}" | tee /run/NIGHTLY_REBOOT/cancelled
 
 # Enable or Disable Gnome Extension
 [group("gnome desktop")]

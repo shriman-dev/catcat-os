@@ -7,40 +7,48 @@ CONFIG="${HOME_DIR}/.config"
 LOCALSHARE="${HOME_DIR}/.local/share"
 SKEL="/etc/skel"
 CATCAT_CONF="${LOCALSHARE}/catcat-os"
-FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ${LOCALSHARE}/flatpak/app/)"
-ENABLED_GNOME_EXTENSIONS="$(dconf read /org/gnome/shell/enabled-extensions)"
 
 on_first_boot() {
   if [[ ! -f "${CATCAT_CONF}/first-boot" ]]; then
-    mkdir -pv "${CATCAT_CONF}" || err "${CATCAT_CONF} creation failed"
-    dconf reset -f /org/gnome/Ptyxis
+    FIRSTBOOT=true
+    mkdir -pv "${CATCAT_CONF}"
+    systemctl is-active gdm &&
+        dconf reset -f /org/gnome/Ptyxis
     echo 'first boot' > "${CATCAT_CONF}/first-boot"
   fi
 }
 
 # sync default configs for user home
 sync_default_configs() {
-  local update_sha="/etc/catcat-os/update_sha"
-  local prev_sha="${CATCAT_CONF}/update_sha_previous"
+    local update_sha="/etc/catcat-os/update_sha"
+    local prev_sha="${CATCAT_CONF}/update_sha_previous"
 
-  if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
     log "INFO" "Updating configs..."
-    CATCAT_SYSTEM_UPDATED=true
-    mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR" || err "${CATCAT_CONF}/LS_COLORS_DIR creation failed"
-    cp -drf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach "${CATCAT_CONF}/LS_COLORS_DIR"/
+    if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
+        CATCAT_SYSTEM_UPDATED=true
+        mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR"
+        cp -fv /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
+                "${CATCAT_CONF}/LS_COLORS_DIR/catppuccin-mocha-peach"
 
-    rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
-        err "Skel update failed"
-    rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/ ||
-        err "Gnome extensions update failed"
+        rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
+            err "Skel update failed"
 
-    rm -rf "${LOCALSHARE}/themes"/*{Catppuccin,Lavanda}*
-    cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/ ||
-        err "Theme update failed"
+        cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
+    fi
 
-    cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
+    if systemctl is-active display-manager; then
+        if ! diff -q "${update_sha}" "${prev_sha}_ii" >/dev/null 2>&1; then
+            CATCAT_DESKTOP_UPDATED=true
+            systemctl is-active gdm &&
+                rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/
+
+            { rm -rf "${LOCALSHARE}/themes"/*{Catppuccin,Lavanda}*
+              cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/; } ||
+                err "Theme update failed"
+            cp -fv "${update_sha}" "${prev_sha}_ii" || err "SHA update failed"
+        fi
+    fi
     log "INFO" "Configs updated"
-  fi
 }
 
 
@@ -55,14 +63,14 @@ gnome_shell_setup() {
         log "INFO" "Extensions update directory octal permission set to ${octalmode}"
 
     # Setup dash to panel
-    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
+    if [[ -n ${CATCAT_DESKTOP_UPDATED} ]]; then
         sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' \
             "${LOCALSHARE}/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css" ||
                 err "Dash to panel style setup failed"
     fi
 
     # Syncthing style
-    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
+    if [[ -n ${CATCAT_DESKTOP_UPDATED} ]]; then
         sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' \
             ${LOCALSHARE}/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg ||
                 err "Syncthing style setup failed"
@@ -81,16 +89,15 @@ gnome_shell_setup() {
     local forge_stylesheet="forge/stylesheet/forge/stylesheet.css"
     if [[ $(grep -c 'border-width: 1px' "${CONFIG}/${forge_stylesheet}") -lt 6 ]]; then
         bak_before "${CONFIG}/forge"
-        cp -drv "${SKEL}/.config/${forge_stylesheet}" "${CONFIG}/${forge_stylesheet}" ||
+        cp -drvf "${SKEL}/.config/${forge_stylesheet}" "${CONFIG}/${forge_stylesheet}" ||
             err "Forge style setup failed"
     fi
 
     # Gnome for Handheld
-    local check_firstboot=$(stat -c "%Y" /etc/catcat-os/first-boot)
     if command -v hhdctl; then
         [[ "${ENABLED_GNOME_EXTENSIONS}" =~ "gjsosk@vishram1123.com" ]] ||
             gnome-extensions enable gjsosk@vishram1123.com
-        [[ ${check_firstboot} -lt $(( $(date +%s) - 600 )) ]] &&
+        [[ -n ${FIRSTBOOT} ]] &&
             dconf write /org/gnome/desktop/interface/text-scaling-factor "1.2"
     fi
 
@@ -124,7 +131,6 @@ gnome_shell_setup() {
 
 set_folder_icons() {
   # Set folder icons
-  if command -v gio; then
     if [[ ! "$(gio info -a metadata "${HOME_DIR}/Me")" =~ (custom-icon-name|user-home) ]]; then
         log "INFO" "Setting up folder icons"
         local -A icons=(
@@ -146,7 +152,6 @@ set_folder_icons() {
         done
         log "INFO" "Done"
     fi
-  fi
 }
 
 
@@ -154,15 +159,17 @@ setup_bookmarks_userdirs() {
     local user_dirs_file="${CONFIG}/user-dirs.dirs"
     local bookmarks="${CONFIG}/gtk-3.0/bookmarks"
 
-    log "INFO" "Setting up default user directories and adding Bookmarks..."
-    grep "HOME/Me/" "${user_dirs_file}" || {
+    if ! grep "HOME/Me/" "${user_dirs_file}"; then
+        log "INFO" "Setting up default user directories..."
         bak_before "${user_dirs_file}"
         cp -drvf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}"/ ||
                 err "Failed to set default user directories"
-    }
+    fi
 
     mkdir -pv /tmp/tmp-${USER}
-    grep "admin:/// AdminRoot" "${bookmarks}" || {
+    if systemctl is-active gdm; then
+        if ! grep "admin:/// AdminRoot" "${bookmarks}"; then
+        log "INFO" "Adding Bookmarks"
         bak_before "${bookmarks}"
         mkdir -pv "$(dirname "${bookmarks}")" &&
         sh -c "echo 'file:///home/${USER}/Me Me
@@ -174,8 +181,8 @@ file:///home/${USER}/Me/Music Music
 file:///home/${USER}/Me/Notes Notes
 admin:/// AdminRoot
 file:///tmp/tmp-${USER} Temporary' > ${bookmarks}" || err "Failed to add bookmarks"
-    }
-    log "INFO" "Done"
+        fi
+    fi
 }
 
 
@@ -211,11 +218,14 @@ remove_unnecessary_directories() {
 
 shell_setup() {
     log "INFO" "Setting up shell..."
-    [[ -n ${CATCAT_SYSTEM_UPDATED} ]] && /usr/bin/bat cache --build
+    /usr/bin/bat cache --build
 
     # Fish shell
-    [[ -n ${CATCAT_SYSTEM_UPDATED} ]] &&
-        { cp -drfv ${SKEL}/.config/fish "${CONFIG}"/ || err "Failed to setup fish_variables"; }
+    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
+        [[ ! -d "${CONFIG}/fish" ]] && mkdir -vp "${CONFIG}/fish"
+        cp -v --update=none "${SKEL}/.config/fish/fish_variables" "${CONFIG}/fish/fish_variables" ||
+            err "Failed to setup fish_variables"
+    fi
 
     local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
@@ -233,7 +243,7 @@ unset rc'
 theme_flatpak_apps() {
     log "INFO" "Setting theme, icons and permissions for flatpak apps..."
 
-    grep 'devices=.*!all' "${LOCALSHARE}/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+    if ! grep 'devices=.*!all' "${LOCALSHARE}/flatpak/overrides/global" | grep 'devices=.*!kvm'; then
         [[ ! -d "${LOCALSHARE}/flatpak/overrides" ]] &&
             mkdir -vp "${LOCALSHARE}/flatpak/overrides"
 
@@ -242,13 +252,14 @@ theme_flatpak_apps() {
 
         /usr/libexec/catcat-flatpak-manager --user --all ||
             err "Failed to configure flatpak permissions"
-    }
+    fi
 
     if [[ ! "$(ls -Al "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]]; then
         mkdir -pv ${LOCALSHARE}/{themes,icons,fonts}
         for dir in themes icons; do
             [[ -d "${HOME_DIR}/.${dir}" ]] &&
-            cp -drf "${HOME_DIR}/.${dir}"/* "${LOCALSHARE}/${dir}"/ && rm -rvf "${HOME_DIR}/.${dir}"
+            cp -drf "${HOME_DIR}/.${dir}"/* "${LOCALSHARE}/${dir}"/ &&
+            rm -rvf "${HOME_DIR}/.${dir}"
             ln -srfTv "${LOCALSHARE}/${dir}" "${HOME_DIR}/.${dir}"
         done
 
@@ -268,7 +279,7 @@ setup_apps() {
 
     # Handle desktop entries
     # Prioritize flatpak steam
-    if [[ ! -f "${apps_dir}/steam.desktop" ]] || [[ ! -s "${apps_dir}/steam.desktop" ]]; then
+    if [[ ! -f "${apps_dir}/steam.desktop" || ! -s "${apps_dir}/steam.desktop" ]]; then
         command -v steam && [[ "${FLATPAK_APPS}" =~ 'steam' ]] &&
             sed "/\[Desktop Entry\]/a NoDisplay=true" /usr/share/applications/steam.desktop > \
                     "${apps_dir}/steam.desktop"
@@ -282,7 +293,7 @@ setup_apps() {
     )
 
     for app in "${!app_icons[@]}"; do
-        if [[ ! -f "${apps_dir}/${app}.desktop" ]] || [[ ! -s "${apps_dir}/${app}.desktop" ]]; then
+        if [[ ! -f "${apps_dir}/${app}.desktop" || ! -s "${apps_dir}/${app}.desktop" ]]; then
             [[ "${FLATPAK_APPS}" =~ "${app}" ]] &&
                 sed "s|^Icon=.*|Icon=${app_icons[${app}]}|" \
                     "/var/lib/flatpak/exports/share/applications/${app}.desktop" > \
@@ -317,13 +328,19 @@ setup_apps() {
 main() {
     on_first_boot
     sync_default_configs
-    gnome_shell_setup
-    set_folder_icons
-    setup_bookmarks_userdirs
-    remove_unnecessary_directories
     shell_setup
-    theme_flatpak_apps
-    setup_apps
+    remove_unnecessary_directories
+    setup_bookmarks_userdirs
+    if systemctl is-active display-manager; then
+        FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/ ${LOCALSHARE}/flatpak/app/)"
+        if systemctl is-active gdm; then
+            ENABLED_GNOME_EXTENSIONS="$(dconf read /org/gnome/shell/enabled-extensions)"
+            set_folder_icons
+            gnome_shell_setup
+        fi
+        theme_flatpak_apps
+        setup_apps
+    fi
 }
 main
 

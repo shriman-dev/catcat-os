@@ -173,16 +173,20 @@ run_as_users() {
 
 notify_users() {
     local running_user
-    for running_user in /run/user/*; do
-        local some_user_id=$(basename "${running_user}")
-        local some_user="$(id -u -n $(basename "${some_user_id}"))"
-        if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-            log "INFO" "Sending notification to user: ${some_user}"
-            sudo -u "${some_user}" \
-                DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
-                notify-send -i "${1}" -a "${2}" "${3}" "${4}"
-        fi
-    done
+    if systemctl is-active display-manager; then
+        for running_user in /run/user/*; do
+            local some_user_id=$(basename "${running_user}")
+            local some_user="$(id -un "${some_user_id}")"
+            if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
+                log "INFO" "Sending notification to user: ${some_user}"
+                sudo -u "${some_user}" \
+                    DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
+                    notify-send -i "${1}" -a "${2}" "${3}" "${4}"
+            fi
+        done
+    else
+        err "Notification failed: display-manager was not running."
+    fi
 }
 
 # Check if a file is older than a specified number of seconds
