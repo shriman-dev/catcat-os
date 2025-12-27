@@ -21,6 +21,9 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
     # Update grubup
     /usr/bin/grubup
 
+    # Set default tty fonts
+    replace_add 'FONT=' 'FONT=sun12x22' /etc/vconsole.conf
+
     # Show grub screen for desktop devices
     hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
 

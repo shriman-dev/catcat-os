@@ -16,7 +16,7 @@ send_warning() {
 reboot_sys() {
     log "INFO" "Performing nightly system reboot"
     wall "Performing nightly system reboot."
-    notify_all "Nightly Reboot" "Rebooting now..."
+    notify_all "Nightly System Reboot" "Rebooting now..."
     sleep 2
     /usr/bin/reboot -f
 }
