@@ -1,0 +1,11 @@
+<b><span size="large">Version 14 (2025-03-02)</span></b>
+
+• Add Weather Forecast Widget.
+• Add GNOME 48 support.
+• Use new text field in settings to allow easier line break usage.
+• Fix 'Lock Position' and 'Always on Top' switches.
+• Fix non-translatable strings in settings.
+• Use Desktop Widgets as project name.
+• Show notification when project receives an update.
+    - Option to turn off can be found in settings.
+• Add Donate Page to settings.

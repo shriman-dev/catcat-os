@@ -1,0 +1,66 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+REBOOT_DELAY=300  # 5 minutes
+
+
+notify_all() {
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot" "${1}" "${2}"
+}
+
+# Broadcast warning to all users and send warning notification
+send_warning() {
+    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nujust cancel_nightly_reboot')"
+    notify_all "System will reboot in 5 minutes" \
+            "To cancel run command: \"ujust cancel_nightly_reboot\""
+}
+
+monitor_cancel_file() {
+    local cancel_file="/tmp/CATCAT_NIGHTLY_REBOOT/user"
+    local attempts=0
+    local max_attempts=${REBOOT_DELAY}
+
+    mkdir -pv /tmp/CATCAT_NIGHTLY_REBOOT
+    chmod -R 666 /tmp/CATCAT_NIGHTLY_REBOOT
+    while [[ ${attempts} -lt ${max_attempts} ]]; do
+        if [[ -f "${cancel_file}" ]]; then
+            log "INFO" "Cancel file detected: ${cancel_file}"
+            local cancel_user="$(cat ${cancel_file})"
+            kill -s SIGKILL ${reboot_cmd_pid}
+            log "INFO" "Reboot cancelled by user: ${cancel_user}"
+            wall "Nightly Reboot was cancelled by user: ${cancel_user}"
+            notify_all "Nightly Reboot was cancelled by user: ${cancel_user}"
+            rm -v /tmp/CATCAT_NIGHTLY_REBOOT/user
+            return 0
+            break
+        fi
+        ((attempts++))
+        sleep 1
+    done
+
+    log "INFO" "Monitoring timeout reached"
+    return 1
+}
+
+# Main reboot sequence
+main() {
+    log "INFO" "Starting nightly reboot sequence..."
+    {
+        sleep ${REBOOT_DELAY}
+        log "INFO" "Performing system reboot"
+        wall "System reboot imminent. Stopping all processes."
+        notify_all "Nightly Reboot Imminent" "Rebooting now..."
+        sleep 2
+        /usr/bin/reboot -f
+    } &
+
+    reboot_cmd_pid=$!
+    log "INFO" "Reboot command PID: ${reboot_cmd_pid}"
+
+    send_warning
+    log "INFO" "Reboot warning sent."
+
+    monitor_cancel_file
+}
+
+main
+

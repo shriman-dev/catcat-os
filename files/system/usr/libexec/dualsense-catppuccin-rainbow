@@ -1,0 +1,50 @@
+#!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+exit_if_root
+
+interpolate() {
+    local start=(${1}) end=(${2}) step=${3} steps=${4}
+    local rr=$((start[0] + (step * (end[0] - start[0]) / steps)))
+    local gg=$((start[1] + (step * (end[1] - start[1]) / steps)))
+    local bb=$((start[2] + (step * (end[2] - start[2]) / steps)))
+    echo "${rr} ${gg} ${bb}"
+}
+
+colors=(
+    "245 224 220" # Rosewater
+    "245 194 231" # Pink
+    "203 166 247" # Mauve
+    "243 139 168" # Red
+    "235 160 172" # Maroon
+    "250 179 135" # Peach
+    "249 226 175" # Yellow
+    "108 255 95"  # Green (vivid)
+    "148 226 213" # Teal
+    "116 199 236" # Sapphire
+    "137 180 250" # Blue
+    "180 190 254" # Lavender
+)
+
+while true; do
+    if grep -i 'dualsense' /proc/bus/input/devices; then
+        dualsensectl microphone off
+        dualsensectl player-leds 0
+        dualsensectl speaker both
+        dualsensectl volume 255
+
+        for (( i=0; i<${#colors[@]}; i++ )); do
+            next=$(( (i + 1) % ${#colors[@]} ))
+            for step in {0..10}; do
+                if ! grep -iq 'dualsense' /proc/bus/input/devices; then
+                    break 2
+                fi
+                interpolate=$(interpolate "${colors[i]}" "${colors[next]}" ${step} 10)
+                echo -e "\033[48;2;${interpolate// /;}m                     \033[0m"
+                dualsensectl lightbar ${interpolate} 150
+                sleep 0.3
+            done
+        done
+    else
+        sleep 5
+    fi
+done

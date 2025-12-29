@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: 2023 Pedro Sader Azevedo
+# SPDX-FileCopyrightText: 2023 Aleksandr Mezin <mezin.alexander@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Desktop Entry]
+Type=Application
+Name[de]=ddterm
+Name[es]=ddterm
+Name[fr]=ddterm
+Name[it]=ddterm
+Name[pl]=ddterm
+Name[pt]=ddterm
+Name[ru]=ddterm
+Name[zh_CN]=ddterm
+Name[eo]=ddterm
+Name[tr]=ddterm
+Name=ddterm
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+Keywords[de]=shell;prompt;command;commandline;cmd;run;terminal;Eingabeaufforderung;Befehl;Befehlszeile;ausführen;
+Keywords[es]=shell;prompt;command;commandline;cmd;run;terminal;
+Keywords[fr]=shell;prompt;invite;command;commande;commandline;cmd;run;exécuter;terminal;
+Keywords[pl]=shell;prompt;command;commandline;cmd;run;terminal;
+Keywords[pt]=shell;prompt;command;commandline;cmd;run;terminal;
+Keywords[ru]=оболочка;подсказка;команда;командная строка;cmd;запустить;терминал;
+Keywords[zh_CN]=shell;提示;命令;命令行;cmd;运行;终端;
+Keywords[tr]=kabuk;istem;komut;komutsatırı;cmd;çalıştır;uçbirim;
+Keywords=shell;prompt;command;commandline;cmd;run;terminal;
+Comment[de]=Ein Aufklapp-Terminal für die GNOME Shell
+Comment[es]=Otra extensión de terminal desplegable para GNOME Shell
+Comment[fr]=Une extension de terminal déroulant pour GNOME shell
+Comment[pl]=Kolejny opuszczany terminal dla powłoki GNOME
+Comment[pt]=Outra extensão de terminal drop down para o GNOME Shell
+Comment[ru]=Еще одно расширение выпадающего терминала для GNOME Shell
+Comment[zh_CN]=GNOME Shell的另一个下拉式终端扩展
+Comment[tr]=GNOME kabuğu için bir başka açılır/kapanır terminal eklentisi
+Comment=Another drop down terminal extension for GNOME Shell
+Icon=@ICON@
+TryExec=@LAUNCHER@
+Exec="@LAUNCHER@"
+Categories=GNOME;GTK;System;TerminalEmulator;
+StartupWMClass=Com.github.amezin.ddterm
+StartupNotify=true
+DBusActivatable=true
+Actions=toggle;preferences;
+OnlyShowIn=GNOME;
+X-ExecArg=--
+
+[Desktop Action toggle]
+Name[de]=Umschalter
+Name[es]=Alternar
+Name[fr]=Basculer
+Name[pl]=Przełącznik
+Name[pt]=Alterar
+Name[ru]=Переключатель
+Name[zh_CN]=切换按钮
+Name[eo]=Baskuligi
+Name[tr]=Aç/Kapat
+Name=Toggle
+Exec=gapplication action com.github.amezin.ddterm toggle
+
+[Desktop Action preferences]
+Name[cs]=Předvolby…
+Name[de]=Einstellungen …
+Name[es]=Ajustes…
+Name[fr]=Préférences…
+Name[it]=Preferenze…
+Name[nb_NO]=Innstillinger …
+Name[pl]=Preferencje…
+Name[pt]=Preferências…
+Name[ru]=Параметры…
+Name[zh_CN]=首选项…
+Name[eo]=Agordoj…
+Name[tr]=Tercihler…
+Name=Preferences…
+Exec=gapplication action com.github.amezin.ddterm preferences

@@ -1,0 +1,37 @@
+[Plymouth Theme]
+Name=catppuccin-mocha
+Description=catppuccin-mocha
+ModuleName=two-step
+
+[script]
+ImageDir=/usr/share/plymouth/themes/catppuccin-mocha
+ScriptFile=/usr/share/plymouth/themes/catppuccin-mocha/cat.script
+
+[two-step]
+Font=Noto Sans 12
+TitleFont=Noto Sans Light 30
+ImageDir=/usr/share/plymouth/themes/catppuccin-mocha
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.5
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.5
+HorizontalAlignment=.5
+VerticalAlignment=.5
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.5
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+ProgressBarBackgroundColor=0x313244
+ProgressBarForegroundColor=0x1e1e2e
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+
+[shutdown]
+UseEndAnimation=true
+
+[reboot]
+UseEndAnimation=false

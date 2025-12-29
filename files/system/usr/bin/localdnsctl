@@ -1,0 +1,379 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+# Default values
+CONFIG_DIR="/etc/catcat-os/localdns.d"
+TMPDIR="/tmp/dns-blocklist"
+REPO_URL="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
+BACKEND_TYPE=$([[ -f "${CONFIG_DIR}/only-dnscrypt-blocklist" ]] && echo "dnscrypt" || echo "dnsmasq")
+DNSCRYPTDIR='/etc/dnscrypt-proxy'
+DNSMASQDIR='/etc/dnsmasq.d'
+DNSCRYPTLOGDIR='/var/log/dnscrypt-proxy'
+DNSMASQLOGDIR='/var/log'
+VERBOSE=
+SYSTEMCTL="systemctl"
+
+toggle_localdns() {
+    need_root
+    [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf is missing"
+
+    case "${1}" in
+        enable)
+            log "INFO" "Enabling local DNS..."
+            ln ${VERBOSE:+-v} -sf /usr/etc/catcat-os/localdns.d/localdns-resolv.conf /etc/resolv.conf &&
+            { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+                 touch "${DNSCRYPTDIR}/domains-blocklist.txt"
+                 ${SYSTEMCTL} is-enabled dnsmasq.service &&
+                    ${SYSTEMCTL} disable --force --now dnsmasq.service
+                 ${SYSTEMCTL} enable --force --now dnscrypt-proxy.service
+              elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
+                 touch "${DNSMASQDIR}/domains-blocklist.conf"
+                 ${SYSTEMCTL} is-enabled dnscrypt-proxy.service &&
+                    ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+                 ${SYSTEMCTL} enable --force --now dnsmasq.service
+              fi } ||
+                die "Failed to enable DNS services"
+            ;;
+        disable)
+            log "INFO" "Disabling local DNS..."
+            local nm_resolvconf='/run/NetworkManager/resolv.conf'
+            [[ ! -f "${nm_resolvconf}" ]] && die "NetworkManager resolv.conf missing at ${nm_resolvconf}"
+            cp ${VERBOSE:+-v} -f ${nm_resolvconf} /etc/resolv.conf &&
+            { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+                 ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+              elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
+                 ${SYSTEMCTL} disable --force --now dnsmasq.service
+              fi } &&
+                ${SYSTEMCTL} restart NetworkManager.service ||
+                die "Failed to disable DNS services"
+            ;;
+        restart)
+            log "INFO" "Restarting DNS services..."
+            { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+                ${SYSTEMCTL} is-enabled dnsmasq.service &&
+                    ${SYSTEMCTL} disable --force --now dnsmasq.service
+                ${SYSTEMCTL} restart dnscrypt-proxy.service
+              elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
+                ${SYSTEMCTL} is-enabled dnscrypt-proxy.service &&
+                    ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+                ${SYSTEMCTL} restart dnsmasq.service
+              fi } ||
+                die "Failed to restart DNS services"
+            ;;
+        *) 
+            die "Invalid service action. Use 'enable', 'disable', or 'restart'"
+            ;;
+    esac
+    ${SYSTEMCTL} daemon-reload
+    log "INFO" "Operation completed successfully"
+}
+
+update_blocklist() {
+    need_root
+    mkdir -p "${CONFIG_DIR}" "${TMPDIR}" || die "Failed to create directories"
+
+    local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
+
+    log "INFO" "Updating DNS blocklist (Backend: ${BACKEND_TYPE})"
+    #, Blocklist Size: $([[ ${mini} =~ 'mini' ]] && echo ${mini:1} || echo 'large'))"
+    
+    local src_file dst_file subdir
+    if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+        src_file="domains-filtered-subdomains${mini}"
+        dst_file="${DNSCRYPTDIR}/domains-blocklist.txt"
+        subdir="domains.d"
+    else
+        src_file="blocklist${mini}.conf"
+        dst_file="${DNSMASQDIR}/domains-blocklist.conf"
+        subdir="dnsmasq.d"
+    fi
+
+    log "INFO" "Downloading blocklist..."
+    curl -sLo "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
+        die "Failed to download blocklist"
+
+    log "INFO" "Extracting blocklist..."
+    tar --use-compress-program "zstd -d" -xf "${TMPDIR}/${src_file}.tar.zst" -C "${TMPDIR}/" ||
+        die "Failed to extract blocklist"
+    cp ${VERBOSE:+-v} -f "${TMPDIR}/${src_file}" "${dst_file}"
+    rm -rf "${TMPDIR}"
+
+    toggle_localdns restart
+    log "INFO" "Blocklist update completed successfully"
+}
+
+
+switch_blocklist() {
+    need_root
+    [[ ! -d "${CONFIG_DIR}" ]] && mkdir ${VERBOSE:+-v} -p "${CONFIG_DIR}"
+    case "${1,,}" in
+        dnscrypt)
+            touch "${CONFIG_DIR}/only-dnscrypt-blocklist"
+            log "INFO" "Switched to DNSCrypt backend"
+            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            ;;
+        dnsmasq)
+            rm ${VERBOSE:+-v} -f "${CONFIG_DIR}/only-dnscrypt-blocklist"
+            log "INFO" "Switched to DNSMasq backend"
+            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            ;;
+        *)
+            die "Invalid backend. Use 'dnscrypt' or 'dnsmasq'"
+            ;;
+    esac
+}
+
+set_size() {
+    need_root
+    case "${1,,}" in
+        mini)
+            rm ${VERBOSE:+-v} -f "${CONFIG_DIR}/large-dns-blocklist"
+            log "INFO" "Set blocklist size to mini"
+            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            ;;
+        large)
+            touch "${CONFIG_DIR}/large-dns-blocklist"
+            log "INFO" "Set blocklist size to large"
+            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            ;;
+        *) 
+            die "Invalid size. Use 'mini' or 'large'"
+            ;;
+    esac
+}
+
+# Log functions
+clean_old_logs() {
+    local retention="3 months"
+    [[ ${1} ]] && echo "${1}" > "${CONFIG_DIR}/keep-log-time"
+    [[ -f "${CONFIG_DIR}/keep-log-time" ]] && retention="$(cat ${CONFIG_DIR}/keep-log-time)"
+
+    log "INFO" "Cleaning logs older than ${retention}"
+
+    local date_format log_file line
+    local dnscrypt_date_format="$(date -d "-${retention}" +"%Y-%m-%d")"
+    local dnsmasq_date_format="$(date -d "-${retention}" +"%b %d")"
+
+    log "DEBUG" "dnscrypt_date_format: ${dnscrypt_date_format}, dnsmasq_date_format: ${dnsmasq_date_format}"
+
+    # Clean logs
+    for log_file in "${DNSMASQLOGDIR}/dnsmasq.log" "${DNSCRYPTLOGDIR}"/*.log; do
+        if [[ -f "${log_file}" ]]; then
+            [[ ${log_file} == *"${DNSCRYPTLOGDIR}"* ]] &&
+            date_format="${dnscrypt_date_format}" || date_format="${dnsmasq_date_format}"
+
+            line=$(rg -n "${date_format}" "${log_file}" | cut -d: -f1 | tail -n1)
+            log "DEBUG" "Clean logs before '${date_format}' from line ${line:-0} in log file: ${log_file}"
+            if [[ ! -z ${line} ]]; then
+                sed -i "1,${line} d" "${log_file}" || die "Log cleanup failed for ${log_file}"
+            else
+                log "DEBUG" "No logs before '${date_format}' in log file: ${log_file}"
+            fi
+        fi
+    done
+
+    log "INFO" "Log cleanup completed"
+}
+
+
+RG_BASE="--line-buffered --passthru --color=always"
+RG_BLUE="${RG_BASE} --colors match:fg:blue"
+RG_YELLOW="${RG_BASE} --colors match:fg:yellow"
+RG_RED="${RG_BASE} --colors match:fg:red"
+RG_RED_BG_BLACK="${RG_RED} --colors match:bg:black"
+
+dnsmasq_logs() {
+  need_root
+  local LAST_LINES=5999
+  local path="${DNSMASQLOGDIR}"
+  local base_cmd="tail -n ${LAST_LINES} -f"
+  local filter_cmd
+  local log_file="${path}/dnsmasq.log"
+  local log_format="log"
+
+  local common_pattern='DNS-rebind| ::$|0\.0\.0\.0|NXDOMAIN|HINFO|REFUSED|SERVFAIL'
+  local nxdata_pattern=': .*NXDOMAIN|NODATA.*|reply.*truncated'
+  local reject_pattern=': .*DNS-rebind.*|: .* ::$|: .*0\.0\.0\.0|config.*NXDOMAIN|: .*HINFO.*'
+  local error_pattern=': .*REFUSED.*|: .*SERVFAIL.*'
+
+  case ${1} in
+        detailed)
+            filter_cmd="rg ${RG_YELLOW} \"${nxdata_pattern}\" | \
+                       rg ${RG_RED} \"${reject_pattern}\" | \
+                       rg ${RG_RED_BG_BLACK} \"${error_pattern}\""
+            ;;
+        queries)
+            filter_cmd="rg --color=never -i \"query|NODATA|${common_pattern}\" | \
+                       rg ${RG_YELLOW} \"${nxdata_pattern}\" | \
+                       rg ${RG_RED} \"${reject_pattern}\" | \
+                       rg ${RG_RED_BG_BLACK} \"${error_pattern}\""
+            ;;
+        blocked)
+            filter_cmd="rg --color=never -i \"${common_pattern}\" | \
+                       rg ${RG_YELLOW} \"${nxdata_pattern}\" | \
+                       rg ${RG_RED} \"${reject_pattern}\" | \
+                       rg ${RG_RED_BG_BLACK} \"${error_pattern}\""
+            ;;
+        *)
+            die "Invalid log type: ${1}"
+            exit 1
+            ;;
+  esac
+
+  [[ ! -f "${log_file}" ]] && die "Log file not found: ${log_file}"
+
+  # Execute the command pipeline
+  ${base_cmd} "${log_file}" | eval "${filter_cmd}" | bat --paging=never -nl "${log_format}"
+}
+
+dnscrypt_logs() {
+  local LAST_LINES=999
+  local path="${DNSCRYPTLOGDIR}"
+  local base_cmd="tail -n ${LAST_LINES} -f"
+  local filter_cmd log_file log_format
+
+  [[ ${1} =~ 'launch' ]] && log_format="log"
+  case ${1} in
+        queries)
+            log_file="${path}/query.log"
+            filter_cmd="rg ${RG_YELLOW} 'NXDOMAIN|NODATA|SYNTH' | \
+                       rg ${RG_RED} '\t.*REJECT|NOT_READY|NETWORK_ERROR|SERVER_TIMEOUT|' | \
+                       rg ${RG_RED_BG_BLACK} '\t.*REFUSED.*|\t.*SERVFAIL.*|\t.*RESPONSE_ERROR.*'"
+            ;;
+        blocked)
+            log_file="${path}/blocked-domains.log"
+            filter_cmd="rg ${RG_YELLOW} '\(alias.*' | rg ${RG_BLUE} '\*\.'"
+            ;;
+        allowed)
+            log_file="${path}/allowed-domains.log"
+            filter_cmd="rg ${RG_YELLOW} '\(alias.*' | rg ${RG_BLUE} '\*\.'"
+            ;;
+        blocked-ips)
+            log_file="${path}/blocked-ips.log"
+            ;;
+        allowed-ips)
+            log_file="${path}/allowed-ips.log"
+            ;;
+        nxdomains)
+            log_file="${path}/nx.log"
+            ;;
+        launch)
+            log_file="${path}/dnscrypt-proxy.log"
+            filter_cmd="rg ${RG_YELLOW} 'Stopped.' | rg ${RG_BLUE} 'dnscrypt-proxy .*\..*\..*'"
+            ;;
+        *)
+            die "Invalid log type: ${1}"
+            exit 1
+            ;;
+  esac
+
+  [[ ! -f "${log_file}" ]] && die "Log file not found: ${log_file}"
+
+  # Execute the command pipeline
+  if [[ -n "${filter_cmd}" ]]; then
+    ${base_cmd} "${log_file}" | eval "${filter_cmd}" | bat --paging=never -nl "${log_format:-csv}"
+  else
+    ${base_cmd} "${log_file}" | bat --paging=never -nl "${log_format:-csv}"
+  fi
+}
+
+# Execute the appropriate function based on log type
+log_types() {
+    bat /etc/dnscrypt-proxy/allowed-ips.txt >/dev/null 2>&1 || bat cache --build >/dev/null 2>&1
+    case ${LOG_TYPE} in
+        "dnsmasq-"*) dnsmasq_logs "${LOG_TYPE#dnsmasq-}" ;;
+        "dnscrypt-"*) dnscrypt_logs "${LOG_TYPE#dnscrypt-}" ;;
+        *) die "Invalid log type specified: ${LOG_TYPE}" show_help ;;
+    esac
+}
+
+show_help() {
+    echo "Usage: $(basename "${0}") [OPTIONS]"
+    echo "Configure and manage DNS to block Ad/Malware using blocklist or monitor DNS logs with localdns"
+    echo
+    echo "Options:"
+    echo " -h, --help                                Show this help message"
+    echo " -v, --verbose                             Enable verbose output"
+    echo " -u, --update                              Update DNS blocklist"
+    echo " --enable                                  Enable localdns"
+    echo " --disable                                 Disable localdns"
+    echo " --restart                                 Restart localdns"
+    echo " --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
+#    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
+    echo
+    echo "Log Options:"
+    echo " --flush-logs TIME                         Remove logs older than TIME"
+    echo "                                           TIME format: N 'day(s)|week(s)|month(s)|year(s)' (default: 3 months)"
+    echo " -n, --lines NUMBER                        Show last N lines of log (default: 5999)"
+    echo " -l, --log TYPE                            Specify log type to display"
+    echo
+    echo "Log types:"
+    echo " dnsmasq-detailed         Show detailed DNSMasq logs"
+    echo " dnsmasq-queries          Show DNSMasq queries"
+    echo " dnsmasq-blocked          Show blocked DNSMasq queries"
+    echo " dnscrypt-queries         Show DNSCrypt queries"
+    echo " dnscrypt-blocked         Show blocked DNSCrypt queries"
+    echo " dnscrypt-allowed         Show allowed DNSCrypt queries"
+    echo " dnscrypt-blocked-ips     Show blocked IPs in DNSCrypt"
+    echo " dnscrypt-allowed-ips     Show allowed IPs in DNSCrypt"
+    echo " dnscrypt-nxdomains       Show DNSCrypt NXDOMAIN responses"
+    echo " dnscrypt-launch          Show DNSCrypt launch logs"
+}
+
+# Main argument parsing
+[[ $# -eq 0 ]] && die "No options provided" show_help
+
+while [[ $# -gt 0 ]]; do
+    case ${1} in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=2
+            shift
+            ;;
+        -u|--update)
+            update_blocklist
+            exit 0
+            ;;
+        --enable|--disable|--restart)
+            toggle_localdns "${1:2}"
+            exit 0
+            ;;
+        --switch-blocklist-backend)
+            shift
+            [[ ${1} ]] && switch_blocklist "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
+            shift
+            ;;
+#        --set-blocklist-size)
+#            shift
+#            [[ $1 ]] && set_size "$1" || die "Size required (mini|large)"
+#            shift
+#            ;;
+        --flush-logs)
+            shift
+            [[ $# -eq 0 ]] && { log "INFO" "Using default retention period"; clean_old_logs; } ||
+            if [[ $# -ge 2 ]]; then
+                clean_old_logs "${1} ${2}"; shift 2
+            else
+                clean_old_logs "${1}"; shift
+            fi
+            ;;
+        -n|--lines)
+            shift
+            [[ ${1} ]] && LAST_LINES=${1} || die "Number of lines required"
+            shift
+            ;;
+        -l|--log)
+            shift
+            LOG_TYPE="${1}"
+            [[ ${LOG_TYPE} ]] && log_types ||
+                die "Log type required" show_help
+            shift
+            ;;
+        *)
+            die "Unknown option: ${1}" show_help
+            ;;
+    esac
+done

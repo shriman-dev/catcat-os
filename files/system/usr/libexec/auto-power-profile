@@ -1,0 +1,64 @@
+#!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+SYSTEM_LOAD_THRESHOLD_LOW=1.5
+SYSTEM_LOAD_THRESHOLD_HIGH=3
+
+set_power_profile() {
+  echo "Setting power profile to: ${1}"
+  local profile="${1}"
+  local power_policy='/sys/module/pcie_aspm/parameters/policy'
+  #/sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference
+  #scaling_governor='/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+  #intel_turbo='/sys/devices/system/cpu/intel_pstate/no_turbo'
+  #boosto='/sys/devices/system/cpu/cpufreq/boost'
+
+  case "${profile}" in
+    "powersave")
+      command -v powerprofilesctl && powerprofilesctl set power-saver
+      command -v tuned-adm && tuned-adm profile powersave
+      [[ -f "${power_policy}" ]] && echo "powersupersave" | tee "${power_policy}"
+      ;;
+    "performance")
+      command -v powerprofilesctl && powerprofilesctl set performance
+      command -v tuned-adm && tuned-adm profile throughput-performance
+      [[ -f "${power_policy}" ]] && echo "performance" | tee "${power_policy}"
+      ;;
+    "balanced")
+      command -v powerprofilesctl && powerprofilesctl set balanced
+      command -v tuned-adm && tuned-adm profile balanced
+      [[ -f "${power_policy}" ]] && echo "default" | tee "${power_policy}"
+      ;;
+    *)
+      die "Unknown power profile: ${profile}"
+      ;;
+  esac
+}
+
+previous_profile=""
+while true; do
+  system_load=$(cut -d' ' -f2 /proc/loadavg)
+  current_power_state=$(upower -d | grep -iE 'state.*discharging')
+  override_profile="${OVERRIDE_POWER_PROFILE}"
+
+  if [[ -n "${override_profile}" ]]; then
+    target_profile="${override_profile}"
+  elif [[ -n "${current_power_state}" ]]; then
+    target_profile="powersave"
+  else
+    if [[ $(echo "${system_load} < ${SYSTEM_LOAD_THRESHOLD_LOW}" | bc -l) -eq 1 ]]; then
+      target_profile="powersave"
+    elif [[ $(echo "${system_load} > ${SYSTEM_LOAD_THRESHOLD_LOW}" | bc -l) -eq 1 && $(echo "${system_load} < ${SYSTEM_LOAD_THRESHOLD_HIGH}" | bc -l) -eq 1 ]]; then
+      target_profile="balanced"
+    else
+      target_profile="performance"
+    fi
+  fi
+
+  if [[ ! "${target_profile}" == "${previous_profile}" ]]; then
+    set_power_profile "${target_profile}"
+    previous_profile="${target_profile}"
+  fi
+
+  sleep 30s
+done

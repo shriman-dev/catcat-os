@@ -1,0 +1,8 @@
+[Unit]
+Description=Scheduled Nightly Reboot for CatCat OS
+
+[Timer]
+OnCalendar=*-*-* 2:30:00
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Icon=a7xpg
+NoDisplay=false
+Exec=cmatrix
+Terminal=true
+X-GNOME-UsesNotifications=false
+Name=Cmatrix

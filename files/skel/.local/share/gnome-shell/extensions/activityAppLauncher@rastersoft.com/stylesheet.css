@@ -1,0 +1,46 @@
+
+.activityAppLauncherText {
+	text-align: center;
+	border: 0px;
+	margin: 0px;
+	padding: 4px 0px 4px 0px;
+	font-size: 110%;
+}
+
+.activityAppLauncherElement {
+	padding: 10px;
+	border-radius: 0.5em;}
+
+.activityAppLauncherElement:selected {
+	background-color: rgba(192,192,192,0.25);
+}
+
+.activityAppLauncherButton {
+	margin: 2px;
+	border: 0px;
+	padding: 6px;
+}
+
+.activityAppLauncher-tooltip, .activityAppLauncher-tooltip-borders {
+    color: #ffffff;
+    background-color: rgba(10,10,10,0.8);
+    border-radius: 5px;
+    padding: 5px;
+    max-width: 300px;
+}
+
+.activityAppLauncher-tooltip-borders {
+    border: 2px solid rgba(255,255,255,0.8);
+}
+
+.activityAppLauncher-tooltip-title {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.activityAppLauncher-tooltip-detail {
+    font-size: 12px;
+    font-weight: normal;
+    text-align: center;
+}

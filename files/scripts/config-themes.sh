@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+set -oue pipefail
+source /usr/lib/catcat/funcvar.sh
+
+desktop_files() {
+    local desktopfile_dir="/usr/share/applications"
+
+    log "INFO" "Configuring desktop files"
+    # To use catcat update
+    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" ${desktopfile_dir}/system-update.desktop || true
+
+    sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
+    sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
+    #cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop ${desktopfile_dir}/ || true
+    sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' ${desktopfile_dir}/autostart.desktop || true
+
+    sed -i 's|^Name=.*|Name=Nemo File Manager|' ${desktopfile_dir}/nemo.desktop || true
+    sed -i 's/^Icon=.*/Icon=user-home/' ${desktopfile_dir}/org.gnome.Nautilus.desktop
+    sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' ${desktopfile_dir}/org.gnome.Nautilus.desktop
+    sed -i 's/^Icon=.*/Icon=fish/' ${desktopfile_dir}/org.gnome.Ptyxis.desktop
+    sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' ${desktopfile_dir}/org.gnome.Settings.desktop
+    sed -i 's/^Icon=.*/Icon=np2/' ${desktopfile_dir}/oneko.desktop
+    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' ${desktopfile_dir}/yazi.desktop || true
+
+    sed -i 's|^Icon=.*|Icon=appgrid|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
+    sed -i 's|^Name.*=.*|Name=Software Store|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
+
+    sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' ${desktopfile_dir}/Waydroid.desktop
+
+    # Remove desktop entries
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/nvtop.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/fish.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/yad-icon-browser.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top-tui.desktop || true
+    log "INFO" "Done."
+}
+
+install_fonts() {
+    local -a nerd_fonts=(
+            "FiraCode"
+            "Hack"
+            "NerdFontsSymbolsOnly"
+            )
+    local nerd_fonts_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
+    local nerd_fonts_dest="/usr/share/fonts/nerd-fonts"
+
+    log "INFO" "Installing Nerd Fonts"
+    rm -rf "${nerd_fonts_dest}"
+
+    mkdir -p /tmp/fonts
+    local font
+    for font in "${nerd_fonts[@]}"; do
+        font=${font// /} # remove spaces
+        if [[ ${#font} -gt 0 ]]; then
+            log "INFO" "Downloading ${font} from ${nerd_fonts_repo}/${font}.tar.xz"
+            mkdir -vp "${nerd_fonts_dest}/${font}"
+            curl -fLs --create-dirs "${nerd_fonts_repo}/${font}.tar.xz" -o \
+                "/tmp/fonts/${font}.tar.xz" &&
+            tar -xf "/tmp/fonts/${font}.tar.xz" -C "${nerd_fonts_dest}/${font}"
+            log "INFO" "Done."
+        fi
+    done
+    rm -rf /tmp/fonts
+    fc-cache --system-only --really-force "${nerd_fonts_dest}"
+    log "INFO" "All done."
+}
+
+install_icon_themes() {
+    local papirus_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
+    local papirus_tar="/tmp/papirus.tar"
+
+    log "INFO" "Installing papirus icon theme"
+    curl -Lo "${papirus_tar}" $(curl -s -X GET "${papirus_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+
+    mkdir -vp "${papirus_tar}.extract"
+    tar -xf "${papirus_tar}" -C "${papirus_tar}.extract" --strip-components=1
+    cp -drf "${papirus_tar}.extract"/Papirus* /usr/share/icons/
+    log "INFO" "Done."
+}
+
+install_gtk_themes() {
+    log "INFO" "Installing GTK themes"
+    # Lavanda-gtk-theme
+    log "INFO" "Lavanda-gtk-theme"
+    local lavanda_theme_repo="https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme"
+    local lavanda_tar="/tmp/lavanda.tar"
+    curl -Lo "${lavanda_tar}" $(curl -s -X GET "${lavanda_theme_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    mkdir -vp "${lavanda_tar}.extract"
+    tar -xf "${lavanda_tar}" -C "${lavanda_tar}.extract" --strip-components=1
+    chmod -v +x "${lavanda_tar}.extract"/install.sh
+    "${lavanda_tar}.extract"/install.sh --color light dark
+
+    # Catppuccin-Gtk-Theme
+    log "INFO" "Catppuccin-Gtk-Theme"
+    local catppuccin_theme_repo="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
+    local catppuccin_theme_tmp="/tmp/Catppuccin-Gtk-Theme"
+    git clone "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
+    chmod -v +x "${catppuccin_theme_tmp}"/install.sh
+    "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all --color dark --tweaks catppuccin rimless
+    log "INFO" "All done."
+}
+
+build_gdm_theme() {
+    local gdm_resource="/usr/share/gnome-shell/gnome-shell-theme.gresource"
+    local gmd_theme_tmp="/tmp/gnome-shell"
+    local gmd_theme_path="/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
+    local background_wall="/usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg"
+    local gdm_xml="$(basename ${gdm_resource}).xml"
+    local resource resource_path
+
+    log "INFO" "Building GDM theme using GTK theme: $(basename $(dirname ${gmd_theme_path}))"
+    # Create directories and extract resources from gresource file
+    log "DEBUG" "Creating directories and extracting resources from gresource file"
+    for resource in $(gresource list "${gdm_resource}"); do
+        resource_path="${resource#\/org\/gnome\/shell\/}"
+        mkdir -vp "${gmd_theme_tmp}/${resource_path%/*}"
+        gresource extract "${gdm_resource}" "${resource}" > "${gmd_theme_tmp}/${resource_path}"
+    done
+
+    # Copy custom theme files and background wallpaper to working directory
+    log "DEBUG" "Copying custom theme files and background wallpaper to working directory"
+    cp -drvf "${gmd_theme_path}"/* "${gmd_theme_tmp}/theme"/
+    cp -dvf "${background_wall}" "${gmd_theme_tmp}/theme/background"
+
+    # Set background wallpaper and modify CSS for login and lock screen
+    log "DEBUG" "Setting background wallpaper and modifying CSS for login and lock screen"
+    echo ".login-dialog { background: transparent; }
+#lockDialogGroup {
+  background-image: url('resource:///org/gnome/shell/theme/background');
+  background-position: center;
+  background-size: cover;
+}" >> "${gmd_theme_tmp}/theme/gnome-shell.css"
+
+    # Ensure the same CSS is used for both light and dark modes
+    log "DEBUG" "Applying custom theme CSS on both light and dark modes"
+    cp -drvf "${gmd_theme_tmp}/theme/gnome-shell.css" "${gmd_theme_tmp}/theme/gnome-shell-dark.css"
+    cp -drvf "${gmd_theme_tmp}/theme/gnome-shell.css" "${gmd_theme_tmp}/theme/gnome-shell-light.css"
+
+    # Generate gresource XML file for compiling resources
+    log "DEBUG" "Generating gresource XML file for compiling resources"
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<gresources>
+  <gresource prefix=\"/org/gnome/shell/theme\">
+$(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf '    <file>%P</file>\n')
+  </gresource>
+</gresources>" > "${gmd_theme_tmp}/theme/${gdm_xml}"
+    cat "${gmd_theme_tmp}/theme/${gdm_xml}"
+
+    # Compile all resources and apply them to the gdm theme
+    log "DEBUG" "Compiling all resources and apply them to the gdm theme"
+    glib-compile-resources --sourcedir=${gmd_theme_tmp}/theme/ "${gmd_theme_tmp}/theme/${gdm_xml}"
+    mv -v "${gmd_theme_tmp}/theme/$(basename ${gdm_resource})" "${gdm_resource}"
+
+    log "INFO" "All done."
+
+    # Default settings for gdm
+    log "INFO" "Getting default settings for GDM"
+    cp -drvf /etc/dconf/db/distro.d/{interface,defaults} /etc/dconf/db/gdm.d/
+    log "INFO" "Custom theme has been built and set for GDM."
+}
+
+set_plymouth_theme() {
+    local plymouth_theme="catppuccin-mocha"
+    log "INFO" "Applying plymouth theme: ${plymouth_theme}"
+    plymouth-set-default-theme ${plymouth_theme}
+    log "INFO" "Done."
+}
+
+apply_default_configs() {
+    # Set default icon and theme
+    log "INFO" "Setting default icon and theme for the OS"
+    sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
+
+    cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
+    cp -drf /usr/share/themes/Catppuccin-Orange-Dark/gtk-4.0 /etc/skel/.config/
+
+    /usr/bin/dconf update
+    log "INFO" "Done."
+
+    mkdir -vp /etc/skel/.config/dconf
+    log "INFO" "Tree of: /etc/dconf"
+    tree /etc/dconf/
+}
+
+install_vscodium_ext() {
+    # Install extensions for vscodium
+    local vscodium_extlist=(
+        "jeronimoekerdt.color-picker-universal"
+        "catppuccin.catppuccin-vsc"
+        "catppuccin.catppuccin-vsc-icons"
+    )
+
+    log "INFO" "Install extensions for vscodium"
+    mkdir -vp /tmp/vscodiumdata /etc/skel/.vscode-oss/extensions
+    for ext in "${vscodium_extlist[@]}"; do
+        codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir /etc/skel/.vscode-oss/extensions --install-extension ${ext}
+    done
+    log "INFO" "Done."
+}
+
+gnome_shell_ext() {
+    log "INFO" "Copying gnome shell extensions to system default path"
+    cp -drf /etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/extensions/
+    log "INFO" "Done."
+}
+
+desktop_files
+install_fonts
+install_icon_themes
+install_gtk_themes
+build_gdm_theme
+set_plymouth_theme
+apply_default_configs
+install_vscodium_ext
+gnome_shell_ext

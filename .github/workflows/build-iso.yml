@@ -1,0 +1,158 @@
+name: build iso
+
+on:
+  workflow_call:
+  schedule:
+    - cron: "0 0 1 * *" # Build & release ISOs every month
+
+  workflow_dispatch:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build-iso.yml'
+
+env:
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+concurrency:
+  group: build-iso-${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-iso:
+    name: Build ISO
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image_name: ["catcat-os", "catcat-os-mi", "catcat-os-nv"]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@v9
+
+      - name: Prepare environment
+        id: prepare-environment
+        shell: bash
+        run: |
+          set -ouex pipefail
+          pwd
+          ls -A1
+          lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          source ${{ github.workspace }}/ENVAR
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
+          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+
+      - name: Determine Flatpak Dependencies
+        id: flatpak_dependencies
+        shell: bash
+        run: |
+          set -ouex pipefail
+          pwd
+          IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
+          # Make temp space
+          TEMP_FLATPAK_INSTALL_DIR=$(mktemp -d -p ${{ github.workspace }} flatpak.XXX)
+          # Get list of refs from directory
+          FLATPAK_REFS_DIR=./flatpak-refs
+          FLATPAK_REFS_DIR_ABS=$(realpath "${FLATPAK_REFS_DIR}")
+          mkdir -p "${FLATPAK_REFS_DIR}"
+          source ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/flatpak-pkg-list.sh
+          FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}"
+          [[ "${{ matrix.image_name }}" =~ "-mi" ]] && FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]}"
+          # Generate install script
+          cat << EOF > ${TEMP_FLATPAK_INSTALL_DIR}/script.sh
+          cat /temp_flatpak_install_dir/script.sh
+          mkdir -p /flatpak/flatpak /flatpak/triggers
+          mkdir /var/tmp || true
+          chmod -R 1777 /var/tmp
+          flatpak config --system --set languages "*"
+          flatpak remote-add --if-not-exists \
+              --system flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --system -y ${FLATPAK_REFS_DIR_LIST}
+          ostree refs --repo=\${FLATPAK_SYSTEM_DIR}/repo | grep '^deploy/' | \
+              grep -v 'org\.freedesktop\.Platform\.openh264' | \
+              sed 's/^deploy\///g' > /output/flatpaks_with_deps
+          EOF
+          podman run --rm --privileged \
+            --entrypoint bash \
+            -e FLATPAK_SYSTEM_DIR=/flatpak/flatpak \
+            -e FLATPAK_TRIGGERSDIR=/flatpak/triggers \
+            --volume ${FLATPAK_REFS_DIR_ABS}:/output \
+            --volume ${TEMP_FLATPAK_INSTALL_DIR}:/temp_flatpak_install_dir \
+            ${IMAGE_FULL} /temp_flatpak_install_dir/script.sh
+          podman rmi ${IMAGE_FULL}
+          echo "flatpak-refs-dir=${FLATPAK_REFS_DIR}" >> $GITHUB_OUTPUT
+
+      - name: Build ISO
+        uses: jasonn3/build-container-installer@v1.4.0
+        id: build-iso
+        with:
+          arch: x86_64
+          image_name: ${{ matrix.image_name }}
+          image_repo: ${{ env.IMAGE_REGISTRY }}
+          image_tag: ${{ env.DEFAULT_TAG }}
+          variant: 'Kinoite'
+          version: ${{ env.MAJOR_VERSION }}
+          secure_boot_key_url: "https://github.com/ublue-os/akmods/raw/main/certs/public_key.der"
+          enrollment_password: "universalblue"
+          iso_name: ${{ matrix.image_name }}-${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}.iso
+          enable_cache_dnf: "false"
+          enable_cache_skopeo: "false"
+          enable_flatpak_dependencies: "false"
+          flatpak_remote_refs_dir: ${{ steps.flatpak_dependencies.outputs.flatpak-refs-dir }}
+          extra_boot_params: "rd.udev.log_priority=3 loglevel=3 rd.shell=0 rd.emergency=halt"
+          additional_templates: /github/workspace/files/scripts/setup_files/remove_root_password_prompt.tmpl
+          repos: '/etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
+
+      - name: Move ISO to Upload Directory
+        id: upload-directory
+        shell: bash
+        run: |
+          ISO_UPLOAD_DIR=${{ github.workspace }}/upload
+          mkdir -vp ${ISO_UPLOAD_DIR}
+          mv -v ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }} ${ISO_UPLOAD_DIR}
+          mv -v ${{ steps.build-iso.outputs.iso_path }}/${{ steps.build-iso.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          tree -a ${ISO_UPLOAD_DIR}
+          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
+
+      - name: Upload ISOs and Checksum as artifacts
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image_name }}-iso
+          path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+      - name: Make URL Artifact
+        shell: bash
+        id: url
+        run: |
+          echo "|[${{ matrix.image_name }}](${{ env.ARTIFACT-URL }})|" \
+              > url-${{ matrix.image_name }}.txt
+        env:
+          ARTIFACT-URL: ${{ steps.upload.outputs.artifact-url }}
+
+      - name: Upload ISO URL for Release
+        id: upload-url
+        uses: actions/upload-artifact@v4
+        with:
+          name: url-${{ matrix.image_name }}
+          path: url-${{ matrix.image_name }}.txt
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+

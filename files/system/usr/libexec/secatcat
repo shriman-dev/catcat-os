@@ -1,0 +1,89 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+# Selinux fix
+#restorecon  -vR /home/${U1000}/.local/share/icc
+#restorecon -vR /etc/dnsmasq.d/
+#restorecon -vR /var/log/usbguard
+#restorecon -vR /var/lib/waydroid
+#restorecon -vR /var/log/libvirt /var/lib/libvirt
+
+# Support to run nix commands with sudo for user 1000
+U1000="$(id -un 1000)"
+nix_user_path="/home/${U1000}/.local/state/nix/profile/bin"
+sudoersd_file="/etc/sudoers.d/nix-sudo-env"
+if ! grep "${nix_user_path}" "${sudoersd_file}"; then
+    log "INFO" "Adding support to run nix commands with sudo for user 1000"
+    chmod -v 640 "${sudoersd_file}"
+    sed -i "/secure_path = /s|$|:${nix_user_path}|" "${sudoersd_file}"
+    # Proper sudoers.d perms
+    chmod -v --recursive 440 "$(dirname ${sudoersd_file})"
+fi
+
+# Mount tmpfs on /var/tmp
+fstab_file="/etc/fstab"
+if ! grep -E "^tmpfs.*/var/tmp.*tmpfs" "${fstab_file}"; then
+    log "INFO" "Adding fstab entry to mount tmpfs on /var/tmp"
+    printf "%-10s %-10s %-10s %-20s %s\n" "tmpfs" "/var/tmp" "tmpfs" \
+        "defaults,noatime,mode=1777" "0 0" >> "${fstab_file}"
+    systemctl daemon-reload && mount -a
+fi
+
+# Set ad-malware blocking localdns
+tmp_localdns="/tmp/localdns.d"
+localdns_confd="/etc/catcat-os/localdns.d"
+dnscrypt_confd="/etc/dnscrypt-proxy"
+dnsmasq_confd="/etc/dnsmasq.d"
+ushare_localdns="/usr/share/localdns.d"
+resolv_conf="/etc/resolv.conf"
+
+mkdir -pv "${tmp_localdns}"
+if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
+    cat ${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst* | \
+            tar -C "${tmp_localdns}"/ --zstd -xvf -
+    cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
+elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnsmasq_confd}/domains-blocklist.conf" ]]; then
+    cat ${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst* | \
+            tar -C "${tmp_localdns}"/ --zstd -xvf -
+    cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
+    restorecon -vR "${dnsmasq_confd}"/
+fi
+rm -rvf "${tmp_localdns}"
+
+if systemctl is-enabled dnscrypt-proxy.service || systemctl is-enabled dnsmasq.service; then
+    if [[ ! $(grep "nameserver" "${resolv_conf}" | wc -l) -eq 2 ]]; then
+        mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
+        ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
+    fi
+    if ! { grep "nameserver.*127\.0\.0\.1" "${resolv_conf}" && grep "nameserver.*::1" "${resolv_conf}"; }; then
+        mkdir -p "${localdns_confd}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
+        ln -sf "/usr${localdns_confd}/localdns-resolv.conf" "${resolv_conf}"
+    fi
+fi
+
+# TODO: Log unsuccessful login attempts
+# Enabling needed authselect features
+authsel_curr=$(authselect current)
+if ! { grep "without-nullok" <<< ${authsel_curr} && grep "with-faillock" <<< ${authsel_curr}; }; then
+    #authselect select sssd
+    authselect enable-feature without-nullok # Blocks empty password logins
+    authselect enable-feature with-faillock # Enables account locking on failure
+    authselect apply-changes
+fi
+
+# Usbguard setup
+#if [[ ! -d /var/log/usbguard ]]; then
+#   usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
+#   mkdir -p /var/log/usbguard
+#   mkdir -p /etc/usbguard
+#   chmod -v 755 /etc/usbguard
+#   restorecon -vR /var/log/usbguard
+#   sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
+
+#   sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
+#   sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
+#   sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
+#   usbguard add-user $U1000
+
+#   systemctl enable --force --now usbguard.service
+#fi

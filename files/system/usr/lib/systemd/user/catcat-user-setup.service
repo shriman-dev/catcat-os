@@ -1,0 +1,15 @@
+[Unit]
+Description=Configure CatCat OS for current user
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/catcat-user-setup
+
+[Install]
+WantedBy=default.target
+#default.target
+#multi-user.target
+
+
+
+
