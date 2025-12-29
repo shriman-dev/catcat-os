@@ -230,9 +230,9 @@ shell_setup() {
     local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
 unset rc'
-    grep -q ".shell.d" "${HOME_DIR}/.bashrc" || echo "${shell_rc}" >> "${HOME_DIR}/.bashrc"
+    grep -q "\.shell\.d" "${HOME_DIR}/.bashrc" || echo "${shell_rc}" >> "${HOME_DIR}/.bashrc"
 
-    grep -q "\[ -f ~/.bashrc \]" "${HOME_DIR}/.bash_profile" ||
+    grep -q "\[ -f ~/\.bashrc \]" "${HOME_DIR}/.bash_profile" ||
         echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> "${HOME_DIR}/.bash_profile"
 
     log "INFO" "Done"
