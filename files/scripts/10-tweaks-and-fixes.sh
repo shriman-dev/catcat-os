@@ -29,6 +29,11 @@ log "INFO" "Tweaking logind to ignore inhabitors for suspend"
 sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/lib/systemd/logind.conf
 #sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
 
+# Let root user to ignore inhabitors
+mkdir -vp /etc/polkit-1/rules.d
+ln -svf /usr/share/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules.example \
+        /etc/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules
+
 # Copy over logind.conf and sleep.conf for ease of access
 log "INFO" "Copying over logind.conf and sleep.conf for ease of access"
 mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}

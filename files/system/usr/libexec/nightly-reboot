@@ -18,7 +18,7 @@ reboot_sys() {
     wall "Performing nightly system reboot."
     notify_all "Nightly System Reboot" "Rebooting now..."
     sleep 2
-    /usr/bin/reboot -f
+    /usr/bin/systemctl reboot -i
 }
 
 monitor_cancel_file() {

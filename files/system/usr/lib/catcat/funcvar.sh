@@ -163,7 +163,7 @@ run_as_users() {
     local running_user
     for running_user in /run/user/*; do
         local some_user_id=$(basename "${running_user}")
-        local some_user="$(id -u -n $(basename "${some_user_id}"))"
+        local some_user="$(id -un "${some_user_id}")"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "INFO" "Running given command as user: ${some_user}"
             sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
