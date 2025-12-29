@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -x
 TMP_DIR="/tmp/catcat_extra_pkgs"
 
 starship() {
