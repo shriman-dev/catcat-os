@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Force Stop Waydroid
+Exec=/usr/bin/waydroid-stop
+Categories=X-WayDroid-App;
+X-Purism-FormFactor=Workstation;Mobile;
+Icon=/usr/share/icons/crafted/waydroid-stop.svg
+NoDisplay=false

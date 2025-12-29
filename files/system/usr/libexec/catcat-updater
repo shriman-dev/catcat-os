@@ -1,0 +1,55 @@
+#!/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+REG_FLATPAK_APPS_UPDATE=(
+    "org.mozilla.firefox"
+    "io.gitlab.librewolf-community"
+    "net.mullvad.MullvadBrowser"
+    "org.garudalinux.firedragon"
+    "one.ablaze.floorp"
+    "app.zen_browser.zen"
+    "org.torproject.torbrowser-launcher"
+    "org.chromium.Chromium"
+    "com.brave.Browser"
+    "io.github.ungoogled_software.ungoogled_chromium"
+    "com.vivaldi.Vivaldi"
+    "com.opera.Opera"
+    "com.microsoft.Edge"
+    "com.google.Chrome"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
+    "re.sonny.Tangram"
+)
+
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/)"
+
+if check_network_connection; then
+    for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
+        [[ "${FLATPAK_APPS}" =~ "${APP}" ]] &&
+            /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
+    done
+fi
+
+notify_all() {
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
+}
+
+one_week=604800
+two_week=1209600
+autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
+# Auto update if system is one weeks old
+if check_network_connection; then
+    if is_file_older ${one_week} "${autoupdate_log_file}"; then
+        notify_all "Weekly automatic update has started."
+
+        date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
+
+        /usr/bin/update extra >> "${autoupdate_log_file}"
+
+        is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
+            /usr/bin/update >> "${autoupdate_log_file}"
+
+        notify_all "Weekly automatic update is done."
+    fi
+fi
+

@@ -1,0 +1,57 @@
+---
+name: release iso
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      run-id:
+        description: "The Run-ID for the workflow."
+        type: number
+        required: true
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: url-catcat*
+          merge-multiple: true
+          run-id: ${{ inputs.run-id || github.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Prepare Release Text
+        id: prepare-release
+        shell: bash
+        run: |
+          set -ouex pipefail
+          source ${{ github.workspace }}/ENVAR
+          pwd
+          TITLE="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"
+          TAG="${MAJOR_VERSION}.${DATESTAMP}"
+          echo -e '### ISOs to Download\n' > release.md
+          echo -e '\n| ISO |\n| --- |' >> release.md
+          for artifact in $(ls -r1 url-catcat*.txt); do
+            cat $artifact >> release.md
+          done
+          ls -A1
+          echo "title=${TITLE}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.prepare-release.outputs.title }}
+          tag_name: ${{ steps.prepare-release.outputs.tag }}
+          body_path: ./release.md
+          make_latest: true

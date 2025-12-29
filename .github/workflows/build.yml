@@ -1,0 +1,45 @@
+name: build catcat-os
+
+# Build Images, ISOs and make release
+# Defines when the workflow will run
+on:
+  schedule:
+    - cron: "0 0 1 * *" # Runs at 00:00 UTC on the 1st of every month
+  push:
+    branches:
+      - main            # Only runs on pushes to main branch
+    paths-ignore:
+      - '**/README.md'
+  workflow_dispatch:    # Allows manual trigger of workflow
+
+# Sets permissions for the workflow
+permissions:
+  contents: write      # Can modify repository contents
+  packages: write      # Can publish packages
+  id-token: write      # Can use OIDC tokens
+
+# Prevents concurrent workflow runs
+concurrency:
+  group: build-main-${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true  # Cancels in-progress runs if a new one is triggered
+
+jobs:
+  build-image:
+    name: Build Images
+    uses: ./.github/workflows/build-image.yml
+    strategy:
+      fail-fast: false  # Continues with other builds even if one fails
+    secrets: inherit    # Uses secrets from parent workflow
+
+  build-iso:
+    name: Build ISOs
+    needs: [build-image]
+    uses: ./.github/workflows/build-iso.yml
+    strategy:
+      fail-fast: false
+    secrets: inherit
+
+  create-release:
+    name: Create Release
+    needs: [build-iso]  # Waits for check and ISO build
+    uses: ./.github/workflows/create-release.yml

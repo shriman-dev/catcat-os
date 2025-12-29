@@ -1,0 +1,159 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+update_flatpak() {
+    source /usr/lib/catcat/funcvar.sh
+    local scope="--user"
+    [[ $(id -u) -eq 0 ]] && scope="--system"
+
+    enclosed_heading "Flatpak ${scope:2} update" "="
+
+    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
+    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
+    /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
+
+    log "INFO" "Running flatpak repair"
+    /usr/bin/flatpak repair ${scope}
+}
+
+update_nixpkg() {
+    source /usr/lib/catcat/funcvar.sh
+    local scope="user"
+    local cmdpath="${HOME}/.local/state/nix/profile/bin"
+
+    if [[ $(id -u) -eq 0 ]]; then
+        scope="global"
+        cmdpath="/nix/var/nix/profiles/default/bin"
+    fi
+
+    if [[ -x "${cmdpath}/nix-env" ]]; then
+        enclosed_heading "Nixpkg ${scope} update" "="
+
+        ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
+        ${cmdpath}/nix-store --optimise >/dev/null 2>&1
+        ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
+    fi
+}
+
+update_dns_blocklist() {
+    enclosed_heading "DNS blocklist update" "="
+    /usr/libexec/dns-blocklist-updater
+}
+
+update_firmware() {
+    enclosed_heading "Firmware update" "="
+
+#    sudo /usr/libexec/fwupd/fwupd &
+    sudo sh -c '
+        /usr/bin/fwupdmgr --no-device-prompt --force -y refresh
+        /usr/bin/fwupdmgr --no-device-prompt -y get-updates
+        /usr/bin/fwupdmgr --no-reboot-check -y update
+    '
+#    sudo /usr/bin/pkill -KILL -fe /usr/libexec/fwupd/fwupd
+}
+
+update_system() {
+    enclosed_heading "System update" "="
+
+    if [[ $(id -u) -eq 0 ]]; then
+        rpm-ostree upgrade
+        rpm-ostree db diff --changelogs
+        rpm-ostree cleanup -bm >/dev/null 2>&1
+        ostree prune >/dev/null 2>&1
+        systemd-tmpfiles --clean >/dev/null 2>&1
+        /usr/bin/grubup
+    else
+        rpm-ostree upgrade
+    fi
+}
+
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [command1] [command2] [command3] ...
+
+Available commands:
+    all            Perform all update operations (System, Firmware, DNS blocklist,
+                   Flatpak, and Nixpkg updates for all users)
+
+    extra          Update Flatpak and Nixpkg for all users
+                   If run as root, also updates Firmware and DNS blocklist
+
+    flat-nix       Update both Flatpak and Nixpkg for current user
+
+    flatpak        Update Flatpak packages for current user
+                   If run as root, updates system-wide packages
+
+    nixpkg         Update Nixpkg packages for current user
+                   If run as root, updates system-wide packages
+
+    dns-blocklist  Update DNS blocklist (requires root privileges)
+
+    system         Update system packages (default if no command is provided)
+
+    firmware       Update device firmware (requires root privileges)
+
+    help           Display this help message
+
+Note: Multiple commands can be provided and will be executed in sequence.
+      Some operations require root privileges to update system-wide packages.
+
+EOF
+}
+
+process_command() {
+    case "${1}" in
+        all)
+            need_root
+            update_system
+            update_firmware
+            update_dns_blocklist
+            update_flatpak
+            update_nixpkg
+            run_as_users update_flatpak
+            run_as_users update_nixpkg
+            ;;
+        extra)
+            update_flatpak
+            update_nixpkg
+            [[ $(id -u) -eq 0 ]] && run_as_users update_flatpak
+            [[ $(id -u) -eq 0 ]] && run_as_users update_nixpkg
+            [[ $(id -u) -eq 0 ]] && { update_firmware; update_dns_blocklist; }
+            ;;
+        flat-nix)
+            update_flatpak
+            update_nixpkg
+            ;;
+        flatpak)
+            update_flatpak
+            ;;
+        nixpkg)
+            update_nixpkg
+            ;;
+        dns-blocklist)
+            need_root
+            update_dns_blocklist
+            ;;
+        system)
+            update_system
+            ;;
+        firmware)
+            update_firmware
+            ;;
+        help)
+            show_help
+            ;;
+        *)
+            die "Error: Unknown argument ${1}" show_help
+            ;;
+    esac
+}
+
+if [[ $# -eq 0 ]]; then
+    update_system
+    exit 0
+fi
+
+# Process all provided arguments
+for arg in "$@"; do
+    process_command "${arg}" || exit 1
+done

@@ -1,0 +1,9 @@
+[com/usebottles/bottles]
+startup-view='page_list'
+force-offline=false
+show-sandbox-warning=false
+update-date=false
+temp=true
+experiments-sandbox=true
+release-candidate=true
+steam-proton-support=true

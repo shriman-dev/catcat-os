@@ -1,0 +1,59 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+REBOOT_DELAY=300  # 5 minutes
+
+notify_all() {
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat Nightly Reboot" "${1}" "${2}"
+}
+
+# Broadcast warning to all users and send warning notification
+send_warning() {
+    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nujust cancel-nightly-reboot')"
+    notify_all "System will reboot in 5 minutes" \
+            "To cancel run command: \"ujust cancel-nightly-reboot\""
+}
+
+reboot_sys() {
+    log "INFO" "Performing nightly system reboot"
+    wall "Performing nightly system reboot."
+    notify_all "Nightly System Reboot" "Rebooting now..."
+    sleep 2
+    /usr/bin/reboot -f
+}
+
+monitor_cancel_file() {
+    local cancel_file="/run/NIGHTLY_REBOOT/user"
+    local attempts=0
+    local max_attempts=${REBOOT_DELAY}
+
+    log "INFO" "Monitoring for cancellation"
+    mkdir -p "$(dirname ${cancel_file})"
+    chmod -R 1777 "$(dirname ${cancel_file})"
+    while [[ ${attempts} -lt ${max_attempts} ]]; do
+        if [[ -f "${cancel_file}" ]]; then
+            log "INFO" "Cancel file detected: ${cancel_file}"
+            local cancel_user="$(cat ${cancel_file})"
+            log "INFO" "Reboot cancelled by user: ${cancel_user}"
+            wall "Nightly Reboot was cancelled by user: ${cancel_user}"
+            notify_all "Nightly Reboot was cancelled by user: ${cancel_user}"
+            rm -v "${cancel_file}"
+            exit 0
+        fi
+        ((attempts++))
+        sleep 1
+    done
+    log "INFO" "Monitoring timeout reached"
+}
+
+# Main reboot sequence
+main() {
+    log "INFO" "Starting nightly reboot sequence..."
+    send_warning
+    log "INFO" "Reboot warning sent."
+
+    monitor_cancel_file
+    reboot_sys
+}
+
+main
+

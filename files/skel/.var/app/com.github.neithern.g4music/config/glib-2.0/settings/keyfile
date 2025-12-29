@@ -1,0 +1,11 @@
+[com/github/neithern/g4music]
+sort-mode=3
+dark-theme=true
+blur-mode=1
+compact-playlist=true
+grid-mode=true
+play-background=false
+audio-sink='pipewiresink'
+replay-gain=1
+single-click-activate=true
+monitor-changes=true

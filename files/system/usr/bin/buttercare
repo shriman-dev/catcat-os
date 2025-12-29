@@ -1,0 +1,190 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+VERBOSE=
+
+# Validate paths
+validate_path() {
+    [[ $# -eq 0 ]] && err "No paths provided to validate"
+    local path
+    for path in "$@"; do
+        [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
+        log "DEBUG" "Validating path is on BTRFS filesystem: ${path}"
+        findmnt -n -o FSTYPE -T "${path}" | grep -q "btrfs" ||
+                die "Path is not on a BTRFS filesystem: ${path}"
+    done
+}
+
+# Get all BTRFS mount points
+get_btrfs_mounts() {
+    lsblk -lo FSTYPE,MOUNTPOINT | awk '$1=="btrfs" && $2 != "" {print $2}'
+}
+
+# Show filesystem usage
+show_btrfs_usage() {
+    local path="${1}"
+    validate_paths "${path}"
+    log "INFO" "Showing BTRFS detailed usage for ${path}"
+    ${BTRFS} filesystem usage "${path}"
+    echo
+    log "INFO" "Showing BTRFS disk space for ${path}"
+    ${BTRFS} filesystem df "${path}"
+}
+
+# Perform balance operation
+balance() {
+    local path="all" musage=50 dusage=80
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -m) musage="${2}"; shift ;;
+            -d) dusage="${2}"; shift ;;
+            -p) path="${2}"; shift ;;
+            *) die "Invalid balance option: ${1}" ;;
+        esac
+        shift
+    done
+
+    local mounts=("${path}")
+    if [[ "${path}" == "all" ]]; then
+        log "INFO" "Auto detecting BTRFS mount points"
+        mounts=($(get_btrfs_mounts))
+        log "INFO" "Mount points detected: ${mounts[@]}"
+    fi
+
+    for mount in ${mounts[@]}; do
+        validate_paths "${mount}"
+        log "INFO" "Starting balance on ${mount}"
+        [[ -n ${VERBOSE} ]] &&
+            { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+        echo ""
+        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue ${mount}
+        echo ""
+        [[ -n ${VERBOSE} ]] &&
+            { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+        log "INFO" "Balance completed for ${mount}"
+    done
+}
+
+# Perform defragmentation
+defrag() {
+    local path comp level
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -c) comp="${2}"; shift ;;
+            -l) level=${2}; shift ;;
+            -p) path="${2}"; shift ;;
+            *) die "Invalid defrag option: ${1}" ;;
+        esac
+        shift
+    done
+    [[ -z ${comp} || -z ${path} ]] && die "Both compression (-c) and path (-p) are required for defrag"
+
+    validate_paths "${path}"
+
+    log "INFO" "Starting defragmentation on ${path} (compression: ${comp}${level:+, level: ${level}})"
+    ${BTRFS} filesystem defragment -r -c"${comp}" ${level:+-L ${level}} "${path}"
+    log "INFO" "Defragmentation completed for ${path}"
+}
+
+# Perform scrub operation
+scrub() {
+    local path="${1}"
+    validate_paths "${path}"
+    log "INFO" "Starting scrub on ${path}"
+    ${BTRFS} scrub start -B "${path}"
+    log "INFO" "Scrub completed for ${path}"
+}
+
+
+# Perform TRIM operation
+trim() {
+    local path="${1:-}"
+    if [[ -z "${path}" ]]; then
+        log "INFO" "Running TRIM on fstab entries"
+        ${FSTRIM} --fstab
+        log "INFO" "TRIM completed on fstab entries"
+    else
+        log "INFO" "Running TRIM on ${path}"
+        ${FSTRIM} "${path}"
+        log "INFO" "TRIM completed on ${path}"
+    fi
+}
+
+show_help() {
+    echo "Usage: $(basename "${0}") [global_options] command1 [options] [command2 [options] ..."
+    echo "Global Options:"
+    echo " -h, --help              Show this help message"
+    echo " -v, --verbose           Enable verbose output (use -vv for debug verbosity)"
+    echo
+    echo "Commands:"
+    echo " usage  <path>           Show BTRFS filesystem usage and disk space information"
+    echo
+    echo " balance                 Start balance operation on BTRFS filesystem"
+    echo "                         Note: Balance operation auto detects all BTRFS mount points if no path specified"
+    echo "                         Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)"
+    echo
+    echo " defrag                  Defragment the BTRFS filesystem using a specified compression algorithm"
+    echo "                         Options: -c <algorithm> -l [level] -p <path>"
+    echo
+    echo " scrub  <path>           Start a scrub operation on BTRFS filesystem"
+    echo
+    echo " trim   [path]           Perform TRIM operation on the path"
+    echo "                         Note: TRIM operation uses fstab entries if no path specified"
+}
+
+execute_command() {
+    need_root
+    BTRFS="$(echo 'btrfs' ${VERBOSE:+-v})"
+    FSTRIM="$(echo 'fstrim' ${VERBOSE:+-v})"
+    # Parse commands
+    command=${1}; shift
+    case "${command}" in
+        usage) [[ $# -eq 1 ]] && show_btrfs_usage "${1}" ||
+                   die "BTRFS mount path required to show usage"
+            ;;
+        defrag) defrag "$@"
+            ;;
+        balance) balance "$@"
+            ;;
+        scrub) [[ $# -eq 1 ]] && scrub "${1}" ||
+                   die "BTRFS mount path required for scrub"
+            ;;
+        trim) [[ $# -le 1 ]] && trim  "$@" ||
+                  die "Usage: $(basename ${0}) trim [PATH]"
+            ;;
+        *) die "Unknown command: ${command}" show_help
+            ;;
+    esac
+}
+
+# Parse command line arguments
+main() {
+    [[ $# -eq 0 ]] && die "No arguments provided" show_help
+
+    # Parse global options
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -h|--help) show_help; exit 0 ;;
+            -v|--verbose) VERBOSE=1 ;;
+            -vv) VERBOSE=2 ;;
+            *) break ;;
+        esac
+        shift
+    done
+
+    # Process commands
+    local valid_commands=("usage" "balance" "defrag" "scrub" "trim")
+    while [[ $# -gt 0 ]]; do
+        local cmd=${1} cmd_args=()
+        shift
+
+        while [[ $# -gt 0 && ! " ${valid_commands[*]} " =~ " ${1} " ]]; do
+            cmd_args+=("${1}")
+            shift
+        done
+
+        execute_command "${cmd}" "${cmd_args[@]}"
+    done
+}
+
+main "$@"

@@ -1,0 +1,187 @@
+colors:
+  # Original "catppuccin" theme
+  # https://github.com/catppuccin/catppuccin
+
+  rosewater: 'f5e0dc'
+  flamingo: 'f2cdcd'
+  pink: 'f5c2e7'
+  mauve: 'cba6f7'
+  red: 'f38ba8'
+  maroon: 'eba0ac'
+  peach: 'fab387'
+  yellow: 'f9e2af'
+  green: 'a6e3a1'
+  teal: '94e2d5'
+  sky: '89dceb'
+  sapphire: '74c7ec'
+  blue: '89b4fa'
+  lavender: 'b4befe'
+
+  text: 'cdd6f4'
+  subtext1: 'bac2de'
+  subtext0: 'a6adc8'
+  overlay2: '9399b2'
+  overlay1: '7f849c'
+  overlay0: '6c7086'
+  surface2: '585b70'
+  surface1: '45475a'
+  surface0: '313244'
+
+  base: '1e1e2e'
+  mantle: '181825'
+  crust: '11111b'
+
+core:
+  normal_text: {}
+  regular_file: {}
+  reset_to_normal: {}
+
+  directory:
+    foreground: peach
+    font-style: bold
+
+  symlink:
+    foreground: yellow
+
+  multi_hard_link:
+    foreground: yellow
+    font-style: underline
+
+  fifo:
+    foreground: crust
+    background: mauve
+
+  socket:
+    foreground: crust
+    background: green
+
+  door:
+    foreground: crust
+    background: overlay0
+
+  block_device:
+    foreground: crust
+    background: overlay2
+
+  character_device:
+    foreground: overlay2
+    background: crust
+
+  broken_symlink:
+    foreground: red
+    font-style:
+      - bold
+      - underline
+
+  missing_symlink_target:
+    foreground: red
+    font-style:
+      - bold
+      - underline
+
+  setuid: {}
+
+  setgid: {}
+
+  file_with_capability: {}
+
+  sticky_other_writable: {}
+
+  other_writable: {}
+
+  sticky: {}
+
+  executable_file:
+    foreground: blue
+    font-style: bold
+
+text:
+  special:
+    foreground: text
+    background: surface2
+
+  todo:
+    foreground: text
+    font-style: bold
+
+  licenses:
+    foreground: subtext0
+
+  configuration:
+    foreground: text
+
+  other:
+    foreground: text
+
+markup:
+  web:
+    foreground: lavender
+  other:
+    foreground: red
+
+programming:
+  source:
+    foreground: sapphire
+
+  tooling:
+    foreground: teal
+
+    continuous-integration:
+      foreground: sky
+
+media:
+  foreground: flamingo
+  3d:
+    application:
+      foreground: flamingo
+      font-style: bold
+    mesh:
+      foreground: flamingo
+
+  audio:
+    foreground: mauve
+    font-style: bold
+
+  fonts:
+    foreground: subtext0
+
+  image:
+    foreground: lavender
+    font-style: bold
+    application:
+      foreground: pink
+
+  video:
+    foreground: sky
+    font-style: bold
+
+office:
+  foreground: blue
+
+  presentation:
+    foreground: peach
+
+  spreadsheet:
+    foreground: green
+
+archives:
+  foreground: green
+  font-style: underline
+
+  images:
+    foreground: maroon
+    font-style: underline
+
+  packages:
+    foreground: green
+    font-style:
+      - underline
+      - bold
+
+
+executable:
+  foreground: blue
+  font-style: bold
+
+unimportant:
+  foreground: overlay1

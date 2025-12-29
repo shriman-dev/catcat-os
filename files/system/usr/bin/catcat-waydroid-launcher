@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+waydroid show-full-ui &
+
+sleep 5
+
+waydroid prop set persist.waydroid.uevent false
+waydroid prop set persist.waydroid.multi_windows false
+
+for file in ${HOME}/.local/share/applications/waydroid.*.desktop; do
+    grep "NoDisplay=true" ${file} || sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true"  ${file}
+done

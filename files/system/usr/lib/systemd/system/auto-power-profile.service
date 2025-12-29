@@ -1,0 +1,9 @@
+[Unit]
+Description=Set power profile based on device power supply
+
+[Service]
+ExecStart=/usr/libexec/auto-power-profile
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

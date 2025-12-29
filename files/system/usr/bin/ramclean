@@ -1,0 +1,53 @@
+#!/usr/bin/bash
+KILLP='gnome-software
+evolution-alarm-notify
+evolution-source-registry
+evolution-calendar-factory
+evolution-addressbook-factory
+gsd-wacom
+gsd-printer
+gsd-sharing
+updatedb
+tracker-miner-fs-3
+localsearch'
+#setroubleshootd
+#sssd_kcm
+#gvfsd-http
+#avahi-daemon
+#gsd-media-key
+#abrt-applet
+#gsd-smartcard
+#gsd-sharing
+#gsd-screensaver-proxy
+#cupsd
+#gvfs-goa-volume-monitor
+#gvfsd-dnssd
+#gsd-power
+#abrt-dump-journal-xorg
+#abrtd
+#dconf-service
+#colord
+#xdg-desktop-portal-gnome
+#gvfsd
+#gsd-housekeeping
+#gsd-color
+#ibus-x11
+#ibus-extention-gtk3
+#goa-daemon
+#goa-identity
+#gsd-print-notifications
+#gsd-datetime
+#gsd-keyboard
+#gsd-daemon
+#gnome-keyring-daemon
+#xdg-desktop-portal-gtk
+#gsd-xsettings
+
+for II in ${KILLP[*]}
+do
+  pkill -KILL -fe ${II}
+done
+
+sync; echo 3 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a
+
+exit 0

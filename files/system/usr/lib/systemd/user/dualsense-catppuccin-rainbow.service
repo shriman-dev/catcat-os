@@ -1,0 +1,9 @@
+[Unit]
+Description=Dualsense Catppuccin Rainbow
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/dualsense-catppuccin-rainbow
+
+[Install]
+WantedBy=default.target

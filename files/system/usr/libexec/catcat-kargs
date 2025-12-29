@@ -1,0 +1,46 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+KARGS=$(rpm-ostree kargs)
+NEEDED_KARGS=()
+
+COMMON_KARGS_TO_ADD=(
+    "vconsole.font=sun12x22"
+    # catppuccin mocha colors for tty
+    "vt.default_red=30,243,166,249,137,245,148,186,88,243,166,249,137,245,148,166"
+    "vt.default_grn=30,139,227,226,180,194,226,194,91,139,227,226,180,194,226,173"
+    "vt.default_blu=46,168,161,175,250,231,213,222,112,168,161,175,250,231,213,200"
+    "rd.udev.log_priority=3"
+    "loglevel=3"
+    "rd.shell=0"
+    "rd.emergency=halt"
+    "rd.luks.options=discard"
+    "luks.options=discard"
+)
+
+for karg in "${COMMON_KARGS_TO_ADD[@]}"; do
+    if [[ ! ${KARGS} =~ ${karg} ]]; then
+        log "INFO" "Adding needed kargs: ${karg}"
+        NEEDED_KARGS+=("--append-if-missing=${karg}")
+    fi
+done
+
+if command -v nvidia-smi; then
+    NEEDED_KARGS+=(
+        "nvidia-drm.modeset=1"
+        "nvidia-drm.fbdev=1"
+        "rd.driver.blacklist=nouveau"
+        "modprobe.blacklist=nouveau"
+    )
+fi
+
+if [[ ${KARGS} =~ "nomodeset" ]]; then
+    log "INFO" "Removing nomodeset"
+    NEEDED_KARGS+=("--delete-if-present=nomodeset")
+fi
+
+if [[ ${#NEEDED_KARGS[@]} -gt 0 ]]; then
+    log "INFO" "Found needed karg changes, applying the following: ${NEEDED_KARGS[*]}"
+    rpm-ostree kargs ${NEEDED_KARGS[*]}
+else
+    log "INFO" "No karg changes needed"
+fi

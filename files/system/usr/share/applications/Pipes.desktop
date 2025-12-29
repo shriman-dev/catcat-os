@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Icon=a7800
+NoDisplay=false
+Exec=pipes.sh -R -p 3 -s 9 -r 90000 -f 100 -t 1
+Terminal=true
+X-GNOME-UsesNotifications=false
+Name=Pipes

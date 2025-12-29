@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -oue pipefail
+source /usr/lib/catcat/funcvar.sh
+
+log "INFO" "Running post setup cleanup"
+dnf5 clean all
+find /var/* -maxdepth 0 -type d -not -name "log" -not -name "cache" -exec rm -rvf {} \;
+find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rvf {} \;
+rm -rvf /var/log/*
+rm -rvf /boot/.*
+rm -rvf /boot/*
+rm -rvf /tmp/*
+
+# Remove stuffs
+#/etc/skel/.config/autostart
+log "INFO" "Removing more stuffs"
+rm -rvf /etc/skel/.mozilla
+rm -rvf /etc/skel/.config/user-tmpfiles.d
+
+# Disable gnome software running in background
+if rpm -q gnome-software; then
+    log "INFO" "Disabling gnome software from running in background"
+    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /usr/lib/systemd/user/gnome-software.service
+    rm -vf /usr/share/dbus-1/services/org.gnome.Software.service
+    rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
+fi
+
+log "INFO" "Running post setup configuring"
+touch /etc/resolv.conf
+
+mkdir -vp /var/tmp
+chmod -vR 1777 /var/tmp

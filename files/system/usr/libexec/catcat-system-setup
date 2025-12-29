@@ -1,0 +1,135 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+U1000="$(id -un 1000)"
+
+# First boot setup
+if [[ ! -f /etc/catcat-os/first-boot ]]; then
+    plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
+
+    # Setup grub
+    mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
+    replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+    replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
+    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=console' /etc/default/grub
+    replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+    replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+    #GRUB_TERMINAL_OUTPUT=gfxterm
+    #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+
+    # Update grubup
+    /usr/bin/grubup
+
+    # Set default tty fonts
+    replace_add 'FONT=' 'FONT=sun12x22' /etc/vconsole.conf
+
+    # Show grub screen for desktop devices
+    hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
+
+    # Set default hostname
+    hostnamectl set-hostname --static "catcat"
+
+    # Permit main user
+    #usermod -aG libvirt ${U1000}
+
+    mkdir -p /etc/catcat-os/
+    echo 'first boot' > /etc/catcat-os/first-boot
+fi
+
+/usr/libexec/secatcat
+/usr/libexec/catcat-kargs
+/usr/libexec/catcat-flatpak-manager
+
+# Sync configs on update
+catcat_update_sha="/etc/catcat-os/update_sha"
+if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
+    [[ ! -d /root/.local/share/catcat-os/LS_COLORS_DIR ]] &&
+            mkdir -vp /root/.local/share/catcat-os/LS_COLORS_DIR
+    cp -dvf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
+            /root/.local/share/catcat-os/LS_COLORS_DIR/
+
+    [[ ! -e /root/.config/bat ]] &&
+            { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
+    /usr/bin/bat cache --build
+
+    [[ ! -e /root/.config/fish/fish_variables ]] &&
+            ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
+
+    [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
+
+    # GDM
+    # Update it or fall back to orignal GDM theme
+    gdm_shell="share/gnome-shell"
+    gdm_resource="gnome-shell-theme.gresource"
+    if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
+        [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
+        cp -av "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+    fi
+    /usr/bin/dconf update
+#    chmod -c -R 755 /etc/dconf/
+
+    cat "${catcat_update_sha}" > "${catcat_update_sha}_previous"
+fi
+
+# Sync main user's monitors.xml with GDM
+monitors_xml=".config/monitors.xml"
+if [[ -f "/home/${U1000}/${monitors_xml}" ]]; then
+    if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}" >/dev/null 2>&1; then
+        cp -vf "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"
+        restorecon -vR "/home/${U1000}/.local/share/icc"
+    fi
+fi
+
+# Nvidia specific
+if command -v nvidia-smi; then
+    if grep '//"hideType":' /etc/fastfetch/config.jsonc; then
+        sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
+        sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
+    fi
+    # Enable nvidia optimus if device is laptop and has nvidia dgpu
+#   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
+#       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
+#           echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
+#       fi
+#   fi
+fi
+
+# Enable i2c-dev support to configure monitors via ddcutil
+i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
+if [[ ! -f "${i2c_dev_conf}" ]] && command -v ddcutil; then
+    echo "i2c-dev" > "${i2c_dev_conf}"
+    # Enable i2c support for nvidia cards
+    if command -v nvidia-smi; then
+        echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > \
+                "${i2c_dev_conf/.conf/_nvidia_support.conf}"
+    fi
+fi
+
+
+# FIXES
+# Set default target to graphical on base images, fixes rebase
+current_default_target=$(systemctl get-default)
+variant_id="$(grep '^VARIANT_ID' /usr/lib/os-release | cut -d= -f2-)"
+default_target=$([[ ${variant_id} =~ "-sv" ]] && echo "multi-user.target" || echo "graphical.target")
+
+grep "${default_target}" <<< "${current_default_target}" || systemctl set-default "${default_target}"
+
+# Waydroid fix
+if [[ -f "/var/lib/waydroid/lxc/waydroid/config" ]]; then
+    # Remove unneeded apparmor entry from Waydroid LXC
+    sed -i '/lxc\.apparmor\.profile\s*=\s*unconfined/d' "/var/lib/waydroid/lxc/waydroid/config"
+fi
+
+# Distrobox fix
+# If the hostname is too long Distrobox will fail during setup
+# Let's check the length and reset it to something sensible if that happens.
+if (( $(hostname | wc -m) > 20 )); then
+    hostnamectl set-hostname catcat
+fi
+
+# Fix missing hostname file breaking distrobox
+if [[ ! -f /etc/hostname ]]; then
+    touch /etc/hostname
+fi

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Hidden=false
+Name=dash_to_panel_primary_monitor
+Comment=Set primary monitor for dash to panel
+Terminal=false
+Exec=/usr/libexec/dash_to_panel_primary_monitor.sh
+Type=Application
