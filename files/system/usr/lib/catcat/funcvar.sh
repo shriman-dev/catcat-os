@@ -48,7 +48,6 @@ VERBOSE=2
 
 # Logging with optional verbose output
 log() {
-    [[ "${-}" =~ "x" ]] && { set +x; local exec_print=true; }
     local color level="${1}" msg="${@:2}"
     local datetime="$([[ ${VERBOSE} -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
 
@@ -60,7 +59,6 @@ log() {
     esac
 
     echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
-    [[ -n ${exec_print} ]] && set -x
 }
 
 # Error handling with optional function call
@@ -167,7 +165,7 @@ run_as_users() {
         local some_user_id=$(basename "${running_user}")
         local some_user="$(id -un "${some_user_id}")"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-            log "INFO" "Running given command as user: ${some_user}"
+            log "DEBUG" "Running given command as user: ${some_user}"
             sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
         fi
     done
@@ -180,7 +178,7 @@ notify_users() {
             local some_user_id=$(basename "${running_user}")
             local some_user="$(id -un "${some_user_id}")"
             if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-                log "INFO" "Sending notification to user: ${some_user}"
+                log "DEBUG" "Sending notification to user: ${some_user}"
                 sudo -u "${some_user}" \
                     DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
                     notify-send -i "${1}" -a "${2}" "${3}" "${4}"
@@ -205,7 +203,7 @@ check_network_connection() {
         if curl --silent --head --fail "https://fedoraproject.org" >/dev/null; then
           return 0
         else
-          log "INFO" "Network connection is not available. Waiting..."
+          log "DEBUG" "Network connection is not available. Waiting..."
           sleep ${sleep_time}
           (( attempt++ ))
         fi
