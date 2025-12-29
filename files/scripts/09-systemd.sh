@@ -1,6 +1,6 @@
 #!/bin/bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
 
 #sddm.service#gdm.service
 services_enable() {

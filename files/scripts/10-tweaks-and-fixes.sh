@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
 
 # Tweak ublue defaults
 if [[ -d /usr/share/ublue-os ]]; then

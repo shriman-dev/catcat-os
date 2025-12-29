@@ -48,6 +48,7 @@ VERBOSE=2
 
 # Logging with optional verbose output
 log() {
+    [[ "${-}" =~ "x" ]] && { set +x; local exec_print=true; }
     local color level="${1}" msg="${@:2}"
     local datetime="$([[ ${VERBOSE} -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
 
@@ -59,6 +60,7 @@ log() {
     esac
 
     echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
+    [[ -n ${exec_print} ]] && set -x
 }
 
 # Error handling with optional function call

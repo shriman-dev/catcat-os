@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
-set -oue pipefail
 export SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source ${SETUP_DIR}/funcvar.sh
 
 enclosed_heading_this() {
+    [[ "${-}" =~ "x" ]] && { set +x; local exec_print=true; }
     local text="${1}" padding_char="${2:-=}" output_width=${3:-120}
     enclosed_heading "${text}" "${padding_char}" ${output_width}
+    [[ -n ${exec_print} ]] && set -x
 }
 
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
+
+set -ouex pipefail
 
 enclosed_heading_this "Cleaning Up"
 ${SETUP_DIR}/01-cleanup.sh

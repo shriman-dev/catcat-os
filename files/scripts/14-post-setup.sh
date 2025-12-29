@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
 
 log "INFO" "Running post setup cleanup"
 dnf5 clean all

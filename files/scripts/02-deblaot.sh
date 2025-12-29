@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source ${SETUP_DIR}/funcvar.sh
+set -ouex pipefail
 
 log "INFO" "Debloating image"
 #avahi avahi-libs fuse-sshfs irqbalance

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
 
 if ! command -v rpm-ostree >/dev/null || ! command -v bootc >/dev/null; then
     die "This module is only compatible with Fedora Atomic images"

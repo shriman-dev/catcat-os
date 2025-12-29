@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
+
 OS_RELEASE_FILE="/usr/lib/os-release"
 
 log "INFO" "Applying custom OS labels"

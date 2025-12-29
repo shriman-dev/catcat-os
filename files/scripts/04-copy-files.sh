@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source ${SETUP_DIR}/funcvar.sh
+set -ouex pipefail
 
 log "INFO" "Copying over default system configurations and files"
 cp -vf ${SETUP_DIR}/setup_files/cosign.pub /etc/pki/containers/catcat-os.pub

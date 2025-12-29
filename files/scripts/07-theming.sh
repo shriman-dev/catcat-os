@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
-set -x
+set -ouex pipefail
 
 desktop_files() {
     local desktopfile_dir="/usr/share/applications"

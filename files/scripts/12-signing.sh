@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -oue pipefail
 source /usr/lib/catcat/funcvar.sh
+set -ouex pipefail
+
 TEMPLATE_POLICY="${SETUP_DIR}/setup_files/policy.json"
 CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
 POLICY_FILE="/etc/containers/policy.json"

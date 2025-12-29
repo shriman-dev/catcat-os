@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-set -ouex pipefail
 source /usr/lib/catcat/funcvar.sh
-set -x
+set -ouex pipefail
 
 DESKTOP_EXTRAS=(
     # Shell setup
