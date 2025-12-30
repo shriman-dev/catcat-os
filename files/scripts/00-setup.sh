@@ -18,54 +18,54 @@ enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.
 
 set -ouex pipefail
 
-enclosed_heading_this "Cleaning Up"
+{ enclosed_heading_this "Cleaning Up"; } 2>/dev/null
 exec_script ${SETUP_DIR}/01-cleanup.sh
 ostree container commit
 
-enclosed_heading_this "Debloating"
+{ enclosed_heading_this "Debloating"; } 2>/dev/null
 exec_script ${SETUP_DIR}/02-deblaot.sh
 ostree container commit
 
-enclosed_heading_this "Preparing System Environment"
+{ enclosed_heading_this "Preparing System Environment"; } 2>/dev/null
 exec_script ${SETUP_DIR}/03-prep-env.sh
 ostree container commit
 
-enclosed_heading_this "Copying Over System Default Files"
+{ enclosed_heading_this "Copying Over System Default Files"; } 2>/dev/null
 exec_script ${SETUP_DIR}/04-copy-files.sh
 ostree container commit
 
-enclosed_heading_this "Updating And Installing Packages"
+{ enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
 exec_script ${SETUP_DIR}/05-rpm-pkgs.sh
 ostree container commit
 
-enclosed_heading_this "Applying Themes On Various System Components"
+{ enclosed_heading_this "Applying Themes On Various System Components"; } 2>/dev/null
 exec_script ${SETUP_DIR}/07-theming.sh
 ostree container commit
 
-enclosed_heading_this "Enhancing Security With Secatcat"
+{ enclosed_heading_this "Enhancing Security With Secatcat"; } 2>/dev/null
 exec_script ${SETUP_DIR}/08-secatcat.sh
 ostree container commit
 
-enclosed_heading_this "Configuring Systemd Services"
+{ enclosed_heading_this "Configuring Systemd Services"; } 2>/dev/null
 exec_script ${SETUP_DIR}/09-systemd.sh
 ostree container commit
 
-enclosed_heading_this "Refining System With Tweaks And Fixes"
+{ enclosed_heading_this "Refining System With Tweaks And Fixes"; } 2>/dev/null
 exec_script ${SETUP_DIR}/10-tweaks-and-fixes.sh
 ostree container commit
 
-enclosed_heading_this "Applying Branding"
+{ enclosed_heading_this "Applying Branding"; } 2>/dev/null
 exec_script ${SETUP_DIR}/11-image-info.sh
 ostree container commit
 
-enclosed_heading_this "Configuring Signing Policy"
+{ enclosed_heading_this "Configuring Signing Policy"; } 2>/dev/null
 exec_script ${SETUP_DIR}/12-signing.sh
 ostree container commit
 
-enclosed_heading_this "Regenerating Initramfs"
+{ enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
 exec_script ${SETUP_DIR}/13-initramfs.sh
 ostree container commit
 
-enclosed_heading_this "Post Build Setup"
+{ enclosed_heading_this "Post Build Setup"; } 2>/dev/null
 exec_script ${SETUP_DIR}/14-post-setup.sh
 ostree container commit
