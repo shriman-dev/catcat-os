@@ -7,7 +7,7 @@ sync_libadwaita_theme() {
   local previous_theme="${2}"
   local theme_path="${3}"
 
-  if [[ ! "${selected_theme}" == "${previous_theme}" ]]; then
+  if [[ "${selected_theme}" != "${previous_theme}" ]]; then
     if [[ -d "${theme_path}/gtk-4.0" ]]; then
       rm -rf "${HOME}/.config/gtk-4.0"
       cp -drf "${theme_path}/gtk-4.0" "${HOME}/.config/"

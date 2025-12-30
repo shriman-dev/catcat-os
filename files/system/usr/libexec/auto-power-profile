@@ -55,7 +55,7 @@ while true; do
     fi
   fi
 
-  if [[ ! "${target_profile}" == "${previous_profile}" ]]; then
+  if [[ "${target_profile}" != "${previous_profile}" ]]; then
     set_power_profile "${target_profile}"
     previous_profile="${target_profile}"
   fi

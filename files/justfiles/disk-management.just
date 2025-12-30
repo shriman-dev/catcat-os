@@ -83,22 +83,3 @@ backup-luks-header DEVICE_PATH BACKUP_FILE:
 restore-luks-header DEVICE_PATH HEADER_FILE:
     #!/usr/bin/bash
     sudo cryptsetup luksHeaderRestore {{ DEVICE_PATH }} --header-backup-file {{ HEADER_FILE }}
-
-# Auto unlock encrypted root
-[group("disk management")]
-auto-unlock-encrypted-root KEY_FILE DEVICE_PATH:
-    #!/usr/bin/env -S sudo -- /bin/bash
-    root_luks_uuid="$(basename $(findmnt -n -o SOURCE -T "/sysroot" | cut -d '[' -f 1))"
-    echo "Presuming {{ KEY_FILE }} is correctly added as a keyfile for the LUKS root encryption"
-    echo "If not, please add it using command: ujust add-keyfile-luks"
-    if grep -qE "${root_luks_uuid}.*none" /etc/crypttab; then
-        sed -i 's/none.*/{{ KEY_FILE }} luks,discard,no-read-workqueue,no-write-workqueue,keyfile-timeout=5s/' /etc/crypttab
-        echo "install_items=\"{{ KEY_FILE }} /etc/crypttab\"" | tee /etc/dracut.conf.d/99-root-luks-key.conf
-        rpm-ostree initramfs --disable ; rpm-ostree initramfs --enable
-    else
-        echo "Looks like a keyfile already set for LUKS root encryption"
-        echo "Edit it manually using command: sudo $EDITOR /etc/crypttab"
-        echo "Then run below command respectively"
-        echo 'echo "install_items=\"{{ KEY_FILE }} /etc/crypttab\"" | sudo tee /etc/dracut.conf.d/99-root-luks-key.conf'
-        echo "sudo rpm-ostree initramfs --disable ; sudo rpm-ostree initramfs --enable"
-    fi
