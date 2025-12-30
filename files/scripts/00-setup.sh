@@ -9,11 +9,11 @@ enclosed_heading_this() {
 
 exec_script() {
     {
-    local script="${1}"
-    sed -E '/log ("DEBUG"|"INFO")/ s/$/; } 2>\/dev\/null/' "${script}" | \
-    sed -Ee 's|log "INFO"|{ log "INFO"|g' \
-            -e 's|log "DEBUG"|{ log "DEBUG"|g' | bash
-    } 2>/dev/null
+        local script="${1}"
+        sed -E '/log ("DEBUG"|"INFO")/ s/$/; } 2>\/dev\/null/' "${script}" | \
+        sed -Ee 's|log "INFO"|{ log "INFO"|g' \
+            -e 's|log "DEBUG"|{ log "DEBUG"|g'
+    } 2>/dev/null | bash
 }
 
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
