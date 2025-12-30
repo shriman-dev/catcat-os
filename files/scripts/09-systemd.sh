@@ -33,6 +33,7 @@ DISABLE_SERVICES=(
     "brew-update.service"
     "brew-upgrade.service"
     "bolt.service"
+    "bootc-fetch-apply-updates.timer"
     "cups-browsed.service"
     "cups.path"
     "cups.service"

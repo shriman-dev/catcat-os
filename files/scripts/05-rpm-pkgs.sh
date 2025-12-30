@@ -172,6 +172,7 @@ DESKTOP_COMMON=(
 
     # Containers
     "distrobox"
+    "podman-compose"
     "podman"
     "udica"
 
