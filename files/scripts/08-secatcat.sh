@@ -192,10 +192,12 @@ log "INFO" "Adding autostart desktop file that mutes mic on user login"
 mkdir -pv "$(dirname ${mute_mic_file})"
 cat > "${mute_mic_file}" << EOF
 [Desktop Entry]
-Type=Application
+Hidden=false
 Name=Mute Microphone on Login
+Comment=Mute Microphone on Login
+Terminal=false
 Exec=/usr/bin/amixer set Capture nocap
-Icon=utilities-terminal
+Type=Application
 EOF
 chmod -v 644 "${mute_mic_file}"
 

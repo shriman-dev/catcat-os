@@ -3,5 +3,6 @@ Hidden=false
 Name=gnome_middle_workspace
 Comment=Set middle workspace as primary
 Terminal=false
-Exec=/usr/libexec/gnome_middle_workspace.sh
+Exec=/usr/libexec/catcat_autostart/gnome_middle_workspace.sh
+OnlyShowIn=GNOME;
 Type=Application
