@@ -11,6 +11,7 @@ if [[ -d /usr/share/ublue-os ]]; then
 fi
 
 # Rpm-ostreed auto update policy to be none
+log "INFO" "Updating update policy"
 sed -i 's|AutomaticUpdatePolicy=.*|AutomaticUpdatePolicy=none|g' /etc/rpm-ostreed.conf
 
 # Enable disk discard
@@ -30,6 +31,7 @@ sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/li
 #sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
 
 # Let root user to ignore inhabitors
+log "INFO" "Allowing root user to ignore inhabitors"
 mkdir -vp /etc/polkit-1/rules.d
 ln -svf /usr/share/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules.example \
         /etc/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules
@@ -49,7 +51,7 @@ cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 #chmod -v 000 /usr/libexec/evolution-addressbook-factory
 #chmod -v 000 /usr/libexec/evolution-calendar-factory
 #chmod -v 000 /usr/libexec/evolution-data-server/evolution-alarm-notify
-log "INFO" "Reducing ram consumption by disabling unneeded process"
+log "INFO" "Reducing ram consumption by disabling unneeded processes"
 restore_point="/etc/catcat-os/restore-point"
 mkdir -vp "${restore_point}"/{xdg-autostart,systemd-{system,user},dbus-services}
 
@@ -64,7 +66,7 @@ sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sh
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    log "INFO" "Applying handheld specific tweaks"
+    log "INFO" "Applying catcat-os-mi specific tweaks"
 #    systemctl disable systemd-nsresourced.service systemd-nsresourced.socket systemd-userdbd.service systemd-userdbd.socket
     systemctl --global disable org.freedesktop.IBus.session.GNOME.service \
                                org.freedesktop.IBus.session.generic.service

@@ -2,6 +2,8 @@
 source /usr/lib/catcat/funcvar.sh
 set -ouex pipefail
 
+log "INFO" "Defining packages"
+
 DESKTOP_EXTRAS=(
     # Shell setup
     ##lsd zellij

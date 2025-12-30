@@ -5,9 +5,9 @@ set -ouex pipefail
 #############################
 # Boot, Services and System #
 #############################
+log "INFO" "Configuring unneeded daemons to stop"
 systemd_dir="/usr/lib/systemd"
 # Avahi daemon to stop when unneeded
-log "INFO" "Configuring avahi daemon to stop when unneeded"
 mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
 echo "[Unit]
 StopWhenUnneeded=true" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
@@ -33,13 +33,15 @@ sed -i -Ee "/#?Storage=/d;/\[Coredump\]/a Storage=none" \
         -e "/#?ExternalSizeMax=/d;/\[Coredump\]/a ExternalSizeMax=0" \
             "${systemd_dir}/coredump.conf"
 
+log "INFO" "All Done."
+
 # Configure Chrony
 ##################
+log "INFO" "Configuring chrony NTP servers"
 tmp_chrony="/tmp/chrony_conf"
 chrony_conf="/etc/chrony.conf"
 grapheneos_repo="https://raw.githubusercontent.com/GrapheneOS/infrastructure/refs/heads/main"
 
-log "INFO" "Configuring chrony NTP servers"
 mkdir -vp "${tmp_chrony}"
 curl -Lo "${tmp_chrony}/LICENSE" "${grapheneos_repo}/LICENSE"
 curl -Lo "${tmp_chrony}/chrony.conf" "${grapheneos_repo}${chrony_conf}"
@@ -56,10 +58,13 @@ echo "d /var/lib/chrony 0755 chrony chrony 30d" > /etc/tmpfiles.d/chrony.conf
 # Clear tmp
 rm -rvf "${tmp_chrony}"
 
+log "INFO" "Chrony Configuration done."
+
 
 ###########
 # Network #
 ###########
+log "INFO" "Setting up network for image: ${IMAGE_NAME}"
 # Enable MAC randomization and temporary IPv6 addresses generation
 log "INFO" "Enabling MAC randomization and dynamic IPv6 address generation"
 networkmanager_confd="/usr/lib/NetworkManager/conf.d"
@@ -89,7 +94,7 @@ dnscrypt_confd="/etc/dnscrypt-proxy"
 ushare_localdns="/usr/share/localdns.d"
 dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
 
-log "DEBUG" "Installing dnscrypt-proxy"
+log "INFO" "Installing dnscrypt-proxy"
 mkdir -vp "${dnscrypt_tar}.extract"
 curl -Lo "${dnscrypt_tar}" \
         $(curl -s -X GET "${dnscrypt_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux_x86_64-.*.tar.gz"' | cut -d '"' -f4)
@@ -103,9 +108,31 @@ curl -Lo "${dnscrypt_confd}/public-resolvers.md.minisig" \
                 "${dnscrypt_resolver_repo}/v3/public-resolvers.md.minisig"
 
 rm -rf "${dnscrypt_tar}" "${dnscrypt_tar}.extract"
-log "DEBUG" "Done."
+log "INFO" "Done."
 
-log "DEBUG" "Enabling localdns"
+# Get DNS blocklist archive
+log "INFO" "Get DNS Ad and Malware blocklist"
+mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
+
+# Dnscrypt blocklist
+[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+    curl -Lo "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
+                "${dns_blocklist_repo}/domains.d/domains-filtered-subdomains.tar.zst"
+    split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
+                "${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst"
+}
+
+# Dnsmasq blocklist
+[[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+    log "INFO" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
+    echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
+    curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
+                "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
+    split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
+                "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
+}
+
+log "INFO" "Enabling localdns"
 # Set localdns as default dns server for blocking ads/malwares
 cp -vf "${localdns_confd}/localdns-server.conf" /etc/NetworkManager/conf.d/
 
@@ -123,34 +150,10 @@ else
     /usr/bin/localdnsctl -v --switch-blocklist-backend dnscrypt
     systemctl -f enable dnscrypt-proxy.service
 fi
-log "DEBUG" "Done."
-
-# Get DNS blocklist archive
-log "DEBUG" "Get DNS Ad and Malware blocklist"
-mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
-
-# Dnscrypt blocklist
-[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
-    curl -Lo "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
-                "${dns_blocklist_repo}/domains.d/domains-filtered-subdomains.tar.zst"
-    split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
-                "${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst"
-}
-
-# Dnsmasq blocklist
-[[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
-    log "DEBUG" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
-    echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
-    curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
-                "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
-    split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
-                "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
-}
-log "DEBUG" "Done."
 
 # Clear tmp
 rm -rvf "${tmp_localdns}"
-log "INFO" "All done."
+log "INFO" "Network setup done."
 
 ######################################################
 # File Permissions, Users, Groups and Authentication #
@@ -187,8 +190,8 @@ sed -i -Ee 's|^(#?[[:space:]]*minlen =.*)|minlen = 12|' \
 # After User Login
 ###############
 # Create a xdg autostart file to mute microphone at login
-mute_mic_file="/etc/xdg/autostart/mute-mic.desktop"
 log "INFO" "Adding autostart desktop file that mutes mic on user login"
+mute_mic_file="/etc/xdg/autostart/mute-mic.desktop"
 mkdir -pv "$(dirname ${mute_mic_file})"
 cat > "${mute_mic_file}" << EOF
 [Desktop Entry]

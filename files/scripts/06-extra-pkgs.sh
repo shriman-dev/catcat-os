@@ -5,9 +5,10 @@ set -ouex pipefail
 TMP_DIR="/tmp/catcat_extra_pkgs"
 
 starship() {
+    log "INFO" "Installing starship"
+
     local starship_repo="https://api.github.com/repos/starship/starship"
     local starship_tar="${TMP_DIR}/starship.tar.gz"
-    log "INFO" "Installing starship"
     mkdir -vp "${starship_tar}.extract"
 
     curl -Lo "${starship_tar}" $(curl -s -X GET "${starship_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
@@ -21,9 +22,10 @@ starship() {
 }
 
 eza() {
+    log "INFO" "Installing eza"
+
     local eza_repo="https://github.com/eza-community/eza"
     local eza_tar="${TMP_DIR}/eza.tar.gz"
-    log "INFO" "Installing eza"
     mkdir -vp "${eza_tar}.extract"
 
     curl -Lo "${eza_tar}" "${eza_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
@@ -37,9 +39,10 @@ eza() {
 }
 
 grex() {
+    log "INFO" "Installing grex"
+
     local grex_repo="https://api.github.com/repos/pemistahl/grex"
     local grex_tar="${TMP_DIR}/grex.tar.gz"
-    log "INFO" "Installing grex"
     mkdir -vp "${grex_tar}.extract"
 
     curl -Lo "${grex_tar}" $(curl -s -X GET "${grex_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
@@ -53,10 +56,11 @@ grex() {
 }
 
 yazi() {
+    log "INFO" "Installing yazi"
+
     local yazi_repo="https://github.com/sxyazi/yazi"
     local yazi_repo_raw="https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main"
     local yazi_zip="${TMP_DIR}/yazi.zip"
-    log "INFO" "Installing yazi"
     mkdir -vp "${yazi_zip}.extract"
 
     curl -Lo "${yazi_zip}" "${yazi_repo}/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip"
@@ -78,16 +82,17 @@ yazi() {
 }
 
 hblock() {
+    log "INFO" "Installing hblock"
+
     local hblock_confd="/etc/hblock"
     local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
     local dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
-    log "INFO" "Installing hblock"
 
     curl -Lo "/usr/bin/hblock" "${hblock_repo}/hblock"
     chmod -v +x "/usr/bin/hblock"
 
     # Get hblock config
-    log "DEBUG" "Getting hblock configuration"
+    log "INFO" "Getting hblock configuration"
     mkdir -vp "${hblock_confd}"
     curl -Lo "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
     curl -Lo "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
@@ -97,9 +102,10 @@ hblock() {
 }
 
 bandwhich() {
+    log "INFO" "Installing bandwhich"
+
     local bandwhich_repo="https://api.github.com/repos/imsnif/bandwhich"
     local bandwhich_tar="${TMP_DIR}/bandwhich.tar.gz"
-    log "INFO" "Installing bandwhich"
     mkdir -vp "${bandwhich_tar}.extract"
 
     curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
@@ -113,8 +119,9 @@ bandwhich() {
 }
 
 buttersnap() {
+    log "INFO" "Installing buttersnap"
+
     local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
-    log "INFO" "Installing btdu"
 
     curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
     chmod -v +x "/usr/bin/buttersnap.sh"
@@ -126,8 +133,9 @@ buttersnap() {
 }
 
 btdu() {
-    local btdu_repo="https://github.com/CyberShadow/btdu"
     log "INFO" "Installing btdu"
+
+    local btdu_repo="https://github.com/CyberShadow/btdu"
 
     curl -Lo "/usr/bin/btdu" "${btdu_repo}/releases/latest/download/btdu-static-x86_64"
 
@@ -136,9 +144,10 @@ btdu() {
 }
 
 gocryptfs() {
+    log "INFO" "Installing gocryptfs"
+
     local gocryptfs_repo="https://api.github.com/repos/rfjakob/gocryptfs"
     local gocryptfs_tar="${TMP_DIR}/gocryptfs.tar.gz"
-    log "INFO" "Installing gocryptfs"
     mkdir -vp "${gocryptfs_tar}.extract"
 
     curl -Lo "${gocryptfs_tar}" $(curl -s -X GET "${gocryptfs_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)
@@ -152,10 +161,11 @@ gocryptfs() {
 }
 
 scrcpy() {
+    log "INFO" "Installing scrcpy"
+
     local scrcpy_repo="https://api.github.com/repos/Genymobile/scrcpy"
     local scrcpy_tar="${TMP_DIR}/scrcpy.tar.gz"
     local usrlibexec_scrcpy="/usr/libexec/scrcpy"
-    log "INFO" "Installing scrcpy"
     mkdir -vp "${scrcpy_tar}.extract" "${usrlibexec_scrcpy}"
 
     curl -Lo "${scrcpy_tar}" $(curl -s -X GET "${scrcpy_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)
@@ -171,10 +181,11 @@ scrcpy() {
 }
 
 llama_cpp() {
+    log "INFO" "Installing llama_cpp"
+
     local llama_cpp_repo="https://api.github.com/repos/ggml-org/llama.cpp"
     local llama_cpp_zip="${TMP_DIR}/llama-cpp-vulkan.zip"
     local usrlibexec_llama_cpp="/usr/libexec/llama_cpp_vulkan"
-    log "INFO" "Installing llama_cpp"
     mkdir -vp "${llama_cpp_zip}.extract" "${usrlibexec_llama_cpp}"
 
     curl -Lo "${llama_cpp_zip}" $(curl -s -X GET "${llama_cpp_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
@@ -191,8 +202,9 @@ llama_cpp() {
 }
 
 pipes_sh() {
-    local pipes_sh_repo="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
     log "INFO" "Installing pipes.sh"
+
+    local pipes_sh_repo="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
 
 #    curl -Lo "/usr/bin/pipes.sh" "${pipes_sh_repo}/pipes.sh"
     chmod -v +x "/usr/bin/pipes.sh"
@@ -201,9 +213,10 @@ pipes_sh() {
 }
 
 ascii_image_converter() {
+    log "INFO" "Installing ascii-image-converter"
+
     local ascii_ic_repo="https://github.com/TheZoraiz/ascii-image-converter"
     local ascii_ic_tar="${TMP_DIR}/ascii_ic.tar.gz"
-    log "INFO" "Installing ascii-image-converter"
 #    mkdir -vp "${ascii_ic_tar}.extract"
 
 #    curl -Lo "${ascii_ic_tar}" "${ascii_ic_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
@@ -217,9 +230,10 @@ ascii_image_converter() {
 }
 
 ls_iommu() {
+    log "INFO" "Installing ls-iommu"
+
     local ls_iommu_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
     local ls_iommu_tar="${TMP_DIR}/ls_iommu.tar.gz"
-    log "INFO" "Installing ls-iommu"
     mkdir -vp "${ls_iommu_tar}.extract"
 
     curl -Lo "${ls_iommu_tar}" $(curl -s -X GET "${ls_iommu_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)
@@ -234,6 +248,8 @@ ls_iommu() {
 }
 
 ujust_setup() {
+    log "INFO" "Setting up ujust"
+
     local just_repo="https://api.github.com/repos/casey/just"
     local just_tar="${TMP_DIR}/just.tar.gz"
     local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
@@ -284,6 +300,7 @@ ujust_setup() {
     }
 
     # Organize ujust
+    log "INFO" "Categorizing justfiles"
 #    sed '/^\[group/d' /usr/share/ublue-os/just/*.just
     sed -i -E '/^configure-broadcom-wl/i [group\("hardware"\)]' \
                             /usr/share/ublue-os/just/50-akmods.just || true
@@ -335,7 +352,7 @@ ujust_setup() {
             import_line="import \"/usr/share/ublue-os/just/$(basename ${justfile})\""
             grep -w "${import_line}" "${import_file}" || {
                 sed -i "/# Imports/a\\${import_line}" "${import_file}"
-                log "DEBUG" "Added: '${import_line}' to ${import_file}"
+                log "INFO" "Added: '${import_line}' to ${import_file}"
             }
         done
     fi

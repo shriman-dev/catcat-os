@@ -5,7 +5,7 @@ set -ouex pipefail
 #sddm.service#gdm.service
 services_enable() {
 #libvirtd.service
-    log "DEBUG" "Enabling system services"
+    log "INFO" "Enabling system services"
     systemctl -f enable \
         nix.mount \
         catcat-system-setup.service \
@@ -13,11 +13,11 @@ services_enable() {
         catcat-system-maintenance.timer
 
 #dualsense-catppuccin-rainbow.service
-    log "DEBUG" "Enabling global services"
+    log "INFO" "Enabling global services"
     systemctl --global -f enable \
         libadwaita-theme-sync.service \
         catcat-user-setup.service
-    log "DEBUG" "Done."
+    log "INFO" "Done."
 }
 
 #setroubleshootd.service
@@ -101,14 +101,14 @@ GLOBAL_DISABLE_SERVICES=(
 )
 
 services_disable() {
-    log "DEBUG" "Disabling and masking system services"
+    log "INFO" "Disabling and masking system services"
     systemctl disable ${DISABLE_SERVICES[@]}
     systemctl mask ${DISABLE_SERVICES[@]}
 
-    log "DEBUG" "Disabling and masking global services"
+    log "INFO" "Disabling and masking global services"
     systemctl --global disable ${GLOBAL_DISABLE_SERVICES[@]}
     systemctl --global mask ${GLOBAL_DISABLE_SERVICES[@]}
-    log "DEBUG" "Done."
+    log "INFO" "Done."
 }
 
 if [[ $# -eq 0 ]]; then

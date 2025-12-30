@@ -2,18 +2,16 @@
 source /usr/lib/catcat/funcvar.sh
 set -ouex pipefail
 
+log "INFO" "Configuring container image signing policy and placing catcat-os pub key"
+
 TEMPLATE_POLICY="${SETUP_DIR}/setup_files/policy.json"
 CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
-# TODO: Add secure boot signing in non ublue images
-
-log "INFO" "Configuring container image signing policy and placing catcat-os pub key"
-
 mkdir -vp /etc/pki/containers /etc/containers/registries.d
+cp -vf "${SETUP_DIR}/setup_files/cosign.pub" "${CATCAT_PUB}"
 
-[[ ! -f "${CATCAT_PUB}" ]] &&
-    die "Cannot find '$(basename ${CATCAT_PUB})' image key in: $(dirname ${CATCAT_PUB})"
+# TODO: Add secure boot signing in non ublue images
 
 # If there is no policy.json file, then copy the template policy
 [[ ! -f "${POLICY_FILE}" ]] && cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"

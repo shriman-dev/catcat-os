@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 source /usr/lib/catcat/funcvar.sh
 set -ouex pipefail
+log "INFO" "Applying custom OS labels"
 
 OS_RELEASE_FILE="/usr/lib/os-release"
-
-log "INFO" "Applying custom OS labels"
 declare -A pairs=(
     ["NAME"]="CatCat OS"
     ["PRETTY_NAME"]="CatCat OS ${MAJOR_VERSION}"
@@ -18,7 +17,7 @@ declare -A pairs=(
 # Iterate over the key-value pairs
 for key in "${!pairs[@]}"; do
     value="${pairs[${key}]}"
-    log "DEBUG" "${key}=${value}"
+    log "INFO" "${key}=${value}"
     sed -i "s|^${key}=.*|${key}=\"${value}\"|" "${OS_RELEASE_FILE}"
     # If the key does not exist, append it to the os-release file
     grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" >> "${OS_RELEASE_FILE}"

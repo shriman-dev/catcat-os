@@ -2,11 +2,14 @@
 source /usr/lib/catcat/funcvar.sh
 set -ouex pipefail
 
+log "INFO" "Regenerating initramfs"
+
 if ! command -v rpm-ostree >/dev/null || ! command -v bootc >/dev/null; then
-    die "This module is only compatible with Fedora Atomic images"
+    die "This script is only compatible with Fedora Atomic images"
 fi
 
-# If images already installed cliwrap, use it. Only used in transition period, so it should be removed when base images like Ublue remove cliwrap
+# If images already installed cliwrap, use it
+# Only used in transition period, so it should be removed when base images like Ublue remove cliwrap
 if [[ -f "/usr/libexec/rpm-ostree/wrapped/dracut" ]]; then
     DRACUT="/usr/libexec/rpm-ostree/wrapped/dracut"
 else
@@ -14,10 +17,9 @@ else
 fi
 
 # NOTE!
-# This won't work when Fedora starts to utilize UKIs (Unified Kernel Images).
-# UKIs will contain kernel + initramfs + bootloader.
-# Refactor the module to support UKIs once they are starting to be used, if possible.
-# That won't be soon, so this module should work for good period of time
+# This won't work when Fedora starts to utilize UKIs (Unified Kernel Images)
+# UKIs will contain kernel + initramfs + bootloader
+# Refactor the script to support UKIs once they are starting to be used
 
 #dnf5 repoquery --installed --queryformat='%{evr}.%{arch}' kernel
 
@@ -25,7 +27,8 @@ KERNEL_MODULES_PATH="/usr/lib/modules"
 readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 
 if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
-    log "INFO" "NOTE: There are several versions of kernel's initramfs. It is most ideal to have only 1 kernel, to make initramfs regeneration faster."
+    log "INFO" "NOTE: There are several versions of kernel's initramfs."
+    log "INFO" "      It is most ideal to have only 1 kernel, to make initramfs regeneration faster."
 fi
 
 # Set dracut log levels using temporary configuration file.

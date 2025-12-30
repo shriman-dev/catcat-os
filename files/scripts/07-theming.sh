@@ -3,9 +3,9 @@ source /usr/lib/catcat/funcvar.sh
 set -ouex pipefail
 
 desktop_files() {
-    local desktopfile_dir="/usr/share/applications"
-
     log "INFO" "Configuring desktop files"
+
+    local desktopfile_dir="/usr/share/applications"
     # To use catcat update
     sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" ${desktopfile_dir}/system-update.desktop || true
 
@@ -33,17 +33,22 @@ desktop_files() {
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/yad-icon-browser.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top-tui.desktop || true
+
     log "INFO" "Done."
 }
 
 set_plymouth_theme() {
+    log "INFO" "Applying plymouth theme"
+
     local plymouth_theme="catppuccin-mocha"
-    log "INFO" "Applying plymouth theme: ${plymouth_theme}"
     plymouth-set-default-theme ${plymouth_theme}
+
     log "INFO" "Done."
 }
 
 install_fonts() {
+    log "INFO" "Installing Nerd Fonts"
+
     local -a nerd_fonts=(
             "FiraCode"
             "Hack"
@@ -52,7 +57,6 @@ install_fonts() {
     local nerd_fonts_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
     local nerd_fonts_dest="/usr/share/fonts/nerd-fonts"
 
-    log "INFO" "Installing Nerd Fonts"
     rm -rf "${nerd_fonts_dest}"
 
     mkdir -vp /tmp/fonts
@@ -74,10 +78,11 @@ install_fonts() {
 }
 
 install_icon_themes() {
+    log "INFO" "Installing papirus icon theme"
+
     local papirus_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
     local papirus_tar="/tmp/papirus.tar"
 
-    log "INFO" "Installing papirus icon theme"
     curl -Lo "${papirus_tar}" $(curl -s -X GET "${papirus_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
 
     mkdir -vp "${papirus_tar}.extract"
@@ -114,6 +119,8 @@ install_gtk_themes() {
 }
 
 build_gdm_theme() {
+    log "INFO" "Building GDM theme"
+
     local gdm_resource="/usr/share/gnome-shell/gnome-shell-theme.gresource"
     local gmd_theme_tmp="/tmp/gnome-shell"
     local gmd_theme_path="/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
@@ -121,9 +128,9 @@ build_gdm_theme() {
     local gdm_xml="$(basename ${gdm_resource}).xml"
     local resource resource_path
 
-    log "INFO" "Building GDM theme using GTK theme: $(basename $(dirname ${gmd_theme_path}))"
+    log "INFO" "Using GTK theme: $(basename $(dirname ${gmd_theme_path}))"
     # Create directories and extract resources from gresource file
-    log "DEBUG" "Creating directories and extracting resources from gresource file"
+    log "INFO" "Creating directories and extracting resources from gresource file"
     for resource in $(gresource list "${gdm_resource}"); do
         resource_path="${resource#\/org\/gnome\/shell\/}"
         mkdir -vp "${gmd_theme_tmp}/${resource_path%/*}"
@@ -131,12 +138,12 @@ build_gdm_theme() {
     done
 
     # Copy custom theme files and background wallpaper to working directory
-    log "DEBUG" "Copying custom theme files and background wallpaper to working directory"
+    log "INFO" "Copying custom theme files and background wallpaper to working directory"
     cp -drvf "${gmd_theme_path}"/* "${gmd_theme_tmp}/theme"/
     cp -dvf "${background_wall}" "${gmd_theme_tmp}/theme/background"
 
     # Set background wallpaper and modify CSS for login and lock screen
-    log "DEBUG" "Setting background wallpaper and modifying CSS for login and lock screen"
+    log "INFO" "Setting background wallpaper and modifying CSS for login and lock screen"
     echo ".login-dialog { background: transparent; }
 #lockDialogGroup {
   background-image: url('resource:///org/gnome/shell/theme/background');
@@ -145,12 +152,12 @@ build_gdm_theme() {
 }" >> "${gmd_theme_tmp}/theme/gnome-shell.css"
 
     # Ensure the same CSS is used for both light and dark modes
-    log "DEBUG" "Applying custom theme CSS on both light and dark modes"
+    log "INFO" "Applying custom theme CSS on both light and dark modes"
     cp -drvf "${gmd_theme_tmp}/theme/gnome-shell.css" "${gmd_theme_tmp}/theme/gnome-shell-dark.css"
     cp -drvf "${gmd_theme_tmp}/theme/gnome-shell.css" "${gmd_theme_tmp}/theme/gnome-shell-light.css"
 
     # Generate gresource XML file for compiling resources
-    log "DEBUG" "Generating gresource XML file for compiling resources"
+    log "INFO" "Generating gresource XML file for compiling resources"
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <gresources>
   <gresource prefix=\"/org/gnome/shell/theme\">
@@ -160,12 +167,11 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     cat "${gmd_theme_tmp}/theme/${gdm_xml}"
 
     # Compile all resources and apply them to the gdm theme
-    log "DEBUG" "Compiling all resources and apply them to the gdm theme"
+    log "INFO" "Compiling all resources and apply them to the gdm theme"
     glib-compile-resources --sourcedir=${gmd_theme_tmp}/theme/ "${gmd_theme_tmp}/theme/${gdm_xml}"
     mv -v "${gmd_theme_tmp}/theme/$(basename ${gdm_resource})" "${gdm_resource}"
 
     rm -rf "${gmd_theme_tmp}"
-    log "INFO" "All done."
 
     # Default settings for gdm
     log "INFO" "Getting default settings for GDM"
@@ -175,27 +181,31 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
     log "INFO" "Allowing GDM re-theming"
     mv -v   "${gdm_resource}" "${gdm_resource}.og"
     ln -svf "/usr/local/share/gnome-shell/$(basename ${gdm_resource})" "${gdm_resource}"
+
+    log "INFO" "All done."
     log "INFO" "Custom theme has been built and set for GDM."
 }
 
 apply_default_configs() {
     # Set default icon and theme
     log "INFO" "Setting default icon and theme for the OS"
+
     sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 
     cp -drf /usr/share/themes/Catppuccin-Orange-Dark/{gtk-2.0,gtk-3.0,gtk-4.0} \
                             /usr/share/themes/Default/
     cp -drf /usr/share/themes/Catppuccin-Orange-Dark/gtk-4.0 /etc/skel/.config/
 
-    /usr/bin/dconf update
-    log "INFO" "Done."
-
     mkdir -vp /etc/skel/.config/dconf
+    /usr/bin/dconf update
+
+    log "INFO" "Done."
     log "INFO" "Tree of: /etc/dconf"
     tree /etc/dconf/
 }
 
 install_vscodium_ext() {
+    log "INFO" "Install extensions for vscodium"
     # Install extensions for vscodium
     local vscodium_extlist=(
         "jeronimoekerdt.color-picker-universal"
@@ -203,7 +213,6 @@ install_vscodium_ext() {
         "catppuccin.catppuccin-vsc-icons"
     )
 
-    log "INFO" "Install extensions for vscodium"
     mkdir -vp /tmp/vscodiumdata /etc/skel/.vscode-oss/extensions
     for ext in "${vscodium_extlist[@]}"; do
         codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir \
