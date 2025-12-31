@@ -50,7 +50,8 @@ install_fonts() {
     log "INFO" "Defining Fonts"
 
     local -a NERD_FONTS=(
-        "JetBrainsMono"
+        "FiraCode"
+        "Hack"
         "NerdFontsSymbolsOnly"
     )
 
@@ -58,9 +59,6 @@ install_fonts() {
     local -A EXTRA_FONTS=(
         ['NotoColorEmoji']="\
 https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
-
-        ['Maple-Mono-NF']="\
-https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-NF-unhinted.zip"
 
         ['AdwaitaMonoNF']="\
 https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar.xz"
@@ -103,19 +101,11 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
                 *.zip)
                     log "INFO" "Extracting ZIP archive..."
                     unzip -j "${font_name_temp}" -d "${font_name_dest}" "*.otf" "*.ttf" || true
-                    # Also try extracting from subdirectories
-                    unzip -q "${font_name_temp}" -d "/tmp/fonts/${font_name}" || true
-                    local extracted_font
-                    for extracted_font in $(find "/tmp/fonts/${font_name}" \
-                                                -name "*.otf" -o -name "*.ttf"); do
-                        cp -vf "${extracted_font}" "${font_name_dest}"/ || true
-                    done
-                    rm -rf "/tmp/extract_$$" || true
                     ;;
                 *.tar.*|*.tgz|*.tbz2)
                     log "INFO" "Extracting TAR archive..."
                     tar -xvf "${font_name_temp}" -C "${font_name_dest}" \
-                        --wildcards --no-anchored "*.otf" "*.ttf" || true
+                        --transform='s/.*\///' --wildcards --no-anchored "*.otf" "*.ttf" || true
                     ;;
                 *.otf|*.ttf)
                     log "INFO" "Copying font file..."

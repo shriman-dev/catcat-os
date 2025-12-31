@@ -57,7 +57,7 @@ ostree container commit
 exec_script ${BUILD_SETUP_DIR}/11-tweaks-and-fixes.sh
 ostree container commit
 
-{ enclosed_heading_this "Applying Branding"; } 2>/dev/null
+{ enclosed_heading_this "Applying Image Info"; } 2>/dev/null
 exec_script ${BUILD_SETUP_DIR}/55-image-info.sh
 ostree container commit
 
