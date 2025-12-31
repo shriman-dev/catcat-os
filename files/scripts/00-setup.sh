@@ -38,10 +38,10 @@ exec_script ${BUILD_SETUP_DIR}/04-copy-files.sh
 ostree container commit
 
 { enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/05-rpm-pkgs.sh
+exec_script ${BUILD_SETUP_DIR}/05-install-pkgs.sh
 ostree container commit
 
-{ enclosed_heading_this "Applying Themes On Various System Components"; } 2>/dev/null
+{ enclosed_heading_this "Applying Various Themes"; } 2>/dev/null
 exec_script ${BUILD_SETUP_DIR}/07-theming.sh
 ostree container commit
 
@@ -50,25 +50,25 @@ exec_script ${BUILD_SETUP_DIR}/08-secatcat.sh
 ostree container commit
 
 { enclosed_heading_this "Configuring Systemd Services"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/09-systemd.sh
+exec_script ${BUILD_SETUP_DIR}/10-systemd.sh
 ostree container commit
 
 { enclosed_heading_this "Refining System With Tweaks And Fixes"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/10-tweaks-and-fixes.sh
+exec_script ${BUILD_SETUP_DIR}/11-tweaks-and-fixes.sh
 ostree container commit
 
 { enclosed_heading_this "Applying Branding"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/11-image-info.sh
+exec_script ${BUILD_SETUP_DIR}/55-image-info.sh
 ostree container commit
 
 { enclosed_heading_this "Configuring Signing Policy"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/12-signing.sh
+exec_script ${BUILD_SETUP_DIR}/56-signing.sh
 ostree container commit
 
 { enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/13-initramfs.sh
+exec_script ${BUILD_SETUP_DIR}/57-initramfs.sh
 ostree container commit
 
 { enclosed_heading_this "Post Build Setup"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/14-post-setup.sh
+exec_script ${BUILD_SETUP_DIR}/58-post-setup.sh
 ostree container commit

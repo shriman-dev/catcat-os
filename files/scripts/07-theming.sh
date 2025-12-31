@@ -104,16 +104,18 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
                     log "INFO" "Extracting ZIP archive..."
                     unzip -j "${font_name_temp}" -d "${font_name_dest}" "*.otf" "*.ttf" || true
                     # Also try extracting from subdirectories
-                    unzip -q "${font_name_temp}" -d "/tmp/extract_$$" || true
+                    unzip -q "${font_name_temp}" -d "/tmp/fonts/${font_name}" || true
                     local extracted_font
-                    for extracted_font in $(find "/tmp/extract_$$" -name "*.otf" -o -name "*.ttf"); do
+                    for extracted_font in $(find "/tmp/fonts/${font_name}" \
+                                                -name "*.otf" -o -name "*.ttf"); do
                         cp -vf "${extracted_font}" "${font_name_dest}"/ || true
                     done
                     rm -rf "/tmp/extract_$$" || true
                     ;;
                 *.tar.*|*.tgz|*.tbz2)
                     log "INFO" "Extracting TAR archive..."
-                    tar -xvf "${font_name_temp}" -C "${font_name_dest}" --wildcards --no-anchored "*.otf" "*.ttf" || true
+                    tar -xvf "${font_name_temp}" -C "${font_name_dest}" \
+                        --wildcards --no-anchored "*.otf" "*.ttf" || true
                     ;;
                 *.otf|*.ttf)
                     log "INFO" "Copying font file..."
@@ -131,6 +133,7 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
     fi
 
     rm -rf /tmp/fonts
+    log "INFO" "Building font cache"
     # Normalize permissions to let all users use installed fonts
     # Directories: 755, Files: 644
     if [[ -d "${FONTS_DIR}" ]]; then
@@ -139,6 +142,7 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
     fi
 
     fc-cache --system-only --really-force "${FONTS_DIR}"
+    log "INFO" "Done"
 
 }
 

@@ -24,9 +24,9 @@ cp -vf "${BUILD_SETUP_DIR}/setup_files/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # ${IMAGE_NAME} is exported by build yaml file
 jq --arg image_name "${IMAGE_NAME}" \
-   --arg image_registry "${PROJECT_REGISTRY}" \
+   --arg project_registry "${PROJECT_REGISTRY}" \
    '.transports.docker |= 
-    { ($image_registry + $image_name): [
+    { ($project_registry + "/" +  $image_name): [
         {
             "type": "sigstoreSigned",
             "keyPath": "'${COSIGN_PUB_KEY}'",
