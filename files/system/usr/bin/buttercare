@@ -23,7 +23,7 @@ get_btrfs_mounts() {
 # Show filesystem usage
 show_btrfs_usage() {
     local path="${1}"
-    validate_paths "${path}"
+    validate_path "${path}"
     log "INFO" "Showing BTRFS detailed usage for ${path}"
     ${BTRFS} filesystem usage "${path}"
     echo
@@ -52,7 +52,7 @@ balance() {
     fi
 
     for mount in ${mounts[@]}; do
-        validate_paths "${mount}"
+        validate_path "${mount}"
         log "INFO" "Starting balance on ${mount}"
         [[ -n ${VERBOSE} ]] &&
             { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
@@ -79,7 +79,7 @@ defrag() {
     done
     [[ -z ${comp} || -z ${path} ]] && die "Both compression (-c) and path (-p) are required for defrag"
 
-    validate_paths "${path}"
+    validate_path "${path}"
 
     log "INFO" "Starting defragmentation on ${path} (compression: ${comp}${level:+, level: ${level}})"
     ${BTRFS} filesystem defragment -r -c"${comp}" ${level:+-L ${level}} "${path}"
@@ -89,7 +89,7 @@ defrag() {
 # Perform scrub operation
 scrub() {
     local path="${1}"
-    validate_paths "${path}"
+    validate_path "${path}"
     log "INFO" "Starting scrub on ${path}"
     ${BTRFS} scrub start -B "${path}"
     log "INFO" "Scrub completed for ${path}"

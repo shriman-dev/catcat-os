@@ -2,6 +2,8 @@
 source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
+log "INFO" "Making system tweaks"
+
 # Tweak ublue defaults
 if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Tweaking ublue/bazzite defaults"
@@ -95,7 +97,10 @@ if command -v hhdctl; then
     #
 fi
 
+log "INFO" "System tweaks applied"
+
 # FIXES
+log "INFO" "Applying system fixes"
 # Fix issues caused by ID no longer being fedora
 log "INFO" "Fixing issues caused by ID no longer being fedora"
 sed -i "s/^EFIDIR=.*/EFIDIR=\"fedora\"/" /usr/sbin/grub2-switch-to-blscfg
@@ -105,4 +110,4 @@ log "INFO" "Fixing librewolf/firefox delayed launch issue"
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
-log "INFO" "All done."
+log "INFO" "System fixes applied"
