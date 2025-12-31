@@ -64,4 +64,6 @@ log "INFO" "Debloating image"
         yelp \
         zincati
 
+    dnf5 -y autoremove
+
 log "INFO" "Done."

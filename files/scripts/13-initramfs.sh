@@ -4,10 +4,6 @@ set -ouex pipefail
 
 log "INFO" "Regenerating initramfs"
 
-if ! command -v rpm-ostree >/dev/null || ! command -v bootc >/dev/null; then
-    die "This script is only compatible with Fedora Atomic images"
-fi
-
 # If images already installed cliwrap, use it
 # Only used in transition period, so it should be removed when base images like Ublue remove cliwrap
 if [[ -f "/usr/libexec/rpm-ostree/wrapped/dracut" ]]; then
