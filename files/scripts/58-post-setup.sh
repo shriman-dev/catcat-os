@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Running post setup cleanup"
+# Remove cache and junk
 dnf5 clean all
 find /var/* -maxdepth 0 -type d -not -name "log" -not -name "cache" -exec rm -rvf {} \;
 find /var/cache/* -maxdepth 0 -type d -not -name "libdnf5" -not -name "rpm-ostree" -exec rm -rvf {} \;
@@ -11,9 +12,8 @@ rm -rvf /boot/.*
 rm -rvf /boot/*
 rm -rvf /tmp/*
 
-# Remove stuffs
+# Remove more stuffs in skel
 #/etc/skel/.config/autostart
-log "INFO" "Removing more stuffs"
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
 

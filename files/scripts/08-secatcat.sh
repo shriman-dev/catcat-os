@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 #############################

@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
-log "INFO" "Configuring container image signing policy and placing catcat-os pub key"
+log "INFO" "Configuring container image signing policy and placing cosign pub key"
 
-TEMPLATE_POLICY="${SETUP_DIR}/setup_files/policy.json"
-CATCAT_PUB="/etc/pki/containers/catcat-os.pub"
+OS_PROJECT_NAME="catcat-os"
+PROJECT_REGISTRY="ghcr.io/shriman-dev"
+TEMPLATE_POLICY="${BUILD_SETUP_DIR}/setup_files/policy.json"
+COSIGN_PUB_KEY="/etc/pki/containers/${OS_PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
 mkdir -vp /etc/pki/containers /etc/containers/registries.d
-cp -vf "${SETUP_DIR}/setup_files/cosign.pub" "${CATCAT_PUB}"
+cp -vf "${BUILD_SETUP_DIR}/setup_files/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # TODO: Add secure boot signing in non ublue images
 
@@ -20,13 +22,14 @@ cp -vf "${SETUP_DIR}/setup_files/cosign.pub" "${CATCAT_PUB}"
 [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]] &&
     cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 
-# ${IMAGE_NAME} is exported by build-image.yml file
+# ${IMAGE_NAME} is exported by build yaml file
 jq --arg image_name "${IMAGE_NAME}" \
+   --arg image_registry "${PROJECT_REGISTRY}" \
    '.transports.docker |= 
-    { ("ghcr.io/shriman-dev/" + $image_name): [
+    { ($image_registry + $image_name): [
         {
             "type": "sigstoreSigned",
-            "keyPath": "'${CATCAT_PUB}'",
+            "keyPath": "'${COSIGN_PUB_KEY}'",
             "signedIdentity": {
                 "type": "matchRepository"
             }
@@ -35,9 +38,9 @@ jq --arg image_name "${IMAGE_NAME}" \
 
 mv -v "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
-echo 'docker:
-  ghcr.io/shriman-dev:
-    use-sigstore-attachments: true' > /etc/containers/registries.d/catcat-os.yaml
+echo "docker:
+  ${PROJECT_REGISTRY}:
+    use-sigstore-attachments: true" > "/etc/containers/registries.d/${OS_PROJECT_NAME}.yaml"
 
 log "INFO" "Done."
 

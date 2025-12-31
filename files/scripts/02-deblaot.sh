@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${SETUP_DIR}/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Debloating image"
@@ -66,4 +66,4 @@ log "INFO" "Debloating image"
 
     dnf5 -y autoremove
 
-log "INFO" "Done."
+log "INFO" "Debloat Done"

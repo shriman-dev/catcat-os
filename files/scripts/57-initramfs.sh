@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Regenerating initramfs"

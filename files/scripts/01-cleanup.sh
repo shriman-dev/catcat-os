@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${SETUP_DIR}/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Cleaning image"
@@ -71,4 +71,4 @@ rm -vf /etc/yum.repos.d/charm.repo
 rm -vf /etc/yum.repos.d/google-chrome.repo
 rm -vf /etc/yum.repos.d/tailscale.repo
 
-log "INFO" "Cleanup done."
+log "INFO" "Cleanup done"

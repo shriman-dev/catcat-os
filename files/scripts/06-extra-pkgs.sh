@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 TMP_DIR="/tmp/catcat_extra_pkgs"
@@ -255,7 +255,7 @@ ujust_setup() {
     local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
     local import_file="/usr/share/ublue-os/justfile"
-    local justfile_dir="$(dirname ${SETUP_DIR})/justfiles"
+    local justfile_dir="$(dirname ${BUILD_SETUP_DIR})/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
     [[ ! -f "/usr/bin/just" ]] && {

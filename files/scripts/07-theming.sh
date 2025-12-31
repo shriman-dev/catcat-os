@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 desktop_files() {
@@ -47,39 +47,105 @@ set_plymouth_theme() {
 }
 
 install_fonts() {
-    log "INFO" "Installing Nerd Fonts"
+    log "INFO" "Defining Fonts"
 
-    local -a nerd_fonts=(
-            "FiraCode"
-            "Hack"
-            "NerdFontsSymbolsOnly"
-            )
+    local -a NERD_FONTS=(
+        "JetBrainsMono"
+        "NerdFontsSymbolsOnly"
+    )
+
+    # From URL
+    local -A EXTRA_FONTS=(
+        ['NotoColorEmoji']="\
+https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
+
+        ['Maple-Mono-NF']="\
+https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-NF-unhinted.zip"
+
+        ['AdwaitaMonoNF']="\
+https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar.xz"
+    )
+
+    local FONTS_DIR="/usr/share/fonts"
     local nerd_fonts_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
-    local nerd_fonts_dest="/usr/share/fonts/nerd-fonts"
-
-    rm -rf "${nerd_fonts_dest}"
-
+    local nerd_fonts_dest="${FONTS_DIR}/nerd-fonts"
     mkdir -vp /tmp/fonts
-    local font
-    for font in "${nerd_fonts[@]}"; do
-        font=${font// /} # remove spaces
-        if [[ ${#font} -gt 0 ]]; then
-            log "INFO" "Downloading ${font} from ${nerd_fonts_repo}/${font}.tar.xz"
-            mkdir -vp "${nerd_fonts_dest}/${font}"
-            curl -fLs --create-dirs "${nerd_fonts_repo}/${font}.tar.xz" -o \
-                "/tmp/fonts/${font}.tar.xz" &&
-            tar -xf "/tmp/fonts/${font}.tar.xz" -C "${nerd_fonts_dest}/${font}"
-            log "INFO" "Done."
-        fi
-    done
+
+    if [[ ${#NERD_FONTS[@]} -gt 0 ]]; then
+        log "INFO" "Installing Nerd Font(s)"
+        rm -rf "${nerd_fonts_dest}"
+        local nf_name
+        for nf_name in "${NERD_FONTS[@]}"; do
+            nf_name=${nf_name// /} # remove spaces
+            log "INFO" "Downloading font: ${nf_name}"
+            log "INFO" "From URL: ${nerd_fonts_repo}/${nf_name}.tar.xz"
+            mkdir -vp "${nerd_fonts_dest}/${nf_name}"
+            curl -fLsS --retry 5 --create-dirs "${nerd_fonts_repo}/${nf_name}.tar.xz" -o \
+                    "/tmp/fonts/${nf_name}.tar.xz" &&
+            tar -xf "/tmp/fonts/${nf_name}.tar.xz" -C "${nerd_fonts_dest}/${nf_name}"
+        done
+        log "INFO" "Nerd Font(s) installed"
+    fi
+    if [[ ${#EXTRA_FONTS[@]} -gt 0 ]]; then
+        log "INFO" "Installing Extra Font(s)"
+        local font_name
+        for font_name in "${!EXTRA_FONTS[@]}"; do
+            font_name=${font_name// /} # remove spaces
+            local font_name_dest="${FONTS_DIR}/${font_name}"
+            local font_name_temp="$(mktemp)"
+            local font_url="${EXTRA_FONTS[$font_name]}"
+            log "INFO" "Downloading font: ${font_name}"
+            log "INFO" "From URL: ${font_url}"
+            mkdir -vp "${font_name_dest}"
+
+            curl -fLsS --retry 5 "${font_url}" -o "${font_name_temp}"
+            case "${font_url}" in
+                *.zip)
+                    log "INFO" "Extracting ZIP archive..."
+                    unzip -j "${font_name_temp}" -d "${font_name_dest}" "*.otf" "*.ttf" || true
+                    # Also try extracting from subdirectories
+                    unzip -q "${font_name_temp}" -d "/tmp/extract_$$" || true
+                    local extracted_font
+                    for extracted_font in $(find "/tmp/extract_$$" -name "*.otf" -o -name "*.ttf"); do
+                        cp -vf "${extracted_font}" "${font_name_dest}"/ || true
+                    done
+                    rm -rf "/tmp/extract_$$" || true
+                    ;;
+                *.tar.*|*.tgz|*.tbz2)
+                    log "INFO" "Extracting TAR archive..."
+                    tar -xvf "${font_name_temp}" -C "${font_name_dest}" --wildcards --no-anchored "*.otf" "*.ttf" || true
+                    ;;
+                *.otf|*.ttf)
+                    log "INFO" "Copying font file..."
+                    local font_file_name="$(basename ${font_url})"
+                    cp -vf "${font_name_temp}" "${font_name_dest}/${font_file_name}"
+                    ;;
+                *)
+                    log "INFO" "Unknown file type for $URL, trying as font file..."
+                    local font_file_name="$(basename ${font_url})"
+                    cp -vf "${font_name_temp}" "${font_name_dest}/${font_file_name}"
+                    ;;
+            esac
+        done
+        log "INFO" "Extra Font(s) installed"
+    fi
+
     rm -rf /tmp/fonts
-    fc-cache --system-only --really-force "${nerd_fonts_dest}"
-    log "INFO" "All done."
+    # Normalize permissions to let all users use installed fonts
+    # Directories: 755, Files: 644
+    if [[ -d "${FONTS_DIR}" ]]; then
+        find "${FONTS_DIR}" -type d -exec chmod 755 {} + || true
+        find "${FONTS_DIR}" -type f -exec chmod 644 {} + || true
+    fi
+
+    fc-cache --system-only --really-force "${FONTS_DIR}"
+
 }
 
 install_icon_themes() {
-    log "INFO" "Installing papirus icon theme"
+    log "INFO" "Installing icons"
 
+    log "INFO" "Papirus icons"
     local papirus_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
     local papirus_tar="/tmp/papirus.tar"
 
@@ -89,11 +155,12 @@ install_icon_themes() {
     tar -xf "${papirus_tar}" -C "${papirus_tar}.extract" --strip-components=1
     cp -drf "${papirus_tar}.extract"/Papirus* /usr/share/icons/
     rm -rf "${papirus_tar}"*
-    log "INFO" "Done."
+
+    log "INFO" "Icons installed"
 }
 
 install_gtk_themes() {
-    log "INFO" "Installing GTK themes"
+    log "INFO" "Installing GTK theme(s)"
     # Lavanda-gtk-theme
     log "INFO" "Lavanda-gtk-theme"
     local lavanda_theme_repo="https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme"
@@ -115,7 +182,7 @@ install_gtk_themes() {
     "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all \
                                             --color dark --tweaks catppuccin rimless
     rm -rf "${catppuccin_theme_tmp}"
-    log "INFO" "All done."
+    log "INFO" "GTK theme(s) installed"
 }
 
 build_gdm_theme() {
@@ -188,7 +255,7 @@ $(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf ' 
 
 apply_default_configs() {
     # Set default icon and theme
-    log "INFO" "Setting default icon and theme for the OS"
+    log "INFO" "Setting default icons and theme for the OS"
 
     sed -i 's/Inherits=.*/Inherits=Catppuccin-Papirus-Orange/' /usr/share/icons/default/index.theme
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 #sddm.service#gdm.service
@@ -117,8 +117,10 @@ if [[ $# -eq 0 ]]; then
     exit 0
 fi
 
-case "${1}" in
-    enable) services_enable;;
-    disable) services_disable;;
-    *) echo -e "Usage: $(basename ${0}) [enable|disable]"; exit 1;;
-esac
+if [[ $# -gt 0 ]]; then
+    case "${1}" in
+        enable) services_enable;;
+        disable) services_disable;;
+        *) die "Usage: $(basename ${0}) [enable|disable]";;
+    esac
+fi

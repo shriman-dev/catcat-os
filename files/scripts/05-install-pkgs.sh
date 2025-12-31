@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Defining packages"
@@ -304,14 +304,31 @@ COMMON=(
 #log "INFO" "Performing updates"
 #rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
 #dnf5 upgrade --refresh --assumeyes
-#log "INFO" "Done."
+#log "INFO" "Updates complete"
 
 log "INFO" "Adding extra RPM repos"
+COPR_LIST=(
+    "bazzite-org/bazzite"
+#    "bazzite-org/bazzite-multilib"
+    "bazzite-org/rom-properties"
+#    "bazzite-org/obs-vkcapture"
+#    "hhd-dev/hhd"
+#    "ublue-os/staging"
+#    "ublue-os/packages"
+#    "kylegospo/unl0kr"
+#    "atim/starship"
+#    "zeno/scrcpy"
+#    "scottames/ghostty"
+#    "atim/lazygit"
+)
+
+for copr in "${COPR_LIST[@]}"; do
+    dnf5 -y copr enable "${copr}"
+done
+
 #dnf5 -y install \
 #        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
 #        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-dnf5 -y copr enable bazzite-org/bazzite
-dnf5 -y copr enable bazzite-org/rom-properties
 if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
@@ -319,6 +336,8 @@ else
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
 fi
+
+log "INFO" "Added extra repos"
 
 log "INFO" "Installing RPM Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
@@ -334,7 +353,7 @@ else
     dnf5 -y install \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
-log "INFO" "Done."
+log "INFO" "Packages installed successfully"
 
 
 log "INFO" "Disabling repos no longer needed"
@@ -344,19 +363,11 @@ sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-extras.repo
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/terra-mesa.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo || true
 sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.repo || true
-dnf5 -y copr disable bazzite-org/bazzite || true
-dnf5 -y copr disable bazzite-org/bazzite-multilib || true
-dnf5 -y copr disable bazzite-org/rom-properties || true
-dnf5 -y copr disable bazzite-org/obs-vkcapture || true
-dnf5 -y copr disable hhd-dev/hhd || true
-dnf5 -y copr disable ublue-os/staging || true
-dnf5 -y copr disable ublue-os/packages || true
-#dnf5 -y copr disable kylegospo/unl0kr || true
-#dnf5 -y copr disable atim/starship || true
-#dnf5 -y copr disable zeno/scrcpy || true
-#dnf5 -y copr disable scottames/ghostty || true
-#dnf5 -y copr disable atim/lazygit || true
-log "INFO" "Done."
+for copr in "${COPR_LIST[@]}"; do
+    dnf5 -y copr disable "${copr}"
+done
+
+log "INFO" "Disabled unneeded repos"
 
 
 # Remove things that doesn't work well with NVIDIA
@@ -374,13 +385,13 @@ fi
 
 log "INFO" "Installing External Packages"
 if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
-    ${SETUP_DIR}/06-extra-pkgs.sh \
+    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | grep "^++" | sed 's|++||')
 elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    ${SETUP_DIR}/06-extra-pkgs.sh \
+    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]}" | grep "^++" | sed 's|++||')
 else
-    ${SETUP_DIR}/06-extra-pkgs.sh \
+    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep "^++" | sed 's|++||')
 fi
-log "INFO" "All Done."
+log "INFO" "External packages installed successfully"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source /usr/lib/catcat/funcvar.sh
+source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 # Tweak ublue defaults
@@ -66,7 +66,7 @@ sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sh
 
 # Minimal catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    log "INFO" "Applying catcat-os-mi specific tweaks"
+    log "INFO" "Applying image specific tweaks: ${IMAGE_NAME}"
 #    systemctl disable systemd-nsresourced.service systemd-nsresourced.socket systemd-userdbd.service systemd-userdbd.socket
     systemctl --global disable org.freedesktop.IBus.session.GNOME.service \
                                org.freedesktop.IBus.session.generic.service
@@ -81,7 +81,7 @@ fi
 
 # Handheld specific tweaks
 if command -v hhdctl; then
-    log "INFO" "Applying handheld specific tweaks"
+    log "INFO" "Applying handheld specific tweaks: ${IMAGE_NAME}"
     rm -vf /usr/etc/xdg/autostart/steam.desktop
     # login manager
     sed -i 's/.*Session=.*/Session=gnome-wayland.desktop/g' /etc/sddm.conf.d/steamos.conf
