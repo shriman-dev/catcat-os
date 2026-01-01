@@ -7,9 +7,9 @@ source /usr/lib/catcat/funcvar.sh
 # System clean up
 one_day=86400
 one_week=$((one_day * 7))
-cleanup_log_file="/etc/catcat-os/log/last_cleanup.log"
-if is_file_older ${one_week} "${cleanup_log_file}"; then
-    date "+%a %b %d %H:%M:%S %Y" > "${cleanup_log_file}"
+cleanup_log="/etc/catcat-os/log/last_cleanup.log"
+if is_file_older ${one_week} "${cleanup_log}"; then
+    date "+%a %b %d %H:%M:%S %Y" > "${cleanup_log}"
     {
         /usr/bin/podman image prune -af
         /usr/bin/podman volume prune -f
@@ -20,12 +20,13 @@ if is_file_older ${one_week} "${cleanup_log_file}"; then
 
         # Delete DNS logs older than 3 months (default}
         /usr/bin/localdnsctl -v --flush-logs
-    } >> "${cleanup_log_file}"
+    } >> "${cleanup_log}"
 fi
 
 # Run buttercare trim every 20 days
 twenty_days=$((one_day * 20))
-buttercare_log_file="/etc/catcat-os/log/buttercare.log"
-if is_file_older ${twenty_days} "${buttercare_log_file}"; then
-    /usr/bin/buttercare -v balance trim > "${buttercare_log_file}"
+buttercare_log="/etc/catcat-os/log/buttercare.log"
+if is_file_older ${twenty_days} "${buttercare_log}"; then
+    date "+%a %b %d %H:%M:%S %Y" > "${buttercare_log}"
+    /usr/bin/buttercare -v balance trim >> "${buttercare_log}"
 fi

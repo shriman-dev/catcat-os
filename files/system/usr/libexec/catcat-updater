@@ -39,8 +39,8 @@ one_week=$((one_day * 7))
 autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
 firstboot_file="/etc/catcat-os/log/.first-boot-done"
 # Auto update if system is one weeks old
-if check_network_connection; then
-    if is_file_older ${one_week} "${autoupdate_log_file}"; then
+if is_file_older ${one_week} "${autoupdate_log_file}"; then
+    if check_network_connection; then
         is_file_older ${one_day} "${firstboot_file}" ||
             notify_all "Weekly automatic update has started."
 
