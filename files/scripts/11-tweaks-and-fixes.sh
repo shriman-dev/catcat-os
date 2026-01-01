@@ -32,11 +32,19 @@ log "INFO" "Tweaking logind to ignore inhabitors for suspend"
 sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/lib/systemd/logind.conf
 #sed -i "s|.*MemorySleepMode=.*|MemorySleepMode=deep|" /usr/lib/systemd/sleep.conf
 
-# Let root user to ignore inhabitors
+# Let root user to ignore inhabitors for suspend and hibernate
 log "INFO" "Allowing root user to ignore inhabitors"
 mkdir -vp /etc/polkit-1/rules.d
-ln -svf /usr/share/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules.example \
-        /etc/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules
+
+echo '// Allow the root user to ignore inhibitors when calling suspend and hibernate.
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.login1.suspend-ignore-inhibit" ||
+         action.id == "org.freedesktop.login1.hibernate-ignore-inhibit") &&
+        subject.user == "root") {
+
+        return polkit.Result.YES;
+    }
+});' > /etc/polkit-1/rules.d/10-root-suspend-hibernate-ignore-inhibitors.rules
 
 # Copy over logind.conf and sleep.conf for ease of access
 log "INFO" "Copying over logind.conf and sleep.conf for ease of access"

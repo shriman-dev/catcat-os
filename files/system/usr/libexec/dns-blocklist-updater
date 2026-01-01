@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
-four_days=345600
+one_day=86400
+four_days=$((one_day * 4))
 blocklist_autoupdate_log="/etc/catcat-os/log/auto-dns-blocklist-update.log"
 
 if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then

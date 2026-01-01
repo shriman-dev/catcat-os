@@ -34,13 +34,15 @@ notify_all() {
     notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
 }
 
-one_week=604800
-two_week=1209600
+one_day=86400
+one_week=$((one_day * 7))
 autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
+firstboot_file="/etc/catcat-os/log/.first-boot-done"
 # Auto update if system is one weeks old
 if check_network_connection; then
     if is_file_older ${one_week} "${autoupdate_log_file}"; then
-        notify_all "Weekly automatic update has started."
+        is_file_older ${one_day} "${firstboot_file}" ||
+            notify_all "Weekly automatic update has started."
 
         date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
 

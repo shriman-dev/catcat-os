@@ -1,5 +1,5 @@
-test -f $HOME/.config/fish/conf.d/plugin_conf.fish && status filename | grep -q 'vendor_conf.d' && exit 0
 status is-interactive || exit 0
+_check_local_config
 
 
 # Puffer fish # https://github.com/nickeb96/puffer-fish

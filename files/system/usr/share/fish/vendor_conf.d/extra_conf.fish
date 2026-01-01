@@ -1,4 +1,5 @@
-test -f $HOME/.config/fish/conf.d/extra_conf.fish && status filename | grep -q 'vendor_conf.d' && exit 0
+status is-interactive || exit 0
+_check_local_config
 ## Environment setup
 # Fish command history
 function history

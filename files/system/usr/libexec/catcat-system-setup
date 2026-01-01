@@ -3,7 +3,8 @@ source /usr/lib/catcat/funcvar.sh
 U1000="$(id -un 1000)"
 
 # First boot setup
-if [[ ! -f /etc/catcat-os/first-boot ]]; then
+firstboot_file="/etc/catcat-os/log/.first-boot-done"
+if [[ ! -f "${firstboot_file}" ]]; then
     plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
 
     # Setup grub
@@ -33,8 +34,8 @@ if [[ ! -f /etc/catcat-os/first-boot ]]; then
     # Permit main user
     #usermod -aG libvirt ${U1000}
 
-    mkdir -p /etc/catcat-os/
-    echo 'first boot' > /etc/catcat-os/first-boot
+    mkdir -pv "$(dirname ${firstboot_file})"
+    echo 'first boot' > "${firstboot_file}"
 fi
 
 /usr/libexec/secatcat
@@ -42,39 +43,44 @@ fi
 /usr/libexec/catcat-flatpak-manager
 
 # Sync configs on update
-catcat_update_sha="/etc/catcat-os/update_sha"
-if ! diff -q "${catcat_update_sha}" "${catcat_update_sha}_previous"; then
-    [[ ! -d /root/.local/share/catcat-os/LS_COLORS_DIR ]] &&
-            mkdir -vp /root/.local/share/catcat-os/LS_COLORS_DIR
+update_sha="/usr/etc/catcat-os/update_sha"
+prev_sha="/etc/catcat-os/log/.update_sha_previous"
+if ! diff -q "${update_sha}" "${prev_sha}"; then
+    ru_config_d="/root/.config"
+    ru_local_share="/root/.local/share"
+    ru_catcat_d="${ru_local_share}/catcat-os"
+    [[ ! -d ${ru_catcat_d}/LS_COLORS_DIR ]] &&
+            mkdir -vp ${ru_catcat_d}/LS_COLORS_DIR
     cp -dvf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
-            /root/.local/share/catcat-os/LS_COLORS_DIR/
+            ${ru_catcat_d}/LS_COLORS_DIR/
 
-    [[ ! -e /root/.config/bat ]] &&
-            { mkdir -vp /root/.config/ ; ln -svf /etc/bat /root/.config/; }
+    [[ ! -e ${ru_config_d}/bat ]] &&
+            { mkdir -vp ${ru_config_d} ; ln -svf /etc/bat ${ru_config_d}/; }
     /usr/bin/bat cache --build
 
-    [[ ! -e /root/.config/fish/fish_variables ]] &&
-            ln -svf /etc/skel/.config/fish/fish_variables /root/.config/fish/fish_variables
+    [[ ! -e ${ru_config_d}/fish/fish_variables ]] &&
+            ln -svf /etc/skel/.config/fish/fish_variables ${ru_config_d}/fish/fish_variables
 
     [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
 
     # GDM
-    # Update it or fall back to orignal GDM theme
-    gdm_shell="share/gnome-shell"
-    gdm_resource="gnome-shell-theme.gresource"
-    if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
-        [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
-        cp -av "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+    if systemctl is-enabled gdm; then
+        # Update it or fall back to orignal GDM theme
+        gdm_shell="share/gnome-shell"
+        gdm_resource="gnome-shell-theme.gresource"
+        if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
+            [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
+            cp -av "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+        fi
+        /usr/bin/dconf update
     fi
-    /usr/bin/dconf update
-#    chmod -c -R 755 /etc/dconf/
 
-    cat "${catcat_update_sha}" > "${catcat_update_sha}_previous"
+    cp -fv "${update_sha}" "${prev_sha}"
 fi
 
 # Sync main user's monitors.xml with GDM
 monitors_xml=".config/monitors.xml"
-if [[ -f "/home/${U1000}/${monitors_xml}" ]]; then
+if [[ -f "/home/${U1000}/${monitors_xml}" ]] && systemctl is-enabled gdm; then
     if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}" >/dev/null 2>&1; then
         cp -vf "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"
         restorecon -vR "/home/${U1000}/.local/share/icc"

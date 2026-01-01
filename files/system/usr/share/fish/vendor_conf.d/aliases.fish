@@ -1,5 +1,5 @@
-test -f $HOME/.config/fish/conf.d/aliases.fish && status filename | grep -q 'vendor_conf.d' && exit 0
 status is-interactive || exit 0
+_check_local_config
 
 ## Useful aliases
 
@@ -16,6 +16,7 @@ alias tc='tc -color=auto'
 alias hw='inxi --expanded -J'
 alias fcc='fc-cache -fvr --really-force'
 alias dir='dir --color=auto'
+alias vim='nvim'
 alias vdir='vdir --color=auto'
 alias tree='tree -a --dirsfirst'
 alias diff='diff --color=auto'

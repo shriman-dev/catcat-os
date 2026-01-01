@@ -5,3 +5,6 @@ for path in "${paths_to_add[@]}"; do
     export PATH="${path}:${PATH}"
   fi
 done
+
+unset path
+unset paths_to_add

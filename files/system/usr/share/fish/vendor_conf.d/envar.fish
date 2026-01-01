@@ -1,7 +1,6 @@
-test -f $HOME/.config/fish/conf.d/envar.fish && status filename | grep -q 'vendor_conf.d' && exit 0
+_check_local_config
 # Hide welcome message
-set fish_greeting
-set VIRTUAL_ENV_DISABLE_PROMPT "1"
+set -g fish_greeting ""
 
 set -gx NIXPKGS_ALLOW_UNFREE 1
 set -gx ni "$HOME/.local/state/nix/profiles/profile/bin"

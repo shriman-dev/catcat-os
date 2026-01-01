@@ -5,7 +5,8 @@ source /usr/lib/catcat/funcvar.sh
 #
 
 # System clean up
-one_week=604800
+one_day=86400
+one_week=$((one_day * 7))
 cleanup_log_file="/etc/catcat-os/log/last_cleanup.log"
 if is_file_older ${one_week} "${cleanup_log_file}"; then
     date "+%a %b %d %H:%M:%S %Y" > "${cleanup_log_file}"
@@ -23,7 +24,7 @@ if is_file_older ${one_week} "${cleanup_log_file}"; then
 fi
 
 # Run buttercare trim every 20 days
-twenty_days=1728000
+twenty_days=$((one_day * 20))
 buttercare_log_file="/etc/catcat-os/log/buttercare.log"
 if is_file_older ${twenty_days} "${buttercare_log_file}"; then
     /usr/bin/buttercare -v balance trim > "${buttercare_log_file}"

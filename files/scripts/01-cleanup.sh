@@ -7,6 +7,7 @@ log "INFO" "Cleaning image"
 if [[ -d /usr/share/ublue-os ]]; then
     log "INFO" "Removing homebrew"
     rm -rf /home/linuxbrew
+    rm -vf /usr/bin/bbrew-helper
     rm -vf /usr/lib/systemd/system/brew-dir-fix.service
     rm -vf /usr/lib/systemd/system/brew-setup.service
     rm -vf /usr/lib/systemd/system/brew-update.timer
@@ -15,6 +16,7 @@ if [[ -d /usr/share/ublue-os ]]; then
     rm -vf /usr/lib/systemd/system/brew-upgrade.service
     rm -vf /usr/lib/systemd/system-preset/01-homebrew.preset
     rm -vf /usr/lib/tmpfiles.d/homebrew.conf
+    rm -vf /usr/share/applications/bbrew.desktop
     rm -vf /usr/share/homebrew.tar.zst
     rm -vf /usr/share/fish/vendor_conf.d/brew.fish
     rm -rf /usr/share/ublue-os/homebrew

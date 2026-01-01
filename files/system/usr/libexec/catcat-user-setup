@@ -5,30 +5,31 @@ exit_if_root
 HOME_DIR="${HOME}"
 CONFIG="${HOME_DIR}/.config"
 LOCALSHARE="${HOME_DIR}/.local/share"
+CATCAT_CONFD="${LOCALSHARE}/catcat-os"
 SKEL="/etc/skel"
-CATCAT_CONF="${LOCALSHARE}/catcat-os"
 
 on_first_boot() {
-  if [[ ! -f "${CATCAT_CONF}/first-boot" ]]; then
-    FIRSTBOOT=true
-    mkdir -pv "${CATCAT_CONF}"
-    systemctl is-active gdm &&
-        dconf reset -f /org/gnome/Ptyxis
-    echo 'first boot' > "${CATCAT_CONF}/first-boot"
-  fi
+    local firstboot_file="${CATCAT_CONFD}/log/.first-boot-done"
+    if [[ ! -f "${firstboot_file}" ]]; then
+        FIRSTBOOT=true
+        mkdir -pv "$(dirname ${firstboot_file})"
+        systemctl is-active gdm &&
+            dconf reset -f /org/gnome/Ptyxis
+        echo 'first boot' > "${firstboot_file}"
+    fi
 }
 
 # sync default configs for user home
 sync_default_configs() {
-    local update_sha="/etc/catcat-os/update_sha"
-    local prev_sha="${CATCAT_CONF}/update_sha_previous"
+    local update_sha="/usr/etc/catcat-os/update_sha"
+    local prev_sha="${CATCAT_CONFD}/log/.update_sha_previous"
 
     log "INFO" "Updating configs..."
     if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
         CATCAT_SYSTEM_UPDATED=true
-        mkdir -pv "${CATCAT_CONF}/LS_COLORS_DIR"
+        mkdir -pv "${CATCAT_CONFD}"/{log,LS_COLORS_DIR}
         cp -fv /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
-                "${CATCAT_CONF}/LS_COLORS_DIR/catppuccin-mocha-peach"
+                "${CATCAT_CONFD}/LS_COLORS_DIR/catppuccin-mocha-peach"
 
         rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
             err "Skel update failed"
