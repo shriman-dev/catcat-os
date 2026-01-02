@@ -6,7 +6,7 @@ log "INFO" "Running post setup cleanup"
 
 # Remove things that doesn't work well with NVIDIA
 if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
-    log "INFO" "Removeing packages unneeded on NVIDIA image"
+    log "INFO" "Removing packages unneeded on NVIDIA image"
     #nvidia-gpu-firmware
     dnf5 -y remove \
         rocm-hip \
@@ -39,6 +39,7 @@ rm -rvf /tmp/*
 #/etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
+
 
 log "INFO" "Post setup configuration"
 touch /etc/resolv.conf

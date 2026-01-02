@@ -353,7 +353,7 @@ if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
-    dnf5 -y --setopt=disable_excludes=* install mesa-demos # need for quickemu
+    dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
     dnf5 -y install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
@@ -376,14 +376,16 @@ log "INFO" "Disabled unneeded repos"
 
 
 log "INFO" "Installing External Packages"
-if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
+
+exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+                $(printf '%s\n' "${COMMON[@]}" | grep "^++" | sed 's|++||')
+
+if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${COMMON[@]}" | grep "^++" | sed 's|++||')
-elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]}" | grep "^++" | sed 's|++||')
+        $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep "^++" | sed 's|++||')
 else
     ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep "^++" | sed 's|++||')
+        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep "^++" | sed 's|++||')
 fi
+
 log "INFO" "External packages installed successfully"

@@ -17,6 +17,8 @@ exec_script() {
     } 2>/dev/null | bash
 }
 
+export -f exec_script
+
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
 
 set -ouex pipefail
