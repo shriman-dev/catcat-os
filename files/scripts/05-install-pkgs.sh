@@ -56,10 +56,12 @@ DESKTOP_EXTRAS=(
 
     # File Manage Stuff
     "nemo"
+    "nemo-python"
+    "nemo-preview"
     "nemo-emblems"
     "nemo-extensions"
-    "nemo-preview"
-    "nemo-python"
+    "nemo-search-helpers"
+    "folder-color-switcher-nemo"
 
     # Extra Gnome Apps
     "awf-gtk2"
@@ -135,6 +137,7 @@ DESKTOP_COMMON=(
 
     # More Terminal Tools
     ##poppler # pdf rendering library
+    "axel"
     "aria2"
     "ddcutil"
     "brightnessctl"
@@ -193,6 +196,7 @@ DESKTOP_COMMON=(
     "dconf-editor"
     "gnome-software"
     "gnome-system-monitor"
+    "gnome-software-rpm-ostree"
     "gnome-shell-extension-hanabi" # from bazzite-org/bazzite
     "gnome-shell-extension-common"
     "gnome-shell-extension-gsconnect"
@@ -341,19 +345,19 @@ fi
 log "INFO" "Added extra repos"
 
 log "INFO" "Installing RPM Packages"
-if [[ "${IMAGE_NAME}" =~ "-sv" ]]; then
-    dnf5 -y install \
+
+dnf5 -y install --setopt=install_weak_deps=True \
         $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
-elif [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+
+if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     dnf5 -y install \
-        $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
-    dnf5 -y --setopt=install_weak_deps=False install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 else
     dnf5 -y --setopt=disable_excludes=* install mesa-demos # need for quickemu
     dnf5 -y install \
-        $(printf '%s\n' "${COMMON[@]} ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
+        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
+
 log "INFO" "Packages installed successfully"
 
 
@@ -369,19 +373,6 @@ for copr in "${COPR_LIST[@]}"; do
 done
 
 log "INFO" "Disabled unneeded repos"
-
-
-# Remove things that doesn't work well with NVIDIA
-if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
-    log "INFO" "Removeing packages unneeded on NVIDIA image"
-    #nvidia-gpu-firmware
-    dnf5 -y remove \
-        rocm-hip \
-        rocm-opencl \
-        rocm-clinfo \
-        rocm-smi
-    log "INFO" "Done."
-fi
 
 
 log "INFO" "Installing External Packages"

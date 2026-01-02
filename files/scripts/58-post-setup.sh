@@ -3,6 +3,29 @@ source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
 log "INFO" "Running post setup cleanup"
+
+# Remove things that doesn't work well with NVIDIA
+if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
+    log "INFO" "Removeing packages unneeded on NVIDIA image"
+    #nvidia-gpu-firmware
+    dnf5 -y remove \
+        rocm-hip \
+        rocm-opencl \
+        rocm-clinfo \
+        rocm-smi
+    log "INFO" "Done."
+fi
+
+# Disable gnome software running in background
+if rpm -q gnome-software; then
+    log "INFO" "Disabling gnome software from running in background"
+    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /usr/lib/systemd/user/gnome-software.service
+    rm -vf /usr/share/dbus-1/services/org.gnome.Software.service
+    rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
+fi
+
 # Remove cache and junk
 dnf5 clean all
 find /var/* -maxdepth 0 -type d -not -name "log" -not -name "cache" -exec rm -rvf {} \;
@@ -16,16 +39,6 @@ rm -rvf /tmp/*
 #/etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
-
-# Disable gnome software running in background
-if rpm -q gnome-software; then
-    log "INFO" "Disabling gnome software from running in background"
-    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
-    rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
-    rm -vf /usr/lib/systemd/user/gnome-software.service
-    rm -vf /usr/share/dbus-1/services/org.gnome.Software.service
-    rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
-fi
 
 log "INFO" "Post setup configuration"
 touch /etc/resolv.conf
