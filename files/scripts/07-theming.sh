@@ -118,6 +118,7 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
                     cp -vf "${font_name_temp}" "${font_name_dest}/${font_file_name}"
                     ;;
             esac
+            rm -rf "${font_name_temp}"
         done
         log "INFO" "Extra Font(s) installed"
     fi
