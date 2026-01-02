@@ -52,7 +52,13 @@ mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
-# Reduce ram consumption by disabling unneeded process
+# Configure zram and reduce ram consumption by disabling unneeded process
+if [[ ! -f /etc/systemd/zram-generator.conf ]]; then
+    log "INFO" "Setting zram compression to zstd"
+    echo '[zram0]
+compression-algorithm = zstd' > /etc/systemd/zram-generator.conf
+fi
+
 # Disable ibus (causes input lag when selected)
 #chmod -v 000 /usr/bin/ibus
 #chmod -v 000 /usr/bin/ibus-daemon
