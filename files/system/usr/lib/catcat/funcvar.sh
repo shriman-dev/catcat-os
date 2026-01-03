@@ -61,8 +61,11 @@ log() {
     echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
 }
 
-# Error handling with optional function call
-die() { log "ERROR" "${1}"; [[ -n "${2}" ]] && ${2}; exit 1; }
+# Error handling with optional pre-exit function call
+die() {
+    local pre_exit_hook="${2:-}"
+    log "ERROR" "${1}"; [[ -n "${pre_exit_hook}" ]] && ${pre_exit_hook}; exit 1
+}
 
 err() { log "ERROR" "${1}"; return 1; }
 
