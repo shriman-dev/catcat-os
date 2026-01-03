@@ -346,13 +346,16 @@ log "INFO" "Added extra repos"
 
 log "INFO" "Installing RPM Packages"
 
-dnf5 -y install --setopt=install_weak_deps=True "${COMMON[@]%%'++'*}"
+dnf5 -y --setopt=install_weak_deps=True install \
+        $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
 
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    dnf5 -y install "${DESKTOP_COMMON[@]%%'++'*}"
+    dnf5 -y install \
+        $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
 elif [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
     dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
-    dnf5 -y install "${DESKTOP_COMMON[@]%%'++'*}" "${DESKTOP_EXTRAS[@]%%'++'*}"
+    dnf5 -y install \
+        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
 
 log "INFO" "Packages installed successfully"
@@ -374,7 +377,7 @@ log "INFO" "Disabled unneeded repos"
 log "INFO" "Installing External Packages"
 
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-                $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
+        $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
 
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
