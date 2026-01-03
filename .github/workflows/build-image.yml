@@ -77,10 +77,14 @@ jobs:
           ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           source ${{ github.workspace }}/ENVAR
-          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
+          DATETIMESTAMP="${DATESTAMP}.${TIMESTAMP}"
+          [[ -n ${{ matrix.ALT_TAG }} ]] &&
+              echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> $GITHUB_ENV
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
           echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
           echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+          echo "DATETIMESTAMP=${DATETIMESTAMP}" >> $GITHUB_ENV
           echo "AHHH_DATE=${AH_DATE}" >> $GITHUB_ENV
           echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
@@ -101,7 +105,7 @@ jobs:
             type=raw,value=${{ env.DEFAULT_TAG }}
             type=raw,value=${{ env.MAJOR_VERSION }}
             type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}
-            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
+            type=raw,value=${{ env.MAJOR_VERSION }}.${{ env.DATETIMESTAMP }}
             type=raw,value={{sha}}
             type=sha,enable=${{ github.event_name == 'pull_request' }}
             type=ref,event=pr
@@ -111,7 +115,7 @@ jobs:
             org.opencontainers.image.description=${{ env.IMAGE_DESC }}
             org.opencontainers.image.title=${{ matrix.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}
+            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATETIMESTAMP }}
             containers.bootc=1
           sep-tags: " "
           sep-annotations: " "
@@ -127,6 +131,7 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           tags: |
             ${{ matrix.ALT_TAG }}
+            ${{ env.ALT_STAMP }}
             ${{ steps.metadata.outputs.tags }}
           build-args: |
             BASE_IMAGE_NAME=${{ matrix.BASE_IMAGE_NAME }}
@@ -182,7 +187,10 @@ jobs:
         with:
           registry: ${{ env.PUSH_IMAGE_REGISTRY }}
           image: ${{ matrix.IMAGE_NAME }}
-          tags: ${{ steps.metadata.outputs.tags }}
+          tags: |
+            ${{ matrix.ALT_TAG }}
+            ${{ env.ALT_STAMP }}
+            ${{ steps.metadata.outputs.tags }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
 #          extra-args: |
