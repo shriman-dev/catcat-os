@@ -341,21 +341,18 @@ else
     dnf5 -y install --nogpgcheck --repofrompath \
             'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
 fi
-
 log "INFO" "Added extra repos"
+
 
 log "INFO" "Installing RPM Packages"
 
-dnf5 -y install --setopt=install_weak_deps=True \
-        $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
+dnf5 -y install --setopt=install_weak_deps=True "${COMMON[@]%%'++'*}"
 
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    dnf5 -y install \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
-else
+    dnf5 -y install "${DESKTOP_COMMON[@]%%'++'*}"
+elif [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
     dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
-    dnf5 -y install \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
+    dnf5 -y install "${DESKTOP_COMMON[@]%%'++'*}" "${DESKTOP_EXTRAS[@]%%'++'*}"
 fi
 
 log "INFO" "Packages installed successfully"
@@ -371,21 +368,20 @@ sed -i 's|enabled=1|enabled=0|g' /etc/yum.repos.d/negativo17-fedora-multimedia.r
 for copr in "${COPR_LIST[@]}"; do
     dnf5 -y copr disable "${copr}"
 done
-
 log "INFO" "Disabled unneeded repos"
 
 
 log "INFO" "Installing External Packages"
 
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-                $(printf '%s\n' "${COMMON[@]}" | grep "^++" | sed 's|++||')
+                $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
 
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep "^++" | sed 's|++||')
-else
-    ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep "^++" | sed 's|++||')
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+        $(printf '%s\n' "${DESKTOP_COMMON[@]}" | sed -n 's|++||gp')
+elif [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | sed -n 's|++||gp')
 fi
 
 log "INFO" "External packages installed successfully"

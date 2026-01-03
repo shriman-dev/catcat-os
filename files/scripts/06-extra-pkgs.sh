@@ -5,8 +5,6 @@ set -ouex pipefail
 TMP_DIR="/tmp/catcat_extra_pkgs"
 
 starship() {
-    log "INFO" "Installing starship"
-
     local starship_repo="https://api.github.com/repos/starship/starship"
     local starship_tar="${TMP_DIR}/starship.tar.gz"
     mkdir -vp "${starship_tar}.extract"
@@ -17,13 +15,9 @@ starship() {
     cp -dvf "${starship_tar}.extract/starship" "/usr/bin"/
     chmod -v +x /usr/bin/starship
     rm -rf "${starship_tar}" "${starship_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 eza() {
-    log "INFO" "Installing eza"
-
     local eza_repo="https://github.com/eza-community/eza"
     local eza_tar="${TMP_DIR}/eza.tar.gz"
     mkdir -vp "${eza_tar}.extract"
@@ -34,13 +28,9 @@ eza() {
     cp -dvf "${eza_tar}.extract/eza" /usr/bin/
     chmod -v +x /usr/bin/eza
     rm -rf "${eza_tar}" "${eza_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 grex() {
-    log "INFO" "Installing grex"
-
     local grex_repo="https://api.github.com/repos/pemistahl/grex"
     local grex_tar="${TMP_DIR}/grex.tar.gz"
     mkdir -vp "${grex_tar}.extract"
@@ -51,13 +41,9 @@ grex() {
     cp -dvf "${grex_tar}.extract/grex" "/usr/bin"/
     chmod -v +x /usr/bin/grex
     rm -rf "${grex_tar}" "${grex_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 yazi() {
-    log "INFO" "Installing yazi"
-
     local yazi_repo="https://github.com/sxyazi/yazi"
     local yazi_repo_raw="https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main"
     local yazi_zip="${TMP_DIR}/yazi.zip"
@@ -77,13 +63,9 @@ yazi() {
     cp -dvf "${yazi_zip}.extract/yazi-x86_64-unknown-linux-gnu/completions/yazi.fish" \
                     /usr/share/fish/completions/
     rm -rf "${yazi_zip}" "${yazi_zip}.extract"
-
-    log "INFO" "Done."
 }
 
 hblock() {
-    log "INFO" "Installing hblock"
-
     local hblock_confd="/etc/hblock"
     local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
     local dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
@@ -97,13 +79,9 @@ hblock() {
     curl -Lo "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
     curl -Lo "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
     curl -Lo "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
-
-    log "INFO" "Done."
 }
 
 bandwhich() {
-    log "INFO" "Installing bandwhich"
-
     local bandwhich_repo="https://api.github.com/repos/imsnif/bandwhich"
     local bandwhich_tar="${TMP_DIR}/bandwhich.tar.gz"
     mkdir -vp "${bandwhich_tar}.extract"
@@ -114,13 +92,9 @@ bandwhich() {
     cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
     chmod -v +x /usr/bin/bandwhich
     rm -rf "${bandwhich_tar}" "${bandwhich_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 buttersnap() {
-    log "INFO" "Installing buttersnap"
-
     local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
 
     curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
@@ -128,24 +102,17 @@ buttersnap() {
 
     curl -Lo "/usr/bin/buttercopy.sh" "${buttersnap_repo}/buttercopy.sh"
     chmod -v +x "/usr/bin/buttercopy.sh"
-
-    log "INFO" "Done."
 }
 
 btdu() {
-    log "INFO" "Installing btdu"
-
     local btdu_repo="https://github.com/CyberShadow/btdu"
 
     curl -Lo "/usr/bin/btdu" "${btdu_repo}/releases/latest/download/btdu-static-x86_64"
 
     chmod -v +x "/usr/bin/btdu"
-    log "INFO" "Done."
 }
 
 gocryptfs() {
-    log "INFO" "Installing gocryptfs"
-
     local gocryptfs_repo="https://api.github.com/repos/rfjakob/gocryptfs"
     local gocryptfs_tar="${TMP_DIR}/gocryptfs.tar.gz"
     mkdir -vp "${gocryptfs_tar}.extract"
@@ -156,13 +123,9 @@ gocryptfs() {
     cp -dvf "${gocryptfs_tar}.extract/gocryptfs" "/usr/bin"/
     chmod -v +x /usr/bin/gocryptfs
     rm -rf "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 scrcpy() {
-    log "INFO" "Installing scrcpy"
-
     local scrcpy_repo="https://api.github.com/repos/Genymobile/scrcpy"
     local scrcpy_tar="${TMP_DIR}/scrcpy.tar.gz"
     local usrlibexec_scrcpy="/usr/libexec/scrcpy"
@@ -176,13 +139,9 @@ scrcpy() {
     ln -svf "${usrlibexec_scrcpy}/scrcpy" /usr/bin/scrcpy
     chmod -v +x "${usrlibexec_scrcpy}/scrcpy"
     rm -rf "${scrcpy_tar}" "${scrcpy_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 llama_cpp() {
-    log "INFO" "Installing llama_cpp"
-
     local llama_cpp_repo="https://api.github.com/repos/ggml-org/llama.cpp"
     local llama_cpp_zip="${TMP_DIR}/llama-cpp-vulkan.zip"
     local usrlibexec_llama_cpp="/usr/libexec/llama_cpp_vulkan"
@@ -197,24 +156,16 @@ llama_cpp() {
     chmod -v +x "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
     ln -svf "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
     rm -rf "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
-
-    log "INFO" "Done."
 }
 
 pipes_sh() {
-    log "INFO" "Installing pipes.sh"
-
     local pipes_sh_repo="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
 
 #    curl -Lo "/usr/bin/pipes.sh" "${pipes_sh_repo}/pipes.sh"
     chmod -v +x "/usr/bin/pipes.sh"
-
-    log "INFO" "Done."
 }
 
 ascii_image_converter() {
-    log "INFO" "Installing ascii-image-converter"
-
     local ascii_ic_repo="https://github.com/TheZoraiz/ascii-image-converter"
     local ascii_ic_tar="${TMP_DIR}/ascii_ic.tar.gz"
 #    mkdir -vp "${ascii_ic_tar}.extract"
@@ -225,13 +176,9 @@ ascii_image_converter() {
 #    cp -dvf "${ascii_ic_tar}.extract"/*/ascii-image-converter "/usr/bin"/
     chmod -v +x /usr/bin/ascii-image-converter
 #    rm -rf "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 ls_iommu() {
-    log "INFO" "Installing ls-iommu"
-
     local ls_iommu_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
     local ls_iommu_tar="${TMP_DIR}/ls_iommu.tar.gz"
     mkdir -vp "${ls_iommu_tar}.extract"
@@ -243,13 +190,9 @@ ls_iommu() {
     cp -dvf "${ls_iommu_tar}.extract/ls-iommu" "/usr/bin"/
     chmod -v +x /usr/bin/ls-iommu
     rm -rf "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
-
-    log "INFO" "Done."
 }
 
 ujust_setup() {
-    log "INFO" "Setting up ujust"
-
     local just_repo="https://api.github.com/repos/casey/just"
     local just_tar="${TMP_DIR}/just.tar.gz"
     local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
@@ -258,7 +201,7 @@ ujust_setup() {
     local justfile_dir="$(dirname ${BUILD_SETUP_DIR})/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
-    [[ ! -f "/usr/bin/just" ]] && {
+    rpm -q just && {
         log "INFO" "Installing just"
         mkdir -vp "${just_tar}.extract"
 
@@ -272,7 +215,7 @@ ujust_setup() {
         log "INFO" "Done."
     }
 
-    [[ ! -f "/usr/bin/ujust" ]] && {
+    [[ ! -x "/usr/bin/ujust" ]] && {
         log "INFO" "Installing ujust and ugum"
         curl -Lo "/usr/bin/ujust" "${ublue_repo}/ublue-os-just/src/ujust"
         curl -Lo "/usr/bin/ugum" "${ublue_repo}/ublue-os-just/src/ugum"
@@ -356,14 +299,13 @@ ujust_setup() {
             }
         done
     fi
-    log "INFO" "All Justfile imports are done."
+    log "INFO" "Justfile(s) imported"
 
     log "INFO" "Full output of: ${import_file}"
     cat "${import_file}"
 }
 
 waydroid_setup() {
-    log "INFO" "Waydroid setup"
 #    /usr/libexec/waydroid-container-restart
 #    /usr/libexec/waydroid-container-start
 #    /usr/libexec/waydroid-container-stop
@@ -379,79 +321,91 @@ waydroid_setup() {
                     /usr/lib/waydroid/data/scripts/waydroid-net.sh
 
     systemctl disable waydroid-container.service
-    log "INFO" "Done."
 }
 
 extras() {
-    log "INFO" "Getting extra confs"
-
     curl -Lo /usr/share/applications/micro.desktop \
         https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
-    log "INFO" "Done."
 }
 
 process_command() {
-    mkdir -vp "${TMP_DIR}"
     case "${1}" in
         eza)
+            log "INFO" "Installing eza"
             eza
             ;;
         starship)
+            log "INFO" "Installing starship"
             starship
             ;;
         grex)
+            log "INFO" "Installing grex"
             grex
             ;;
         yazi)
+            log "INFO" "Installing yazi"
             yazi
             ;;
         hblock)
+            log "INFO" "Installing hblock"
             hblock
             ;;
         bandwhich)
+            log "INFO" "Installing bandwhich"
             bandwhich
             ;;
         buttersnap)
+            log "INFO" "Installing buttersnap"
             buttersnap
             ;;
         btdu)
+            log "INFO" "Installing btdu"
             btdu
             ;;
         gocryptfs)
+            log "INFO" "Installing gocryptfs"
             gocryptfs
             ;;
         scrcpy)
+            log "INFO" "Installing scrcpy"
             scrcpy
             ;;
         llama_cpp)
+            log "INFO" "Installing llama_cpp"
             llama_cpp
             ;;
         pipes_sh)
+            log "INFO" "Installing pipes_sh"
             pipes_sh
             ;;
         ascii_image_converter)
+            log "INFO" "Installing ascii_image_converter"
             ascii_image_converter
             ;;
         ls_iommu)
+            log "INFO" "Installing ls_iommu"
             ls_iommu
             ;;
         ujust_setup)
+                log "INFO" "Setting up ujust"
             ujust_setup
             ;;
         waydroid_setup)
+            log "INFO" "Waydroid setup"
             waydroid_setup
             ;;
         extras)
+            log "INFO" "Getting extra confs"
             extras
             ;;
         *)
             die "Error: Unknown argument ${1}"
             ;;
     esac
-    rm -rf "${TMP_DIR}"
 }
 
 # Process all provided arguments
 for arg in "$@"; do
     process_command "${arg}" || exit 1
 done
+rm -rf "${TMP_DIR}"

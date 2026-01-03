@@ -42,6 +42,7 @@ jobs:
             BASE_IMAGE_NAME: ghcr.io/ublue-os/silverblue-main
 
           - IMAGE_NAME: catcat-os-nv
+            ALT_TAG: nvidia
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
 
           - IMAGE_NAME: catcat-os-hh
@@ -123,11 +124,14 @@ jobs:
           containerfiles: |
             ./Containerfile
           image: ${{ matrix.IMAGE_NAME }}
-          tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+          tags: |
+            ${{ matrix.ALT_TAG }}
+            ${{ steps.metadata.outputs.tags }}
           build-args: |
-            IMAGE_NAME=${{ matrix.IMAGE_NAME }}
             BASE_IMAGE_NAME=${{ matrix.BASE_IMAGE_NAME }}
+            IMAGE_NAME=${{ matrix.IMAGE_NAME }}
+            ALT_TAG=${{ matrix.ALT_TAG }}
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
             TAG_VER=${{ env.TAG_VER }}
             DATESTAMP=${{ env.DATESTAMP }}
