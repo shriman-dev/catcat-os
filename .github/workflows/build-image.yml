@@ -86,11 +86,12 @@ jobs:
           echo "AHHH_DATE=${AH_DATE}" >> ${GITHUB_ENV}
           echo "COMMIT_SHA=${GITHUB_SHA}" >> ${GITHUB_ENV}
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
-          echo "${{ matrix.ALT_TAG }+ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}}" >> \
-                                                                                ${GITHUB_ENV}
-          if [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "bazzite" ]]; then
+          ALT_TAG="${{ matrix.ALT_TAG }}"
+          [[ -n "${ALT_TAG}" ]] &&
+              echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> ${GITHUB_ENV}
+          if [[ "${{ matrix.BASE_IMAGE_NAME }}" =~ "bazzite" ]]; then
               echo "TAG_VER=stable-${MAJOR_VERSION}" >> ${GITHUB_ENV}
-          elif [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "ucore" ]]; then
+          elif [[ "${{ matrix.BASE_IMAGE_NAME }}" =~ "ucore" ]]; then
               echo "TAG_VER=stable" >> ${GITHUB_ENV}
           else
               echo "TAG_VER=${MAJOR_VERSION}" >> ${GITHUB_ENV}
