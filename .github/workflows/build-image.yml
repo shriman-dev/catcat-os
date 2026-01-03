@@ -78,23 +78,22 @@ jobs:
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           source ${{ github.workspace }}/ENVAR
           DATETIMESTAMP="${DATESTAMP}.${TIMESTAMP}"
-          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
-          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> $GITHUB_ENV
-          echo "DATESTAMP=${DATESTAMP}" >> $GITHUB_ENV
-          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
-          echo "DATETIMESTAMP=${DATETIMESTAMP}" >> $GITHUB_ENV
-          echo "AHHH_DATE=${AH_DATE}" >> $GITHUB_ENV
-          echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> ${GITHUB_ENV}
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> ${GITHUB_ENV}
+          echo "DATESTAMP=${DATESTAMP}" >> ${GITHUB_ENV}
+          echo "TIMESTAMP=${TIMESTAMP}" >> ${GITHUB_ENV}
+          echo "DATETIMESTAMP=${DATETIMESTAMP}" >> ${GITHUB_ENV}
+          echo "AHHH_DATE=${AH_DATE}" >> ${GITHUB_ENV}
+          echo "COMMIT_SHA=${GITHUB_SHA}" >> ${GITHUB_ENV}
           echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
-          if [[ -n ${{ matrix.ALT_TAG }} ]]; then
-              echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> $GITHUB_ENV
-          fi
+          [[ -n ${{ matrix.ALT_TAG }} ]] &&
+              echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> ${GITHUB_ENV} || true
           if [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "bazzite" ]]; then
-              echo "TAG_VER=stable-${MAJOR_VERSION}" >> $GITHUB_ENV
+              echo "TAG_VER=stable-${MAJOR_VERSION}" >> ${GITHUB_ENV}
           elif [[ ${{ matrix.BASE_IMAGE_NAME }} =~ "ucore" ]]; then
-              echo "TAG_VER=stable" >> $GITHUB_ENV
+              echo "TAG_VER=stable" >> ${GITHUB_ENV}
           else
-              echo "TAG_VER=${MAJOR_VERSION}" >> $GITHUB_ENV
+              echo "TAG_VER=${MAJOR_VERSION}" >> ${GITHUB_ENV}
           fi
 
       # Build metadata
