@@ -331,71 +331,54 @@ extras() {
 process_command() {
     case "${1}" in
         eza)
-            log "INFO" "Installing eza"
             eza
             ;;
         starship)
-            log "INFO" "Installing starship"
             starship
             ;;
         grex)
-            log "INFO" "Installing grex"
             grex
             ;;
         yazi)
-            log "INFO" "Installing yazi"
             yazi
             ;;
         hblock)
-            log "INFO" "Installing hblock"
             hblock
             ;;
         bandwhich)
-            log "INFO" "Installing bandwhich"
             bandwhich
             ;;
         buttersnap)
-            log "INFO" "Installing buttersnap"
             buttersnap
             ;;
         btdu)
-            log "INFO" "Installing btdu"
             btdu
             ;;
         gocryptfs)
-            log "INFO" "Installing gocryptfs"
             gocryptfs
             ;;
         scrcpy)
-            log "INFO" "Installing scrcpy"
             scrcpy
             ;;
         llama_cpp)
-            log "INFO" "Installing llama_cpp"
             llama_cpp
             ;;
         pipes_sh)
-            log "INFO" "Installing pipes_sh"
             pipes_sh
             ;;
         ascii_image_converter)
-            log "INFO" "Installing ascii_image_converter"
             ascii_image_converter
             ;;
         ls_iommu)
-            log "INFO" "Installing ls_iommu"
             ls_iommu
             ;;
         ujust_setup)
-            log "INFO" "Setting up ujust"
             ujust_setup
             ;;
         waydroid_setup)
-            log "INFO" "Waydroid setup"
             waydroid_setup
             ;;
         extras)
-            log "INFO" "Getting extra confs"
             extras
             ;;
         *)
@@ -406,6 +389,7 @@ process_command() {
 
 # Process all provided arguments
 for arg in "$@"; do
+    log "INFO" "Installing and setting up: ${arg}"
     process_command "${arg}" || exit 1
 done
 rm -rf "${TMP_DIR}"
