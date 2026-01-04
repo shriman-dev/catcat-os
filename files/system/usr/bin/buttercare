@@ -3,18 +3,6 @@ source /usr/lib/catcat/funcvar.sh
 
 VERBOSE=
 
-# Validate paths
-validate_path() {
-    [[ $# -eq 0 ]] && err "No paths provided to validate"
-    local path
-    for path in "$@"; do
-        [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
-        log "DEBUG" "Validating path is on BTRFS filesystem: ${path}"
-        findmnt -n -o FSTYPE -T "${path}" | grep -q "btrfs" ||
-                die "Path is not on a BTRFS filesystem: ${path}"
-    done
-}
-
 # Get all BTRFS mount points
 get_btrfs_mounts() {
     lsblk -lo FSTYPE,MOUNTPOINT | awk '$1=="btrfs" && $2 != "" {print $2}'
@@ -23,7 +11,7 @@ get_btrfs_mounts() {
 # Show filesystem usage
 show_btrfs_usage() {
     local path="${1}"
-    validate_path "${path}"
+    validate_path "btrfs" "${path}"
     log "INFO" "Showing BTRFS detailed usage for ${path}"
     ${BTRFS} filesystem usage "${path}"
     echo
@@ -52,7 +40,7 @@ balance() {
     fi
 
     for mount in ${mounts[@]}; do
-        validate_path "${mount}"
+        validate_path "btrfs" "${mount}"
         log "INFO" "Starting balance on ${mount}"
         [[ -n ${VERBOSE} ]] &&
             { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
@@ -79,7 +67,7 @@ defrag() {
     done
     [[ -z ${comp} || -z ${path} ]] && die "Both compression (-c) and path (-p) are required for defrag"
 
-    validate_path "${path}"
+    validate_path "btrfs" "${path}"
 
     log "INFO" "Starting defragmentation on ${path} (compression: ${comp}${level:+, level: ${level}})"
     ${BTRFS} filesystem defragment -r -c"${comp}" ${level:+-L ${level}} "${path}"
@@ -89,7 +77,7 @@ defrag() {
 # Perform scrub operation
 scrub() {
     local path="${1}"
-    validate_path "${path}"
+    validate_path "btrfs" "${path}"
     log "INFO" "Starting scrub on ${path}"
     ${BTRFS} scrub start -B "${path}"
     log "INFO" "Scrub completed for ${path}"

@@ -192,6 +192,31 @@ notify_users() {
     fi
 }
 
+validate_path() {
+    local path fs_check
+    [[ $# -eq 0 ]] && die "No path provided to validate"
+
+    if [[ ! "${1}" =~ "/" ]]; then
+        local fs_check="${1}"
+        shift
+    fi
+
+    for path in "$@"; do
+        [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
+        if [[ -n "${fs_check}" ]]; then
+            log "DEBUG" "Validating path exists on ${fs_check} filesystem: ${path}"
+            local path_fs="$(stat -f -c '%T' ${path})"
+            [[ "${path_fs,,}" == "${fs_check,,}" ]] ||
+                die "Path is not on ${fs_check} filesystem: ${path}"
+        fi
+    done
+}
+
+one_filesystem() {
+    [[ $# -eq 2 ]] || die "Specify two paths to check filesystem"
+    [[ $(stat -L -c %d ${1}) -eq $(stat -L -c %d ${2}) ]]
+}
+
 # Check if a file is older than a specified number of seconds
 is_file_older() {
     local max_age_seconds="${1}"
@@ -225,8 +250,8 @@ replace_add() {
 }
 
 bak_before() {
-    [[ ! -e ${1}.og.bak ]] && {
+    if [[ ! -e ${1}.og.bak ]]; then
         cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
-    }
+    fi
     cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
 }
