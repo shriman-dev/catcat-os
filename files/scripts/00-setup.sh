@@ -10,12 +10,11 @@ enclosed_heading_this() {
 
 exec_script() {
     {
-        _script="${1}"; shift
-        _script_args="${@}"
-        sed -E '/log ("DEBUG"|"INFO")/ s/$/; } 2>\/dev\/null/' "${_script}" | \
+        local script="${1}"
+        sed -E '/log ("DEBUG"|"INFO")/ s/$/; } 2>\/dev\/null/' "${script}" | \
         sed -Ee 's|log "INFO"|{ log "INFO"|g' \
             -e 's|log "DEBUG"|{ log "DEBUG"|g'
-    } 2>/dev/null | bash -s -- ${_script_args}
+    } 2>/dev/null | bash -s -- "${@:2}"
 }
 
 export -f exec_script
