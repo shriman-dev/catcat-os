@@ -405,7 +405,6 @@ process_command() {
 }
 
 # Process all provided arguments
-echo "$@"
 for arg in "$@"; do
     process_command "${arg}" || exit 1
 done
