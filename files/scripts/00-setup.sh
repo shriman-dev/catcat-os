@@ -15,7 +15,7 @@ exec_script() {
         sed -E '/log ("DEBUG"|"INFO")/ s/$/; } 2>\/dev\/null/' "${script}" | \
         sed -Ee 's|log "INFO"|{ log "INFO"|g' \
             -e 's|log "DEBUG"|{ log "DEBUG"|g'
-    } 2>/dev/null | bash -s -- ${script_args}
+    } 2>/dev/null | bash -s -- ${script_args:-}
 }
 
 export -f exec_script
