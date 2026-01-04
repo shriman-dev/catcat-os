@@ -5,7 +5,7 @@ VERBOSE=
 
 # Get all BTRFS mount points
 get_btrfs_mounts() {
-    lsblk -lo FSTYPE,MOUNTPOINT | awk '$1=="btrfs" && $2 != "" {print $2}'
+    lsblk -lno MOUNTPOINT --filter 'FSTYPE == "btrfs"'
 }
 
 # Show filesystem usage

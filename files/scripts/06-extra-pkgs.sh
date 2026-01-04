@@ -387,7 +387,7 @@ process_command() {
             ls_iommu
             ;;
         ujust_setup)
-                log "INFO" "Setting up ujust"
+            log "INFO" "Setting up ujust"
             ujust_setup
             ;;
         waydroid_setup)
