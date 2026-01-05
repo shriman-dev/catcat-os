@@ -22,51 +22,56 @@ export -f exec_script
 
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
 
-declare -A STEPS=(
-    ["Cleaning Up"]="\
-01-cleanup.sh"
-
-    ["Debloating"]="\
-02-deblaot.sh"
-
-    ["Preparing System Environment"]="\
-03-prep-env.sh"
-
-    ["Copying Over System Default Files"]="\
-04-copy-files.sh"
-
-    ["Updating And Installing Packages"]="\
-05-install-pkgs.sh"
-
-    ["Applying Various Themes"]="\
-07-theming.sh"
-
-    ["Enhancing Security With Secatcat"]="\
-08-secatcat.sh"
-
-    ["Configuring Systemd Services"]="\
-10-systemd.sh"
-
-    ["Refining System With Tweaks And Fixes"]="\
-11-tweaks-and-fixes.sh"
-
-    ["Applying Image Info"]="\
-55-image-info.sh"
-
-    ["Configuring Signing Policy"]="\
-56-signing.sh"
-
-    ["Regenerating Initramfs"]="\
-57-initramfs.sh"
-
-    ["Post Build Setup"]="\
-58-post-setup.sh"
-)
-
 set -x
-for heading in "${!STEPS[@]}"; do
-    step_script="${STEPS[${heading}]}"
-    { enclosed_heading_this "${heading}"; } 2>/dev/null
-    exec_script "${BUILD_SETUP_DIR}/${step_script}"
-    ostree container commit
-done
+
+{ enclosed_heading_this "Cleaning Up"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/01-cleanup.sh
+ostree container commit
+
+{ enclosed_heading_this "Debloating"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/02-deblaot.sh
+ostree container commit
+
+{ enclosed_heading_this "Preparing System Environment"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/03-prep-env.sh
+ostree container commit
+
+{ enclosed_heading_this "Copying Over System Default Files"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/04-copy-files.sh
+ostree container commit
+
+{ enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/05-install-pkgs.sh
+ostree container commit
+
+{ enclosed_heading_this "Applying Various Themes"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/07-theming.sh
+ostree container commit
+
+{ enclosed_heading_this "Enhancing Security With Secatcat"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/08-secatcat.sh
+ostree container commit
+
+{ enclosed_heading_this "Configuring Systemd Services"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/10-systemd.sh
+ostree container commit
+
+{ enclosed_heading_this "Refining System With Tweaks And Fixes"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/11-tweaks-and-fixes.sh
+ostree container commit
+
+{ enclosed_heading_this "Applying Image Info"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/55-image-info.sh
+ostree container commit
+
+{ enclosed_heading_this "Configuring Signing Policy"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/56-signing.sh
+ostree container commit
+
+{ enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/57-initramfs.sh
+ostree container commit
+
+{ enclosed_heading_this "Post Build Setup"; } 2>/dev/null
+exec_script ${BUILD_SETUP_DIR}/58-post-setup.sh
+ostree container commit
