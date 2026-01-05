@@ -349,13 +349,14 @@ log "INFO" "Installing RPM Packages"
 dnf5 -y --setopt=install_weak_deps=True install \
         $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
 
-if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+[[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
     dnf5 -y install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
-elif [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
+
+if [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
     dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
     dnf5 -y install \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | grep -v "^++")
+        $(printf '%s\n' "${DESKTOP_EXTRAS[@]}" | grep -v "^++")
 fi
 
 log "INFO" "Packages installed successfully"

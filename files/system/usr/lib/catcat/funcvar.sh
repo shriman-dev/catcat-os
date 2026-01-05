@@ -63,7 +63,7 @@ log() {
 
 # Error handling with optional pre-exit function call
 die() {
-    local pre_exit_hook="${2:-}"
+    local pre_exit_hook="${2}"
     log "ERROR" "${1}"; [[ -n "${pre_exit_hook}" ]] && ${pre_exit_hook}; exit 1
 }
 
