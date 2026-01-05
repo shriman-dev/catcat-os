@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -oue pipefail
 export BUILD_SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 export BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 source ${BUILD_SCRIPT_LIB}
@@ -21,56 +22,51 @@ export -f exec_script
 
 enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
 
-set -ouex pipefail
+declare -A STEPS=(
+    ["Cleaning Up"]="\
+01-cleanup.sh"
 
-{ enclosed_heading_this "Cleaning Up"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/01-cleanup.sh
-ostree container commit
+    ["Debloating"]="\
+02-deblaot.sh"
 
-{ enclosed_heading_this "Debloating"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/02-deblaot.sh
-ostree container commit
+    ["Preparing System Environment"]="\
+03-prep-env.sh"
 
-{ enclosed_heading_this "Preparing System Environment"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/03-prep-env.sh
-ostree container commit
+    ["Copying Over System Default Files"]="\
+04-copy-files.sh"
 
-{ enclosed_heading_this "Copying Over System Default Files"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/04-copy-files.sh
-ostree container commit
+    ["Updating And Installing Packages"]="\
+05-install-pkgs.sh"
 
-{ enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/05-install-pkgs.sh
-ostree container commit
+    ["Applying Various Themes"]="\
+07-theming.sh"
 
-{ enclosed_heading_this "Applying Various Themes"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/07-theming.sh
-ostree container commit
+    ["Enhancing Security With Secatcat"]="\
+08-secatcat.sh"
 
-{ enclosed_heading_this "Enhancing Security With Secatcat"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/08-secatcat.sh
-ostree container commit
+    ["Configuring Systemd Services"]="\
+10-systemd.sh"
 
-{ enclosed_heading_this "Configuring Systemd Services"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/10-systemd.sh
-ostree container commit
+    ["Refining System With Tweaks And Fixes"]="\
+11-tweaks-and-fixes.sh"
 
-{ enclosed_heading_this "Refining System With Tweaks And Fixes"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/11-tweaks-and-fixes.sh
-ostree container commit
+    ["Applying Image Info"]="\
+55-image-info.sh"
 
-{ enclosed_heading_this "Applying Image Info"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/55-image-info.sh
-ostree container commit
+    ["Configuring Signing Policy"]="\
+56-signing.sh"
 
-{ enclosed_heading_this "Configuring Signing Policy"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/56-signing.sh
-ostree container commit
+    ["Regenerating Initramfs"]="\
+57-initramfs.sh"
 
-{ enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/57-initramfs.sh
-ostree container commit
+    ["Post Build Setup"]="\
+58-post-setup.sh"
+)
 
-{ enclosed_heading_this "Post Build Setup"; } 2>/dev/null
-exec_script ${BUILD_SETUP_DIR}/58-post-setup.sh
-ostree container commit
+set -x
+for heading in "${!STEPS[@]}"; do
+    step_script="${STEPS[${heading}]}"
+    { enclosed_heading_this "${heading}"; } 2>/dev/null
+    exec_script "${BUILD_SETUP_DIR}/${step_script}"
+    ostree container commit
+done
