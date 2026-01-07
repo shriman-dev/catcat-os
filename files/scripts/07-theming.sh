@@ -107,7 +107,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
                 *.git)
                     log "INFO" "Copying font files from git repo..."
                     for font_file in $(find "${font_temp}" -type f -name "*.otf" -o -name "*.ttf"); do
-                        cp -vf "${font_file}" "${font_name_dest}"/
+                        cp -vf "${font_file}" "${font_name_dest}"/ || true
                     done
                     ;;
                 *.otf|*.ttf)
