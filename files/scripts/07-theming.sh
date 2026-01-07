@@ -48,61 +48,48 @@ set_plymouth_theme() {
 
 install_fonts() {
     log "INFO" "Defining Fonts"
-
-    local -a NERD_FONTS=(
-        "FiraCode"
-        "Hack"
-        "NerdFontsSymbolsOnly"
-    )
-
-    # From URL
     local -A EXTRA_FONTS=(
+        # Nerd Fonts
+        # When Nerd Font name is correct, URL is not needed
+        ['AdwaitaMono']=
+        ['FiraCode']=
+        ['Hack']=
+        ['NerdFontsSymbolsOnly']=
+
+        # From URL
         ['NotoColorEmoji']="\
 https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
-
-        ['AdwaitaMonoNF']="\
-https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar.xz"
     )
 
-    local FONTS_DIR="/usr/share/fonts"
-    local nerd_fonts_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
-    local nerd_fonts_dest="${FONTS_DIR}/nerd-fonts"
-    mkdir -vp /tmp/fonts
-
-    if [[ ${#NERD_FONTS[@]} -gt 0 ]]; then
-        log "INFO" "Installing Nerd Font(s)"
-        rm -rf "${nerd_fonts_dest}"
-        local nf_name
-        for nf_name in "${NERD_FONTS[@]}"; do
-            nf_name=${nf_name// /} # remove spaces
-            log "INFO" "Downloading font: ${nf_name}"
-            log "INFO" "From URL: ${nerd_fonts_repo}/${nf_name}.tar.xz"
-            mkdir -vp "${nerd_fonts_dest}/${nf_name}"
-            curl -fLsS --retry 5 --create-dirs "${nerd_fonts_repo}/${nf_name}.tar.xz" -o \
-                    "/tmp/fonts/${nf_name}.tar.xz" &&
-            tar -xf "/tmp/fonts/${nf_name}.tar.xz" -C "${nerd_fonts_dest}/${nf_name}"
-        done
-        log "INFO" "Nerd Font(s) installed"
-    fi
     if [[ ${#EXTRA_FONTS[@]} -gt 0 ]]; then
         log "INFO" "Installing Extra Font(s)"
-        local font_name
+        local FONTS_DIR="/usr/share/fonts"
+        local nf_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
+        local font_name font_name_dest font_name_temp
         for font_name in "${!EXTRA_FONTS[@]}"; do
             font_name=${font_name// /} # remove spaces
-            local font_name_dest="${FONTS_DIR}/${font_name}"
-            local font_name_temp="$(mktemp)"
-            local font_url="${EXTRA_FONTS[$font_name]}"
+            font_url="${EXTRA_FONTS[$font_name]}"
+            font_name_dest="${FONTS_DIR}/${font_name}"
+            font_name_temp="$(mktemp)"
+            [[ -z "${font_url}" ]] && {
+                font_url="${nf_repo}/${font_name}.tar.xz"
+                font_name_dest="${FONTS_DIR}/nerd-fonts/${font_name}"
+            }
             log "INFO" "Downloading font: ${font_name}"
             log "INFO" "From URL: ${font_url}"
-            mkdir -vp "${font_name_dest}"
 
+            mkdir -vp "${font_name_dest}"
             curl -fLsS --retry 5 "${font_url}" -o "${font_name_temp}"
             case "${font_url}" in
                 *.zip)
                     log "INFO" "Extracting ZIP archive..."
                     unzip -j "${font_name_temp}" -d "${font_name_dest}" "*.otf" "*.ttf" || true
                     ;;
-                *.tar.*|*.tgz|*.tbz2)
+                *.7z)
+                    log "INFO" "Extracting 7-Zip archive..."
+                    7z e -o"${font_name_dest}" "${font_name_temp}" '-ir!*.otf' '-ir!*.ttf' || true
+                    ;;
+                *.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
                     log "INFO" "Extracting TAR archive..."
                     tar -xvf "${font_name_temp}" -C "${font_name_dest}" \
                         --transform='s/.*\///' --wildcards --no-anchored "*.otf" "*.ttf" || true
@@ -123,7 +110,6 @@ https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AdwaitaMono.tar
         log "INFO" "Extra Font(s) installed"
     fi
 
-    rm -rf /tmp/fonts
     log "INFO" "Building font cache"
     # Normalize permissions to let all users use installed fonts
     # Directories: 755, Files: 644
