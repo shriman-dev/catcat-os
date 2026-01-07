@@ -285,6 +285,7 @@ COMMON=(
     # More Terminal Tools
     "jq"
     "gum"
+    "kmscon"
 
     # Performance Tuning
     "tuned"

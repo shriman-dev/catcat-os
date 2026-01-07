@@ -8,8 +8,23 @@ update_flatpak() {
 
     enclosed_heading "Flatpak ${scope:2} update" "="
 
+    # Add repo if does not exists
+    /usr/bin/flatpak remotes | grep -i "flathub.*${scope:2}" || {
+        log "INFO" "Adding flathub repo for current ${scope:2}"
+        # First remove fedora flatpak repo
+        /usr/bin/flatpak remote-delete --system --force fedora
+        /usr/bin/flatpak remote-delete --user --force fedora
+
+        # Add flathub repo
+        /usr/bin/flatpak ${scope} remote-add \
+                    --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    }
+
+    # Update flatpaks
     /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
     /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
+
+    # Clean unneeded runtimes silently
     /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
 
     log "INFO" "Running flatpak repair"
@@ -55,12 +70,25 @@ update_firmware() {
 update_system() {
     enclosed_heading "System update" "="
 
+    # Rebase to signed image if current image is not signed
+    local booted_image="$(rpm-ostree status --booted | grep -w 'ostree-unverified-registry')"
+    if [[ -n "${booted_image}" ]]; then
+        local image_ref="${booted_image#*ostree-unverified-registry:}"
+        log "WARN" "Current image is not signed"
+        log "INFO" "Rebasing to signed image"
+        rpm-ostree rebase "ostree-image-signed:docker://${image_ref}" ||
+                err "Could not rebase to signed image"
+    fi
+
     if [[ $(id -u) -eq 0 ]]; then
         rpm-ostree upgrade
+        # Show change logs
         rpm-ostree db diff --changelogs
+        # Clean up system silently
         rpm-ostree cleanup -bm >/dev/null 2>&1
         ostree prune >/dev/null 2>&1
         systemd-tmpfiles --clean >/dev/null 2>&1
+        # Update grub
         /usr/bin/grubup
     else
         rpm-ostree upgrade

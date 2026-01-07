@@ -51,7 +51,8 @@ if is_file_older ${one_week} "${autoupdate_log_file}"; then
         is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
             /usr/bin/update >> "${autoupdate_log_file}"
 
-        notify_all "Weekly automatic update is done."
+        is_file_older ${one_day} "${firstboot_file}" ||
+            notify_all "Weekly automatic update is done."
     fi
 fi
 

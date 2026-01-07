@@ -9,7 +9,7 @@ declare -A IMAGE_INFO=(
     ["ID"]="catcat"
     ["ID_LIKE"]="fedora"
     ["IMAGE_ID"]="${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP}"
-    ["VARIANT_ID"]="${IMAGE_NAME}${ALT_TAG:+-$ALT_TAG}"
+    ["VARIANT_ID"]="${IMAGE_NAME}${ALT_TAG:+:$ALT_TAG}"
     ["BOOTLOADER_NAME"]="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"
     ["DEFAULT_HOSTNAME"]="catcat"
 )
