@@ -68,15 +68,18 @@ use-custom-command=true
 use-proxy=false
 
 [org/gnome/Ptyxis/Profiles/db8703c64d752ad6daf64e776707763b]
+cjk-ambiguous-width='narrow'
 custom-command='fish'
+custom-links=@a(ss) []
 exit-action='close'
 label='fish'
 limit-scrollback=false
 login-shell=true
 opacity=1.0
-palette='Catppuccin-Mocha-mine'
+palette='Catppuccin-Mocha-CatCat'
 preserve-container='never'
 preserve-directory='never'
+scroll-on-output=true
 scrollback-lines=2147483647
 use-custom-command=true
 use-proxy=false

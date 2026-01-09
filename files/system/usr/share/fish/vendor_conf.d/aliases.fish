@@ -2,7 +2,7 @@ status is-interactive || exit 0
 _check_local_config
 
 ## Useful aliases
-
+alias cd='z'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
@@ -57,7 +57,7 @@ alias proctree='procs --tree'
 #  end
 #end
 
-if command -v yazi >/dev/null 2>&1
+if command -q yazi
     function y
         set tmp (mktemp -t "yazi-cwd.XXXXXX")
         yazi $argv --cwd-file="$tmp"
@@ -68,14 +68,14 @@ if command -v yazi >/dev/null 2>&1
     end
 end
 
-if command -v gedit >/dev/null 2>&1
+if command -q gedit
     alias gedit="command gedit"
 else
     alias gedit="flatpak run --command=gedit --file-forwarding org.gnome.gedit"
 end
 
 # distrobox aliases
-if command -v distrobox >/dev/null 2>&1
+if command -q distrobox
     alias dbox-hexec="distrobox-host-exec"
     alias dbox-expo-app="distrobox-export -a"
 
@@ -91,7 +91,7 @@ if command -v distrobox >/dev/null 2>&1
 end
 
 # flatpak aliases
-if command -v flatpak >/dev/null 2>&1
+if command -q flatpak
     alias flup="flatpak update --assumeyes --noninteractive"
     alias flin="flatpak install"
     alias flre="flatpak install --reinstall"
@@ -110,7 +110,7 @@ if command -v flatpak >/dev/null 2>&1
 end
 
 # nix aliases
-if command -v nix-env >/dev/null 2>&1
+if command -q nix-env
     alias niup="nix-channel --update && nix-env -b --upgrade"
     alias niin="nix-channel --update && nix-env -ib"
     alias nire="nix-collect-garbage && nix-channel --update && nix-env -ib"
@@ -137,7 +137,7 @@ if command -v nix-env >/dev/null 2>&1
 end
 
 # dnf aliases
-if command -v dnf >/dev/null 2>&1
+if command -q dnf
     alias dnfup="sudo dnf distro-sync --refresh && sudo dnf upgrade && sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg"
     alias dnfin="sudo dnf install"
     alias dnfre="sudo dnf reinstall"
@@ -151,7 +151,7 @@ if command -v dnf >/dev/null 2>&1
 end
 
 # apt aliases
-if command -v apt >/dev/null 2>&1
+if command -q apt
     alias aptup="sudo apt update && sudo apt upgrade"
     alias aptin="sudo apt install" # use version num for downgrade
     alias aptre="sudo apt install --reinstall"
@@ -164,7 +164,7 @@ if command -v apt >/dev/null 2>&1
 end
 
 # arch aliases
-if command -v pacman >/dev/null 2>&1
+if command -q pacman
     alias pacup="sudo pacman -Sy && sudo powerpill -Su && paru -Su"
     alias pacin="sudo pacman -Sy --needed"
     alias yayin="paru -S"
@@ -190,7 +190,7 @@ if command -v pacman >/dev/null 2>&1
 end
 
 ## Useful abbreviations
-abbr -- - 'cd -'
+abbr -- - 'z -'
 abbr cp 'cp -v'
 abbr ln 'ln -v'
 abbr mv 'mv -v'
@@ -209,8 +209,3 @@ abbr bandwhich 'sudo bandwhich --processes --connections'
 # Help wrapper with bat
 abbr -a --position anywhere -- --help '--help | bat -pplhelp'
 abbr -a --position anywhere -- --help-all '--help-all | bat -pplhelp'
-alias bathelp 'bat --plain --language=help'
-function help
-  $argv --help 2>&1 | bathelp
-end
-

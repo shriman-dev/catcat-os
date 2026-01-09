@@ -286,6 +286,7 @@ COMMON=(
     "jq"
     "gum"
     "kmscon"
+    "kmscon-gl"
 
     # Performance Tuning
     "tuned"

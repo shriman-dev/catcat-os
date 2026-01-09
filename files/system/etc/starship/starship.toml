@@ -181,12 +181,12 @@ disabled = false
 disabled = false
 ssh_only = false
 ssh_symbol = "SSH::"
-style = "fg:#eba0ac bg:bright-black"
+style = "fg:bright-red bg:bright-black"
 format = "[$ssh_symbol](bold fg:bright-blue bg:bright-black)[$hostname]($style)"
 trim_at = "-"
 
 [directory]
-style = "fg:cyan"
+style = "fg:#a8e5ff"
 read_only = "󰣮 "
 read_only_style = "bold red"
 format = "[ $path ]($style)[$read_only]($read_only_style)"

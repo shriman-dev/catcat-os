@@ -222,11 +222,11 @@ shell_setup() {
     #/usr/bin/bat cache --build # is in profile.d
 
     # Fish shell
-    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
-        [[ ! -d "${CONFIG}/fish" ]] && mkdir -vp "${CONFIG}/fish"
-        cp -v --update=none "${SKEL}/.config/fish/fish_variables" "${CONFIG}/fish/fish_variables" ||
-            err "Failed to setup fish_variables"
-    fi
+#    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
+#        [[ ! -d "${CONFIG}/fish" ]] && mkdir -vp "${CONFIG}/fish"
+#        cp -v --update=none "${SKEL}/.config/fish/fish_variables" "${CONFIG}/fish/fish_variables" ||
+#            err "Failed to setup fish_variables"
+#    fi
 
     local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
@@ -303,7 +303,7 @@ setup_apps() {
     done
 
     # Setup additional apps config
-    [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-mine.palette" ]] && {
+    [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-CatCat.palette" ]] && {
         cp -drvf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}"/ ||
             err "Failed to configure Ptyxis"
     }
