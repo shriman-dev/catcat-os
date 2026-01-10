@@ -255,3 +255,36 @@ bak_before() {
     fi
     cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
 }
+
+unarchive() {
+    local archive="${1}" dest="${2}"
+
+    if [[ ! -d "${dest}" ]]; then
+        log "INFO" "Creating: ${dest}"
+        mkdir ${VERBOSE:+-v} -p "${dest}"
+    fi
+
+    case "${archive}" in
+        *.zip)
+            log "INFO" "Extracting ZIP archive in: ${dest}"
+            unzip "${archive}" -d "${dest}"
+            ;;
+        *.7z)
+            log "INFO" "Extracting 7-ZIP archive in: ${dest}"
+            7z x -o"${dest}" "${archive}"
+            ;;
+        *.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+            log "INFO" "Extracting TAR archive in: ${dest}"
+            tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
+            ;;
+        *.rar)
+            log "INFO" "Extracting RAR archive in: ${dest}"
+            cd "${dest}"
+            unrar x "${archive}"
+            cd -
+            ;;
+        *)
+            err "Unknown archive file: ${archive}"
+            ;;
+    esac
+}

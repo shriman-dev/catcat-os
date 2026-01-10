@@ -67,61 +67,41 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     if [[ ${#EXTRA_FONTS[@]} -gt 0 ]]; then
         log "INFO" "Installing Extra Font(s)"
         local FONTS_DIR="/usr/share/fonts"
+        local TMP_DIR="/tmp/extra_fonts"
         local nf_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
-        local font_name font_name_dest font_temp
+        local font_name font_url url_file font_file font_dest font_tmpd
         for font_name in "${!EXTRA_FONTS[@]}"; do
-            font_name=${font_name// /} # remove spaces
-            font_name_dest="${FONTS_DIR}/${font_name}"
             font_url="${EXTRA_FONTS[$font_name]}"
-            font_temp="$(mktemp)"
+            url_file="$(basename ${font_url})"
+            font_name=${font_name// /} # remove spaces
+            font_dest="${FONTS_DIR}/${font_name}"
+            font_tmpd="${TMP_DIR}/${font_name}"
             [[ -z "${font_url}" ]] && {
                 font_url="${nf_repo}/${font_name}.tar.xz"
-                font_name_dest="${FONTS_DIR}/nerd-fonts/${font_name}"
+                font_dest="${FONTS_DIR}/nerd-fonts/${font_name}"
             }
-            log "INFO" "Downloading font: ${font_name}"
+            log "INFO" "Adding font(s): ${font_name}"
             log "INFO" "From URL: ${font_url}"
 
-            mkdir -vp "${font_name_dest}"
-
-            if [[ ${font_url} == *".git" ]]; then
-                font_temp="$(mktemp -d)"
-                git clone --depth 1 "${font_url}" "${font_temp}"
-            else
-                curl -fLsS --retry 5 "${font_url}" -o "${font_temp}"
-            fi
-
+            mkdir -vp "${font_tmpd}" "${font_dest}"
             case "${font_url}" in
-                *.zip)
-                    log "INFO" "Extracting ZIP archive..."
-                    unzip -j "${font_temp}" -d "${font_name_dest}" "*.otf" "*.ttf" || true
-                    ;;
-                *.7z)
-                    log "INFO" "Extracting 7-Zip archive..."
-                    7z e -o"${font_name_dest}" "${font_temp}" '-ir!*.otf' '-ir!*.ttf' || true
-                    ;;
-                *.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-                    log "INFO" "Extracting TAR archive..."
-                    tar -xvf "${font_temp}" -C "${font_name_dest}" \
-                        --transform='s/.*\///' --wildcards --no-anchored "*.otf" "*.ttf" || true
-                    ;;
-                *.git)
-                    log "INFO" "Copying font files from git repo..."
-                    for font_file in $(find "${font_temp}" -type f -name "*.otf" -o -name "*.ttf"); do
-                        cp -vf "${font_file}" "${font_name_dest}"/ || true
-                    done
+                *.zip|*.7z|*.rar|*.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+                    curl -fLsS --retry 5 "${font_url}" -o "${url_file}"
+                    unarchive "${url_file}" "${font_tmpd}"
                     ;;
                 *.otf|*.ttf)
-                    log "INFO" "Copying font file..."
-                    local font_file_name="$(basename ${font_url})"
-                    cp -vf "${font_temp}" "${font_name_dest}/${font_file_name}"
+                    curl -fLsS --retry 5 "${font_url}" -o "${font_tmpd}/${url_file}"
+                    ;;
+                *.git)
+                    git clone --depth 1 "${font_url}" "${font_tmpd}"
                     ;;
                 *)
-                    log "INFO" "Unknown file type for $URL, trying as font file..."
-                    local font_file_name="$(basename ${font_url})"
-                    cp -vf "${font_temp}" "${font_name_dest}/${font_file_name}"
+                    err "Unsupported URL: ${font_url}"
                     ;;
             esac
-            rm -rf "${font_temp}"
+            for font_file in $(find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf"); do
+                cp -vf "${font_file}" "${font_dest}"/
+            done
         done
         log "INFO" "Extra Font(s) installed"
     fi

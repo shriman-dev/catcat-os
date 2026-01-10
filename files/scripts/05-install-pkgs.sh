@@ -9,7 +9,6 @@ DESKTOP_EXTRAS=(
     ##lsd zellij
     "nu"
     "zsh"
-    "zoxide"
     "++yazi"
     "++grex"
 
@@ -241,6 +240,7 @@ COMMON=(
     "fzf"
     "bat"
     "++eza"
+    "zoxide"
     "ripgrep"
     "fd-find"
     "tmux"

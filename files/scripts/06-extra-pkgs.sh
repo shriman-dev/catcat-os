@@ -11,7 +11,7 @@ starship() {
 
     curl -Lo "${starship_tar}" $(curl -s -X GET "${starship_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
 
-    tar -xvf "${starship_tar}" -C "${starship_tar}.extract"
+    unarchive "${starship_tar}" "${starship_tar}.extract"
     cp -dvf "${starship_tar}.extract/starship" "/usr/bin"/
     chmod -v +x /usr/bin/starship
     rm -rf "${starship_tar}" "${starship_tar}.extract"
@@ -24,7 +24,7 @@ eza() {
 
     curl -Lo "${eza_tar}" "${eza_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
 
-    tar -xvf "${eza_tar}" -C "${eza_tar}.extract"
+    unarchive "${eza_tar}" "${eza_tar}.extract"
     cp -dvf "${eza_tar}.extract/eza" /usr/bin/
     chmod -v +x /usr/bin/eza
     rm -rf "${eza_tar}" "${eza_tar}.extract"
@@ -37,7 +37,7 @@ grex() {
 
     curl -Lo "${grex_tar}" $(curl -s -X GET "${grex_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
 
-    tar -xvf "${grex_tar}" -C "${grex_tar}.extract"
+    unarchive "${grex_tar}" "${grex_tar}.extract"
     cp -dvf "${grex_tar}.extract/grex" "/usr/bin"/
     chmod -v +x /usr/bin/grex
     rm -rf "${grex_tar}" "${grex_tar}.extract"
@@ -53,14 +53,13 @@ yazi() {
     curl -Lo /usr/share/applications/yazi.desktop "${yazi_repo_raw}/assets/yazi.desktop"
     curl -Lo /usr/share/icons/yazi.png "${yazi_repo_raw}/assets/logo.png"
 
-    cd "${yazi_zip}.extract"
-    unzip "${yazi_zip}"
-    cd -
-    cp -dvf "${yazi_zip}.extract/yazi-x86_64-unknown-linux-gnu"/{ya,yazi} /usr/bin/
+    unarchive "${yazi_zip}" "${yazi_zip}.extract"
+
+    cp -dvf "${yazi_zip}.extract"/yazi*/{ya,yazi} /usr/bin/
     chmod -v +x /usr/bin/{ya,yazi}
-    cp -dvf "${yazi_zip}.extract/yazi-x86_64-unknown-linux-gnu/completions/ya.bash" \
+    cp -dvf "${yazi_zip}.extract/yazi*/completions/ya.bash" \
                     /usr/share/bash-completion/completions/
-    cp -dvf "${yazi_zip}.extract/yazi-x86_64-unknown-linux-gnu/completions/yazi.fish" \
+    cp -dvf "${yazi_zip}.extract/yazi*/completions/yazi.fish" \
                     /usr/share/fish/completions/
     rm -rf "${yazi_zip}" "${yazi_zip}.extract"
 }
@@ -88,7 +87,7 @@ bandwhich() {
 
     curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
 
-    tar -xvf "${bandwhich_tar}" -C "${bandwhich_tar}.extract"
+    unarchive "${bandwhich_tar}" "${bandwhich_tar}.extract"
     cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
     chmod -v +x /usr/bin/bandwhich
     rm -rf "${bandwhich_tar}" "${bandwhich_tar}.extract"
@@ -98,10 +97,8 @@ buttersnap() {
     local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
 
     curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
-    chmod -v +x "/usr/bin/buttersnap.sh"
-
     curl -Lo "/usr/bin/buttercopy.sh" "${buttersnap_repo}/buttercopy.sh"
-    chmod -v +x "/usr/bin/buttercopy.sh"
+    chmod -v +x "/usr/bin"/{buttersnap.sh,buttercopy.sh}
 }
 
 btdu() {
@@ -119,7 +116,7 @@ gocryptfs() {
 
     curl -Lo "${gocryptfs_tar}" $(curl -s -X GET "${gocryptfs_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)
 
-    tar -xvf "${gocryptfs_tar}" -C "${gocryptfs_tar}.extract"
+    unarchive "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
     cp -dvf "${gocryptfs_tar}.extract/gocryptfs" "/usr/bin"/
     chmod -v +x /usr/bin/gocryptfs
     rm -rf "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
@@ -133,7 +130,7 @@ scrcpy() {
 
     curl -Lo "${scrcpy_tar}" $(curl -s -X GET "${scrcpy_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)
 
-    tar -xvf "${scrcpy_tar}" -C "${scrcpy_tar}.extract"
+    unarchive "${scrcpy_tar}" "${scrcpy_tar}.extract"
     cp -dvf "${scrcpy_tar}.extract"/*/* "${usrlibexec_scrcpy}"/
     ln -svf /usr/bin/adb "${usrlibexec_scrcpy}/adb"
     ln -svf "${usrlibexec_scrcpy}/scrcpy" /usr/bin/scrcpy
@@ -149,9 +146,8 @@ llama_cpp() {
 
     curl -Lo "${llama_cpp_zip}" $(curl -s -X GET "${llama_cpp_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
 
-    cd "${llama_cpp_zip}.extract"
-    unzip "${llama_cpp_zip}"
-    cd -
+    unarchive "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
+
     mv -v "${llama_cpp_zip}.extract/build/bin" "${usrlibexec_llama_cpp}"/
     chmod -v +x "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
     ln -svf "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
@@ -172,7 +168,7 @@ ascii_image_converter() {
 
 #    curl -Lo "${ascii_ic_tar}" "${ascii_ic_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
 
-#    tar -xvf "${ascii_ic_tar}" -C "${ascii_ic_tar}.extract"
+#    unarchive "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
 #    cp -dvf "${ascii_ic_tar}.extract"/*/ascii-image-converter "/usr/bin"/
     chmod -v +x /usr/bin/ascii-image-converter
 #    rm -rf "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
@@ -186,7 +182,7 @@ ls_iommu() {
     curl -Lo "${ls_iommu_tar}" $(curl -s -X GET "${ls_iommu_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)
 
 
-    tar -xvf "${ls_iommu_tar}" -C "${ls_iommu_tar}.extract"
+    unarchive "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
     cp -dvf "${ls_iommu_tar}.extract/ls-iommu" "/usr/bin"/
     chmod -v +x /usr/bin/ls-iommu
     rm -rf "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
@@ -207,7 +203,7 @@ ujust_setup() {
 
         curl -Lo "${just_tar}" $(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
 
-        tar -xvf "${just_tar}" -C "${just_tar}.extract"
+        unarchive "${just_tar}" "${just_tar}.extract"
         cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
         cp -dvf "${just_tar}.extract/just" "/usr/bin"/
         chmod -v +x /usr/bin/just
