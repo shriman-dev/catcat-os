@@ -382,10 +382,11 @@ log "INFO" "Installing External Packages"
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
 
-if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
+[[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | sed -n 's|++||gp')
-elif [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
+
+if [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | sed -n 's|++||gp')
 fi

@@ -221,6 +221,14 @@ shell_setup() {
     log "INFO" "Setting up shell..."
     #/usr/bin/bat cache --build # is in profile.d
 
+    # Fish shell
+    if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
+        [[ ! -d "${CONFIG}/fish/themes" ]] && mkdir -vp "${CONFIG}/fish/themes"
+        cp -vf "/usr/share/fish/tools/web_config/themes/Catppuccin Mocha.theme" \
+                "${CONFIG}/fish/themes"/ ||
+                    err "Failed to setup fish_variables"
+    fi
+
     local shell_rc='
 [[ -d ~/.shell.d ]] && for rc in ~/.shell.d/*; do [[ -f "${rc}" ]] && . "${rc}"; done
 unset rc'
