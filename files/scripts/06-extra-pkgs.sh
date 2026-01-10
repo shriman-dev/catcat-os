@@ -57,9 +57,9 @@ yazi() {
 
     cp -dvf "${yazi_zip}.extract"/yazi*/{ya,yazi} /usr/bin/
     chmod -v +x /usr/bin/{ya,yazi}
-    cp -dvf "${yazi_zip}.extract/yazi*/completions/ya.bash" \
+    cp -dvf "${yazi_zip}.extract"/yazi*/completions/{ya,yazi}.bash \
                     /usr/share/bash-completion/completions/
-    cp -dvf "${yazi_zip}.extract/yazi*/completions/yazi.fish" \
+    cp -dvf "${yazi_zip}.extract"/yazi*/completions/{ya,yazi}.fish \
                     /usr/share/fish/completions/
     rm -rf "${yazi_zip}" "${yazi_zip}.extract"
 }
@@ -197,7 +197,7 @@ ujust_setup() {
     local justfile_dir="$(dirname ${BUILD_SETUP_DIR})/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
-    rpm -q just && {
+    rpm -q just || {
         log "INFO" "Installing just"
         mkdir -vp "${just_tar}.extract"
 

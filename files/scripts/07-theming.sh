@@ -72,7 +72,6 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
         local font_name font_url url_file font_file font_dest font_tmpd
         for font_name in "${!EXTRA_FONTS[@]}"; do
             font_url="${EXTRA_FONTS[$font_name]}"
-            url_file="$(basename ${font_url})"
             font_name=${font_name// /} # remove spaces
             font_dest="${FONTS_DIR}/${font_name}"
             font_tmpd="${TMP_DIR}/${font_name}"
@@ -80,6 +79,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
                 font_url="${nf_repo}/${font_name}.tar.xz"
                 font_dest="${FONTS_DIR}/nerd-fonts/${font_name}"
             }
+            url_file="$(basename ${font_url})"
             log "INFO" "Adding font(s): ${font_name}"
             log "INFO" "From URL: ${font_url}"
 

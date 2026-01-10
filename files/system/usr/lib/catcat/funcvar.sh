@@ -266,19 +266,19 @@ unarchive() {
 
     case "${archive}" in
         *.zip)
-            log "INFO" "Extracting ZIP archive in: ${dest}"
+            { log "INFO" "Extracting ZIP archive in: ${dest}"; } 2>/dev/null
             unzip "${archive}" -d "${dest}"
             ;;
         *.7z)
-            log "INFO" "Extracting 7-ZIP archive in: ${dest}"
+            { log "INFO" "Extracting 7-ZIP archive in: ${dest}"; } 2>/dev/null
             7z x -o"${dest}" "${archive}"
             ;;
         *.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-            log "INFO" "Extracting TAR archive in: ${dest}"
+            { log "INFO" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
             tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
             ;;
         *.rar)
-            log "INFO" "Extracting RAR archive in: ${dest}"
+            { log "INFO" "Extracting RAR archive in: ${dest}"; } 2>/dev/null
             cd "${dest}"
             unrar x "${archive}"
             cd -

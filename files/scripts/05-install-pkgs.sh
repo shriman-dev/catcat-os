@@ -388,7 +388,7 @@ exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
 
 if [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
-        $(printf '%s\n' "${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}" | sed -n 's|++||gp')
+        $(printf '%s\n' "${DESKTOP_EXTRAS[@]}" | sed -n 's|++||gp')
 fi
 
 log "INFO" "External packages installed successfully"
