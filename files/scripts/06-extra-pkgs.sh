@@ -2,74 +2,120 @@
 source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
-TMP_DIR="/tmp/catcat_extra_pkgs"
+TMP_DIR="/tmp/extra_pkgs"
 
 starship() {
-    local starship_repo="https://api.github.com/repos/starship/starship"
-    local starship_tar="${TMP_DIR}/starship.tar.gz"
-    mkdir -vp "${starship_tar}.extract"
+    local pkg_repo="https://api.github.com/repos/starship/starship"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
-    curl -Lo "${starship_tar}" $(curl -s -X GET "${starship_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${starship_tar}" "${starship_tar}.extract"
-    cp -dvf "${starship_tar}.extract/starship" "/usr/bin"/
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/starship" "/usr/bin"/
     chmod -v +x /usr/bin/starship
-    rm -rf "${starship_tar}" "${starship_tar}.extract"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 eza() {
-    local eza_repo="https://github.com/eza-community/eza"
-    local eza_tar="${TMP_DIR}/eza.tar.gz"
-    mkdir -vp "${eza_tar}.extract"
+    local pkg_repo="https://github.com/eza-community/eza"
+    local latest_pkg_url="${pkg_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
-    curl -Lo "${eza_tar}" "${eza_repo}/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${eza_tar}" "${eza_tar}.extract"
-    cp -dvf "${eza_tar}.extract/eza" /usr/bin/
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/eza" /usr/bin/
     chmod -v +x /usr/bin/eza
-    rm -rf "${eza_tar}" "${eza_tar}.extract"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 grex() {
-    local grex_repo="https://api.github.com/repos/pemistahl/grex"
-    local grex_tar="${TMP_DIR}/grex.tar.gz"
-    mkdir -vp "${grex_tar}.extract"
+    local pkg_repo="https://api.github.com/repos/pemistahl/grex"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
-    curl -Lo "${grex_tar}" $(curl -s -X GET "${grex_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${grex_tar}" "${grex_tar}.extract"
-    cp -dvf "${grex_tar}.extract/grex" "/usr/bin"/
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/grex" "/usr/bin"/
     chmod -v +x /usr/bin/grex
-    rm -rf "${grex_tar}" "${grex_tar}.extract"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
+}
+
+bandwhich() {
+    local pkg_repo="https://api.github.com/repos/imsnif/bandwhich"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/bandwhich" "/usr/bin"/
+    chmod -v +x /usr/bin/bandwhich
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
+}
+
+gocryptfs() {
+    local pkg_repo="https://api.github.com/repos/rfjakob/gocryptfs"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/gocryptfs" "/usr/bin"/
+    chmod -v +x /usr/bin/gocryptfs
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
+}
+
+ls_iommu() {
+    local pkg_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract/ls-iommu" "/usr/bin"/
+    chmod -v +x /usr/bin/ls-iommu
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 yazi() {
-    local yazi_repo="https://github.com/sxyazi/yazi"
-    local yazi_repo_raw="https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main"
-    local yazi_zip="${TMP_DIR}/yazi.zip"
-    mkdir -vp "${yazi_zip}.extract"
+    local pkg_repo="https://github.com/sxyazi/yazi"
+    local pkg_repo_raw="https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main"
+    local latest_pkg_url="${pkg_repo}/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
-    curl -Lo "${yazi_zip}" "${yazi_repo}/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip"
-    curl -Lo /usr/share/applications/yazi.desktop "${yazi_repo_raw}/assets/yazi.desktop"
-    curl -Lo /usr/share/icons/yazi.png "${yazi_repo_raw}/assets/logo.png"
+    mkdir -vp "${pkg_archive}.extract"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl -Lo /usr/share/applications/yazi.desktop "${pkg_repo_raw}/assets/yazi.desktop"
+    curl -Lo /usr/share/icons/yazi.png "${pkg_repo_raw}/assets/logo.png"
 
-    unarchive "${yazi_zip}" "${yazi_zip}.extract"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    cp -dvf "${yazi_zip}.extract"/yazi*/{ya,yazi} /usr/bin/
+    cp -dvf "${pkg_archive}.extract"/yazi*/{ya,yazi} /usr/bin/
     chmod -v +x /usr/bin/{ya,yazi}
-    cp -dvf "${yazi_zip}.extract"/yazi*/completions/{ya,yazi}.bash \
+    cp -dvf "${pkg_archive}.extract"/yazi*/completions/{ya,yazi}.bash \
                     /usr/share/bash-completion/completions/
-    cp -dvf "${yazi_zip}.extract"/yazi*/completions/{ya,yazi}.fish \
+    cp -dvf "${pkg_archive}.extract"/yazi*/completions/{ya,yazi}.fish \
                     /usr/share/fish/completions/
-    rm -rf "${yazi_zip}" "${yazi_zip}.extract"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 hblock() {
-    local hblock_confd="/etc/hblock"
-    local hblock_repo="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
+    local pkg_repo_raw="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
     local dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
+    local hblock_confd="/etc/hblock"
 
-    curl -Lo "/usr/bin/hblock" "${hblock_repo}/hblock"
+    curl -Lo "/usr/bin/hblock" "${pkg_repo_raw}/hblock"
     chmod -v +x "/usr/bin/hblock"
 
     # Get hblock config
@@ -80,117 +126,94 @@ hblock() {
     curl -Lo "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
 }
 
-bandwhich() {
-    local bandwhich_repo="https://api.github.com/repos/imsnif/bandwhich"
-    local bandwhich_tar="${TMP_DIR}/bandwhich.tar.gz"
-    mkdir -vp "${bandwhich_tar}.extract"
-
-    curl -Lo "${bandwhich_tar}" $(curl -s -X GET "${bandwhich_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)
-
-    unarchive "${bandwhich_tar}" "${bandwhich_tar}.extract"
-    cp -dvf "${bandwhich_tar}.extract/bandwhich" "/usr/bin"/
-    chmod -v +x /usr/bin/bandwhich
-    rm -rf "${bandwhich_tar}" "${bandwhich_tar}.extract"
-}
-
 buttersnap() {
-    local buttersnap_repo="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
+    local pkg_repo_raw="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
 
-    curl -Lo "/usr/bin/buttersnap.sh" "${buttersnap_repo}/buttersnap.sh"
-    curl -Lo "/usr/bin/buttercopy.sh" "${buttersnap_repo}/buttercopy.sh"
+    curl -Lo "/usr/bin/buttersnap.sh" "${pkg_repo_raw}/buttersnap.sh"
+    curl -Lo "/usr/bin/buttercopy.sh" "${pkg_repo_raw}/buttercopy.sh"
     chmod -v +x "/usr/bin"/{buttersnap.sh,buttercopy.sh}
 }
 
 btdu() {
-    local btdu_repo="https://github.com/CyberShadow/btdu"
+    local pkg_repo="https://github.com/CyberShadow/btdu"
 
-    curl -Lo "/usr/bin/btdu" "${btdu_repo}/releases/latest/download/btdu-static-x86_64"
+    curl -Lo "/usr/bin/btdu" "${pkg_repo}/releases/latest/download/btdu-static-x86_64"
 
     chmod -v +x "/usr/bin/btdu"
 }
 
-gocryptfs() {
-    local gocryptfs_repo="https://api.github.com/repos/rfjakob/gocryptfs"
-    local gocryptfs_tar="${TMP_DIR}/gocryptfs.tar.gz"
-    mkdir -vp "${gocryptfs_tar}.extract"
+scrcpy() {
+    local pkg_repo="https://api.github.com/repos/Genymobile/scrcpy"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    local usrlibexec_pkg="/usr/libexec/scrcpy"
 
-    curl -Lo "${gocryptfs_tar}" $(curl -s -X GET "${gocryptfs_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)
+    mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
-    cp -dvf "${gocryptfs_tar}.extract/gocryptfs" "/usr/bin"/
-    chmod -v +x /usr/bin/gocryptfs
-    rm -rf "${gocryptfs_tar}" "${gocryptfs_tar}.extract"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+    cp -dvf "${pkg_archive}.extract"/*/* "${usrlibexec_pkg}"/
+    ln -svf /usr/bin/adb "${usrlibexec_pkg}/adb"
+    ln -svf "${usrlibexec_pkg}/scrcpy" /usr/bin/scrcpy
+    chmod -v +x "${usrlibexec_pkg}/scrcpy"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
-scrcpy() {
-    local scrcpy_repo="https://api.github.com/repos/Genymobile/scrcpy"
-    local scrcpy_tar="${TMP_DIR}/scrcpy.tar.gz"
-    local usrlibexec_scrcpy="/usr/libexec/scrcpy"
-    mkdir -vp "${scrcpy_tar}.extract" "${usrlibexec_scrcpy}"
+llama_cpp_vk() {
+    local pkg_repo="https://api.github.com/repos/ggml-org/llama.cpp"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    local usrlibexec_pkg="/usr/libexec/llama_cpp_vk"
 
-    curl -Lo "${scrcpy_tar}" $(curl -s -X GET "${scrcpy_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)
+    mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${scrcpy_tar}" "${scrcpy_tar}.extract"
-    cp -dvf "${scrcpy_tar}.extract"/*/* "${usrlibexec_scrcpy}"/
-    ln -svf /usr/bin/adb "${usrlibexec_scrcpy}/adb"
-    ln -svf "${usrlibexec_scrcpy}/scrcpy" /usr/bin/scrcpy
-    chmod -v +x "${usrlibexec_scrcpy}/scrcpy"
-    rm -rf "${scrcpy_tar}" "${scrcpy_tar}.extract"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+
+    mv -v "${pkg_archive}.extract"/llama*/* "${usrlibexec_pkg}"/
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 llama_cpp() {
-    local llama_cpp_repo="https://api.github.com/repos/ggml-org/llama.cpp"
-    local llama_cpp_zip="${TMP_DIR}/llama-cpp-vulkan.zip"
-    local usrlibexec_llama_cpp="/usr/libexec/llama_cpp_vulkan"
-    mkdir -vp "${llama_cpp_zip}.extract" "${usrlibexec_llama_cpp}"
+    local pkg_repo="https://api.github.com/repos/ggml-org/llama.cpp"
+    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-x64.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    local usrlibexec_pkg="/usr/libexec/llama_cpp"
 
-    curl -Lo "${llama_cpp_zip}" $(curl -s -X GET "${llama_cpp_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.zip"' | cut -d '"' -f4)
+    mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
+    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-    unarchive "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    mv -v "${llama_cpp_zip}.extract/build/bin" "${usrlibexec_llama_cpp}"/
-    chmod -v +x "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts}
-    ln -svf "${usrlibexec_llama_cpp}/bin"/llama-{batched-bench,bench,cli,imatrix,gguf-split,mtmd-cli,quantize,run,server,tokenize,tts} /usr/bin/
-    rm -rf "${llama_cpp_zip}" "${llama_cpp_zip}.extract"
+    mv -v "${pkg_archive}.extract"/llama*/* "${usrlibexec_pkg}"/
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 pipes_sh() {
-    local pipes_sh_repo="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
+    local pkg_repo_raw="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
 
-#    curl -Lo "/usr/bin/pipes.sh" "${pipes_sh_repo}/pipes.sh"
+#    curl -Lo "/usr/bin/pipes.sh" "${pkg_repo_raw}/pipes.sh"
     chmod -v +x "/usr/bin/pipes.sh"
 }
 
 ascii_image_converter() {
-    local ascii_ic_repo="https://github.com/TheZoraiz/ascii-image-converter"
-    local ascii_ic_tar="${TMP_DIR}/ascii_ic.tar.gz"
-#    mkdir -vp "${ascii_ic_tar}.extract"
+    local pkg_repo="https://github.com/TheZoraiz/ascii-image-converter"
+    local latest_pkg_url="${pkg_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
-#    curl -Lo "${ascii_ic_tar}" "${ascii_ic_repo}/releases/latest/download/ascii-image-converter_Linux_amd64_64bit.tar.gz"
+#    mkdir -vp "${pkg_archive}.extract"
+#    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
 
-#    unarchive "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
-#    cp -dvf "${ascii_ic_tar}.extract"/*/ascii-image-converter "/usr/bin"/
+#    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+#    cp -dvf "${pkg_archive}.extract"/*/ascii-image-converter "/usr/bin"/
     chmod -v +x /usr/bin/ascii-image-converter
-#    rm -rf "${ascii_ic_tar}" "${ascii_ic_tar}.extract"
-}
-
-ls_iommu() {
-    local ls_iommu_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
-    local ls_iommu_tar="${TMP_DIR}/ls_iommu.tar.gz"
-    mkdir -vp "${ls_iommu_tar}.extract"
-
-    curl -Lo "${ls_iommu_tar}" $(curl -s -X GET "${ls_iommu_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)
-
-
-    unarchive "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
-    cp -dvf "${ls_iommu_tar}.extract/ls-iommu" "/usr/bin"/
-    chmod -v +x /usr/bin/ls-iommu
-    rm -rf "${ls_iommu_tar}" "${ls_iommu_tar}.extract"
+#    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
 ujust_setup() {
     local just_repo="https://api.github.com/repos/casey/just"
-    local just_tar="${TMP_DIR}/just.tar.gz"
+    local latest_just_url="$(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
+    local just_tar="${TMP_DIR}/$(basename ${latest_just_url})"
     local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
     local import_file="/usr/share/ublue-os/justfile"
@@ -201,7 +224,7 @@ ujust_setup() {
         log "INFO" "Installing just"
         mkdir -vp "${just_tar}.extract"
 
-        curl -Lo "${just_tar}" $(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)
+        curl -Lo "${just_tar}" "${latest_just_url}"
 
         unarchive "${just_tar}" "${just_tar}.extract"
         cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
@@ -357,6 +380,7 @@ process_command() {
             scrcpy
             ;;
         llama_cpp)
+            llama_cpp_vk
             llama_cpp
             ;;
         pipes_sh)

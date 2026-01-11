@@ -86,8 +86,8 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
             mkdir -vp "${font_tmpd}" "${font_dest}"
             case "${font_url}" in
                 *.zip|*.7z|*.rar|*.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-                    curl -fLsS --retry 5 "${font_url}" -o "${url_file}"
-                    unarchive "${url_file}" "${font_tmpd}"
+                    curl -fLsS --retry 5 "${font_url}" -o "${TMP_DIR}/${url_file}"
+                    unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}"
                     ;;
                 *.otf|*.ttf)
                     curl -fLsS --retry 5 "${font_url}" -o "${font_tmpd}/${url_file}"
@@ -103,6 +103,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
                 cp -vf "${font_file}" "${font_dest}"/
             done
         done
+        rm -rf "${TMP_DIR}"
         log "INFO" "Extra Font(s) installed"
     fi
 
