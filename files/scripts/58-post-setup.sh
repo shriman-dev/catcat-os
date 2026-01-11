@@ -39,6 +39,8 @@ rm -rvf /tmp/*
 #/etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
 rm -rvf /etc/skel/.config/user-tmpfiles.d
+rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vapor.palette
+rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
 
 
 log "INFO" "Post setup configuration"

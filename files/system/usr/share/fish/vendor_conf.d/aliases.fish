@@ -26,7 +26,6 @@ alias grep='grep --color=auto'
 alias egrep='grep --color=auto -E'
 alias fgrep='grep --color=auto -F'
 alias rgrep='grep --color=auto -r'
-alias where='which'
 alias untar='tar -xvf'
 alias tarnow='tar -acf'
 alias ramcln="sudo /usr/bin/ramclean"
