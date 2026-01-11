@@ -214,9 +214,10 @@ ujust_setup() {
     local just_repo="https://api.github.com/repos/casey/just"
     local latest_just_url="$(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
     local just_tar="${TMP_DIR}/$(basename ${latest_just_url})"
-    local ublue_repo="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
+    local ublue_pkgs="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
-    local import_file="/usr/share/ublue-os/justfile"
+    local import_dir="/usr/share/ublue-os/just"
+    local import_file="${import_dir}file"
     local justfile_dir="$(dirname ${BUILD_SETUP_DIR})/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
@@ -236,8 +237,8 @@ ujust_setup() {
 
     [[ ! -x "/usr/bin/ujust" ]] && {
         log "INFO" "Installing ujust and ugum"
-        curl -Lo "/usr/bin/ujust" "${ublue_repo}/ublue-os-just/src/ujust"
-        curl -Lo "/usr/bin/ugum" "${ublue_repo}/ublue-os-just/src/ugum"
+        curl -Lo "/usr/bin/ujust" "${ublue_pkgs}/ublue-os-just/src/ujust"
+        curl -Lo "/usr/bin/ugum" "${ublue_pkgs}/ublue-os-just/src/ugum"
         chmod -v +x /usr/bin/{ujust,ugum}
         log "INFO" "Done."
     }
@@ -246,72 +247,66 @@ ujust_setup() {
     [[ ! -f "/usr/libexec/luks-enable-tpm2-autounlock" ]] && {
         mkdir -vp /usr/lib/dracut/dracut.conf.d
         curl -Lo "/usr/lib/dracut/dracut.conf.d/90-ublue-luks.conf" \
-                    "${ublue_repo}/ublue-os-luks/src/90-ublue-luks.conf"
+                    "${ublue_pkgs}/ublue-os-luks/src/90-ublue-luks.conf"
         curl -Lo "/usr/libexec/luks-enable-tpm2-autounlock" \
-                    "${ublue_repo}/ublue-os-luks/src/luks-enable-tpm2-autounlock"
+                    "${ublue_pkgs}/ublue-os-luks/src/luks-enable-tpm2-autounlock"
         curl -Lo "/usr/libexec/luks-disable-tpm2-autounlock" \
-                    "${ublue_repo}/ublue-os-luks/src/luks-disable-tpm2-autounlock"
+                    "${ublue_pkgs}/ublue-os-luks/src/luks-disable-tpm2-autounlock"
     }
 
-    # Waydroid setup recipe
-    rpm -q waydroid && [[ ! -f "${justfile_dir}/82-bazzite-waydroid.just" ]] && {
-        curl -Lo "${justfile_dir}/82-bazzite-waydroid.just" "${bazzite_repo}/82-bazzite-waydroid.just"
-        sed -i '/waydroid-container-restart.desktop/d' "${justfile_dir}/82-bazzite-waydroid.just"
+    # Fetch just recipes
+    local fetched_justd="/tmp/fetched_justd"
+    mkdir -vp ${fetched_justd}
+    rpm -q waydroid && [[ ! -f "${import_dir}/82-bazzite-waydroid.just" ]] && {
+        local fetched_justd="/tmp/fetched_justd"
+        curl -Lo "${fetched_justd}/82-bazzite-waydroid.just" \
+                        "${bazzite_repo}/82-bazzite-waydroid.just"
+        sed -i '/waydroid-container-restart.desktop/d' "${fetched_justd}/82-bazzite-waydroid.just"
         sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
-                "${justfile_dir}/82-bazzite-waydroid.just"
+                        "${fetched_justd}/82-bazzite-waydroid.just"
     }
 
     # Organize ujust
     log "INFO" "Categorizing justfiles"
-#    sed '/^\[group/d' /usr/share/ublue-os/just/*.just
+#    sed '/^\[group/d' ${import_dir}/*.just
     sed -i -E '/^configure-broadcom-wl/i [group\("hardware"\)]' \
-                            /usr/share/ublue-os/just/50-akmods.just || true
+                            ${import_dir}/50-akmods.just || true
     sed -i -E '/^enroll-secure-boot-key/i [group\("utilities"\)]' \
-                            /usr/share/ublue-os/just/00-default.just || true
+                            ${import_dir}/00-default.just || true
     sed -i -E '/^(toggle-nvk|configure-(nvidia|nvidia-optimus))/i [group\("nvidia"\)]' \
-                            /usr/share/ublue-os/just/40-nvidia.just || true
+                            ${import_dir}/40-nvidia.just || true
     sed -i -E '/^install-resolve/i [group\("apps"\)]' \
-                            /usr/share/ublue-os/just/30-distrobox.just || true
+                            ${import_dir}/30-distrobox.just || true
     sed -i 's|^toggle-user-motd|_toggle-user-motd|' \
-                            /usr/share/ublue-os/just/00-default.just || true
-    sed -i 's|^changelogs-testing|_changelogs-testing|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^distrobox-assemble|_distrobox-assemble|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^distrobox-new|_distrobox-new|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^setup-distrobox-app|_setup-distrobox-app|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^install-coolercontrol|_install-coolercontrol|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^install-scrcpy|_install-scrcpy|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^install-openrgb|_install-openrgb|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^changelogs-testing|_changelogs-testing|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^configure-grub|_configure-grub|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i 's|^configure-snapshots|_configure-snapshots|' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i '/^alias.*distrobox-assemble/d' \
-                            /usr/share/ublue-os/just/*.just || true
-    sed -i '/^alias.*distrobox-new/d' \
-                            /usr/share/ublue-os/just/*.just || true
+                            ${import_dir}/00-default.just || true
+    sed -i -e 's|^changelogs-testing|_changelogs-testing|' \
+           -e 's|^distrobox-assemble|_distrobox-assemble|' \
+           -e 's|^distrobox-new|_distrobox-new|' \
+           -e 's|^setup-distrobox-app|_setup-distrobox-app|' \
+           -e 's|^install-coolercontrol|_install-coolercontrol|' \
+           -e 's|^install-scrcpy|_install-scrcpy|' \
+           -e 's|^install-openrgb|_install-openrgb|' \
+           -e 's|^changelogs-testing|_changelogs-testing|' \
+           -e 's|^configure-grub|_configure-grub|' \
+           -e 's|^configure-snapshots|_configure-snapshots|' \
+           -e '/^alias.*distrobox-assemble/d' \
+           -e '/^alias.*distrobox-new/d' \
+                            ${import_dir}/*.just || true
 
 
     # Import justfiles to ujust
     log "INFO" "Importing justfiles to ujust"
     [[ ! -f "${import_file}" ]] &&
-        curl -Lo "${import_file}" "${ublue_repo}/ublue-os-just/src/header.just"
+        curl -Lo "${import_file}" "${ublue_pkgs}/ublue-os-just/src/header.just"
 
     if [[ -f "${import_file}" ]]; then
         local justfile import_line
-        for justfile in ${justfile_dir}/*.just; do
+        for justfile in ${justfile_dir}/*.just ${fetched_justd}/*.just; do
             # Copy justfiles to ujust default directory
-            cp -dvf "${justfile}" /usr/share/ublue-os/just/
+            mkdir -vp ${import_dir}
+            cp -dvf "${justfile}" ${import_dir}/
             # Add import line if it does not exists already
-            import_line="import \"/usr/share/ublue-os/just/$(basename ${justfile})\""
+            import_line="import \"${import_dir}/$(basename ${justfile})\""
             grep -w "${import_line}" "${import_file}" || {
                 sed -i "/# Imports/a\\${import_line}" "${import_file}"
                 log "INFO" "Added: '${import_line}' to ${import_file}"

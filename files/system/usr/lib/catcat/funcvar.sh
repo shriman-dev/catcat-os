@@ -260,7 +260,6 @@ unarchive() {
     local archive="${1}" dest="${2}"
 
     if [[ ! -d "${dest}" ]]; then
-        log "INFO" "Creating: ${dest}"
         mkdir ${VERBOSE:+-v} -p "${dest}"
     fi
 
