@@ -114,13 +114,13 @@
     },
     {
       "type": "terminalfont",
-      "key": "{#96;1}  ├─󰉿 {$2}" // 
+      "key": "{#96;1}  ╰─󰉿 {$2}" // 
     },
-    {
-      "type": "terminaltheme",
-      "key": "{#96;1}  ╰─󰧷 {$2}",
-      "format": "FG:{1} BG:{3} [{4}]"
-    },
+//    {
+//      "type": "terminaltheme",
+//      "key": "{#96;1}  ╰─󰧷 {$2}",
+//      "format": "FG:{1} BG:{3} [{4}]"
+//    },
     "break",
 
     {
