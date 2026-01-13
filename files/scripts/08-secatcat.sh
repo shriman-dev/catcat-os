@@ -111,25 +111,32 @@ check_file_inplace /etc/catcat-os/localdns.d/localdns-server.conf \
 
 # Get DNS blocklist archive
 log "INFO" "Get DNS Ad and Malware blocklist"
-mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
+mkdir -vp "${tmp_localdns}" "${ushare_localdns}"/{dnscrypt,dnsmasq}
 
-# Dnscrypt blocklist
-[[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+if [[ "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
+    /usr/bin/localdnsctl -v --switch-blocklist-backend dnsmasq
+    systemctl -f enable dnsmasq.service
+else
+    /usr/bin/localdnsctl -v --switch-blocklist-backend dnscrypt
+    systemctl -f enable dnscrypt-proxy.service
+fi
+
+
+if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]]; then
+    # Dnscrypt blocklist
     curl_get "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${dns_blocklist_repo}/domains.d/domains-filtered-subdomains.tar.zst"
     split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst"
-}
-
-# Dnsmasq blocklist
-[[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]]; then
+    # Dnsmasq blocklist
     log "INFO" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
     echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
     curl_get "${tmp_localdns}/blocklist.conf.tar.zst" \
                 "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
     split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
                 "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
-}
+fi
 
 log "INFO" "Enabling localdns"
 # Set localdns as default dns server for blocking ads/malwares
@@ -141,14 +148,6 @@ systemctl mask systemd-resolved.service
 
 # Enable blocklist updater
 systemctl -f enable dns-blocklist-updater.timer
-
-if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
-    /usr/bin/localdnsctl -v --switch-blocklist-backend dnsmasq
-    systemctl -f enable dnsmasq.service
-else
-    /usr/bin/localdnsctl -v --switch-blocklist-backend dnscrypt
-    systemctl -f enable dnscrypt-proxy.service
-fi
 
 # Clear tmp
 rm -rvf "${tmp_localdns}"
