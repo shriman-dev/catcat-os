@@ -223,7 +223,7 @@ shell_setup() {
 
     # Fish shell
     # To load fish config
-    [[ -n ${FIRSTBOOT} ]] && fish -C 'kill -9 $fish_pid' >/dev/null 2>&1
+    ( [[ -n ${FIRSTBOOT} ]] && fish -C 'kill -9 $fish_pid' & ) 2>/dev/null
     #
     if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
         [[ ! -d "${CONFIG}/fish/themes" ]] && mkdir -vp "${CONFIG}/fish/themes"
