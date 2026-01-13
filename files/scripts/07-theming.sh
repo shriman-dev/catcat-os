@@ -86,17 +86,17 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
             mkdir -vp "${font_tmpd}" "${font_dest}"
             case "${font_url}" in
                 *.zip|*.7z|*.rar|*.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-                    curl -fLsS --retry 5 "${font_url}" -o "${TMP_DIR}/${url_file}"
+                    curl_get "${TMP_DIR}/${url_file}" "${font_url}"
                     unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}"
                     ;;
                 *.otf|*.ttf)
-                    curl -fLsS --retry 5 "${font_url}" -o "${font_tmpd}/${url_file}"
+                    curl_get "${TMP_DIR}/${url_file}" "${font_url}"
                     ;;
                 *.git)
                     git clone --depth 1 "${font_url}" "${font_tmpd}"
                     ;;
                 *)
-                    err "Unsupported URL: ${font_url}"
+                    err "Unsupported URL: ${font_url}" && return 1
                     ;;
             esac
             for font_file in $(find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf"); do
@@ -124,15 +124,15 @@ install_icon_themes() {
     log "INFO" "Installing icons"
 
     log "INFO" "Papirus icons"
-    local papirus_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
-    local papirus_tar="/tmp/papirus.tar"
+    local icons_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
+    local latest_icons_url=$(curl_fetch "${icons_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
 
-    curl -Lo "${papirus_tar}" $(curl -s -X GET "${papirus_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
-
-    mkdir -vp "${papirus_tar}.extract"
-    tar -xf "${papirus_tar}" -C "${papirus_tar}.extract" --strip-components=1
-    cp -drf "${papirus_tar}.extract"/Papirus* /usr/share/icons/
-    rm -rf "${papirus_tar}"*
+    mkdir -vp "${icons_archive}.extract"
+    curl_get "${icons_archive}" "${latest_icons_url}"
+    unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
+    cp -drf "${icons_archive}.extract"/Papirus*/Papirus* /usr/share/icons/
+    rm -rf "${icons_archive}"*
 
     log "INFO" "Icons installed"
 }
@@ -142,24 +142,27 @@ install_gtk_themes() {
     # Lavanda-gtk-theme
     log "INFO" "Lavanda-gtk-theme"
     local lavanda_theme_repo="https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme"
-    local lavanda_tar="/tmp/lavanda.tar"
-    curl -Lo "${lavanda_tar}" $(curl -s -X GET "${lavanda_theme_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    local latest_lavanda_url=$(curl_fetch "${lavanda_theme_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
+
     mkdir -vp "${lavanda_tar}.extract"
-    tar -xf "${lavanda_tar}" -C "${lavanda_tar}.extract" --strip-components=1
-    chmod -v +x "${lavanda_tar}.extract"/install.sh
-    "${lavanda_tar}.extract"/install.sh --color light dark
-    
+    curl_get "${lavanda_tar}" "${latest_lavanda_url}"
+    unarchive "${lavanda_tar}" "${lavanda_tar}.extract" >/dev/null
+
+    chmod -v +x "${lavanda_tar}.extract"/*/install.sh
+    "${lavanda_tar}.extract"/*/install.sh --color light dark
+
     rm -rf "${lavanda_tar}"*
 
     # Catppuccin-Gtk-Theme
     log "INFO" "Catppuccin-Gtk-Theme"
     local catppuccin_theme_repo="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
-    local catppuccin_theme_tmp="/tmp/Catppuccin-Gtk-Theme"
-    git clone "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
+    local catppuccin_theme_tmp="/tmp/themes/Catppuccin-Gtk-Theme"
+    git clone --depth 1 "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
     chmod -v +x "${catppuccin_theme_tmp}"/install.sh
     "${catppuccin_theme_tmp}"/install.sh --name 'Catppuccin' --theme all \
                                             --color dark --tweaks catppuccin rimless
-    rm -rf "${catppuccin_theme_tmp}"
+    rm -rf /tmp/themes
     log "INFO" "GTK theme(s) installed"
 }
 

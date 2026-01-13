@@ -90,7 +90,7 @@ update_blocklist() {
     fi
 
     log "INFO" "Downloading blocklist..."
-    curl -sLo "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
+    curl_get "${TMPDIR}/${src_file}.tar.zst" "${REPO_URL}/${subdir}/${src_file}.tar.zst" ||
         die "Failed to download blocklist"
 
     log "INFO" "Extracting blocklist..."

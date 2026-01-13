@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+source /usr/lib/catcat/funcvar.sh
+
+unarchive "${1}" "${2}"

@@ -2,17 +2,36 @@
 source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
+check_file_inplace() {
+    local _file
+    for _file in "$@"; do
+        if [[ -f "${_file}" ]]; then
+             log "DEBUG" "File is in place: ${_file}"
+        else
+            err "File does not exist in place: ${_file}" && return 1
+        fi
+    done
+}
+
 #############################
 # Boot, Services and System #
 #############################
-log "INFO" "Configuring unneeded daemons to stop"
+log "INFO" "Checking dracut blacklist"
+check_file_inplace /usr/lib/dracut/dracut.conf.d/catcat-blacklist.conf
+
+log "INFO" "Checking modprobe blacklist"
+check_file_inplace /usr/lib/modprobe.d/catcat-blacklist.conf
+
+log "INFO" "Checking sysctl configuration"
+check_file_inplace /usr/lib/sysctl.d/99-catcat-sysctl.conf
+
+log "INFO" "Stop unneeded daemons dynamically"
 systemd_dir="/usr/lib/systemd"
 # Avahi daemon to stop when unneeded
 mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
 echo "[Unit]
 StopWhenUnneeded=true" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
 
-# Disable coredump for better security and performance
 log "INFO" "Disabling coredump for better security and performance"
 no_coredump_conf="disable-coredump.conf"
 mkdir -vp ${systemd_dir}/{system,user}.conf.d
@@ -43,8 +62,8 @@ chrony_conf="/etc/chrony.conf"
 grapheneos_repo="https://raw.githubusercontent.com/GrapheneOS/infrastructure/refs/heads/main"
 
 mkdir -vp "${tmp_chrony}"
-curl -Lo "${tmp_chrony}/LICENSE" "${grapheneos_repo}/LICENSE"
-curl -Lo "${tmp_chrony}/chrony.conf" "${grapheneos_repo}${chrony_conf}"
+curl_get "${tmp_chrony}/LICENSE" "${grapheneos_repo}/LICENSE"
+curl_get "${tmp_chrony}/chrony.conf" "${grapheneos_repo}${chrony_conf}"
 
 sed 's/^/# /' "${tmp_chrony}/LICENSE" > "${tmp_chrony}/LICENSE_temp"
 cat "${tmp_chrony}/LICENSE_temp" > "${chrony_conf}"
@@ -64,51 +83,31 @@ log "INFO" "Chrony Configuration done."
 ###########
 # Network #
 ###########
-log "INFO" "Setting up network for image: ${IMAGE_NAME}"
-# Enable MAC randomization and temporary IPv6 addresses generation
-log "INFO" "Enabling MAC randomization and dynamic IPv6 address generation"
-networkmanager_confd="/usr/lib/NetworkManager/conf.d"
+log "INFO" "Checking MAC randomization and dynamic IPv6 address generation"
 #ethernet.cloned-mac-address=random
-cat > "${networkmanager_confd}/mac-randomization.conf" << EOF
-[device]
-wifi.scan-rand-mac-address=yes
+networkmanager_confd="/usr/lib/NetworkManager/conf.d"
+check_file_inplace "${networkmanager_confd}/mac-randomization.conf" \
+                   "${networkmanager_confd}/privacy_ext_ipv6.conf"
 
-[connection]
-wifi.cloned-mac-address=random
-EOF
-
-cat > "${networkmanager_confd}/privacy_ext_ipv6.conf" << EOF
-[connection]
-ipv6.ip6-privacy=2
-EOF
+# Harden SSH
+log "INFO" "Checking harden SSH configuration"
+check_file_inplace "/etc/ssh/sshd_config.d/catcat-ssh.conf"
 
 # Ad/Malware blocking
 log "INFO" "Adding support for Ad/Malware blocking"
-# Install dnscrypt-proxy
 tmp_localdns="/tmp/localdns.d"
 localdns_confd="/etc/catcat-os/localdns.d"
-dnscrypt_resolver_repo="https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master"
-dnscrypt_repo="https://api.github.com/repos/DNSCrypt/dnscrypt-proxy"
-dnscrypt_tar="${tmp_localdns}/dnscrypt-proxy.tar.gz"
-dnscrypt_confd="/etc/dnscrypt-proxy"
 ushare_localdns="/usr/share/localdns.d"
 dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
 
-log "INFO" "Installing dnscrypt-proxy"
-mkdir -vp "${dnscrypt_tar}.extract"
-curl -Lo "${dnscrypt_tar}" \
-        $(curl -s -X GET "${dnscrypt_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux_x86_64-.*.tar.gz"' | cut -d '"' -f4)
+# Install dnscrypt-proxy if not installed
+[[ ! -x /usr/bin/dnscrypt-proxy ]] &&
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh dnscrypt
 
-tar -xvf "${dnscrypt_tar}" -C "${dnscrypt_tar}.extract"
-cp -dvf "${dnscrypt_tar}.extract/linux-x86_64/dnscrypt-proxy" "/usr/bin/"
-chmod -v +x "/usr/bin/dnscrypt-proxy"
-
-curl -Lo "${dnscrypt_confd}/public-resolvers.md" "${dnscrypt_resolver_repo}/v3/public-resolvers.md"
-curl -Lo "${dnscrypt_confd}/public-resolvers.md.minisig" \
-                "${dnscrypt_resolver_repo}/v3/public-resolvers.md.minisig"
-
-rm -rf "${dnscrypt_tar}" "${dnscrypt_tar}.extract"
-log "INFO" "Done."
+check_file_inplace /etc/catcat-os/localdns.d/localdns-server.conf \
+                   /etc/dnscrypt-proxy/dnscrypt-proxy.toml \
+                   /etc/dnsmasq.d/defaults.conf \
+                   /etc/dnsmasq.d/dns-defaults.conf
 
 # Get DNS blocklist archive
 log "INFO" "Get DNS Ad and Malware blocklist"
@@ -116,7 +115,7 @@ mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
 
 # Dnscrypt blocklist
 [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
-    curl -Lo "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
+    curl_get "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${dns_blocklist_repo}/domains.d/domains-filtered-subdomains.tar.zst"
     split -dC 5M "${tmp_localdns}/domains-filtered-subdomains.tar.zst" \
                 "${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst"
@@ -126,7 +125,7 @@ mkdir -vp "${ushare_localdns}"/{dnscrypt,dnsmasq}
 [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
     log "INFO" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
     echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
-    curl -Lo "${tmp_localdns}/blocklist.conf.tar.zst" \
+    curl_get "${tmp_localdns}/blocklist.conf.tar.zst" \
                 "${dns_blocklist_repo}/dnsmasq.d/blocklist.conf.tar.zst"
     split -dC 5M "${tmp_localdns}/blocklist.conf.tar.zst" \
                 "${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst"
@@ -189,25 +188,13 @@ sed -i -Ee 's|^(#?[[:space:]]*minlen =.*)|minlen = 12|' \
 
 # After User Login
 ###############
-# Create a xdg autostart file to mute microphone at login
-log "INFO" "Adding autostart desktop file that mutes mic on user login"
+log "INFO" "Checking autostart desktop file that mutes mic on user login"
 mute_mic_file="/etc/xdg/autostart/mute-mic.desktop"
-mkdir -pv "$(dirname ${mute_mic_file})"
-cat > "${mute_mic_file}" << EOF
-[Desktop Entry]
-Hidden=false
-Name=Mute Microphone on Login
-Comment=Mute Microphone on Login
-Terminal=false
-Exec=/usr/bin/amixer set Capture nocap
-Type=Application
-EOF
-chmod -v 644 "${mute_mic_file}"
+check_file_inplace "${mute_mic_file}"
 
 ######################
 # Package Management #
 ######################
-# Make all repos to use https protocol
 log "INFO" "Setting all RPM repos to use HTTPS protocol"
 for repo in /etc/yum.repos.d/*.repo; do
     sed -i 's/metalink?/metalink?protocol=https\&/g' "${repo}"

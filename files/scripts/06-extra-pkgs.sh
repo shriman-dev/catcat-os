@@ -6,11 +6,11 @@ TMP_DIR="/tmp/extra_pkgs"
 
 starship() {
     local pkg_repo="https://api.github.com/repos/starship/starship"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/starship" "/usr/bin"/
@@ -24,7 +24,7 @@ eza() {
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/eza" /usr/bin/
@@ -34,11 +34,11 @@ eza() {
 
 grex() {
     local pkg_repo="https://api.github.com/repos/pemistahl/grex"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/grex" "/usr/bin"/
@@ -48,11 +48,11 @@ grex() {
 
 bandwhich() {
     local pkg_repo="https://api.github.com/repos/imsnif/bandwhich"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/bandwhich" "/usr/bin"/
@@ -62,11 +62,11 @@ bandwhich() {
 
 gocryptfs() {
     local pkg_repo="https://api.github.com/repos/rfjakob/gocryptfs"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-static_amd64.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/gocryptfs" "/usr/bin"/
@@ -76,11 +76,11 @@ gocryptfs() {
 
 ls_iommu() {
     local pkg_repo="https://api.github.com/repos/HikariKnight/ls-iommu"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*Linux_x86_64.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract/ls-iommu" "/usr/bin"/
@@ -95,9 +95,9 @@ yazi() {
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
-    curl -Lo /usr/share/applications/yazi.desktop "${pkg_repo_raw}/assets/yazi.desktop"
-    curl -Lo /usr/share/icons/yazi.png "${pkg_repo_raw}/assets/logo.png"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    curl_get /usr/share/applications/yazi.desktop "${pkg_repo_raw}/assets/yazi.desktop"
+    curl_get /usr/share/icons/yazi.png "${pkg_repo_raw}/assets/logo.png"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
@@ -110,46 +110,67 @@ yazi() {
     rm -rf "${pkg_archive}" "${pkg_archive}.extract"
 }
 
+dnscrypt() {
+    local pkg_repo="https://api.github.com/repos/DNSCrypt/dnscrypt-proxy"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux_x86_64-.*.tar.gz"' | cut -d '"' -f4)"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    local dnscrypt_resolver_repo="https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/refs/heads/master"
+
+    mkdir -vp "${pkg_archive}.extract" /etc/dnscrypt-proxy
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+
+    cp -dvf "${dnscrypt_tar}.extract"/*/dnscrypt-proxy /usr/bin/
+    chmod -v +x /usr/bin/dnscrypt-proxy
+
+    curl_get "/etc/dnscrypt-proxy/public-resolvers.md" \
+                "${dnscrypt_resolver_repo}/v3/public-resolvers.md"
+    curl_get "/etc/dnscrypt-proxy/public-resolvers.md.minisig" \
+                "${dnscrypt_resolver_repo}/v3/public-resolvers.md.minisig"
+
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
+}
+
 hblock() {
     local pkg_repo_raw="https://raw.githubusercontent.com/hectorm/hblock/refs/heads/master"
     local dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
     local hblock_confd="/etc/hblock"
 
-    curl -Lo "/usr/bin/hblock" "${pkg_repo_raw}/hblock"
+    curl_get "/usr/bin/hblock" "${pkg_repo_raw}/hblock"
     chmod -v +x "/usr/bin/hblock"
 
     # Get hblock config
     log "INFO" "Getting hblock configuration"
     mkdir -vp "${hblock_confd}"
-    curl -Lo "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
-    curl -Lo "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
-    curl -Lo "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
+    curl_get "${hblock_confd}/sources.list" "${dns_blocklist_repo}/hblock/sources.list"
+    curl_get "${hblock_confd}/deny.list" "${dns_blocklist_repo}/hblock/deny.list"
+    curl_get "${hblock_confd}/allow.list" "${dns_blocklist_repo}/hblock/allow.list"
 }
 
 buttersnap() {
     local pkg_repo_raw="https://raw.githubusercontent.com/shriman-dev/buttersnap.sh/refs/heads/main"
 
-    curl -Lo "/usr/bin/buttersnap.sh" "${pkg_repo_raw}/buttersnap.sh"
-    curl -Lo "/usr/bin/buttercopy.sh" "${pkg_repo_raw}/buttercopy.sh"
+    curl_get "/usr/bin/buttersnap.sh" "${pkg_repo_raw}/buttersnap.sh"
+    curl_get "/usr/bin/buttercopy.sh" "${pkg_repo_raw}/buttercopy.sh"
     chmod -v +x "/usr/bin"/{buttersnap.sh,buttercopy.sh}
 }
 
 btdu() {
     local pkg_repo="https://github.com/CyberShadow/btdu"
 
-    curl -Lo "/usr/bin/btdu" "${pkg_repo}/releases/latest/download/btdu-static-x86_64"
+    curl_get "/usr/bin/btdu" "${pkg_repo}/releases/latest/download/btdu-static-x86_64"
 
     chmod -v +x "/usr/bin/btdu"
 }
 
 scrcpy() {
     local pkg_repo="https://api.github.com/repos/Genymobile/scrcpy"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*linux-x86_64-.*.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
     local usrlibexec_pkg="/usr/libexec/scrcpy"
 
     mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
     cp -dvf "${pkg_archive}.extract"/*/* "${usrlibexec_pkg}"/
@@ -161,12 +182,12 @@ scrcpy() {
 
 llama_cpp_vk() {
     local pkg_repo="https://api.github.com/repos/ggml-org/llama.cpp"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-vulkan-x64.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
     local usrlibexec_pkg="/usr/libexec/llama_cpp_vk"
 
     mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
@@ -176,12 +197,12 @@ llama_cpp_vk() {
 
 llama_cpp() {
     local pkg_repo="https://api.github.com/repos/ggml-org/llama.cpp"
-    local latest_pkg_url="$(curl -s -X GET "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-x64.tar.gz"' | cut -d '"' -f4)"
+    local latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*ubuntu-x64.tar.gz"' | cut -d '"' -f4)"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
     local usrlibexec_pkg="/usr/libexec/llama_cpp"
 
     mkdir -vp "${pkg_archive}.extract" "${usrlibexec_pkg}"
-    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
@@ -192,7 +213,7 @@ llama_cpp() {
 pipes_sh() {
     local pkg_repo_raw="https://raw.githubusercontent.com/pipeseroni/pipes.sh/refs/heads/master"
 
-#    curl -Lo "/usr/bin/pipes.sh" "${pkg_repo_raw}/pipes.sh"
+#    curl_get "/usr/bin/pipes.sh" "${pkg_repo_raw}/pipes.sh"
     chmod -v +x "/usr/bin/pipes.sh"
 }
 
@@ -202,7 +223,7 @@ ascii_image_converter() {
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
 #    mkdir -vp "${pkg_archive}.extract"
-#    curl -Lo "${pkg_archive}" "${latest_pkg_url}"
+#    curl_get "${pkg_archive}" "${latest_pkg_url}"
 
 #    unarchive "${pkg_archive}" "${pkg_archive}.extract"
 #    cp -dvf "${pkg_archive}.extract"/*/ascii-image-converter "/usr/bin"/
@@ -212,7 +233,7 @@ ascii_image_converter() {
 
 ujust_setup() {
     local just_repo="https://api.github.com/repos/casey/just"
-    local latest_just_url="$(curl -s -X GET "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
+    local latest_just_url="$(curl_fetch "${just_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-musl.tar.gz"' | cut -d '"' -f4)"
     local just_tar="${TMP_DIR}/$(basename ${latest_just_url})"
     local ublue_pkgs="https://raw.githubusercontent.com/ublue-os/packages/refs/heads/main/packages"
     local bazzite_repo="https://raw.githubusercontent.com/ublue-os/bazzite/refs/heads/main/system_files/desktop/shared/usr/share/ublue-os/just"
@@ -225,7 +246,7 @@ ujust_setup() {
         log "INFO" "Installing just"
         mkdir -vp "${just_tar}.extract"
 
-        curl -Lo "${just_tar}" "${latest_just_url}"
+        curl_get "${just_tar}" "${latest_just_url}"
 
         unarchive "${just_tar}" "${just_tar}.extract"
         cp -dvf "${just_tar}.extract/just.1" "/usr/share/man/man1/just.1"
@@ -237,8 +258,8 @@ ujust_setup() {
 
     [[ ! -x "/usr/bin/ujust" ]] && {
         log "INFO" "Installing ujust and ugum"
-        curl -Lo "/usr/bin/ujust" "${ublue_pkgs}/ublue-os-just/src/ujust"
-        curl -Lo "/usr/bin/ugum" "${ublue_pkgs}/ublue-os-just/src/ugum"
+        curl_get "/usr/bin/ujust" "${ublue_pkgs}/ublue-os-just/src/ujust"
+        curl_get "/usr/bin/ugum" "${ublue_pkgs}/ublue-os-just/src/ugum"
         chmod -v +x /usr/bin/{ujust,ugum}
         log "INFO" "Done."
     }
@@ -246,25 +267,26 @@ ujust_setup() {
     # Needed files for luks tpm2 autounlock recipe
     [[ ! -f "/usr/libexec/luks-enable-tpm2-autounlock" ]] && {
         mkdir -vp /usr/lib/dracut/dracut.conf.d
-        curl -Lo "/usr/lib/dracut/dracut.conf.d/90-ublue-luks.conf" \
+        curl_get "/usr/lib/dracut/dracut.conf.d/90-ublue-luks.conf" \
                     "${ublue_pkgs}/ublue-os-luks/src/90-ublue-luks.conf"
-        curl -Lo "/usr/libexec/luks-enable-tpm2-autounlock" \
+        curl_get "/usr/libexec/luks-enable-tpm2-autounlock" \
                     "${ublue_pkgs}/ublue-os-luks/src/luks-enable-tpm2-autounlock"
-        curl -Lo "/usr/libexec/luks-disable-tpm2-autounlock" \
+        curl_get "/usr/libexec/luks-disable-tpm2-autounlock" \
                     "${ublue_pkgs}/ublue-os-luks/src/luks-disable-tpm2-autounlock"
     }
 
     # Fetch just recipes
-    local fetched_justd="/tmp/fetched_justd"
-    mkdir -vp ${fetched_justd}
+    local fetched_justfiles="/tmp/fetched_justfiles"
+    mkdir -vp ${fetched_justfiles}
     rpm -q waydroid && [[ ! -f "${import_dir}/82-bazzite-waydroid.just" ]] && {
-        local fetched_justd="/tmp/fetched_justd"
-        curl -Lo "${fetched_justd}/82-bazzite-waydroid.just" \
+        local fetched_justfiles="/tmp/fetched_justfiles"
+        curl_get "${fetched_justfiles}/82-bazzite-waydroid.just" \
                         "${bazzite_repo}/82-bazzite-waydroid.just"
-        sed -i '/waydroid-container-restart.desktop/d' "${fetched_justd}/82-bazzite-waydroid.just"
+        sed -i '/waydroid-container-restart.desktop/d' "${fetched_justfiles}/82-bazzite-waydroid.just"
         sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
-                        "${fetched_justd}/82-bazzite-waydroid.just"
+                        "${fetched_justfiles}/82-bazzite-waydroid.just"
     }
+
 
     # Organize ujust
     log "INFO" "Categorizing justfiles"
@@ -297,13 +319,13 @@ ujust_setup() {
     # Import justfiles to ujust
     log "INFO" "Importing justfiles to ujust"
     [[ ! -f "${import_file}" ]] &&
-        curl -Lo "${import_file}" "${ublue_pkgs}/ublue-os-just/src/header.just"
+        curl_get "${import_file}" "${ublue_pkgs}/ublue-os-just/src/header.just"
 
     if [[ -f "${import_file}" ]]; then
+        mkdir -vp ${import_dir}
         local justfile import_line
-        for justfile in ${justfile_dir}/*.just ${fetched_justd}/*.just; do
+        for justfile in ${justfile_dir}/*.just ${fetched_justfiles}/*.just; do
             # Copy justfiles to ujust default directory
-            mkdir -vp ${import_dir}
             cp -dvf "${justfile}" ${import_dir}/
             # Add import line if it does not exists already
             import_line="import \"${import_dir}/$(basename ${justfile})\""
@@ -313,6 +335,7 @@ ujust_setup() {
             }
         done
     fi
+    rm -rvf ${fetched_justfiles}
     log "INFO" "Justfile(s) imported"
 
     log "INFO" "Full output of: ${import_file}"
@@ -326,7 +349,7 @@ waydroid_setup() {
 #    /usr/libexec/waydroid-fix-controllers
 #    /usr/share/applications/waydroid-container-restart.desktop
 #    /etc/default/waydroid-launcher
-    curl -Lo /usr/bin/waydroid-choose-gpu \
+    curl_get /usr/bin/waydroid-choose-gpu \
         "https://raw.githubusercontent.com/bazzite-org/waydroid-scripts/main/waydroid-choose-gpu.sh"
     chmod -v +x /usr/bin/waydroid-choose-gpu
 
@@ -338,7 +361,7 @@ waydroid_setup() {
 }
 
 extras() {
-    curl -Lo /usr/share/applications/micro.desktop \
+    curl_get /usr/share/applications/micro.desktop \
         https://raw.githubusercontent.com/zyedidia/micro/refs/heads/master/assets/packaging/micro.desktop
 }
 
@@ -355,6 +378,9 @@ process_command() {
             ;;
         yazi)
             yazi
+            ;;
+        dnscrypt)
+            dnscrypt
             ;;
         hblock)
             hblock

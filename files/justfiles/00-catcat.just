@@ -79,20 +79,23 @@ install-catcat-flatpaks:
 install-mcontrolcenter:
     #!/usr/bin/env -S sudo -- /bin/bash
     source /usr/lib/catcat/funcvar.sh
-    mcontrolcenter_repo="https://api.github.com/repos/dmitry-s93/MControlCenter"
-    mcontrolcenter_tar="/tmp/catcat_extra_pkgs/mcontrolcenter.tar.gz"
     log "INFO" "Installing mcontrolcenter"
-    mkdir -vp "${mcontrolcenter_tar}.extract"
-    curl -Lo "${mcontrolcenter_tar}" $(curl -s -X GET "${mcontrolcenter_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*bin.tar.gz"' | cut -d '"' -f4)
-    tar -xvf "${mcontrolcenter_tar}" -C "${mcontrolcenter_tar}.extract" --strip-components=1
-    sed -i "s|/usr/|/usr/local/|" "${mcontrolcenter_tar}.extract/install.sh"
-    sed -i "s|/usr/|/usr/local/|" "${mcontrolcenter_tar}.extract/app/mcontrolcenter.helper.service"
-    cd "${mcontrolcenter_tar}.extract"
-    ${mcontrolcenter_tar}.extract/install.sh
+    pkg_repo="https://api.github.com/repos/dmitry-s93/MControlCenter"
+    latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*bin.tar.gz"' | cut -d '"' -f4)"
+    pkg_archive="/tmp/catcat_extra_pkgs/mcontrolcenter.tar.gz"
+
+    mkdir -vp "${pkg_archive}.extract"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+
+    sed -i "s|/usr/|/usr/local/|" "${pkg_archive}.extract"/*/install.sh
+    sed -i "s|/usr/|/usr/local/|" "${pkg_archive}.extract"/*/app/mcontrolcenter.helper.service
+    cd "${pkg_archive}.extract"
+    ${pkg_archive}.extract/*/install.sh
     cp -fv /usr/local/share/applications/mcontrolcenter.desktop \
                 ${SUDO_USER}/.config/autostart/mcontrolcenter.desktop
     cd -
-    rm -rf "${mcontrolcenter_tar}" "${mcontrolcenter_tar}.extract"
+    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
     log "INFO" "All Done."
 
 # Show all logs from this boot

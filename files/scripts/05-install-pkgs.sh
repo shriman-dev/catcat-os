@@ -21,7 +21,7 @@ DESKTOP_EXTRAS=(
     "wireshark"
     "++bandwhich"
     #amdgpu_top
-    "$(curl -s -X GET https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)"
+    "$(curl_fetch https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)"
 
     # Backup, Archive, Encryption and Compression
     ##borgbackup zsync
@@ -40,7 +40,7 @@ DESKTOP_EXTRAS=(
     "ffmpegthumbnailer"
     "kpcli"
     #watchexec
-    "$(curl -s -X GET https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
+    "$(curl_fetch https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
@@ -89,14 +89,14 @@ DESKTOP_EXTRAS=(
     "openrgb"
     "openrgb-udev-rules"
     #lsfg-vk
-    #$(curl -s -X GET https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
+    #$(curl_fetch https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
 
     # Performance Tuning
     ##corectrl
     "uresourced"
     "irqbalance"
     #lact
-    #"$(curl -s -X GET https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)"
+    #"$(curl_fetch https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)"
 
     # Extras
     "++extras"
@@ -107,7 +107,7 @@ DESKTOP_COMMON=(
     "firewall-config"
     "usbguard-notifier"
     #opensnitch
-    #$(curl -s -X GET https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
+    #$(curl_fetch https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
 
     # Monitoring Tools
     "powertop"
@@ -163,7 +163,7 @@ DESKTOP_COMMON=(
     "python3-pip"
     "inotify-tools"
     #vscodium
-    "$(curl -s -X GET https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)"
+    "$(curl_fetch https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)"
 
     # Android Tools
     "++scrcpy"
@@ -235,7 +235,7 @@ COMMON=(
     # Shell setup
     "fish"
     #fastfetch
-    "$(curl -s -X GET https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -i '"browser_download_url": "[^"]*linux-amd64.rpm"' | cut -d'"' -f4)"
+    "$(curl_fetch https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -i '"browser_download_url": "[^"]*linux-amd64.rpm"' | cut -d'"' -f4)"
     "starship" # from terra repo
     "fzf"
     "bat"
@@ -249,6 +249,7 @@ COMMON=(
     "firewalld"
     "usbguard"
     "setools-console"
+    "++dnscrypt"
 
     # Monitoring Tools
     "btop"

@@ -224,6 +224,22 @@ is_file_older() {
     [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
 }
 
+bak_before() {
+    if [[ ! -e ${1}.og.bak ]]; then
+        cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
+    fi
+    cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
+}
+
+replace_add() {
+    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+}
+
+is_network_metered() {
+    /usr/bin/busctl get-property org.freedesktop.NetworkManager \
+        /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
+}
+
 check_network_connection() {
     local max_attempts=3 sleep_time=2 attempt=1
 
@@ -240,50 +256,46 @@ check_network_connection() {
     return 1
 }
 
-is_network_metered() {
-    /usr/bin/busctl get-property org.freedesktop.NetworkManager \
-        /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
-}
+curl_fetch() { curl -fsS -X GET --retry 5 "${1}"; }
 
-replace_add() {
-    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
-}
-
-bak_before() {
-    if [[ ! -e ${1}.og.bak ]]; then
-        cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
+curl_get() {
+    if [[ ! $# -eq 2 ]]; then
+        { err "Specify URL and local file path"; } 2>/dev/null
+        return 1
     fi
-    cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
+    curl -fLsS --retry 5 "${2}" -o "${1}"
 }
 
 unarchive() {
     local archive="${1}" dest="${2}"
-
-    if [[ ! -d "${dest}" ]]; then
-        mkdir ${VERBOSE:+-v} -p "${dest}"
+    if [[ ! $# -eq 2 ]]; then
+        { err "Specify paths to archive and destination"; } 2>/dev/null
+        return 1
     fi
+
+    [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
 
     case "${archive}" in
         *.zip)
-            { log "INFO" "Extracting ZIP archive in: ${dest}"; } 2>/dev/null
+            { log "DEBUG" "Extracting ZIP archive in: ${dest}"; } 2>/dev/null
             unzip "${archive}" -d "${dest}"
             ;;
         *.7z)
-            { log "INFO" "Extracting 7-ZIP archive in: ${dest}"; } 2>/dev/null
+            { log "DEBUG" "Extracting 7-ZIP archive in: ${dest}"; } 2>/dev/null
             7z x -o"${dest}" "${archive}"
             ;;
-        *.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-            { log "INFO" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
+        *.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+            { log "DEBUG" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
             tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
             ;;
         *.rar)
-            { log "INFO" "Extracting RAR archive in: ${dest}"; } 2>/dev/null
+            { log "DEBUG" "Extracting RAR archive in: ${dest}"; } 2>/dev/null
             cd "${dest}"
             unrar x "${archive}"
             cd -
             ;;
         *)
-            err "Unknown archive file: ${archive}"
+            err "Unknown archive file: ${archive}" && return 1
             ;;
     esac
 }
