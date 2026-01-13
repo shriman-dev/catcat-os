@@ -25,16 +25,52 @@ if type -q starship
     source ("starship" init fish --print-full-init | psub) && enable_transience
 end
 
-# Catppuccin mocha theme for fzf
-set -gx FZF_DEFAULT_OPTS "\
---color=bg+:#47476f,bg:#1E1E2E,spinner:#89b4fa,hl:#fab387 \
---color=fg:#CDD6F4,header:#F38BA8,info:#f2cdcd,pointer:#fab387 \
---color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#f2cdcd,hl+:#fab387 \
---color=selected-bg:#45475A \
---color=border:#47476f,label:#fab387"
-
-## Fish theme
-fish_config theme choose "Catppuccin Mocha"
-
 ## Zoxide
 type -q zoxide && zoxide init fish | source
+
+# Fzf colors
+set -gx FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS\
+--color=bg+:bright-black,gutter:-1,spinner:bright-magenta,hl:bright-blue \
+--color=fg:bright-white,header:bright-red,info:bright-yellow,pointer:blue \
+--color=marker:bright-blue,fg+:bright-white:bold,prompt:bright-yellow,hl+:bright-cyan \
+--color=selected-bg:bright-black \
+--color=border:bright-black,label:bright-magenta"
+
+# Fish syntex highlightings
+set -U fish_color_autosuggestion 'brblack'
+set -U fish_color_cancel 'red'
+set -U fish_color_command 'brcyan' '--bold'
+set -U fish_color_comment 'brblack'
+set -U fish_color_cwd 'brcyan'
+set -U fish_color_cwd_root 'brcyan'
+set -U fish_color_end 'brcyan' '--bold'
+set -U fish_color_error 'red'
+set -U fish_color_escape 'brpurple'
+set -U fish_color_history_current '--bold'
+set -U fish_color_host 'brred'
+set -U fish_color_host_remote 'red'
+set -U fish_color_keyword 'cyan' '--bold'
+set -U fish_color_normal 'normal'
+set -U fish_color_operator 'brred' '--bold'
+set -U fish_color_option 'brblue'
+set -U fish_color_param 'brcyan'
+set -U fish_color_quote 'brgreen'
+set -U fish_color_redirection 'brblue' '--bold'
+set -U fish_color_search_match '--bold' '--background=brblack'
+set -U fish_color_selection '--bold' '--background=brblack'
+set -U fish_color_status 'red'  '--bold'
+set -U fish_color_user 'bryellow'
+set -U fish_color_valid_path '--underline'
+set -U fish_pager_color_completion 'normal'
+set -U fish_pager_color_description 'bryellow'
+set -U fish_pager_color_prefix 'brcyan' '--bold'
+set -U fish_pager_color_progress 'bryellow' '--bold' '--background=black'
+set -U fish_pager_color_background
+set -U fish_pager_color_secondary_background
+set -U fish_pager_color_secondary_completion
+set -U fish_pager_color_secondary_description
+set -U fish_pager_color_secondary_prefix
+set -U fish_pager_color_selected_background
+set -U fish_pager_color_selected_completion
+set -U fish_pager_color_selected_description
+set -U fish_pager_color_selected_prefix

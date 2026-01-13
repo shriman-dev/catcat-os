@@ -186,7 +186,7 @@ format = "[$ssh_symbol](bold fg:bright-blue bg:bright-black)[$hostname]($style)"
 trim_at = "-"
 
 [directory]
-style = "fg:#a8e5ff"
+style = "fg:bright-cyan"
 read_only = "󰣮 "
 read_only_style = "bold red"
 format = "[ $path ]($style)[$read_only]($read_only_style)"

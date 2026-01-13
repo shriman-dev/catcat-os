@@ -222,11 +222,11 @@ shell_setup() {
     #/usr/bin/bat cache --build # is in profile.d
 
     # Fish shell
+    # To load fish config
+    [[ -n ${FIRSTBOOT} ]] && fish -C 'kill -9 $fish_pid' >/dev/null 2>&1
+    #
     if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
         [[ ! -d "${CONFIG}/fish/themes" ]] && mkdir -vp "${CONFIG}/fish/themes"
-        cp -vf "/usr/share/fish/tools/web_config/themes/Catppuccin Mocha.theme" \
-                "${CONFIG}/fish/themes"/ ||
-                    err "Failed to setup fish_variables"
     fi
 
     local shell_rc='

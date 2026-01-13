@@ -37,7 +37,6 @@ alias l.='eza -A1'
 alias la='eza -A  --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first'
 alias ll='eza -Al --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --octal-permissions --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
 alias lt='eza -AT --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git'
-alias bat='bat --force-colorization'
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias pscpu='procs --sortd cpu'
 alias psmem='procs --sortd rss'
@@ -206,5 +205,5 @@ abbr nethogs 'sudo nethogs -a -C -b -v 4'
 abbr bandwhich 'sudo bandwhich --processes --connections'
 
 # Help wrapper with bat
-abbr -a --position anywhere -- --help '--help | bat -pplhelp'
-abbr -a --position anywhere -- --help-all '--help-all | bat -pplhelp'
+abbr -a --position anywhere -- --help '--help | bat -fpplhelp'
+abbr -a --position anywhere -- --help-all '--help-all | bat -fpplhelp'
