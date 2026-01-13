@@ -120,7 +120,7 @@ dnscrypt() {
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    cp -dvf "${dnscrypt_tar}.extract"/*/dnscrypt-proxy /usr/bin/
+    cp -dvf "${pkg_archive}.extract"/*/dnscrypt-proxy /usr/bin/
     chmod -v +x /usr/bin/dnscrypt-proxy
 
     curl_get "/etc/dnscrypt-proxy/public-resolvers.md" \
