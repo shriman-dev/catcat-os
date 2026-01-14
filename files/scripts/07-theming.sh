@@ -90,7 +90,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
                     unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}"
                     ;;
                 *.otf|*.ttf)
-                    curl_get "${TMP_DIR}/${url_file}" "${font_url}"
+                    curl_get "${font_tmpd}/${url_file}" "${font_url}"
                     ;;
                 *.git)
                     git clone --depth 1 "${font_url}" "${font_tmpd}"
@@ -108,7 +108,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     fi
 
     log "INFO" "Building font cache"
-    # Normalize permissions to let all users use installed fonts
+    # Permit global fonts to be used by all users
     # Directories: 755, Files: 644
     if [[ -d "${FONTS_DIR}" ]]; then
         find "${FONTS_DIR}" -type d -exec chmod 755 {} + || true
@@ -117,7 +117,6 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
 
     fc-cache --system-only --really-force "${FONTS_DIR}"
     log "INFO" "Done"
-
 }
 
 install_icon_themes() {
