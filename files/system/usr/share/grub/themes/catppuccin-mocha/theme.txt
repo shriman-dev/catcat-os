@@ -2,7 +2,7 @@
 # Designed for any resolution
 
 # Global Property
-title-text: ""
+title-text: "Meow"
 desktop-image: "waves.png"
 desktop-image-scale-method: "stretch"
 desktop-color: "#1E1E2E"
@@ -12,12 +12,12 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-# set left = 47%-50 top = 35%-50 for garuda
+
 # Logo image
 + image {
-	left = 50%-50
-	top = 50%-50
-    file = "logogg.png"
+  left = 50%-50
+  top = 50%-50
+  file = "logo.png"
 }
 
 # Show the boot menu

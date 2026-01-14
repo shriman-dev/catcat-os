@@ -1,4 +1,4 @@
-name: build catcat-os
+name: build all
 
 # Build Images, ISOs and make release
 # Defines when the workflow will run

@@ -15,7 +15,7 @@ cp -vf "${BUILD_SETUP_DIR}/setup_files/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # TODO: Add secure boot signing in non ublue images
 
-# Copy the template policy.json if the file is missing or lacks a 'reject' default policy
+# Copy the template policy.json if the file is missing or lacks 'reject' default policy
 [[ ! -f "${POLICY_FILE}" ]] && cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]] &&
     cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"

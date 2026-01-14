@@ -8,16 +8,19 @@ if [[ ! -f "${firstboot_file}" ]]; then
     plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
 
     # Setup grub
-    mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes
+    mkdir -vp /boot/grub_themes && cp -drf /usr/share/grub/themes/* /boot/grub_themes/
     replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+    replace_add 'GRUB_DEFAULT=' 'GRUB_DEFAULT=saved' /etc/default/grub
+    replace_add 'GRUB_DISABLE_SUBMENU=' 'GRUB_DISABLE_SUBMENU=true' /etc/default/grub
+    replace_add 'GRUB_DISABLE_RECOVERY=' 'GRUB_DISABLE_RECOVERY=true' /etc/default/grub
     replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
-    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=console' /etc/default/grub
+    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
     replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
     replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
-    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=false' /etc/default/grub
+    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=true' /etc/default/grub
     #GRUB_TERMINAL_OUTPUT=gfxterm
     #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
-    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha-grub-theme/theme.txt"' /etc/default/grub
+    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha/theme.txt"' /etc/default/grub
 
     # Update grubup
     /usr/bin/grubup
