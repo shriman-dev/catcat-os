@@ -85,7 +85,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
 
             mkdir -vp "${font_tmpd}" "${font_dest}"
             case "${font_url}" in
-                *.zip|*.7z|*.rar|*.tar.*|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+                *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
                     curl_get "${TMP_DIR}/${url_file}" "${font_url}"
                     unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}"
                     ;;
