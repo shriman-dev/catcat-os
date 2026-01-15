@@ -342,8 +342,8 @@ if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
 else
-    dnf5 -y install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
-                    --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' \
+    #--setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' \
+    dnf5 -y install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
                     terra-release{,-extras}
 fi
 log "INFO" "Added extra repos"
