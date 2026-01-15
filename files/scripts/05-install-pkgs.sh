@@ -258,6 +258,8 @@ COMMON=(
     "nethogs"
     "tcpdump"
     "traceroute"
+    #bottom
+    "$(curl -fsS -X GET --retry 5 https://api.github.com/repos/ClementTsang/bottom/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | grep -v 'musl' | cut -d'"' -f4)"
 
     # Info Helper
     "which"
