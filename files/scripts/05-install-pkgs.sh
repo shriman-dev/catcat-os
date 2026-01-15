@@ -252,8 +252,9 @@ COMMON=(
     "++dnscrypt"
 
     # Monitoring Tools
-    "btop"
+    #"btop"
     "procs"
+    "bottom" # from terra repo
     "nethogs"
     "tcpdump"
     "traceroute"
@@ -341,8 +342,9 @@ if [[ -f /etc/yum.repos.d/terra.repo ]]; then
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra.repo
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/terra-extras.repo
 else
-    dnf5 -y install --nogpgcheck --repofrompath \
-            'terra,https://repos.fyralabs.com/terra$releasever' terra-release{,-extras}
+    dnf5 -y install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
+                    --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' \
+                    terra-release{,-extras}
 fi
 log "INFO" "Added extra repos"
 

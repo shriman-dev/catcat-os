@@ -40,6 +40,10 @@ alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias pscpu='procs --sortd cpu'
 alias psmem='procs --sortd rss'
 alias proctree='procs --tree'
+alias btm="btm --config_location $BOTTOM_CONFIG_FILE"
+alias btop='btm'
+alias htop='btm --basic'
+
 
 #function grubup
 #  if command -v update-grub
