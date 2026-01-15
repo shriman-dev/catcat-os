@@ -259,7 +259,7 @@ COMMON=(
     "tcpdump"
     "traceroute"
     #bottom
-    "$(curl -fsS -X GET --retry 5 https://api.github.com/repos/ClementTsang/bottom/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | grep -v 'musl' | cut -d'"' -f4)"
+    "$(curl_fetch https://api.github.com/repos/ClementTsang/bottom/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | grep -v 'musl' | cut -d'"' -f4)"
 
     # Info Helper
     "which"
