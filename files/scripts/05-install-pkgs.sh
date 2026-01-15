@@ -16,6 +16,7 @@ DESKTOP_EXTRAS=(
     "++hblock"
 
     # Monitoring Tools
+    #"htop"
     "s-tui"
     "wireshark"
     "++bandwhich"
