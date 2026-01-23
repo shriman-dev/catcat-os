@@ -6,7 +6,7 @@ TMP_DIR="/tmp/extra_pkgs"
 USRBIN="/usr/bin"
 USRLIBEXEC="/usr/libexec"
 
-has_multiple_items() {
+has_valid_items() {
     find "${1}" -exec bash -c \
     '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
             echo "{}"' \;
@@ -38,17 +38,17 @@ get_ghpkg() {
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    auto_fold_dir=($(has_multiple_items "${pkg_archive}.extract"))
+    auto_fold_dir=($(has_valid_items "${pkg_archive}.extract"))
     found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
-    if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
+    if [[ -z ${islibexec:-} && ${#found_executable[@]} -eq 1 ]]; then
         log "DEBUG" "Executable type: $(file -b --mime ${found_executable[0]})"
         cp -vf "${found_executable[0]}" "${USRBIN}"/
         chmod -v +x "${USRBIN}/${pkg_name}"
-    elif [[ -z ${islibexec} && ${#found_executable[@]} -gt 1 ]]; then
+    elif [[ -z ${islibexec:-} && ${#found_executable[@]} -gt 1 ]]; then
         err "More than 1 executable with same package name\n$(printf '%s\n' ${found_executable[@]})"
         return 1
-    elif [[ -n ${islibexec} ]]; then
+    elif [[ -n ${islibexec:-} ]]; then
         log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
         mkdir -vp "${USRLIBEXEC}/${pkg_name}"
         cp -dvf "${auto_fold_dir[0]}"/* "${USRLIBEXEC}/${pkg_name}"/
@@ -309,15 +309,15 @@ process_command() {
             extras
             ;;
         *)
-            die "Error: Unknown argument ${1}"
+            die "Error: Unknown package ${1}"
             ;;
     esac
 }
 
 # Process all provided arguments
-for arg in "$@"; do
-    log "INFO" "Installing and setting up: ${arg}"
-    process_command "${arg}" || exit 1
-    log "INFO" "Operation done for: ${arg}"
+for pkg in "$@"; do
+    log "INFO" "Installing and setting up: ${pkg}"
+    process_package "${pkg}" || exit 1
+    log "INFO" "Operation done for: ${pkg}"
 done
 rm -rf "${TMP_DIR}"
