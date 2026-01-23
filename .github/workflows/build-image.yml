@@ -39,6 +39,7 @@ jobs:
             BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome
 
           - IMAGE_NAME: catcat-os-mi
+            ALT_TAG: mi
             BASE_IMAGE_NAME: ghcr.io/ublue-os/silverblue-main
 
           - IMAGE_NAME: catcat-os-nv

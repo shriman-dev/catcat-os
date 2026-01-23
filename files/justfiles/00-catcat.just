@@ -2,7 +2,7 @@
 [group("utilities")]
 bios:
     #!/usr/bin/bash
-    if [ -d /sys/firmware/efi ]; then
+    if [[ -d /sys/firmware/efi ]]; then
       systemctl reboot --firmware-setup
     else
       echo "Rebooting to legacy BIOS from OS is not supported."

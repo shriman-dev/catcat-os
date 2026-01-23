@@ -256,7 +256,7 @@ check_network_connection() {
     return 1
 }
 
-curl_fetch() { curl -fsS -X GET --retry 5 "${1}"; }
+curl_fetch() { curl -fsS --retry 5 "${1}"; }
 
 curl_get() {
     if [[ ! $# -eq 2 ]]; then
@@ -264,6 +264,28 @@ curl_get() {
         return 1
     fi
     curl -fLsS --retry 5 "${2}" -o "${1}"
+}
+
+latest_ghpkg_url() {
+    local repo="${1}"
+    local include_pattern="${2}"
+    local exclude_patterns="${3:-musl}"
+    local gh_release_api="https://api.github.com/repos/${repo}/releases/${4:-latest}"
+
+    curl_fetch "${gh_release_api}" | \
+        jq -r --arg include_pattern "${include_pattern}" \
+              --arg exclude_patterns "${exclude_patterns}" \
+            '.assets[] |
+                select(.name | test($include_pattern) and
+                    (if $exclude_patterns != "" then test($exclude_patterns) | not else true end)
+                ).browser_download_url'
+}
+
+latest_ghtar_url() {
+    local repo="${1}"
+    local gh_release_api="https://api.github.com/repos/${repo}/releases/${2:-latest}"
+
+    curl_fetch "${gh_release_api}" | jq -r '.tarball_url'
 }
 
 unarchive() {

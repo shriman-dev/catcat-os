@@ -1,5 +1,7 @@
+shopt -s histappend
+export HISTCONTROL=ignoreboth
 export HISTSIZE=-1
-export HISTFILESIZE=-1
+export HISTFILESIZE="${HISTSIZE}"
 
 export LS_COLORS="$(sed '/^$/d; /^#/d' ${HOME}/.local/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach)"
 export MICRO_TRUECOLOR=1

@@ -3,7 +3,7 @@ Description=Cleanup and Maintenance of CatCat OS
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/catcat-system-maintenance
+ExecStart=/usr/libexec/catcat-maintenance
 
 [Install]
 WantedBy=multi-user.target

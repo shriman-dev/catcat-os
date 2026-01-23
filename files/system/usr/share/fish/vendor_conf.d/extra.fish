@@ -2,7 +2,7 @@ status is-interactive || exit 0
 _check_local_config
 
 # Fish command history
-function _hist
+function histr
     # Merge history merge from other fish sessions execpt private mode
     if test -z "$fish_private_mode"
         builtin history merge
@@ -30,14 +30,14 @@ function _hist
 end
 
 # Fish history sync
-function _hisync
+function hisync
     builtin history save
     builtin history merge
 end
 
-# Use hist and hisync (history sync) without saving itself into history
-abbr -a hist --position command ' _hist'
-abbr -a hisync --position command ' _hisync'
+# Use histr and hisync (history sync) without saving itself into history
+abbr -a hist --position command ' histr'
+abbr -a hisync --position command ' hisync'
 
 # Run fish functions and aliases with sudo
 function sudo --wraps sudo

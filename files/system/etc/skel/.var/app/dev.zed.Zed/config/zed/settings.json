@@ -7,9 +7,13 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+      "disable_ai": true,
+      "ui_font_weight": 250.0,
+      "buffer_font_weight": 250.0,
+      "auto_update": false,
       "autosave": "on_focus_change",
-      "ui_font_family": "Inter",
-      "ui_font_size": 20,
+      "ui_font_family": "Adwaita Sans",
+      "ui_font_size": 18.0,
       "buffer_font_family": "FiraCode Nerd Font",
       "buffer_font_size": 16,
 

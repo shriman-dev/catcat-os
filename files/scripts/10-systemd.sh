@@ -10,7 +10,7 @@ services_enable() {
         nix.mount \
         catcat-system-setup.service \
         catcat-os-update.timer \
-        catcat-system-maintenance.timer
+        catcat-maintenance.timer
 
 #dualsense-catppuccin-rainbow.service
     log "INFO" "Enabling global services"

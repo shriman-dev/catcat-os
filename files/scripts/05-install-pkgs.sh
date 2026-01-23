@@ -9,6 +9,7 @@ DESKTOP_EXTRAS=(
     ##lsd zellij
     "nu"
     "zsh"
+    "++ya"
     "++yazi"
     "++grex"
 
@@ -21,7 +22,7 @@ DESKTOP_EXTRAS=(
     "wireshark"
     "++bandwhich"
     #amdgpu_top
-    "$(curl_fetch https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d '"' -f4)"
+    "$(latest_ghpkg_url 'Umio-Yasuno/amdgpu_top' 'amdgpu_top-.*x86_64\.rpm$')"
 
     # Backup, Archive, Encryption and Compression
     ##borgbackup zsync
@@ -40,12 +41,12 @@ DESKTOP_EXTRAS=(
     "ffmpegthumbnailer"
     "kpcli"
     #watchexec
-    "$(curl_fetch https://api.github.com/repos/watchexec/watchexec/releases/latest | grep -i '"browser_download_url": "[^"]*x86_64-unknown-linux-gnu.rpm"' | cut -d'"' -f4)"
+    "$(latest_ghpkg_url 'watchexec/watchexec' 'watchexec-.*x86_64-unknown-linux-gnu\.rpm$')"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
     "buildah"
-    "++llama_cpp"
+    "++llama-cpp"
 
     # Rocm lib
     #rocm-hip
@@ -80,7 +81,7 @@ DESKTOP_EXTRAS=(
     "spice-gtk-tools"
     "swtpm"
     "swtpm-tools"
-    "++ls_iommu"
+    "++ls-iommu"
 
     # Gaming Stuff
     ##coolercontrol mfancontrol liquidctl lsfg-vk
@@ -89,14 +90,14 @@ DESKTOP_EXTRAS=(
     "openrgb"
     "openrgb-udev-rules"
     #lsfg-vk
-    #$(curl_fetch https://api.github.com/repos/PancakeTAS/lsfg-vk/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)
+    #$(latest_ghpkg_url 'PancakeTAS/lsfg-vk' 'lsfg-vk-.*x86_64\.rpm$')
 
     # Performance Tuning
     ##corectrl
     "uresourced"
     "irqbalance"
     #lact
-    #"$(curl_fetch https://api.github.com/repos/ilya-zlobintsev/LACT/releases/latest | grep -i '"browser_download_url": "[^"]*'$(rpm -E %fedora)'.rpm"' | grep -v "headless" | cut -d '"' -f4)"
+    #"$(latest_ghpkg_url 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
 
     # Extras
     "++extras"
@@ -107,7 +108,8 @@ DESKTOP_COMMON=(
     "firewall-config"
     "usbguard-notifier"
     #opensnitch
-    #$(curl_fetch https://api.github.com/repos/evilsocket/opensnitch/releases/latest | grep -i '"browser_download_url": "[^"]*.noarch.rpm"' | cut -d '"' -f4)
+    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'opensnitch-.*x86_64.rpm$')
+    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'opensnitch-ui.*noarch\.rpm$')
 
     # Monitoring Tools
     "powertop"
@@ -150,10 +152,10 @@ DESKTOP_COMMON=(
     "cbonsai"
     "cmatrix"
     "asciinema"
-    "++pipes_sh"
+    "++pipes-sh"
     "fortune-mod"
     "asciiquarium"
-    "++ascii_image_converter"
+    "++ascii-image-converter"
 
     # Dev Tools
     "git"
@@ -163,7 +165,7 @@ DESKTOP_COMMON=(
     "python3-pip"
     "inotify-tools"
     #vscodium
-    "$(curl_fetch https://api.github.com/repos/VSCodium/vscodium/releases/latest | grep -i '"browser_download_url": "[^"]*.x86_64.rpm"' | cut -d'"' -f4)"
+    "$(latest_ghpkg_url 'VSCodium/vscodium' 'codium-.*x86_64\.rpm$')"
 
     # Android Tools
     "++scrcpy"
@@ -235,7 +237,7 @@ COMMON=(
     # Shell setup
     "fish"
     #fastfetch
-    "$(curl_fetch https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep -i '"browser_download_url": "[^"]*linux-amd64.rpm"' | cut -d'"' -f4)"
+    "$(latest_ghpkg_url 'fastfetch-cli/fastfetch' 'fastfetch-linux-amd64\.rpm$')"
     "starship" # from terra repo
     "fzf"
     "bat"
@@ -249,7 +251,7 @@ COMMON=(
     "firewalld"
     "usbguard"
     "setools-console"
-    "++dnscrypt"
+    "++dnscrypt-proxy"
 
     # Monitoring Tools
     #"btop"
@@ -259,7 +261,7 @@ COMMON=(
     "tcpdump"
     "traceroute"
     #bottom
-    "$(curl_fetch https://api.github.com/repos/ClementTsang/bottom/releases/latest | grep -i '"browser_download_url": "[^"]*.rpm"' | grep -v 'musl' | cut -d'"' -f4)"
+    "$(latest_ghpkg_url 'ClementTsang/bottom' 'bottom-.*x86_64\.rpm$')"
 
     # Info Helper
     "which"
@@ -386,6 +388,9 @@ log "INFO" "Installing External Packages"
 
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
+
+[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh rtw89
 
 [[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \

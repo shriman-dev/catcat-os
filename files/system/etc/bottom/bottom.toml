@@ -155,18 +155,18 @@ columns = ["PID", "User", "Name", "CPU%", "Mem%", "GPU%", "GMem%", "R/s", "W/s",
 
 # By default, there are no disk name filters enabled. These can be turned on to filter out specific data entries if you
 # don't want to see them. An example use case is provided below.
-[disk.name_filter]
+#[disk.name_filter]
 # Whether to ignore any matches. Defaults to true.
-is_list_ignored = true
+#is_list_ignored = true
 
 # A list of filters to try and match.
-list = ["/dev/dm-*"]
+#list = ["/dev/dm-*"]
 
 # Whether to use regex. Defaults to false.
-regex = true
+#regex = true
 
 # Whether to be case-sensitive. Defaults to false.
-case_sensitive = true
+#case_sensitive = true
 
 # Whether to be require matching the whole word. Defaults to false.
 #whole_word = false

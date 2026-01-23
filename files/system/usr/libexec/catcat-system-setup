@@ -106,7 +106,7 @@ if command -v nvidia-smi; then
 fi
 
 # Enable i2c-dev support to configure monitors via ddcutil
-i2c_dev_conf="/etc/modules-load.d/load_i2c_dev.conf"
+i2c_dev_conf="/etc/modules-load.d/i2c_dev.conf"
 if [[ ! -f "${i2c_dev_conf}" ]] && command -v ddcutil; then
     echo "i2c-dev" > "${i2c_dev_conf}"
     # Enable i2c support for nvidia cards
@@ -114,6 +114,14 @@ if [[ ! -f "${i2c_dev_conf}" ]] && command -v ddcutil; then
         echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > \
                 "${i2c_dev_conf/.conf/_nvidia_support.conf}"
     fi
+fi
+
+# Disable wifi power saving for better wifi performance
+wifi_performance_conf="/etc/NetworkManager/conf.d/better-wifi-performance.conf"
+# 0 (use default), 1 (ignore/don't touch), 2 (disable) or 3 (enable).
+if [[ ! -f "${wifi_performance_conf}" ]] && hostnamectl | grep -i "Chassis:.*desktop"; then
+    echo -e "[connection]\nwifi.powersave = 2" > "${wifi_performance_conf}"
+    systemctl restart NetworkManager
 fi
 
 

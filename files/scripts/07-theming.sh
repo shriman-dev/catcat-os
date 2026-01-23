@@ -60,6 +60,9 @@ install_fonts() {
         ['SFMonoNF']="\
 https://github.com/shaunsingh/SFMono-Nerd-Font-Ligaturized.git"
 
+        ['FontAwesome']="\
+https://github.com/FortAwesome/Font-Awesome/releases/latest/download"
+
         ['NotoColorEmoji']="\
 https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     )
@@ -123,16 +126,14 @@ install_icon_themes() {
     log "INFO" "Installing icons"
 
     log "INFO" "Papirus icons"
-    local icons_repo="https://api.github.com/repos/PapirusDevelopmentTeam/papirus-icon-theme"
-    local latest_icons_url=$(curl_fetch "${icons_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    local latest_icons_url="$(latest_ghtar_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
     local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
 
-    mkdir -vp "${icons_archive}.extract"
     curl_get "${icons_archive}" "${latest_icons_url}"
     unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
     cp -drf "${icons_archive}.extract"/Papirus*/Papirus* /usr/share/icons/
-    rm -rf "${icons_archive}"*
 
+    rm -rf /tmp/icons
     log "INFO" "Icons installed"
 }
 
@@ -140,11 +141,9 @@ install_gtk_themes() {
     log "INFO" "Installing GTK theme(s)"
     # Lavanda-gtk-theme
     log "INFO" "Lavanda-gtk-theme"
-    local lavanda_theme_repo="https://api.github.com/repos/vinceliuice/Lavanda-gtk-theme"
-    local latest_lavanda_url=$(curl_fetch "${lavanda_theme_repo}/releases/latest" | grep -i '"tarball_url"' | cut -d '"' -f4)
+    local latest_lavanda_url="$(latest_ghtar_url 'vinceliuice/Lavanda-gtk-theme')"
     local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
 
-    mkdir -vp "${lavanda_tar}.extract"
     curl_get "${lavanda_tar}" "${latest_lavanda_url}"
     unarchive "${lavanda_tar}" "${lavanda_tar}.extract" >/dev/null
 
