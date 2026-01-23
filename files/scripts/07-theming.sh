@@ -72,7 +72,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
         local FONTS_DIR="/usr/share/fonts"
         local TMP_DIR="/tmp/extra_fonts"
         local nf_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
-        local font_name font_url url_file font_file font_dest font_tmpd
+        local font_name font_url url_file font_dest font_tmpd fontfile
         for font_name in "${!EXTRA_FONTS[@]}"; do
             font_url="${EXTRA_FONTS[$font_name]}"
             font_name=${font_name// /} # remove spaces
@@ -90,7 +90,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
             case "${font_url}" in
                 *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
                     curl_get "${TMP_DIR}/${url_file}" "${font_url}"
-                    unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}"
+                    unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}" >/dev/null
                     ;;
                 *.otf|*.ttf)
                     curl_get "${font_tmpd}/${url_file}" "${font_url}"
@@ -102,8 +102,8 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
                     err "Unsupported URL: ${font_url}" && return 1
                     ;;
             esac
-            for font_file in $(find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf"); do
-                cp -vf "${font_file}" "${font_dest}"/
+            find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf" | while read -r fontfile; do
+                cp -vf "${fontfile}" "${font_dest}"/
             done
         done
         rm -rf "${TMP_DIR}"
