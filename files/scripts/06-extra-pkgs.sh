@@ -23,7 +23,7 @@ get_ghpkg() {
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
 
-    mkdir -vp "$(basename ${pkg_archive})"
+    mkdir -vp "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
