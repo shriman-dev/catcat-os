@@ -61,7 +61,7 @@ install_fonts() {
 https://github.com/shaunsingh/SFMono-Nerd-Font-Ligaturized.git"
 
         ['FontAwesome']="\
-https://github.com/FortAwesome/Font-Awesome/releases/latest/download"
+$(latest_ghpkg_url 'FortAwesome/Font-Awesome' 'desktop\.zip')"
 
         ['NotoColorEmoji']="\
 https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
@@ -129,6 +129,7 @@ install_icon_themes() {
     local latest_icons_url="$(latest_ghtar_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
     local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
 
+    mkdir -vp "$(dirname ${icons_archive})"
     curl_get "${icons_archive}" "${latest_icons_url}"
     unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
     cp -drf "${icons_archive}.extract"/Papirus*/Papirus* /usr/share/icons/
@@ -144,6 +145,7 @@ install_gtk_themes() {
     local latest_lavanda_url="$(latest_ghtar_url 'vinceliuice/Lavanda-gtk-theme')"
     local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
 
+    mkdir -vp "$(dirname ${lavanda_tar})"
     curl_get "${lavanda_tar}" "${latest_lavanda_url}"
     unarchive "${lavanda_tar}" "${lavanda_tar}.extract" >/dev/null
 

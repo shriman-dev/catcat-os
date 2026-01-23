@@ -9,7 +9,6 @@ DESKTOP_EXTRAS=(
     ##lsd zellij
     "nu"
     "zsh"
-    "++ya"
     "++yazi"
     "++grex"
 
@@ -223,6 +222,10 @@ DESKTOP_COMMON=(
     "pam_yubico"
     "pamu2fcfg"
     "yubikey-manager"
+
+    # Build deps
+    "make"
+    "gcc"
 
     # Needed Deps
     "yad"

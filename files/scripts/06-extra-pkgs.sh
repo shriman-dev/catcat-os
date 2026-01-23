@@ -42,7 +42,7 @@ get_ghpkg() {
     found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
     if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable type: $(file -b --mime ${found_executable[0]})"
+        log "DEBUG" "Executable: ${pkg_name} | Mime type: $(file -b --mime ${found_executable[0]})"
         cp -vf "${found_executable[0]}" "${USRBIN}"/
         chmod -v +x "${USRBIN}/${pkg_name}"
     elif [[ -z ${islibexec} && ${#found_executable[@]} -gt 1 ]]; then
@@ -159,7 +159,8 @@ ujust_setup() {
     if [[ -f "${import_file}" ]]; then
         mkdir -vp ${import_dir}
         local justfile import_line
-        for justfile in ${justfile_dir}/*.just ${fetched_justfiles}/*.just; do
+        for justfile in $(ls -A1 ${fetched_justfiles}/*.just | tac) \
+                        $(ls -A1 ${justfile_dir}/*.just | tac); do
             # Copy justfiles to ujust default directory
             cp -dvf "${justfile}" ${import_dir}/
             # Add import line if it does not exists already
@@ -200,6 +201,7 @@ rtw89() {
 
     cd /tmp/rtw89
 
+    dnf5 -y install make gcc kernel-headers
     make clean modules && make install
     make install_fw
     cp -vf rtw89.conf /etc/modprobe.d/
@@ -234,9 +236,11 @@ process_package() {
             get_ghpkg --name "${1}" --repo "pemistahl/grex" \
                       --regx 'x86_64-unknown-linux-musl\.tar\.gz&' --negx '~~'
             ;;
-        yazi|ya)
+        yazi)
             get_ghpkg --name "${1}" --repo "sxyazi/yazi" \
                       --regx 'x86_64-unknown-linux-gnu\.zip$'
+            cp -vf "${auto_fold_dir[0]}/ya" "${USRBIN}"/
+            chmod -v +x "${USRBIN}/ya"
             cp -vf "${auto_fold_dir[0]}/completions"/{ya,yazi}.bash \
                     /usr/share/bash-completion/completions/
             cp -vf "${auto_fold_dir[0]}/completions"/{ya,yazi}.fish \
@@ -245,7 +249,6 @@ process_package() {
         dnscrypt-proxy)
             get_ghpkg --name "${1}" --repo "DNSCrypt/dnscrypt-proxy" \
                       --regx 'linux_x86_64-.*\.tar\.gz$'
-
             get_ghraw --dstd "/etc/dnscrypt-proxy" --repo "DNSCrypt/dnscrypt-resolvers" \
                       --repod "v3" --flist "public-resolvers.md" "public-resolvers.md.minisig"
             ;;
@@ -317,7 +320,7 @@ process_package() {
 # Process all provided arguments
 for pkg in "$@"; do
     log "INFO" "Installing and setting up: ${pkg}"
-    process_package "${pkg}" || exit 1
+    process_package "${pkg}"
     log "INFO" "Operation done for: ${pkg}"
 done
 rm -rf "${TMP_DIR}"
