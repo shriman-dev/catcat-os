@@ -220,7 +220,7 @@ extras() {
               --repod "assets" -f "logo.png"
 }
 
-process_command() {
+process_package() {
     case "${1}" in
         eza)
             get_ghpkg --name "${1}" --repo "eza-community/eza" \
