@@ -19,7 +19,7 @@ find_executables() {
 }
 
 get_ghpkg() {
-    local pkg_name pkg_repo pkg_regx pkg_negx islibexec
+    local pkg_name pkg_repo pkg_regx pkg_negx="" islibexec=""
     while [[ $# -gt 0 ]]; do
         case ${1} in
             --name)    pkg_name="${2}"; shift ;;
@@ -31,7 +31,7 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "$(dirname ${pkg_archive})"
@@ -41,14 +41,14 @@ get_ghpkg() {
     auto_fold_dir=($(has_valid_items "${pkg_archive}.extract"))
     found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
-    if [[ -z ${islibexec:-} && ${#found_executable[@]} -eq 1 ]]; then
+    if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
         log "DEBUG" "Executable type: $(file -b --mime ${found_executable[0]})"
         cp -vf "${found_executable[0]}" "${USRBIN}"/
         chmod -v +x "${USRBIN}/${pkg_name}"
-    elif [[ -z ${islibexec:-} && ${#found_executable[@]} -gt 1 ]]; then
+    elif [[ -z ${islibexec} && ${#found_executable[@]} -gt 1 ]]; then
         err "More than 1 executable with same package name\n$(printf '%s\n' ${found_executable[@]})"
         return 1
-    elif [[ -n ${islibexec:-} ]]; then
+    elif [[ -n ${islibexec} ]]; then
         log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
         mkdir -vp "${USRLIBEXEC}/${pkg_name}"
         cp -dvf "${auto_fold_dir[0]}"/* "${USRLIBEXEC}/${pkg_name}"/
@@ -56,7 +56,7 @@ get_ghpkg() {
 }
 
 get_ghraw() {
-    local destfile dest_dir repo_raw repo_dir ffile
+    local destfile="" dest_dir="" repo_raw="" repo_dir="" ffile
     while [[ $# -gt 0 ]]; do
         case ${1} in
             --dstf)  destfile="${2}"; shift 2 ;;
