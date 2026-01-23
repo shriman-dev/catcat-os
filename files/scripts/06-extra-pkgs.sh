@@ -6,6 +6,18 @@ TMP_DIR="/tmp/extra_pkgs"
 USRBIN="/usr/bin"
 USRLIBEXEC="/usr/libexec"
 
+has_multiple_items() {
+    find "${1}" -exec bash -c \
+    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
+            echo "{}"' \;
+}
+
+find_executables() {
+    local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
+    find "${1}" -type f -exec file --mime '{}' \; | \
+            grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"
+}
+
 get_ghpkg() {
     local pkg_name pkg_repo pkg_regx pkg_negx islibexec
     while [[ $# -gt 0 ]]; do
@@ -21,16 +33,13 @@ get_ghpkg() {
     done
     local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-})"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
-    local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
 
     mkdir -vp "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    auto_fold_dir=($(find "${pkg_archive}.extract" -type d \
-                            -exec bash -c '[[ $(ls -A "{}" | wc -l) -gt 1 ]] && echo "{}"' \;))
-    found_executable=($(find "${auto_fold_dir[0]}" -type f -exec file --mime '{}' \; | \
-                                grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${pkg_name}\$"))
+    auto_fold_dir=($(has_multiple_items "${pkg_archive}.extract"))
+    found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
     if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
         log "DEBUG" "Executable type: $(file -b --mime ${found_executable[0]})"
