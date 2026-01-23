@@ -19,7 +19,7 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-})"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
 
