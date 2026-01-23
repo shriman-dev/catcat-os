@@ -185,7 +185,7 @@ waydroid_setup() {
 #    /usr/libexec/waydroid-fix-controllers
 #    /usr/share/applications/waydroid-container-restart.desktop
 #    /etc/default/waydroid-launcher
-    get_ghraw --dstd "${USRBIN}" --repo "bazzite-org/waydroid-scripts" \
+    get_ghraw --dstd "${USRBIN}" --repo "ublue-os/waydroid-scripts" \
               -f "waydroid-choose-gpu.sh"
     chmod -v +x "${USRBIN}/waydroid-choose-gpu.sh"
 
@@ -197,7 +197,7 @@ waydroid_setup() {
 }
 
 rtw89() {
-    git clone https://github.com/morrownr/rtw89 /tmp/rtw89
+    git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
 
     cd /tmp/rtw89
 
