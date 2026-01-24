@@ -124,9 +124,11 @@ waydroid_setup() {
 }
 
 wldrivers() {
+    local ker="$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
     git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
 
-    sed -i "s|\`uname -r\`|$(rpm -q --queryformat="%{evr}.%{arch}" kernel)|" \
+    dnf5 -y install "kernel-headers" "kernel-devel-${ker}"
+    sed -i "s|\`uname -r\`|${ker}|" \
                 /tmp/rtw89/Makefile
 
     cd /tmp/rtw89
@@ -134,6 +136,8 @@ wldrivers() {
     make install_fw &&
     cp -vf rtw89.conf /etc/modprobe.d/
     cd -
+
+    dnf5 -y remove "kernel-headers" "kernel-devel-${ker}"
     rm -rf /tmp/rtw89
 }
 
