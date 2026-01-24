@@ -127,7 +127,7 @@ wldrivers() {
     local ker="$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
     git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
 
-    dnf5 -y install "kernel-headers" "kernel-devel-${ker}"
+    dnf5 -y install make gcc kernel-headers "kernel-devel-${ker}"
     sed -i "s|\`uname -r\`|${ker}|" \
                 /tmp/rtw89/Makefile
 
@@ -137,7 +137,7 @@ wldrivers() {
     cp -vf rtw89.conf /etc/modprobe.d/
     cd -
 
-    dnf5 -y remove "kernel-headers" "kernel-devel-${ker}"
+    dnf5 -y remove make gcc kernel-headers "kernel-devel-${ker}"
     rm -rf /tmp/rtw89
 }
 
