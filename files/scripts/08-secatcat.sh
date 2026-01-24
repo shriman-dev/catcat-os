@@ -6,9 +6,9 @@ check_file_inplace() {
     local _file
     for _file in "$@"; do
         if [[ -f "${_file}" ]]; then
-             log "DEBUG" "File is in place: ${_file}"
+            log "DEBUG" "File is in place: ${_file}"
         else
-            err "File does not exist in place: ${_file}" && return 1
+            die "File does not exist in place: ${_file}"
         fi
     done
 }

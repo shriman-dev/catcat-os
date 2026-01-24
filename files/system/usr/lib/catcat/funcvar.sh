@@ -258,13 +258,7 @@ check_network_connection() {
 
 curl_fetch() { curl -fsS --retry 5 "${1}"; }
 
-curl_get() {
-    if [[ ! $# -eq 2 ]]; then
-        { err "Specify URL and local file path"; } 2>/dev/null
-        return 1
-    fi
-    curl -fLsS --retry 5 "${2}" -o "${1}"
-}
+curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
     local repo="${1}"
@@ -290,25 +284,18 @@ latest_ghtar_url() {
 
 unarchive() {
     local archive="${1}" dest="${2}"
-    if [[ ! $# -eq 2 ]]; then
-        { err "Specify paths to archive and destination"; } 2>/dev/null
-        return 1
-    fi
+    [[ ! $# -eq 2 ]] && die "Specify paths to archive and destination"
 
     [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
 
     case "${archive}" in
-        *.zip)
+        *.zip|*.ZIP)
             { log "DEBUG" "Extracting ZIP archive in: ${dest}"; } 2>/dev/null
             unzip "${archive}" -d "${dest}"
             ;;
         *.7z)
-            { log "DEBUG" "Extracting 7-ZIP archive in: ${dest}"; } 2>/dev/null
+            { log "DEBUG" "Extracting 7Z archive in: ${dest}"; } 2>/dev/null
             7z x -o"${dest}" "${archive}"
-            ;;
-        *.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-            { log "DEBUG" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
-            tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
             ;;
         *.rar)
             { log "DEBUG" "Extracting RAR archive in: ${dest}"; } 2>/dev/null
@@ -316,8 +303,12 @@ unarchive() {
             unrar x "${archive}"
             cd -
             ;;
+        *.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+            { log "DEBUG" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
+            tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
+            ;;
         *)
-            err "Unknown archive file: ${archive}" && return 1
+            die "Unknown archive file: ${archive}"
             ;;
     esac
 }

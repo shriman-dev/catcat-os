@@ -7,15 +7,25 @@ USRBIN="/usr/bin"
 USRLIBEXEC="/usr/libexec"
 
 populated_or_afile_dirs() {
-    find "${1}" -exec bash -c \
+    find "${1}" -type d -exec bash -c \
     '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
             echo "{}"' \;
 }
 
-find_executables() {
+place_executable() {
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
-    find "${1}" -type f -exec file --mime '{}' \; | \
-            grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"
+    local found_executables=($(find "${1}" -type f -exec file --mime '{}' \; | \
+                                    grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"))
+
+    if [[ ${#found_executable[@]} -eq 1 ]]; then
+        log "DEBUG" "Executable: ${2} | Mime type: $(file -b --mime ${found_executable[0]})"
+        cp -vf "${found_executable[0]}" "${USRBIN}"/
+        chmod -v +x "${USRBIN}/${2}"
+    elif [[ ${#found_executable[@]} -gt 1 ]]; then
+        die "More than 1 executable with same package name\n$(printf '%s\n' ${found_executable[@]})"
+    else
+        die "No executable found: ${2}"
+    fi
 }
 
 get_ghpkg() {
@@ -39,15 +49,9 @@ get_ghpkg() {
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
-    found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
-    if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable: ${pkg_name} | Mime type: $(file -b --mime ${found_executable[0]})"
-        cp -vf "${found_executable[0]}" "${USRBIN}"/
-        chmod -v +x "${USRBIN}/${pkg_name}"
-    elif [[ -z ${islibexec} && ${#found_executable[@]} -gt 1 ]]; then
-        err "More than 1 executable with same package name\n$(printf '%s\n' ${found_executable[@]})"
-        return 1
+    if [[ -z ${islibexec} ]]; then
+        place_executable "${auto_fold_dir[0]}" "${pkg_name}"
     elif [[ -n ${islibexec} ]]; then
         log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
         mkdir -vp "${USRLIBEXEC}/${pkg_name}"
@@ -205,8 +209,9 @@ rtw89() {
     ls -Al /lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/
     sed -i "s|\`uname -r\`|$(rpm -q --queryformat="%{evr}.%{arch}" kernel)|" \
                 /tmp/rtw89/Makefile
-    make clean modules && make install
-    make install_fw
+    sed -i 's|$(MAKE).*-C $(KDIR)|$(MAKE) -C $(KDIR)/|' /tmp/rtw89/Makefile
+    make clean modules && make install &&
+    make install_fw &&
     cp -vf rtw89.conf /etc/modprobe.d/
 
     cd -
@@ -242,8 +247,7 @@ process_package() {
         yazi)
             get_ghpkg --name "${1}" --repo "sxyazi/yazi" \
                       --regx 'x86_64-unknown-linux-gnu\.zip$'
-            cp -vf "${auto_fold_dir[0]}/ya" "${USRBIN}"/
-            chmod -v +x "${USRBIN}/ya"
+            place_executable "${auto_fold_dir[0]}" "ya"
             cp -vf "${auto_fold_dir[0]}/completions"/{ya,yazi}.bash \
                     /usr/share/bash-completion/completions/
             cp -vf "${auto_fold_dir[0]}/completions"/{ya,yazi}.fish \
