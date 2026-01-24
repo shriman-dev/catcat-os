@@ -312,7 +312,7 @@ COMMON=(
     "sbsigntools" # tools to add signatures to efi binaries and drivers
     "wireguard-tools"
     "kernel-headers"
-    "kernel-devel-$(uname -r)"
+    "kernel-devel-$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
     "kernel-devel-matched"
     "fwupd"
     "fwupd-plugin-flashrom"
