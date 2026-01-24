@@ -320,7 +320,7 @@ place_executable() {
                                     grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"))
 
     if [[ ${#found_executables[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable: ${2} | Mime type: $(file -b --mime ${found_executables[0]})"
+        log "DEBUG" "Executable: ${2} | Mimetype: $(file -b --mime ${found_executables[0]})"
         cp -vf "${found_executables[0]}" "${USRBIN}"/
         chmod -v +x "${USRBIN}/${2}"
     elif [[ ${#found_executables[@]} -gt 1 ]]; then

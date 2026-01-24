@@ -125,7 +125,7 @@ waydroid_setup() {
 
 wldrivers() {
     # Make space for rtw89 drivers in kernel extra
-    mkdir -vp "/usr/lib/firmware"
+    mv -v "/usr/lib/firmware/rtw89" "/usr/lib/firmware/rtw89.bak"
     mkdir -vp "/usr/lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/extra"
     ln -svf "/usr/local/lib/firmware/rtw89" "/usr/lib/firmware/rtw89"
     ln -svf "/usr/local/lib/modules/catcat-kernel/extra/rtw89" \
