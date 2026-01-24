@@ -71,10 +71,10 @@ get_ghraw() {
     local branch="$(curl_fetch ${gh_api} | jq -r '.default_branch')"
     local raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
 
-    [[ ! -d "${dest_dir}" ]] && mkdir -vp "${dest_dir}"
+    [[ -n "${dest_dir}" && ! -d "${dest_dir}" ]] && mkdir -vp "${dest_dir}"
     for ffile in "$@"; do
         local dest_path="${dest_dir}/${ffile}"
-        [[ -n ${destfile} ]] && dest_path="${destfile}"
+        [[ -n "${destfile}" ]] && dest_path="${destfile}"
         curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
     done
 }

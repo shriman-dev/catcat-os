@@ -2,6 +2,9 @@
 source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
+[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh rtw89
+
 log "INFO" "Defining packages"
 
 DESKTOP_EXTRAS=(
@@ -391,9 +394,6 @@ log "INFO" "Installing External Packages"
 
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
-
-[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh rtw89
 
 [[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
     exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
