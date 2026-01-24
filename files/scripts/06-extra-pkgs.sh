@@ -202,7 +202,8 @@ rtw89() {
     cd /tmp/rtw89
 
     dnf5 -y install make gcc kernel-headers
-    sed -i "s|\`uname -r\`|'$(rpm -q --queryformat="%{evr}.%{arch}" kernel)'|" \
+    ls -Al /lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/
+    sed -i "s|\`uname -r\`|$(rpm -q --queryformat="%{evr}.%{arch}" kernel)|" \
                 /tmp/rtw89/Makefile
     make clean modules && make install
     make install_fw
@@ -236,7 +237,7 @@ process_package() {
             ;;
         grex)
             get_ghpkg --name "${1}" --repo "pemistahl/grex" \
-                      --regx 'x86_64-unknown-linux-musl\.tar\.gz&' --negx '~~'
+                      --regx 'x86_64-unknown-linux-musl\.tar\.gz$' --negx '~~'
             ;;
         yazi)
             get_ghpkg --name "${1}" --repo "sxyazi/yazi" \
