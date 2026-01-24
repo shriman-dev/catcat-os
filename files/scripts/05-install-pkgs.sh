@@ -310,7 +310,6 @@ COMMON=(
     "openssl"
     "lsb_release"
     "sbsigntools" # tools to add signatures to efi binaries and drivers
-    "++wldrivers"
     "wireguard-tools"
     "kernel-devel"
     "kernel-headers"
@@ -391,6 +390,9 @@ log "INFO" "Disabled unneeded repos"
 
 
 log "INFO" "Installing External Packages"
+
+[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
+    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh wldrivers
 
 exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')

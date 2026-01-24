@@ -124,12 +124,17 @@ waydroid_setup() {
 }
 
 wldrivers() {
-    # Make space for rtw89 drivers in kernel extra
-    mv -v "/usr/lib/firmware/rtw89" "/usr/lib/firmware/rtw89.bak"
-    mkdir -vp "/usr/lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/extra"
-    ln -svf "/usr/local/lib/firmware/rtw89" "/usr/lib/firmware/rtw89"
-    ln -svf "/usr/local/lib/modules/catcat-kernel/extra/rtw89" \
-            "/usr/lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/extra/rtw89"
+    git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
+
+    sed -i "s|\`uname -r\`|$(rpm -q --queryformat="%{evr}.%{arch}" kernel)|" \
+                /tmp/rtw89/Makefile
+
+    cd /tmp/rtw89
+    make clean modules && make install &&
+    make install_fw &&
+    cp -vf rtw89.conf /etc/modprobe.d/
+    cd -
+    rm -rf /tmp/rtw89
 }
 
 extras() {
