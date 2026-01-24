@@ -69,21 +69,16 @@ die() {
 
 err() { log "ERROR" "${1}"; return 1; }
 
-
-########
 ## Function to generate a choice selection and return the selected choice
-########
 # CHOICE=$(Choice option1 option2 "option 3")
 # *user selects "option 3"*
 # echo "$CHOICE" will return "option 3"
 function Choose (){
-    CHOICE=$(ugum choose "$@")
+    local CHOICE=$(ugum choose "$@")
     echo "$CHOICE"
 }
 
-########
 ## Function to generate a confirm dialog and return the selected choice
-########
 # CHOICE=$(Confirm "Are you sure you want to do this?")
 # *user selects "No"*
 # echo "$CHOICE" will return "1"
@@ -101,14 +96,14 @@ function Confirm (){
 # bgblue=$(Bg "$blue")
 # echo "${bgblue}text now has blue background${normal} this text has no background color"
 function Bg (){
-    COLOR="${1}"
+    local COLOR="${1}"
     echo "${COLOR}" | sed -E 's/\[3([0-8]{1,1})/\[4\1/'
 }
 
 # Function to generate a clickable link, you can call this using
 function Urllink (){
-    URL="${1}"
-    TEXT="${2}"
+    local URL="${1}"
+    local TEXT="${2}"
     # Generate a clickable hyperlink
     printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
 }
@@ -142,16 +137,6 @@ enclosed_heading() {
     echo "${border}"
 }
 
-# Quiet mode handling function
-_quiet_exec() {
-    local cmd="$@"
-    if [[ ${QUIET} == true ]]; then
-        ${cmd} >/dev/null
-    else
-        ${cmd}
-    fi
-}
-
 need_root() {
     [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
 }
@@ -160,6 +145,16 @@ exit_if_root() {
     [[ $(id -u) -eq 0 ]] && die "Cannot run as root"
     [[ $(id -un) == "gdm" ]] && die "Cannot run as gdm user"
     [[ "${HOME}" =~ (/run/gdm|/var/lib/gdm) ]] && die "Cannot run as gdm user"
+}
+
+# Quiet mode handling function
+_quiet_exec() {
+    local cmd="$@"
+    if [[ ${QUIET} == true ]]; then
+        ${cmd} >/dev/null
+    else
+        ${cmd}
+    fi
 }
 
 run_as_users() {
@@ -192,6 +187,35 @@ notify_users() {
     fi
 }
 
+bak_before() {
+    if [[ ! -e ${1}.og.bak ]]; then
+        cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
+    fi
+    cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
+}
+
+populated_or_afile_dirs() {
+    find "${1}" -type d -exec bash -c \
+    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
+            echo "{}"' \;
+}
+
+# Check if a file is older than a specified number of seconds
+is_file_older() {
+    local max_age_seconds="${1}"
+    local path="${2}"
+    [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
+}
+
+replace_add() {
+    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+}
+
+one_filesystem() {
+    [[ $# -eq 2 ]] || die "Specify two paths to check filesystem"
+    [[ $(stat -L -c %d ${1}) -eq $(stat -L -c %d ${2}) ]]
+}
+
 validate_path() {
     local path fs_check
     [[ $# -eq 0 ]] && die "No path provided to validate"
@@ -210,29 +234,6 @@ validate_path() {
                 die "Path is not on ${fs_check} filesystem: ${path}"
         fi
     done
-}
-
-one_filesystem() {
-    [[ $# -eq 2 ]] || die "Specify two paths to check filesystem"
-    [[ $(stat -L -c %d ${1}) -eq $(stat -L -c %d ${2}) ]]
-}
-
-# Check if a file is older than a specified number of seconds
-is_file_older() {
-    local max_age_seconds="${1}"
-    local path="${2}"
-    [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
-}
-
-bak_before() {
-    if [[ ! -e ${1}.og.bak ]]; then
-        cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
-    fi
-    cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
-}
-
-replace_add() {
-    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
 }
 
 is_network_metered() {
@@ -311,4 +312,75 @@ unarchive() {
             die "Unknown archive file: ${archive}"
             ;;
     esac
+}
+
+place_executable() {
+    local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
+    local found_executables=($(find "${1}" -type f -exec file --mime '{}' \; | \
+                                    grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"))
+
+    if [[ ${#found_executables[@]} -eq 1 ]]; then
+        log "DEBUG" "Executable: ${2} | Mime type: $(file -b --mime ${found_executables[0]})"
+        cp -vf "${found_executables[0]}" "${USRBIN}"/
+        chmod -v +x "${USRBIN}/${2}"
+    elif [[ ${#found_executables[@]} -gt 1 ]]; then
+        die "More than 1 executable with same name\n$(printf '%s\n' ${found_executables[@]})"
+    else
+        die "No executable found: ${2}"
+    fi
+}
+
+get_ghpkg() {
+    local pkg_name pkg_repo pkg_regx pkg_negx="" islibexec=""
+    while [[ $# -gt 0 ]]; do
+        case ${1} in
+            --name)    pkg_name="${2}"; shift ;;
+            --repo)    pkg_repo="${2}"; shift ;;
+            --regx)    pkg_regx="${2}"; shift ;;
+            --negx)    pkg_negx="${2}"; shift ;; # exclusion regx
+            --libexec) islibexec=1 ;;
+            *)         die "Unknown option: ${1}" ;;
+        esac
+        shift
+    done
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
+    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+
+    mkdir -vp "$(dirname ${pkg_archive})"
+    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    unarchive "${pkg_archive}" "${pkg_archive}.extract"
+
+    auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
+
+    if [[ -z ${islibexec} ]]; then
+        place_executable "${auto_fold_dir[0]}" "${pkg_name}"
+    elif [[ -n ${islibexec} ]]; then
+        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
+        mkdir -vp "${USRLIBEXEC}/${pkg_name}"
+        cp -dvf "${auto_fold_dir[0]}"/* "${USRLIBEXEC}/${pkg_name}"/
+    fi
+}
+
+get_ghraw() {
+    local destfile="" dest_dir="" repo_raw="" repo_dir="" ffile
+    while [[ $# -gt 0 ]]; do
+        case ${1} in
+            --dstf)  destfile="${2}"; shift 2 ;;
+            --dstd)  dest_dir="${2}"; shift 2 ;;
+            --repo)  repo_raw="${2}"; shift 2 ;;
+            --repod) repo_dir="${2}"; shift 2 ;;
+            -f|--flist) shift; break ;; # file or list of files to fetch
+            *)       die "Unknown option: ${1}" ;;
+        esac
+    done
+    local gh_api="https://api.github.com/repos/${repo_raw}"
+    local branch="$(curl_fetch ${gh_api} | jq -r '.default_branch')"
+    local raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
+
+    [[ -n "${dest_dir}" && ! -d "${dest_dir}" ]] && mkdir -vp "${dest_dir}"
+    for ffile in "$@"; do
+        local dest_path="${dest_dir}/${ffile}"
+        [[ -n "${destfile}" ]] && dest_path="${destfile}"
+        curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
+    done
 }

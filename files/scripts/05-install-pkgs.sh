@@ -2,17 +2,12 @@
 source ${BUILD_SCRIPT_LIB}
 set -ouex pipefail
 
-[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh rtw89
-
 log "INFO" "Defining packages"
 
 DESKTOP_EXTRAS=(
     # Shell setup
     ##lsd zellij
     "nu"
-    "zsh"
-    "++yazi"
     "++grex"
 
     # Secure
@@ -241,6 +236,7 @@ DESKTOP_COMMON=(
 
 COMMON=(
     # Shell setup
+    "zsh"
     "fish"
     #fastfetch
     "$(latest_ghpkg_url 'fastfetch-cli/fastfetch' 'fastfetch-linux-amd64\.rpm$')"
@@ -249,6 +245,7 @@ COMMON=(
     "bat"
     "++eza"
     "zoxide"
+    "++yazi"
     "ripgrep"
     "fd-find"
     "tmux"
@@ -313,6 +310,7 @@ COMMON=(
     "openssl"
     "lsb_release"
     "sbsigntools" # tools to add signatures to efi binaries and drivers
+    "++wldrivers"
     "wireguard-tools"
     "fwupd"
     "fwupd-plugin-flashrom"

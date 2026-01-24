@@ -6,83 +6,6 @@ TMP_DIR="/tmp/extra_pkgs"
 USRBIN="/usr/bin"
 USRLIBEXEC="/usr/libexec"
 
-populated_or_afile_dirs() {
-    find "${1}" -type d -exec bash -c \
-    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
-            echo "{}"' \;
-}
-
-place_executable() {
-    local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
-    local found_executables=($(find "${1}" -type f -exec file --mime '{}' \; | \
-                                    grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"))
-
-    if [[ ${#found_executable[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable: ${2} | Mime type: $(file -b --mime ${found_executable[0]})"
-        cp -vf "${found_executable[0]}" "${USRBIN}"/
-        chmod -v +x "${USRBIN}/${2}"
-    elif [[ ${#found_executable[@]} -gt 1 ]]; then
-        die "More than 1 executable with same package name\n$(printf '%s\n' ${found_executable[@]})"
-    else
-        die "No executable found: ${2}"
-    fi
-}
-
-get_ghpkg() {
-    local pkg_name pkg_repo pkg_regx pkg_negx="" islibexec=""
-    while [[ $# -gt 0 ]]; do
-        case ${1} in
-            --name)    pkg_name="${2}"; shift ;;
-            --repo)    pkg_repo="${2}"; shift ;;
-            --regx)    pkg_regx="${2}"; shift ;;
-            --negx)    pkg_negx="${2}"; shift ;; # exclusion regx
-            --libexec) islibexec=1 ;;
-            *)         die "Unknown option: ${1}" ;;
-        esac
-        shift
-    done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
-    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
-
-    mkdir -vp "$(dirname ${pkg_archive})"
-    curl_get "${pkg_archive}" "${latest_pkg_url}"
-    unarchive "${pkg_archive}" "${pkg_archive}.extract"
-
-    auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
-
-    if [[ -z ${islibexec} ]]; then
-        place_executable "${auto_fold_dir[0]}" "${pkg_name}"
-    elif [[ -n ${islibexec} ]]; then
-        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
-        mkdir -vp "${USRLIBEXEC}/${pkg_name}"
-        cp -dvf "${auto_fold_dir[0]}"/* "${USRLIBEXEC}/${pkg_name}"/
-    fi
-}
-
-get_ghraw() {
-    local destfile="" dest_dir="" repo_raw="" repo_dir="" ffile
-    while [[ $# -gt 0 ]]; do
-        case ${1} in
-            --dstf)  destfile="${2}"; shift 2 ;;
-            --dstd)  dest_dir="${2}"; shift 2 ;;
-            --repo)  repo_raw="${2}"; shift 2 ;;
-            --repod) repo_dir="${2}"; shift 2 ;;
-            -f|--flist) shift; break ;; # file or list of files to fetch
-            *)       die "Unknown option: ${1}" ;;
-        esac
-    done
-    local gh_api="https://api.github.com/repos/${repo_raw}"
-    local branch="$(curl_fetch ${gh_api} | jq -r '.default_branch')"
-    local raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
-
-    [[ -n "${dest_dir}" && ! -d "${dest_dir}" ]] && mkdir -vp "${dest_dir}"
-    for ffile in "$@"; do
-        local dest_path="${dest_dir}/${ffile}"
-        [[ -n "${destfile}" ]] && dest_path="${destfile}"
-        curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
-    done
-}
-
 ujust_setup() {
     local import_dir="/usr/share/ublue-os/just"
     local import_file="${import_dir}file"
@@ -200,22 +123,10 @@ waydroid_setup() {
     systemctl disable waydroid-container.service
 }
 
-rtw89() {
-    git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
-
-    cd /tmp/rtw89
-
-    dnf5 -y install make gcc kernel-headers
-    ls -Al /lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/
-    sed -i "s|\`uname -r\`|$(rpm -q --queryformat="%{evr}.%{arch}" kernel)|" \
-                /tmp/rtw89/Makefile
-    sed -i 's|$(MAKE).*-C $(KDIR)|$(MAKE) -C $(KDIR)/|' /tmp/rtw89/Makefile
-    make clean modules && make install &&
-    make install_fw &&
-    cp -vf rtw89.conf /etc/modprobe.d/
-
-    cd -
-    rm -rf /tmp/rtw89
+wldrivers() {
+    # Make space for rtw89 drivers in kernel extra
+    ln -svf "/usr/local/lib/modules/kernel/extra/rtw89" \
+            "/usr/lib/modules/$(rpm -q --queryformat='%{evr}.%{arch}' kernel)/extra/rtw89"
 }
 
 extras() {
@@ -312,8 +223,8 @@ process_package() {
         waydroid_setup)
             waydroid_setup
             ;;
-        rtw89)
-            rtw89
+        wldrivers)
+            wldrivers
             ;;
         extras)
             extras

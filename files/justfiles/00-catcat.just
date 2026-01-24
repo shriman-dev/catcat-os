@@ -80,23 +80,47 @@ install-mcontrolcenter:
     #!/usr/bin/env -S sudo -- /bin/bash
     source /usr/lib/catcat/funcvar.sh
     log "INFO" "Installing mcontrolcenter"
-    pkg_repo="https://api.github.com/repos/dmitry-s93/MControlCenter"
-    latest_pkg_url="$(curl_fetch "${pkg_repo}/releases/latest" | grep -i '"browser_download_url": "[^"]*bin.tar.gz"' | cut -d '"' -f4)"
-    pkg_archive="/tmp/catcat_extra_pkgs/mcontrolcenter.tar.gz"
+    TMP_DIR="/tmp/extra_pkgs"
+    pkg_name="mcontrolcenter"
+    latest_pkg_url="$(latest_ghpkg_url 'dmitry-s93/MControlCenter' 'bin\.tar\.gz$')"
+    pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "${pkg_archive}.extract"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    sed -i "s|/usr/|/usr/local/|" "${pkg_archive}.extract"/*/install.sh
-    sed -i "s|/usr/|/usr/local/|" "${pkg_archive}.extract"/*/app/mcontrolcenter.helper.service
-    cd "${pkg_archive}.extract"
-    ${pkg_archive}.extract/*/install.sh
-    cp -fv /usr/local/share/applications/mcontrolcenter.desktop \
+    auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
+
+    sed -i "s|/usr/|/usr/local/|" "${auto_fold_dir[0]}"/install.sh
+    sed -i "s|/usr/|/usr/local/|" "${auto_fold_dir[0]}"/app/mcontrolcenter.helper.service
+    cd "${auto_fold_dir[0]}"
+    "${auto_fold_dir[0]}"/install.sh
+    ln -svf /usr/local/share/applications/mcontrolcenter.desktop \
                 ${SUDO_USER}/.config/autostart/mcontrolcenter.desktop
     cd -
-    rm -rf "${pkg_archive}" "${pkg_archive}.extract"
+    rm -rf "${TMP_DIR}"
     log "INFO" "All Done."
+
+# Install rtw89 wifi drivers
+[group("apps")]
+wldrivers-rtw89
+    #!/usr/bin/env -S sudo -- /bin/bash
+    source /usr/lib/catcat/funcvar.sh
+    if [[ "$(mokutil --sb-state)" =~ (E|e)nable ]]; then
+        die "Installing external drivers is not supported when Secure Boot is enabled. Please disable Secure Boot in your BIOS settings and try again."
+    else
+        log "INFO" "Installing rtw89 wifi drivers"
+        git clone https://github.com/morrownr/rtw89 /tmp/rtw89
+        cd /tmp/rtw89
+        make cleanup_target_system
+        make clean modules &&
+        make install &&
+        make install_fw &&
+        cp -v rtw89.conf /etc/modprobe.d/ &&
+        sh -c "echo 'rtw89_core_git' > /etc/modules-load.d/rtw89_core_git.conf"
+        cd -
+        log "INFO" "All Done."
+    fi
 
 # Show all logs from this boot
 [group("logging")]
