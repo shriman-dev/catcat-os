@@ -110,7 +110,9 @@ wldrivers-rtw89
         die "Installing external drivers is not supported when Secure Boot is enabled. Please disable Secure Boot in your BIOS settings and try again."
     else
         log "INFO" "Installing rtw89 wifi drivers"
-        git clone https://github.com/morrownr/rtw89 /tmp/rtw89
+        mkdir -vp /usr/local/lib/firmware/rtw89
+        mkdir -vp /usr/local/lib/modules/catcat-kernel/extra/rtw89
+        git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
         cd /tmp/rtw89
         make cleanup_target_system
         make clean modules &&
