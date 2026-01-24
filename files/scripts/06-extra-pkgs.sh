@@ -217,7 +217,7 @@ process_package() {
             chmod -v +x "${USRBIN}/${1}"
             ;;
         ls-iommu)
-            get_ghpkg --name "${1}" --repo "rfjakob/gocryptfs" \
+            get_ghpkg --name "${1}" --repo "HikariKnight/ls-iommu" \
                       --regx 'Linux_x86_64\.tar\.gz$'
             ;;
         ujust_setup)
