@@ -6,7 +6,7 @@ TMP_DIR="/tmp/extra_pkgs"
 USRBIN="/usr/bin"
 USRLIBEXEC="/usr/libexec"
 
-has_valid_items() {
+populated_or_afile_dirs() {
     find "${1}" -exec bash -c \
     '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
             echo "{}"' \;
@@ -38,7 +38,7 @@ get_ghpkg() {
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
-    auto_fold_dir=($(has_valid_items "${pkg_archive}.extract"))
+    auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
     found_executable=($(find_executables "${auto_fold_dir[0]}" "${pkg_name}"))
 
     if [[ -z ${islibexec} && ${#found_executable[@]} -eq 1 ]]; then
@@ -202,6 +202,8 @@ rtw89() {
     cd /tmp/rtw89
 
     dnf5 -y install make gcc kernel-headers
+    sed -i "s|\`uname -r\`|'$(rpm -q --queryformat="%{evr}.%{arch}" kernel)'|" \
+                /tmp/rtw89/Makefile
     make clean modules && make install
     make install_fw
     cp -vf rtw89.conf /etc/modprobe.d/
