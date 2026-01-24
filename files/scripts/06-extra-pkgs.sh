@@ -134,7 +134,7 @@ wldrivers() {
 
 extras() {
     # micro.desktop
-    get_ghraw --dstd "/usr/share/applications" --repo "zyedidia/micro" \
+    get_ghraw --dstd "/usr/share/applications" --repo "micro-editor/micro" \
               --repod "assets/packaging" -f "micro.desktop"
 
     # yazi.desktop
