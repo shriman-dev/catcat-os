@@ -103,7 +103,7 @@ install-mcontrolcenter:
 
 # Install rtw89 wifi drivers
 [group("apps")]
-wldrivers-rtw89
+wldrivers-rtw89:
     #!/usr/bin/env -S sudo -- /bin/bash
     source /usr/lib/catcat/funcvar.sh
     if [[ "$(mokutil --sb-state)" =~ (E|e)nable ]]; then
