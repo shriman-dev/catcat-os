@@ -312,6 +312,8 @@ COMMON=(
     "sbsigntools" # tools to add signatures to efi binaries and drivers
     "++wldrivers"
     "wireguard-tools"
+    "kernel-devel"
+    "kernel-headers"
     "fwupd"
     "fwupd-plugin-flashrom"
     "fwupd-plugin-modem-manager"
