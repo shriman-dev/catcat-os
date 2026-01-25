@@ -290,7 +290,7 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_pattern="${3}" url
+    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-}" url
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
