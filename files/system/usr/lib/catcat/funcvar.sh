@@ -290,19 +290,19 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-}" url
+    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}" url
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
     [[ "${include_pattern}" == '.tarball_url' ]] && jq_filter='.tarball_url'
 
+    local ii
     for ii in {1..10}; do
         url=$(curl_fetch "https://api.github.com/repos/${repo}/releases/latest" |
                 jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
         [[ -n "${url}" ]] && echo "${url}" && return 0
         sleep 0.2
     done
-    unset ii
     return 1
 }
 
@@ -337,7 +337,7 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-musl})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "$(dirname ${pkg_archive})"
