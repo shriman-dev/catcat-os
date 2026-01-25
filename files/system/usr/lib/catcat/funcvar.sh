@@ -175,12 +175,11 @@ notify_users() {
         for running_user in /run/user/*; do
             local some_user_id="$(basename ${running_user})"
             local some_user="$(id -un ${some_user_id})"
-            if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-                log "DEBUG" "Sending notification to user: ${some_user}"
-                sudo -u "${some_user}" \
+            exit_if_root
+            log "DEBUG" "Sending notification to user: ${some_user}"
+            sudo -u "${some_user}" \
                     DBUS_SESSION_BUS_ADDRESS=unix:path="/run/user/${some_user_id}/bus" \
                     notify-send -i "${1}" -a "${2}" "${3}" "${4}"
-            fi
         done
     else
         err "Notification failed: display-manager was not running."
@@ -291,7 +290,7 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}" url
+    local repo="${1}" include_pattern="${2}" exclude_pattern="${3}" url
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
@@ -300,10 +299,9 @@ latest_ghpkg_url() {
     for ii in {1..10}; do
         url=$(curl_fetch "https://api.github.com/repos/$repo/releases/latest" |
                 jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
-        [[ -n "${url}" ]] && echo "${url}" && break
+        [[ -n "${url}" ]] && echo "${url}" && return 0
         sleep 0.2
     done
-
     unset ii
     return 1
 }
@@ -339,7 +337,7 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-musl})"
     local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     mkdir -vp "$(dirname ${pkg_archive})"
