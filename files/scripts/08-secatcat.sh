@@ -30,7 +30,8 @@ systemd_dir="/usr/lib/systemd"
 # Avahi daemon to stop when unneeded
 mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
 echo "[Unit]
-StopWhenUnneeded=true" | tee ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
+StopWhenUnneeded=true" | tee \
+            ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
 
 log "INFO" "Disabling coredump for better security and performance"
 no_coredump_conf="disable-coredump.conf"
@@ -69,7 +70,7 @@ sed 's/^/# /' "${tmp_chrony}/LICENSE" > "${tmp_chrony}/LICENSE_temp"
 cat "${tmp_chrony}/LICENSE_temp" > "${chrony_conf}"
 cat "${tmp_chrony}/chrony.conf" >> "${chrony_conf}"
 # Update chronyd
-sed -i 's/^OPTIONS=.*$/OPTIONS="-F 1 -r"/' /etc/sysconfig/chronyd
+sed -i 's/^OPTIONS=.*$/OPTIONS="-F1 -r"/' /etc/sysconfig/chronyd
 
 # 30 days retention period for files in directory: /var/lib/chrony
 echo "d /var/lib/chrony 0755 chrony chrony 30d" > /etc/tmpfiles.d/chrony.conf
