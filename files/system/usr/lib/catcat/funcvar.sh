@@ -194,12 +194,6 @@ bak_before() {
     cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
 }
 
-populated_or_afile_dirs() {
-    find "${1}" -type d -exec bash -c \
-    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
-            echo "{}"' \;
-}
-
 # Check if a file is older than a specified number of seconds
 is_file_older() {
     local max_age_seconds="${1}" path="${2}"
@@ -233,6 +227,12 @@ validate_path() {
                 die "Path is not on ${fs_check} filesystem: ${path}"
         fi
     done
+}
+
+populated_or_afile_dirs() {
+    find "${1}" -type d -exec bash -c \
+    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
+            echo "{}"' \;
 }
 
 unarchive() {
@@ -297,8 +297,7 @@ latest_ghpkg_url() {
     curl_fetch "${gh_release_api}" | \
         jq -r --arg include_pattern "${include_pattern}" \
               --arg exclude_patterns "${exclude_patterns}" \
-            '.assets[] |
-                select(.name | test($include_pattern) and
+            '.assets[] | select(.name | test($include_pattern) and
                     (if $exclude_patterns != "" then test($exclude_patterns) | not else true end)
                 ).browser_download_url'
 }
