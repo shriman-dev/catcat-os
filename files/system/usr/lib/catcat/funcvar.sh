@@ -291,14 +291,14 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_patterns="${3:-musl}"
+    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}"
     local gh_release_api="https://api.github.com/repos/${repo}/releases/${4:-latest}"
 
     curl_fetch "${gh_release_api}" | \
         jq -r --arg include_pattern "${include_pattern}" \
-              --arg exclude_patterns "${exclude_patterns}" \
+              --arg exclude_pattern "${exclude_pattern}" \
             '.assets[] | select(.name | test($include_pattern) and
-                    (if $exclude_patterns != "" then test($exclude_patterns) | not else true end)
+                    (if $exclude_pattern != "" then test($exclude_pattern) | not else true end)
                 ).browser_download_url'
 }
 
