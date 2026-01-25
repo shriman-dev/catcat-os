@@ -102,18 +102,18 @@ function Bg (){
 
 # Function to generate a clickable link, you can call this using
 function Urllink (){
-    local URL="${1}"
-    local TEXT="${2}"
+    local URL="${1}" TEXT="${2}"
     # Generate a clickable hyperlink
     printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
 }
 
-# Function to generates a centered text header with customizable padding character, width, and symmetrical padding
+# Function to generates a centered text header
+# With customizable padding character, width, and symmetrical padding
 symmetric_heading() {
     local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
     local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
-    local left_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
-    local right_padding=$(printf "%*s" ${padding_length} | tr ' ' "${padding_char}")
+    local left_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
+    local right_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
 
     if (( ${#text} >= output_width - 3 )); then
         err "Text is too long for the given output width. Increase value of output width."
@@ -130,7 +130,7 @@ symmetric_heading() {
 # Same as above but with upper and lower borders using given character
 enclosed_heading() {
     local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
-    local border=$(printf "%*s" ${output_width} | tr ' ' "${padding_char}")
+    local border="$(printf "%*s" ${output_width} | tr ' ' ${padding_char})"
 
     echo "${border}"
     symmetric_heading "${text}" "${padding_char}" ${output_width}
@@ -160,8 +160,8 @@ _quiet_exec() {
 run_as_users() {
     local running_user
     for running_user in /run/user/*; do
-        local some_user_id=$(basename "${running_user}")
-        local some_user="$(id -un "${some_user_id}")"
+        local some_user_id="$(basename ${running_user})"
+        local some_user="$(id -un ${some_user_id})"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "DEBUG" "Running given command as user: ${some_user}"
             sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
@@ -173,12 +173,12 @@ notify_users() {
     local running_user
     if systemctl is-active display-manager; then
         for running_user in /run/user/*; do
-            local some_user_id=$(basename "${running_user}")
-            local some_user="$(id -un "${some_user_id}")"
+            local some_user_id="$(basename ${running_user})"
+            local some_user="$(id -un ${some_user_id})"
             if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
                 log "DEBUG" "Sending notification to user: ${some_user}"
                 sudo -u "${some_user}" \
-                    DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"${some_user_id}"/bus \
+                    DBUS_SESSION_BUS_ADDRESS=unix:path="/run/user/${some_user_id}/bus" \
                     notify-send -i "${1}" -a "${2}" "${3}" "${4}"
             fi
         done
@@ -202,8 +202,7 @@ populated_or_afile_dirs() {
 
 # Check if a file is older than a specified number of seconds
 is_file_older() {
-    local max_age_seconds="${1}"
-    local path="${2}"
+    local max_age_seconds="${1}" path="${2}"
     [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
 }
 
@@ -234,53 +233,6 @@ validate_path() {
                 die "Path is not on ${fs_check} filesystem: ${path}"
         fi
     done
-}
-
-is_network_metered() {
-    /usr/bin/busctl get-property org.freedesktop.NetworkManager \
-        /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
-}
-
-check_network_connection() {
-    local max_attempts=3 sleep_time=2 attempt=1
-
-    while (( attempt <= max_attempts )); do
-        if curl --silent --head --fail "https://fedoraproject.org" >/dev/null; then
-          return 0
-        else
-          log "DEBUG" "Network connection is not available. Waiting..."
-          sleep ${sleep_time}
-          (( attempt++ ))
-        fi
-    done
-
-    return 1
-}
-
-curl_fetch() { curl -fsS --retry 5 "${1}"; }
-
-curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
-
-latest_ghpkg_url() {
-    local repo="${1}"
-    local include_pattern="${2}"
-    local exclude_patterns="${3:-musl}"
-    local gh_release_api="https://api.github.com/repos/${repo}/releases/${4:-latest}"
-
-    curl_fetch "${gh_release_api}" | \
-        jq -r --arg include_pattern "${include_pattern}" \
-              --arg exclude_patterns "${exclude_patterns}" \
-            '.assets[] |
-                select(.name | test($include_pattern) and
-                    (if $exclude_patterns != "" then test($exclude_patterns) | not else true end)
-                ).browser_download_url'
-}
-
-latest_ghtar_url() {
-    local repo="${1}"
-    local gh_release_api="https://api.github.com/repos/${repo}/releases/${2:-latest}"
-
-    curl_fetch "${gh_release_api}" | jq -r '.tarball_url'
 }
 
 unarchive() {
@@ -314,19 +266,67 @@ unarchive() {
     esac
 }
 
+is_network_metered() {
+    /usr/bin/busctl get-property org.freedesktop.NetworkManager \
+        /org/freedesktop/NetworkManager org.freedesktop.NetworkManager Metered | cut -d' ' -f2
+}
+
+check_network_connection() {
+    local max_attempts=3 sleep_time=2 attempt=1
+
+    while (( attempt <= max_attempts )); do
+        if curl --silent --head --fail "https://fedoraproject.org" >/dev/null; then
+          return 0
+        else
+          log "DEBUG" "Network connection is not available. Waiting..."
+          sleep ${sleep_time}
+          (( attempt++ ))
+        fi
+    done
+
+    return 1
+}
+
+curl_fetch() { curl -fsS --retry 5 "${1}"; }
+
+curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
+
+latest_ghpkg_url() {
+    local repo="${1}" include_pattern="${2}" exclude_patterns="${3:-musl}"
+    local gh_release_api="https://api.github.com/repos/${repo}/releases/${4:-latest}"
+
+    curl_fetch "${gh_release_api}" | \
+        jq -r --arg include_pattern "${include_pattern}" \
+              --arg exclude_patterns "${exclude_patterns}" \
+            '.assets[] |
+                select(.name | test($include_pattern) and
+                    (if $exclude_patterns != "" then test($exclude_patterns) | not else true end)
+                ).browser_download_url'
+}
+
+latest_ghtar_url() {
+    local repo="${1}"
+    local gh_release_api="https://api.github.com/repos/${repo}/releases/${2:-latest}"
+
+    curl_fetch "${gh_release_api}" | jq -r '.tarball_url'
+}
+
 place_executable() {
+    local find_exec_dir="${1}" exec_name="${2}"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
-    local found_executables=($(find "${1}" -type f -exec file --mime '{}' \; | \
-                                    grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${2}\$"))
+    local found_executables=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
+                            grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
 
     if [[ ${#found_executables[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable: ${2} | Mimetype: $(file -b --mime ${found_executables[0]})"
+        { log "DEBUG" \
+              "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_executables[0]})"
+        } 2>/dev/null
         cp -vf "${found_executables[0]}" "${USRBIN}"/
-        chmod -v +x "${USRBIN}/${2}"
+        chmod -v +x "${USRBIN}/${exec_name}"
     elif [[ ${#found_executables[@]} -gt 1 ]]; then
         die "More than 1 executable with same name\n$(printf '%s\n' ${found_executables[@]})"
     else
-        die "No executable found: ${2}"
+        die "No executable found: ${exec_name}"
     fi
 }
 
@@ -334,11 +334,11 @@ get_ghpkg() {
     local pkg_name pkg_repo pkg_regx pkg_negx="" islibexec=""
     while [[ $# -gt 0 ]]; do
         case ${1} in
-            --name)    pkg_name="${2}"; shift ;;
-            --repo)    pkg_repo="${2}"; shift ;;
-            --regx)    pkg_regx="${2}"; shift ;;
-            --negx)    pkg_negx="${2}"; shift ;; # exclusion regx
-            --libexec) islibexec=1 ;;
+            --name)    pkg_name="${2}"; shift ;; # Set package name
+            --repo)    pkg_repo="${2}"; shift ;; # GitHub repo (owner/repo)
+            --regx)    pkg_regx="${2}"; shift ;; # Filter release assets by regex
+            --negx)    pkg_negx="${2}"; shift ;; # Exclude assets matching by regex
+            --libexec) islibexec=1 ;;            # Installs package contents into libexec
             *)         die "Unknown option: ${1}" ;;
         esac
         shift
@@ -350,6 +350,7 @@ get_ghpkg() {
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
+    # Detect top populated directories
     auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
 
     if [[ -z ${islibexec} ]]; then
@@ -365,11 +366,11 @@ get_ghraw() {
     local destfile="" dest_dir="" repo_raw="" repo_dir="" ffile
     while [[ $# -gt 0 ]]; do
         case ${1} in
-            --dstf)  destfile="${2}"; shift 2 ;;
-            --dstd)  dest_dir="${2}"; shift 2 ;;
-            --repo)  repo_raw="${2}"; shift 2 ;;
-            --repod) repo_dir="${2}"; shift 2 ;;
-            -f|--flist) shift; break ;; # file or list of files to fetch
+            --dstf)  destfile="${2}"; shift 2 ;; # Output to single file
+            --dstd)  dest_dir="${2}"; shift 2 ;; # Output directory (for multiple files)
+            --repo)  repo_raw="${2}"; shift 2 ;; # GitHub repo (owner/repo)
+            --repod) repo_dir="${2}"; shift 2 ;; # Subdirectory in the repo
+            -f|--flist) shift; break ;;          # File or list of files to fetch
             *)       die "Unknown option: ${1}" ;;
         esac
     done

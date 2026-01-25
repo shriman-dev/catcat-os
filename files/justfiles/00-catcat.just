@@ -101,29 +101,6 @@ install-mcontrolcenter:
     rm -rf "${TMP_DIR}"
     log "INFO" "All Done."
 
-# Install rtw89 wifi drivers
-[group("apps")]
-wldrivers-rtw89:
-    #!/usr/bin/env -S sudo -- /bin/bash
-    source /usr/lib/catcat/funcvar.sh
-    if [[ "$(mokutil --sb-state)" =~ (E|e)nable ]]; then
-        die "Installing external drivers is not supported when Secure Boot is enabled. Please disable Secure Boot in your BIOS settings and try again."
-    else
-        log "INFO" "Installing rtw89 wifi drivers"
-        mkdir -vp /usr/local/lib/firmware/rtw89
-        mkdir -vp /usr/local/lib/modules/catcat-kernel/extra/rtw89
-        git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
-        cd /tmp/rtw89
-        make cleanup_target_system
-        make clean modules &&
-        make install &&
-        make install_fw &&
-        cp -v rtw89.conf /etc/modprobe.d/ &&
-        sh -c "echo 'rtw89_core_git' > /etc/modules-load.d/rtw89_core_git.conf"
-        cd -
-        log "INFO" "All Done."
-    fi
-
 # Show all logs from this boot
 [group("logging")]
 logs-this-boot:

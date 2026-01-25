@@ -125,20 +125,33 @@ waydroid_setup() {
 
 wldrivers() {
     local ker="$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
-    git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/rtw89
 
     dnf5 -y install make gcc kernel-headers "kernel-devel-${ker}"
-    sed -i "s|\`uname -r\`|${ker}|" \
-                /tmp/rtw89/Makefile
+    dnf5 -y install haveged hostapd gcc-c++ gtk3-devel pkg-config qrencode-devel libpng-devel
 
-    cd /tmp/rtw89
+    # Rtw89 drivers
+    mkdir -vp /tmp/wldrivers
+    git clone --depth 1 https://github.com/morrownr/rtw89 /tmp/wldrivers/rtw89
+    sed -i "s|\`uname -r\`|${ker}|" \
+                /tmp/wldrivers/rtw89/Makefile
+
+    cd /tmp/wldrivers/rtw89
     make clean modules && make install &&
     make install_fw &&
     cp -vf rtw89.conf /etc/modprobe.d/
     cd -
 
-    dnf5 -y remove make gcc kernel-headers "kernel-devel-${ker}"
-    rm -rf /tmp/rtw89
+    # Wihotspot
+    git clone --depth 1 https://github.com/lakinduakash/linux-wifi-hotspot /tmp/wldrivers/wihotspot
+    cd /tmp/wldrivers/wihotspot
+    make &&
+    make install
+    cd -
+
+    # Clean up
+    dnf5 -y remove make gcc gcc-c++ kernel-headers "kernel-devel-${ker}" \
+                   gtk3-devel pkg-config qrencode-devel libpng-devel
+    rm -rf /tmp/wldrivers
 }
 
 extras() {
