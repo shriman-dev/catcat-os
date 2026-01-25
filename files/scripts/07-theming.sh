@@ -126,7 +126,7 @@ install_icon_themes() {
     log "INFO" "Installing icons"
 
     log "INFO" "Papirus icons"
-    local latest_icons_url="$(latest_ghtar_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
+    local latest_icons_url="$(latest_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme' '.tarball_url')"
     local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
 
     mkdir -vp "$(dirname ${icons_archive})"
@@ -142,7 +142,7 @@ install_gtk_themes() {
     log "INFO" "Installing GTK theme(s)"
     # Lavanda-gtk-theme
     log "INFO" "Lavanda-gtk-theme"
-    local latest_lavanda_url="$(latest_ghtar_url 'vinceliuice/Lavanda-gtk-theme')"
+    local latest_lavanda_url="$(latest_ghpkg_url 'vinceliuice/Lavanda-gtk-theme' '.tarball_url')"
     local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
 
     mkdir -vp "$(dirname ${lavanda_tar})"

@@ -291,22 +291,21 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}"
-    local gh_release_api="https://api.github.com/repos/${repo}/releases/${4:-latest}"
+    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}" url
+    local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
+                        not else true end)).browser_download_url'
 
-    curl_fetch "${gh_release_api}" | \
-        jq -r --arg include_pattern "${include_pattern}" \
-              --arg exclude_pattern "${exclude_pattern}" \
-            '.assets[] | select(.name | test($include_pattern) and
-                    (if $exclude_pattern != "" then test($exclude_pattern) | not else true end)
-                ).browser_download_url'
-}
+    [[ "${include_pattern}" == '.tarball_url' ]] && jq_filter='.tarball_url'
 
-latest_ghtar_url() {
-    local repo="${1}"
-    local gh_release_api="https://api.github.com/repos/${repo}/releases/${2:-latest}"
+    for ii in {1..10}; do
+        url=$(curl_fetch "https://api.github.com/repos/$repo/releases/latest" |
+                jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
+        [[ -n "${url}" ]] && echo "${url}" && break
+        sleep 0.2
+    done
 
-    curl_fetch "${gh_release_api}" | jq -r '.tarball_url'
+    unset ii
+    return 1
 }
 
 place_executable() {
