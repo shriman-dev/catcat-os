@@ -237,7 +237,6 @@ validate_path() {
 
 unarchive() {
     local archive="${1}" dest="${2}"
-    [[ ! $# -eq 2 ]] && die "Specify paths to archive and destination"
 
     [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
 
@@ -314,17 +313,16 @@ latest_ghtar_url() {
 place_executable() {
     local find_exec_dir="${1}" exec_name="${2}"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
-    local found_executables=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
+    local found_execs=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
                             grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
 
-    if [[ ${#found_executables[@]} -eq 1 ]]; then
-        { log "DEBUG" \
-              "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_executables[0]})"
+    if [[ ${#found_execs[@]} -eq 1 ]]; then
+        { log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_execs[0]})"
         } 2>/dev/null
-        cp -vf "${found_executables[0]}" "${USRBIN}"/
+        cp -vf "${found_execs[0]}" "${USRBIN}"/
         chmod -v +x "${USRBIN}/${exec_name}"
-    elif [[ ${#found_executables[@]} -gt 1 ]]; then
-        die "More than 1 executable with same name\n$(printf '%s\n' ${found_executables[@]})"
+    elif [[ ${#found_execs[@]} -gt 1 ]]; then
+        die "More than 1 executable with same name\n$(printf '%s\n' ${found_execs[@]})"
     else
         die "No executable found: ${exec_name}"
     fi
