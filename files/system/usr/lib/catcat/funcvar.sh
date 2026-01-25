@@ -297,7 +297,7 @@ latest_ghpkg_url() {
     [[ "${include_pattern}" == '.tarball_url' ]] && jq_filter='.tarball_url'
 
     for ii in {1..10}; do
-        url=$(curl_fetch "https://api.github.com/repos/$repo/releases/latest" |
+        url=$(curl_fetch "https://api.github.com/repos/${repo}/releases/latest" |
                 jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
         [[ -n "${url}" ]] && echo "${url}" && return 0
         sleep 0.2
