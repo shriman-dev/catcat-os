@@ -9,7 +9,6 @@ DESKTOP_EXTRAS=(
     # Graphics and Video Editors
     "app/org.upscayl.Upscayl/x86_64/stable"
     "app/org.gnome.gitlab.YaLTeR.Identity/x86_64/stable"
-#    "app/io.gitlab.adhami3310.Footage/x86_64/stable"
 
     # Document Viewers and Editors
     "app/org.onlyoffice.desktopeditors/x86_64/stable"
@@ -29,6 +28,7 @@ DESKTOP_EXTRAS=(
     "app/com.vysp3r.ProtonPlus/x86_64/stable"
     "app/page.kramo.Cartridges/x86_64/stable"
     "app/io.github.radiolamp.mangojuice/x86_64/stable"
+    "app/io.github.benjamimgois.goverlay/x86_64/stable"
     "app/io.github.ilya_zlobintsev.LACT/x86_64/stable"
 
     # Cleanups and Optimize

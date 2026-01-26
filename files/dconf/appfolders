@@ -64,7 +64,7 @@ name='Productivity'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Gaming]
-apps=['com.valvesoftware.Steam.desktop', 'io.github.antimicrox.antimicrox.desktop', 'com.heroicgameslauncher.hgl.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'io.github.ryubing.Ryujinx.desktop', 'net.rpcs3.RPCS3.desktop', 'net.pcsx2.PCSX2.desktop', 'org.libretro.RetroArch.desktop', 'io.github.benjamimgois.goverlay.desktop', 'io.github.radiolamp.mangojuice.desktop', 'page.kramo.Cartridges.desktop', 'org.gnome.Chess.desktop', 'input-remapper-gtk.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'dev.lizardbyte.app.Sunshine.desktop', 'lsfg-vk-ui.desktop']
+apps=['com.valvesoftware.Steam.desktop', 'io.github.antimicrox.antimicrox.desktop', 'com.heroicgameslauncher.hgl.desktop', 'com.usebottles.bottles.desktop', 'net.lutris.Lutris.desktop', 'com.vysp3r.ProtonPlus.desktop', 'io.github.ryubing.Ryujinx.desktop', 'net.rpcs3.RPCS3.desktop', 'net.pcsx2.PCSX2.desktop', 'org.libretro.RetroArch.desktop', 'io.github.radiolamp.mangojuice.desktop', 'org.gnome.Chess.desktop', 'input-remapper-gtk.desktop', 'io.github.benjamimgois.goverlay.desktop', 'com.github.Matoking.protontricks.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'page.kramo.Cartridges.desktop', 'org.ryujinx.Ryujinx.desktop']
 name='Gaming'
 translate=false
 

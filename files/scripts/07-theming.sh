@@ -22,17 +22,17 @@ desktop_files() {
     sed -i 's/^Icon=.*/Icon=np2/' ${desktopfile_dir}/oneko.desktop
     sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' ${desktopfile_dir}/yazi.desktop || true
 
-    sed -i 's|^Icon=.*|Icon=appgrid|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
     sed -i 's|^Name.*=.*|Name=Software Store|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
 
     sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' ${desktopfile_dir}/Waydroid.desktop
 
-    # Remove desktop entries
+    # Hide desktop entries
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/nvtop.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/fish.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/yad-icon-browser.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top-tui.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/bottom.desktop || true
 
     log "INFO" "Done."
 }
@@ -67,48 +67,15 @@ $(latest_ghpkg_url 'FortAwesome/Font-Awesome' 'desktop\.zip')"
 https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     )
 
-    if [[ ${#EXTRA_FONTS[@]} -gt 0 ]]; then
-        log "INFO" "Installing Extra Font(s)"
-        local FONTS_DIR="/usr/share/fonts"
-        local TMP_DIR="/tmp/extra_fonts"
-        local nf_repo="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
-        local font_name font_url url_file font_dest font_tmpd fontfile
-        for font_name in "${!EXTRA_FONTS[@]}"; do
-            font_url="${EXTRA_FONTS[$font_name]}"
-            font_name=${font_name// /} # remove spaces
-            font_dest="${FONTS_DIR}/${font_name}"
-            font_tmpd="${TMP_DIR}/${font_name}"
-            [[ -z "${font_url}" ]] && {
-                font_url="${nf_repo}/${font_name}.tar.xz"
-                font_dest="${FONTS_DIR}/nerd-fonts/${font_name}"
-            }
-            url_file="$(basename ${font_url})"
-            log "INFO" "Adding font(s): ${font_name}"
-            log "INFO" "From URL: ${font_url}"
-
-            mkdir -vp "${font_tmpd}" "${font_dest}"
-            case "${font_url}" in
-                *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-                    curl_get "${TMP_DIR}/${url_file}" "${font_url}"
-                    unarchive "${TMP_DIR}/${url_file}" "${font_tmpd}" >/dev/null
-                    ;;
-                *.otf|*.ttf)
-                    curl_get "${font_tmpd}/${url_file}" "${font_url}"
-                    ;;
-                *.git)
-                    git clone --depth 1 "${font_url}" "${font_tmpd}"
-                    ;;
-                *)
-                    err "Unsupported URL: ${font_url}" && return 1
-                    ;;
-            esac
-            find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf" | while read -r fontfile; do
-                cp -vf "${fontfile}" "${font_dest}"/
-            done
-        done
-        rm -rf "${TMP_DIR}"
-        log "INFO" "Extra Font(s) installed"
-    fi
+    log "INFO" "Installing Extra Font(s)"
+    local font_name font_url TMP_DIR="/tmp/extra_fonts"
+    for font_name in "${!EXTRA_FONTS[@]}"; do
+        font_url="${EXTRA_FONTS[$font_name]}"
+        font_name=${font_name// /} # remove spaces
+        get_fonts "${font_name}" "${font_url}"
+    done
+    rm -rf "${TMP_DIR}"
+    log "INFO" "Extra Font(s) installed"
 
     log "INFO" "Building font cache"
     # Permit global fonts to be used by all users
@@ -126,7 +93,8 @@ install_icon_themes() {
     log "INFO" "Installing icons"
 
     log "INFO" "Papirus icons"
-    local latest_icons_url="$(latest_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme' '.tarball_url')"
+    local JQ_FILTER='.tarball_url'
+    local latest_icons_url="$(latest_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
     local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
 
     mkdir -vp "$(dirname ${icons_archive})"
@@ -142,7 +110,8 @@ install_gtk_themes() {
     log "INFO" "Installing GTK theme(s)"
     # Lavanda-gtk-theme
     log "INFO" "Lavanda-gtk-theme"
-    local latest_lavanda_url="$(latest_ghpkg_url 'vinceliuice/Lavanda-gtk-theme' '.tarball_url')"
+    local JQ_FILTER='.tarball_url'
+    local latest_lavanda_url="$(latest_ghpkg_url 'vinceliuice/Lavanda-gtk-theme')"
     local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
 
     mkdir -vp "$(dirname ${lavanda_tar})"

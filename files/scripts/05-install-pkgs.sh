@@ -19,7 +19,7 @@ DESKTOP_EXTRAS=(
     "wireshark"
     "++bandwhich"
     #amdgpu_top
-    "$(latest_ghpkg_url 'Umio-Yasuno/amdgpu_top' 'amdgpu_top-.*x86_64\.rpm$')"
+    "$(latest_ghpkg_url 'Umio-Yasuno/amdgpu_top' 'x86_64\.rpm$')"
 
     # Backup, Archive, Encryption and Compression
     ##borgbackup zsync
@@ -38,7 +38,7 @@ DESKTOP_EXTRAS=(
     "ffmpegthumbnailer"
     "kpcli"
     #watchexec
-    "$(latest_ghpkg_url 'watchexec/watchexec' 'watchexec-.*x86_64-unknown-linux-gnu\.rpm$')"
+    "$(latest_ghpkg_url 'watchexec/watchexec' 'x86_64-unknown-linux-gnu\.rpm$')"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
@@ -87,7 +87,7 @@ DESKTOP_EXTRAS=(
     "openrgb"
     "openrgb-udev-rules"
     #lsfg-vk
-    #$(latest_ghpkg_url 'PancakeTAS/lsfg-vk' 'lsfg-vk-.*x86_64\.rpm$')
+    #$(latest_ghpkg_url 'PancakeTAS/lsfg-vk' 'x86_64\.rpm$')
 
     # Performance Tuning
     ##corectrl
@@ -105,8 +105,8 @@ DESKTOP_COMMON=(
     "firewall-config"
     "usbguard-notifier"
     #opensnitch
-    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'opensnitch-.*x86_64.rpm$')
-    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'opensnitch-ui.*noarch\.rpm$')
+    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'x86_64.rpm$')
+    #$(latest_ghpkg_url 'evilsocket/opensnitch' 'noarch\.rpm$')
 
     # Monitoring Tools
     "powertop"
@@ -162,7 +162,7 @@ DESKTOP_COMMON=(
     "python3-pip"
     "inotify-tools"
     #vscodium
-    "$(latest_ghpkg_url 'VSCodium/vscodium' 'codium-.*x86_64\.rpm$')"
+    "$(latest_ghpkg_url 'VSCodium/vscodium' 'x86_64\.rpm$')"
 
     # Android Tools
     "++scrcpy"
@@ -235,7 +235,7 @@ COMMON=(
     "zsh"
     "fish"
     #fastfetch
-    "$(latest_ghpkg_url 'fastfetch-cli/fastfetch' 'fastfetch-linux-amd64\.rpm$')"
+    "$(latest_ghpkg_url 'fastfetch-cli/fastfetch' 'linux-amd64\.rpm$')"
     "starship" # from terra repo
     "fzf"
     "bat"
@@ -260,7 +260,7 @@ COMMON=(
     "tcpdump"
     "traceroute"
     #bottom
-    "$(latest_ghpkg_url 'ClementTsang/bottom' 'bottom-.*x86_64\.rpm$')"
+    "$(latest_ghpkg_url 'ClementTsang/bottom' 'x86_64\.rpm$' 'musl')"
 
     # Info Helper
     "which"

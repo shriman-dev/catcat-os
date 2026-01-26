@@ -290,11 +290,11 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2}" exclude_pattern="${3:-musl}" url
+    local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" url
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
-    [[ "${include_pattern}" == '.tarball_url' ]] && jq_filter='.tarball_url'
+    [[ -n "${JQ_FILTER}" ]] && jq_filter="${JQ_FILTER}"
 
     local ii
     for ii in {1..10}; do
@@ -307,7 +307,7 @@ latest_ghpkg_url() {
 }
 
 place_executable() {
-    local find_exec_dir="${1}" exec_name="${2}"
+    local find_exec_dir="${1}" exec_name="${2}" bin_dir="${BIN_DIR:-'/usr/bin'}"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
     local found_execs=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
                             grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
@@ -315,8 +315,8 @@ place_executable() {
     if [[ ${#found_execs[@]} -eq 1 ]]; then
         { log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_execs[0]})"
         } 2>/dev/null
-        cp -vf "${found_execs[0]}" "${USRBIN}"/
-        chmod -v +x "${USRBIN}/${exec_name}"
+        cp ${VERBOSE:+-v} -f "${found_execs[0]}" "${bin_dir}"/
+        chmod ${VERBOSE:+-v} +x "${bin_dir}/${exec_name}"
     elif [[ ${#found_execs[@]} -gt 1 ]]; then
         die "More than 1 executable with same name\n$(printf '%s\n' ${found_execs[@]})"
     else
@@ -337,22 +337,23 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx})"
-    local pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-'musl'})"
+    local pkg_archive="${TMP_DIR:-'/tmp/get_ghpkg'}/$(basename ${latest_pkg_url})"
 
-    mkdir -vp "$(dirname ${pkg_archive})"
+    mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     # Detect top populated directories
     auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
 
-    if [[ -z ${islibexec} ]]; then
+    if [[ ${islibexec} -ne 1 ]]; then
         place_executable "${auto_fold_dir[0]}" "${pkg_name}"
-    elif [[ -n ${islibexec} ]]; then
-        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${USRLIBEXEC}/${pkg_name}"
-        mkdir -vp "${USRLIBEXEC}/${pkg_name}"
-        cp -dvf "${auto_fold_dir[0]}"/* "${USRLIBEXEC}/${pkg_name}"/
+    else
+        local libexec_dir="${LIBEXEC_DIR:-'/usr/libexec'}"
+        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${LIBEXEC_DIR}/${pkg_name}"
+        mkdir -vp "${LIBEXEC_DIR}/${pkg_name}"
+        cp -dvf "${auto_fold_dir[0]}"/* "${LIBEXEC_DIR}/${pkg_name}"/
     fi
 }
 
@@ -361,7 +362,7 @@ get_ghraw() {
     while [[ $# -gt 0 ]]; do
         case ${1} in
             --dstf)  destfile="${2}"; shift 2 ;; # Output to single file
-            --dstd)  dest_dir="${2}"; shift 2 ;; # Output directory (for multiple files)
+            --dstd)  dest_dir="${2}"; shift 2 ;; # Fetch file or files in a directory
             --repo)  repo_raw="${2}"; shift 2 ;; # GitHub repo (owner/repo)
             --repod) repo_dir="${2}"; shift 2 ;; # Subdirectory in the repo
             -f|--flist) shift; break ;;          # File or list of files to fetch
@@ -369,7 +370,7 @@ get_ghraw() {
         esac
     done
     local gh_api="https://api.github.com/repos/${repo_raw}"
-    local branch="$(curl_fetch ${gh_api} | jq -r '.default_branch')"
+    local branch="${GITBRANCH:-"$(curl_fetch ${gh_api} | jq -r '.default_branch')"}"
     local raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
 
     [[ -n "${dest_dir}" && ! -d "${dest_dir}" ]] && mkdir -vp "${dest_dir}"
@@ -377,5 +378,43 @@ get_ghraw() {
         local dest_path="${dest_dir}/${ffile}"
         [[ -n "${destfile}" ]] && dest_path="${destfile}"
         curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
+    done
+}
+
+get_fonts() {
+    local font_name="${1}" font_url="${2}"
+    local fonts_dir="${FONTS_DIR:-'/usr/share/fonts'}" tmpdir="${TMP_DIR:-'/tmp/get_fonts'}"
+    local font_dest="${fonts_dir}/${font_name}" font_tmpd="${tmpdir}/${font_name}"
+    if [[ -z "${font_url}" ]]; then
+        font_url="$(latest_ghpkg_url 'ryanoasis/nerd-fonts' '.' | grep -i '/${font_name}\.tar')"
+        font_dest="${fonts_dir}/nerd-fonts/${font_name}"
+        if [[ -z "${font_url}" ]]; then
+            err "No Nerd Font with name: ${font_name}"
+            die "No URL provided to get the font"
+        fi
+    fi
+    local url_file="$(basename ${font_url})" fontfile
+    log "INFO" "Adding font(s): ${font_name}"
+    log "INFO" "From URL: ${font_url}"
+
+    mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
+    case "${font_url}" in
+        *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+            curl_get "${tmpdir}/${url_file}" "${font_url}"
+            unarchive "${tmpdir}/${url_file}" "${font_tmpd}" >/dev/null
+            ;;
+        *.otf|*.ttf)
+            curl_get "${font_tmpd}/${url_file}" "${font_url}"
+            ;;
+        *.git)
+            git clone --depth 1 "${font_url}" "${font_tmpd}"
+            ;;
+        *)
+            err "Fonts can only be added from URL pointing to an archive format, font file (.otf or .ttf) or git repo (.git)"
+            die "Unsupported URL: ${font_url}"
+            ;;
+    esac
+    find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf" | while read -r fontfile; do
+        cp ${VERBOSE:+-v} -f "${fontfile}" "${font_dest}"/
     done
 }
