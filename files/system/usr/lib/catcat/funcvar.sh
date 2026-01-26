@@ -303,7 +303,7 @@ latest_ghpkg_url() {
         [[ -n "${url}" ]] && echo "${url}" && return 0
         sleep 0.2
     done
-    return 1
+    die "Unable to retrieve latest package URL"
 }
 
 place_executable() {

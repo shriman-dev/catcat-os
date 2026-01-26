@@ -63,7 +63,7 @@ if command -q yazi
         set tmp (mktemp -t "yazi-cwd.XXXXXX")
         yazi $argv --cwd-file="$tmp"
         if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-            builtin cd -- "$cwd"
+            z -- "$cwd"
         end
         rm -f -- "$tmp"
     end
@@ -84,10 +84,10 @@ if command -q distrobox
         distrobox-export -a $argv --delete
     end
     function dbox-expo-bin
-        distrobox-export --bin $argv --export-path $HOME/.local/bin/bim
+        distrobox-export --bin $argv --export-path $HOME/.local/bin
     end
     function dbox-unexpo-bin
-        distrobox-export --bin $argv --export-path $HOME/.local/bin/bim --delete
+        distrobox-export --bin $argv --export-path $HOME/.local/bin --delete
     end
 end
 
@@ -184,7 +184,7 @@ if command -q pacman
     alias yay='paru'
 
     # Get fastest mirrors arch alias
-    alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+    alias mirrorr="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
     alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
     alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
     alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
@@ -198,12 +198,26 @@ abbr mv 'mv -v'
 abbr rm 'rm -v'
 abbr df 'df -h'
 abbr du 'du -h'
-abbr free 'free -hm'
+abbr free  'free -hm'
 abbr chmod 'chmod -v'
 abbr chown 'chown -v'
 abbr rmdir 'rmdir -v'
 abbr mkdir 'mkdir -v'
-abbr mount 'mount -vm'
+
+abbr -c sudo cp 'cp -v'
+abbr -c sudo ln 'ln -v'
+abbr -c sudo mv 'mv -v'
+abbr -c sudo df 'df -h'
+abbr -c sudo du 'du -h'
+abbr -c sudo free  'free -hm'
+abbr -c sudo chmod 'chmod -v'
+abbr -c sudo chown 'chown -v'
+abbr -c sudo mkdir 'mkdir -v'
+abbr -c sudo mount 'mount -vm'
+
+abbr sysd 'sudo systemctl'
+abbr sysdu 'systemctl --user'
+abbr mount 'sudo mount -vm'
 abbr nethogs 'sudo nethogs -a -C -b -v 4'
 abbr bandwhich 'sudo bandwhich --processes --connections'
 
