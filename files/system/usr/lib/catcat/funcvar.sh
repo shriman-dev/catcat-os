@@ -291,7 +291,10 @@ curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
     local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" url
-    local jq_filter="${JQ_FILTER:-'.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) | not else true end)).browser_download_url'}"
+    local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
+                        not else true end)).browser_download_url'
+
+    [[ -n "${JQ_FILTER:-}" ]] && jq_filter="${JQ_FILTER}"
 
     local ii
     for ii in {1..10}; do
