@@ -307,7 +307,7 @@ latest_ghpkg_url() {
 }
 
 place_executable() {
-    local find_exec_dir="${1}" exec_name="${2}" bin_dir="${BIN_DIR:-'/usr/bin'}"
+    local find_exec_dir="${1}" exec_name="${2}" bin_dir="${BIN_DIR:-/usr/bin}"
     local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
     local found_execs=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
                             grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
@@ -337,8 +337,8 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-'musl'})"
-    local pkg_archive="${TMP_DIR:-'/tmp/get_ghpkg'}/$(basename ${latest_pkg_url})"
+    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-musl})"
+    local pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/$(basename ${latest_pkg_url})"
 
     mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
@@ -350,7 +350,7 @@ get_ghpkg() {
     if [[ ${islibexec} -ne 1 ]]; then
         place_executable "${auto_fold_dir[0]}" "${pkg_name}"
     else
-        local libexec_dir="${LIBEXEC_DIR:-'/usr/libexec'}"
+        local libexec_dir="${LIBEXEC_DIR:-/usr/libexec}"
         { log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
         } 2>/dev/null
         mkdir -vp "${libexec_dir}/${pkg_name}"
@@ -384,7 +384,7 @@ get_ghraw() {
 
 get_fonts() {
     local font_name="${1}" font_url="${2}"
-    local fonts_dir="${FONTS_DIR:-'/usr/share/fonts'}" tmpdir="${TMP_DIR:-'/tmp/get_fonts'}"
+    local fonts_dir="${FONTS_DIR:-/usr/share/fonts}" tmpdir="${TMP_DIR:-/tmp/get_fonts}"
     local font_dest="${fonts_dir}/${font_name}" font_tmpd="${tmpdir}/${font_name}"
     if [[ -z "${font_url}" ]]; then
         font_url="$(latest_ghpkg_url 'ryanoasis/nerd-fonts' '.' 2>/dev/null | \

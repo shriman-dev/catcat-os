@@ -68,7 +68,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     )
 
     log "INFO" "Installing Extra Font(s)"
-    local font_name font_url TMP_DIR="/tmp/extra_fonts"
+    local FONTS_DIR="/usr/share/fonts" TMP_DIR="/tmp/extra_fonts" font_name font_url
     for font_name in "${!EXTRA_FONTS[@]}"; do
         font_url="${EXTRA_FONTS[$font_name]}"
         font_name=${font_name// /} # remove spaces
