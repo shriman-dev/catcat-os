@@ -351,9 +351,10 @@ get_ghpkg() {
         place_executable "${auto_fold_dir[0]}" "${pkg_name}"
     else
         local libexec_dir="${LIBEXEC_DIR:-'/usr/libexec'}"
-        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${LIBEXEC_DIR}/${pkg_name}"
-        mkdir -vp "${LIBEXEC_DIR}/${pkg_name}"
-        cp -dvf "${auto_fold_dir[0]}"/* "${LIBEXEC_DIR}/${pkg_name}"/
+        { log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
+        } 2>/dev/null
+        mkdir -vp "${libexec_dir}/${pkg_name}"
+        cp -dvf "${auto_fold_dir[0]}"/* "${libexec_dir}/${pkg_name}"/
     fi
 }
 
@@ -386,7 +387,8 @@ get_fonts() {
     local fonts_dir="${FONTS_DIR:-'/usr/share/fonts'}" tmpdir="${TMP_DIR:-'/tmp/get_fonts'}"
     local font_dest="${fonts_dir}/${font_name}" font_tmpd="${tmpdir}/${font_name}"
     if [[ -z "${font_url}" ]]; then
-        font_url="$(latest_ghpkg_url 'ryanoasis/nerd-fonts' '.' | grep -i '/${font_name}\.tar')"
+        font_url="$(latest_ghpkg_url 'ryanoasis/nerd-fonts' '.' 2>/dev/null | \
+                        grep -i "/${font_name}\.tar")"
         font_dest="${fonts_dir}/nerd-fonts/${font_name}"
         if [[ -z "${font_url}" ]]; then
             err "No Nerd Font with name: ${font_name}"
@@ -394,8 +396,8 @@ get_fonts() {
         fi
     fi
     local url_file="$(basename ${font_url})" fontfile
-    log "INFO" "Adding font(s): ${font_name}"
-    log "INFO" "From URL: ${font_url}"
+    { log "INFO" "Adding font(s): ${font_name}" } 2>/dev/null
+    { log "INFO" "From URL: ${font_url}" } 2>/dev/null
 
     mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
     case "${font_url}" in
