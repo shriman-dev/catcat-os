@@ -294,7 +294,7 @@ latest_ghpkg_url() {
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
-    [[ -n "${JQ_FILTER}" ]] && jq_filter="${JQ_FILTER}"
+    [[ "${JQ_FILTER}" ]] && jq_filter="${JQ_FILTER}"
 
     local ii
     for ii in {1..10}; do
