@@ -396,8 +396,8 @@ get_fonts() {
         fi
     fi
     local url_file="$(basename ${font_url})" fontfile
-    { log "INFO" "Adding font(s): ${font_name}" } 2>/dev/null
-    { log "INFO" "From URL: ${font_url}" } 2>/dev/null
+    { log "INFO" "Adding font(s): ${font_name}"; } 2>/dev/null
+    { log "INFO" "From URL: ${font_url}"; } 2>/dev/null
 
     mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
     case "${font_url}" in
