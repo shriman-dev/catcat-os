@@ -73,7 +73,7 @@ err() { log "ERROR" "${1}"; return 1; }
 # CHOICE=$(Choice option1 option2 "option 3")
 # *user selects "option 3"*
 # echo "$CHOICE" will return "option 3"
-function Choose (){
+function Choose() {
     local CHOICE=$(ugum choose "$@")
     echo "$CHOICE"
 }
@@ -84,7 +84,7 @@ function Choose (){
 # echo "$CHOICE" will return "1"
 # 0 = Yes
 # 1 = No
-function Confirm (){
+function Confirm() {
     ugum confirm "$@"
     echo $?
 }
@@ -95,13 +95,13 @@ function Confirm (){
 # option 38 (foreground) which can be flipped to 48 (background)
 # bgblue=$(Bg "$blue")
 # echo "${bgblue}text now has blue background${normal} this text has no background color"
-function Bg (){
+function Bg() {
     local COLOR="${1}"
     echo "${COLOR}" | sed -E 's/\[3([0-8]{1,1})/\[4\1/'
 }
 
 # Function to generate a clickable link, you can call this using
-function Urllink (){
+function Urllink() {
     local URL="${1}" TEXT="${2}"
     # Generate a clickable hyperlink
     printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
@@ -291,10 +291,7 @@ curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
     local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" url
-    local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
-                        not else true end)).browser_download_url'
-
-    [[ "${JQ_FILTER}" ]] && jq_filter="${JQ_FILTER}"
+    local jq_filter="${JQ_FILTER:-'.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) | not else true end)).browser_download_url'}"
 
     local ii
     for ii in {1..10}; do
