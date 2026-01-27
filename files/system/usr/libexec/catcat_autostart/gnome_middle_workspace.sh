@@ -13,7 +13,7 @@ if [[ "$(dconf read /org/gnome/mutter/dynamic-workspaces)" == "false" ]]; then
     middle_workspace=$((workspace_count / 2))
     # Attempt to switch to the middle workspace
     while [[ ${attempts} -lt ${max_attempts} ]]; do
-        /usr/bin/wmctrl -s ${middle_workspace}
+        /usr/bin/wmctrl -s "${middle_workspace}"
         # Exit if it is already middle workspace
         /usr/bin/wmctrl -d | grep -w "${middle_workspace}  \*" && exit 0
         # Decrease speed of attempts after 4th attempt

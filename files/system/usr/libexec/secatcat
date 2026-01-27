@@ -40,14 +40,14 @@ resolv_conf="/etc/resolv.conf"
 # Extract blocklist
 if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
     mkdir -pv "${tmp_localdns}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
-    cat ${ushare_localdns}/dnscrypt/domains-filtered-subdomains.tar.zst* | \
+    cat "${ushare_localdns}/dnscrypt"/domains-filtered-subdomains.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
     cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
     localdnsctl --restart
     rm -rvf "${tmp_localdns}"
 elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnsmasq_confd}/domains-blocklist.conf" ]]; then
     mkdir -pv "${tmp_localdns}"
-    cat ${ushare_localdns}/dnsmasq/blocklist.conf.tar.zst* | \
+    cat "${ushare_localdns}/dnsmasq"/blocklist.conf.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
     cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
     restorecon -vR "${dnsmasq_confd}"/
@@ -58,7 +58,8 @@ fi
 # TODO: Log unsuccessful login attempts
 # Enabling needed authselect features
 authsel_curr=$(authselect current)
-if ! { grep "without-nullok" <<< ${authsel_curr} && grep "with-faillock" <<< ${authsel_curr}; }; then
+if ! { grep "without-nullok" <<< "${authsel_curr}" &&
+            grep "with-faillock" <<< "${authsel_curr}"; }; then
     #authselect select sssd
     authselect enable-feature without-nullok # Blocks empty password logins
     authselect enable-feature with-faillock # Enables account locking on failure

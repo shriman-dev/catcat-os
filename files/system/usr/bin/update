@@ -16,19 +16,19 @@ update_flatpak() {
         /usr/bin/flatpak remote-delete --user --force fedora
 
         # Add flathub repo
-        /usr/bin/flatpak ${scope} remote-add \
+        /usr/bin/flatpak "${scope}" remote-add \
                     --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     }
 
     # Update flatpaks
-    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive --appstream
-    /usr/bin/flatpak update ${scope} --assumeyes --noninteractive
+    /usr/bin/flatpak update "${scope}" --assumeyes --noninteractive --appstream
+    /usr/bin/flatpak update "${scope}" --assumeyes --noninteractive
 
     # Clean unneeded runtimes silently
-    /usr/bin/flatpak uninstall ${scope} --unused --assumeyes --noninteractive >/dev/null 2>&1
+    /usr/bin/flatpak uninstall "${scope}" --unused --assumeyes --noninteractive >/dev/null 2>&1
 
     log "INFO" "Running flatpak repair"
-    /usr/bin/flatpak repair ${scope}
+    /usr/bin/flatpak repair "${scope}"
 }
 
 update_nixpkg() {
@@ -44,9 +44,9 @@ update_nixpkg() {
     if [[ -x "${cmdpath}/nix-env" ]]; then
         enclosed_heading "Nixpkg ${scope} update" "="
 
-        ${cmdpath}/nix-channel --update && ${cmdpath}/nix-env -b --upgrade
-        ${cmdpath}/nix-store --optimise >/dev/null 2>&1
-        ${cmdpath}/nix-collect-garbage >/dev/null 2>&1
+        "${cmdpath}"/nix-channel --update && "${cmdpath}"/nix-env -b --upgrade
+        "${cmdpath}"/nix-store --optimise >/dev/null 2>&1
+        "${cmdpath}"/nix-collect-garbage >/dev/null 2>&1
     fi
 }
 
@@ -70,7 +70,7 @@ update_firmware() {
 update_system() {
     enclosed_heading "System update" "="
 
-    # Rebase to signed image if current image is not signed
+    # Always update to signed image if current image is not signed
     local booted_image="$(rpm-ostree status --booted | grep -w 'ostree-unverified-registry')"
     if [[ -n "${booted_image}" ]]; then
         local image_ref="${booted_image#*ostree-unverified-registry:}"

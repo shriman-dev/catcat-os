@@ -146,7 +146,7 @@ set_size() {
 # Log functions
 clean_old_logs() {
     local retention="3 months"
-    [[ ${1} ]] && echo "${1}" > "${CONFIG_DIR}/keep-log-time"
+    [[ -n ${1} ]] && echo "${1}" > "${CONFIG_DIR}/keep-log-time"
     [[ -f "${CONFIG_DIR}/keep-log-time" ]] && retention="$(cat ${CONFIG_DIR}/keep-log-time)"
 
     log "INFO" "Cleaning logs older than ${retention}"
@@ -344,7 +344,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --switch-blocklist-backend)
             shift
-            [[ ${1} ]] && switch_blocklist "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
+            [[ -n ${1} ]] && switch_blocklist "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
             shift
             ;;
 #        --set-blocklist-size)
@@ -363,13 +363,13 @@ while [[ $# -gt 0 ]]; do
             ;;
         -n|--lines)
             shift
-            [[ ${1} ]] && LAST_LINES=${1} || die "Number of lines required"
+            [[ -n ${1} ]] && LAST_LINES=${1} || die "Number of lines required"
             shift
             ;;
         -l|--log)
             shift
             LOG_TYPE="${1}"
-            [[ ${LOG_TYPE} ]] && log_types ||
+            [[ -n ${LOG_TYPE} ]] && log_types ||
                 die "Log type required" show_help
             shift
             ;;

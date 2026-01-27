@@ -52,19 +52,16 @@ if ! diff -q "${update_sha}" "${prev_sha}"; then
     ru_config_d="/root/.config"
     ru_local_share="/root/.local/share"
     ru_catcat_d="${ru_local_share}/catcat-os"
-    [[ ! -d ${ru_catcat_d}/LS_COLORS_DIR ]] &&
-            mkdir -vp ${ru_catcat_d}/LS_COLORS_DIR
+    [[ ! -d "${ru_catcat_d}/LS_COLORS_DIR" ]] &&
+            mkdir -vp "${ru_catcat_d}/LS_COLORS_DIR"
     cp -dvf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
-            ${ru_catcat_d}/LS_COLORS_DIR/
+            "${ru_catcat_d}/LS_COLORS_DIR"/
 
-    [[ ! -e ${ru_config_d}/bat ]] &&
-            { mkdir -vp ${ru_config_d} ; ln -svf /etc/bat ${ru_config_d}/; }
+    [[ ! -e "${ru_config_d}/bat" ]] &&
+            { mkdir -vp "${ru_config_d}" ; ln -svf /etc/bat "${ru_config_d}"/; }
     /usr/bin/bat cache --build
 
-    [[ ! -e ${ru_config_d}/fish/fish_variables ]] &&
-            ln -svf /etc/skel/.config/fish/fish_variables ${ru_config_d}/fish/fish_variables
-
-    [[ -d /var/lib/waydroid ]] && restorecon -vR /var/lib/waydroid
+    [[ -d "/var/lib/waydroid" ]] && restorecon -vR "/var/lib/waydroid"
 
     # GDM
     if systemctl is-enabled gdm; then

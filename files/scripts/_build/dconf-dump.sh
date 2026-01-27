@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-DCONF_DIR="$(dirname $(dirname $SCRIPT_DIR))/files/dconf"
+DCONF_DIR="$(dirname $(dirname "${SCRIPT_DIR}"))/files/dconf"
 
 dconfDump() {
     local path=$1
@@ -12,17 +12,17 @@ dconfDump() {
 }
 
 # keybindings
-> $DCONF_DIR/keybindings
-dconfDump '/org/gnome/desktop/wm/keybindings/' "" $DCONF_DIR/keybindings
-dconfDump '/org/gnome/shell/keybindings/' "" $DCONF_DIR/keybindings
-dconfDump '/org/gnome/mutter/keybindings/' "" $DCONF_DIR/keybindings
-dconfDump '/org/gnome/mutter/wayland/keybindings/' "" $DCONF_DIR/keybindings
-dconfDump '/org/gnome/settings-daemon/plugins/media-keys/' "" $DCONF_DIR/keybindings
+> ${DCONF_DIR}/keybindings
+dconfDump '/org/gnome/desktop/wm/keybindings/' "" ${DCONF_DIR}/keybindings
+dconfDump '/org/gnome/shell/keybindings/' "" ${DCONF_DIR}/keybindings
+dconfDump '/org/gnome/mutter/keybindings/' "" ${DCONF_DIR}/keybindings
+dconfDump '/org/gnome/mutter/wayland/keybindings/' "" ${DCONF_DIR}/keybindings
+dconfDump '/org/gnome/settings-daemon/plugins/media-keys/' "" ${DCONF_DIR}/keybindings
 
 # input
-> $DCONF_DIR/input
-#dconfDump '/org/gnome/desktop/input-sources/' "" $DCONF_DIR/input
-dconfDump '/org/freedesktop/ibus/engine/typing-booster/' "" $DCONF_DIR/input
+> ${DCONF_DIR}/input
+#dconfDump '/org/gnome/desktop/input-sources/' "" ${DCONF_DIR}/input
+dconfDump '/org/freedesktop/ibus/engine/typing-booster/' "" ${DCONF_DIR}/input
 
 # apps
 declare -A appPathsWithSed=(
@@ -50,9 +50,9 @@ s/side-pane-view=.*/side-pane-view='tree'/
 /editor\/state/,/^$/ { /size/d; /state/d }"
 )
 
-> $DCONF_DIR/apps
+> ${DCONF_DIR}/apps
 for path in "${!appPathsWithSed[@]}"; do
-    dconfDump "$path" "${appPathsWithSed[$path]}" "$DCONF_DIR/apps"
+    dconfDump "$path" "${appPathsWithSed[$path]}" "${DCONF_DIR}/apps"
 done
 
 
@@ -82,25 +82,25 @@ s/hot-sensors=.*/hot-sensors=\['__temperature_avg__', '_processor_usage_', '_mem
 )
 
 echo -e "\n[org/gnome/shell]
-enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'dash-to-panel@jderose9.github.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > $DCONF_DIR/extensions
+enabled-extensions=['blur-my-shell@aunetx', 'caffeine@patapon.info', 'clipboard-history@alexsaveau.dev', 'custom-hot-corners-extended@G-dH.github.com', 'dash-to-panel@jderose9.github.com', 'forge@jmmaranan.com', 'hide-universal-access@akiirui.github.io', 'notification-timeout@chlumskyvaclav.gmail.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'Vitals@CoreCoding.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']\n" > ${DCONF_DIR}/extensions
 
 for path in "${!extensionPathsWithSed[@]}"; do
-    dconfDump "$path" "${extensionPathsWithSed[$path]}" "$DCONF_DIR/extensions"
+    dconfDump "$path" "${extensionPathsWithSed[$path]}" "${DCONF_DIR}/extensions"
 done
 
 
 # background
-> $DCONF_DIR/background
-dconfDump '/org/gnome/desktop/background/' "s|file://.*|file:///usr/share/backgrounds/catcat-os/altos_odyssey.jpg'|" $DCONF_DIR/background
+> ${DCONF_DIR}/background
+dconfDump '/org/gnome/desktop/background/' "s|file://.*|file:///usr/share/backgrounds/catcat-os/altos_odyssey.jpg'|" ${DCONF_DIR}/background
 
 # interface
-> $DCONF_DIR/interface
-dconfDump '/org/gnome/desktop/interface/' "" $DCONF_DIR/interface
+> ${DCONF_DIR}/interface
+dconfDump '/org/gnome/desktop/interface/' "" ${DCONF_DIR}/interface
 
 # wmpreferences
-> $DCONF_DIR/wmpreferences
-dconfDump '/org/gnome/desktop/wm/preferences/' "" $DCONF_DIR/wmpreferences
-dconfDump '/org/gnome/mutter/' "/output-luminance/d" $DCONF_DIR/wmpreferences
+> ${DCONF_DIR}/wmpreferences
+dconfDump '/org/gnome/desktop/wm/preferences/' "" ${DCONF_DIR}/wmpreferences
+dconfDump '/org/gnome/mutter/' "/output-luminance/d" ${DCONF_DIR}/wmpreferences
 
 
 # shell
@@ -123,9 +123,9 @@ s|'syncthing@gnome.2nv2u.com',||;s|, 'syncthing@gnome.2nv2u.com'||"
     ['/org/gnome/shell/window-switcher/']=""
 )
 
-> $DCONF_DIR/shell
+> ${DCONF_DIR}/shell
 for path in "${!shellPathsWithSed[@]}"; do
-    dconfDump "$path" "${shellPathsWithSed[$path]}" "$DCONF_DIR/shell"
+    dconfDump "$path" "${shellPathsWithSed[$path]}" "${DCONF_DIR}/shell"
 done
 
 
@@ -162,14 +162,14 @@ s|message-text=.*|message-text='Meow'|"
 /last-folder-uri/d"
 )
 
-> $DCONF_DIR/defaults
+> ${DCONF_DIR}/defaults
 for path in "${!defaultPathsWithSed[@]}"; do
-    dconfDump "$path" "${defaultPathsWithSed[$path]}" "$DCONF_DIR/defaults"
+    dconfDump "$path" "${defaultPathsWithSed[$path]}" "${DCONF_DIR}/defaults"
 done
 
 sh -c "echo '
 [org/gnome/desktop/notifications]
 show-in-lock-screen=false
-' >> $DCONF_DIR/defaults"
+' >> ${DCONF_DIR}/defaults"
 
 

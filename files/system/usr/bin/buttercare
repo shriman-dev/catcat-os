@@ -45,7 +45,7 @@ balance() {
         [[ -n ${VERBOSE} ]] &&
             { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
         echo ""
-        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue ${mount}
+        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue "${mount}"
         echo ""
         [[ -n ${VERBOSE} ]] &&
             { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }

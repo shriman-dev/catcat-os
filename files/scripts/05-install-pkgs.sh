@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 log "INFO" "Defining packages"
@@ -387,17 +387,17 @@ log "INFO" "Disabled unneeded repos"
 log "INFO" "Installing External Packages"
 
 [[ "${IMAGE_NAME}" =~ "-mi" ]] &&
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh wldrivers
+    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh wldrivers
 
-exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
 
 [[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | sed -n 's|++||gp')
 
 if [[ ! "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh \
+    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh \
         $(printf '%s\n' "${DESKTOP_EXTRAS[@]}" | sed -n 's|++||gp')
 fi
 

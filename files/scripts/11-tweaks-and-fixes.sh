@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 # TWEAKS
@@ -40,11 +40,8 @@ cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
 # Configure zram and reduce ram consumption by disabling unneeded process
-if [[ ! -f /etc/systemd/zram-generator.conf ]]; then
-    log "INFO" "Setting zram compression to zstd"
-    echo '[zram0]
-compression-algorithm = zstd' > /etc/systemd/zram-generator.conf
-fi
+log "INFO" "Checking zram compression"
+check_file_inplace /etc/systemd/zram-generator.conf
 
 # Disable ibus (causes input lag when selected)
 #chmod -v 000 /usr/bin/ibus
@@ -67,7 +64,7 @@ chmod -v 000 /usr/libexec/goa-identity-service || true
 sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Wacom.service || true
 sed -i '/Restart=on-failure/d' /usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service || true
 
-# Minimal catcat specific tweaks
+# Mi catcat specific tweaks
 if [[ "${IMAGE_NAME}" =~ "-mi" ]]; then
     log "INFO" "Applying image specific tweaks: ${IMAGE_NAME}"
 #    systemctl disable systemd-nsresourced.service systemd-nsresourced.socket systemd-userdbd.service systemd-userdbd.socket

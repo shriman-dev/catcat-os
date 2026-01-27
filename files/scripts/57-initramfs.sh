@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 log "INFO" "Regenerating initramfs"

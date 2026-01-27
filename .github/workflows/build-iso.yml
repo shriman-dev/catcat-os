@@ -66,8 +66,9 @@ jobs:
           FLATPAK_REFS_DIR_ABS=$(realpath "${FLATPAK_REFS_DIR}")
           mkdir -p "${FLATPAK_REFS_DIR}"
           source ${{ github.workspace }}/files/system/etc/catcat-os/flatpak-list/flatpak-pkg-list.sh
-          FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}"
-          [[ "${{ matrix.image_name }}" =~ "-mi" ]] && FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]}"
+          FLATPAK_REFS_DIR_LIST="${DESKTOP_COMMON[@]}"
+          #[[ ! "${{ matrix.image_name }}" =~ "-mi" ]] &&
+          #      FLATPAK_REFS_DIR_LIST="${FLATPAK_REFS_DIR_LIST[@]} ${DESKTOP_EXTRAS[@]}"
           # Generate install script
           cat << EOF > ${TEMP_FLATPAK_INSTALL_DIR}/script.sh
           cat /temp_flatpak_install_dir/script.sh

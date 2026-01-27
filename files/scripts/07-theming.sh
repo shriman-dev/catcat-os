@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 desktop_files() {
@@ -7,32 +7,32 @@ desktop_files() {
 
     local desktopfile_dir="/usr/share/applications"
     # To use catcat update
-    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" ${desktopfile_dir}/system-update.desktop || true
+    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" "${desktopfile_dir}"/system-update.desktop || true
 
     sed -i 's|^Name=.*|Name=CatCat Setup|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
     sed -i 's|^Icon=.*|Icon=/usr/share/pixmaps/catcat-os-logo.svg|' /usr/share/ublue-os/firstboot/launcher/autostart.desktop || true
-    #cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop ${desktopfile_dir}/ || true
-    sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' ${desktopfile_dir}/autostart.desktop || true
+    #cp -dv /usr/share/ublue-os/firstboot/launcher/autostart.desktop "${desktopfile_dir}"/ || true
+    sed -i 's|^Exec=.*|Exec=/usr/bin/yafti -f /usr/share/ublue-os/firstboot/yafti.yml|' "${desktopfile_dir}"/autostart.desktop || true
 
-    sed -i 's|^Name=.*|Name=Nemo File Manager|' ${desktopfile_dir}/nemo.desktop || true
-    sed -i 's/^Icon=.*/Icon=user-home/' ${desktopfile_dir}/org.gnome.Nautilus.desktop
-    sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' ${desktopfile_dir}/org.gnome.Nautilus.desktop
-    sed -i 's/^Icon=.*/Icon=fish/' ${desktopfile_dir}/org.gnome.Ptyxis.desktop
-    sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' ${desktopfile_dir}/org.gnome.Settings.desktop
-    sed -i 's/^Icon=.*/Icon=np2/' ${desktopfile_dir}/oneko.desktop
-    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' ${desktopfile_dir}/yazi.desktop || true
+    sed -i 's|^Name=.*|Name=Nemo File Manager|' "${desktopfile_dir}"/nemo.desktop || true
+    sed -i 's/^Icon=.*/Icon=user-home/' "${desktopfile_dir}"/org.gnome.Nautilus.desktop
+    sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' "${desktopfile_dir}"/org.gnome.Nautilus.desktop
+    sed -i 's/^Icon=.*/Icon=fish/' "${desktopfile_dir}"/org.gnome.Ptyxis.desktop
+    sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' "${desktopfile_dir}"/org.gnome.Settings.desktop
+    sed -i 's/^Icon=.*/Icon=np2/' "${desktopfile_dir}"/oneko.desktop
+    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' "${desktopfile_dir}"/yazi.desktop || true
 
-    sed -i 's|^Name.*=.*|Name=Software Store|' ${desktopfile_dir}/io.github.kolunmi.Bazaar.desktop || true
+    sed -i 's|^Name.*=.*|Name=Software Store|' "${desktopfile_dir}"/io.github.kolunmi.Bazaar.desktop || true
 
-    sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' ${desktopfile_dir}/Waydroid.desktop
+    sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' "${desktopfile_dir}"/Waydroid.desktop
 
     # Hide desktop entries
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/nvtop.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/fish.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/yad-icon-browser.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/amdgpu_top-tui.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" ${desktopfile_dir}/bottom.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/nvtop.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/fish.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/yad-icon-browser.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/amdgpu_top.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/amdgpu_top-tui.desktop || true
+    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/bottom.desktop || true
 
     log "INFO" "Done."
 }
@@ -41,7 +41,7 @@ set_plymouth_theme() {
     log "INFO" "Applying plymouth theme"
 
     local plymouth_theme="catppuccin-mocha"
-    plymouth-set-default-theme ${plymouth_theme}
+    plymouth-set-default-theme "${plymouth_theme}"
 
     log "INFO" "Done."
 }
@@ -70,7 +70,7 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     log "INFO" "Installing Extra Font(s)"
     local FONTS_DIR="/usr/share/fonts" TMP_DIR="/tmp/extra_fonts" font_name font_url
     for font_name in "${!EXTRA_FONTS[@]}"; do
-        font_url="${EXTRA_FONTS[$font_name]}"
+        font_url="${EXTRA_FONTS[${font_name}]}"
         font_name=${font_name// /} # remove spaces
         get_fonts "${font_name}" "${font_url}"
     done
@@ -176,14 +176,14 @@ build_gdm_theme() {
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <gresources>
   <gresource prefix=\"/org/gnome/shell/theme\">
-$(find ${gmd_theme_tmp}/theme/ -type f -not -wholename '*.gresource*' -printf '    <file>%P</file>\n')
+$(find "${gmd_theme_tmp}/theme"/ -type f -not -wholename '*.gresource*' -printf '    <file>%P</file>\n')
   </gresource>
 </gresources>" > "${gmd_theme_tmp}/theme/${gdm_xml}"
     cat "${gmd_theme_tmp}/theme/${gdm_xml}"
 
     # Compile all resources and apply them to the gdm theme
     log "INFO" "Compiling all resources and apply them to the gdm theme"
-    glib-compile-resources --sourcedir=${gmd_theme_tmp}/theme/ "${gmd_theme_tmp}/theme/${gdm_xml}"
+    glib-compile-resources --sourcedir="${gmd_theme_tmp}/theme"/ "${gmd_theme_tmp}/theme/${gdm_xml}"
     mv -v "${gmd_theme_tmp}/theme/$(basename ${gdm_resource})" "${gdm_resource}"
 
     rm -rf "${gmd_theme_tmp}"
@@ -231,7 +231,7 @@ install_vscodium_ext() {
     mkdir -vp /tmp/vscodiumdata /etc/skel/.vscode-oss/extensions
     for ext in "${vscodium_extlist[@]}"; do
         codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir \
-                            /etc/skel/.vscode-oss/extensions --install-extension ${ext}
+                            /etc/skel/.vscode-oss/extensions --install-extension "${ext}"
     done
     rm -rf /tmp/vscodiumdata
     log "INFO" "Done."

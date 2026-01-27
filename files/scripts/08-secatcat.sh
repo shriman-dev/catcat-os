@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
-
-check_file_inplace() {
-    local _file
-    for _file in "$@"; do
-        if [[ -f "${_file}" ]]; then
-            log "DEBUG" "File is in place: ${_file}"
-        else
-            die "File does not exist in place: ${_file}"
-        fi
-    done
-}
 
 #############################
 # Boot, Services and System #
@@ -28,14 +17,14 @@ check_file_inplace /usr/lib/sysctl.d/99-catcat-sysctl.conf
 log "INFO" "Stop unneeded daemons dynamically"
 systemd_dir="/usr/lib/systemd"
 # Avahi daemon to stop when unneeded
-mkdir -vp ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}
+mkdir -vp "${systemd_dir}/system"/avahi-daemon.{service.d,socket.d}
 echo "[Unit]
 StopWhenUnneeded=true" | tee \
-            ${systemd_dir}/system/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
+            "${systemd_dir}/system"/avahi-daemon.{service.d,socket.d}/stop-when-unneeded.conf
 
 log "INFO" "Disabling coredump for better security and performance"
 no_coredump_conf="disable-coredump.conf"
-mkdir -vp ${systemd_dir}/{system,user}.conf.d
+mkdir -vp "${systemd_dir}"/{system,user}.conf.d
 #echo 'ulimit -S -c 0' >> /etc/profile
 echo "# Disable coredump
 fs.suid_dumpable=0
@@ -46,7 +35,7 @@ echo "# Disable coredump
 * soft core 0" > "/etc/security/limits.d/${no_coredump_conf}"
 
 echo "[Manager]
-DumpCore=no" | tee ${systemd_dir}/{system,user}.conf.d/${no_coredump_conf}
+DumpCore=no" | tee "${systemd_dir}"/{system,user}.conf.d/"${no_coredump_conf}"
 
 sed -i -Ee "/#?Storage=/d;/\[Coredump\]/a Storage=none" \
         -e "/#?ProcessSizeMax=/d;/\[Coredump\]/a ProcessSizeMax=0" \
@@ -103,7 +92,7 @@ dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/
 
 # Install dnscrypt-proxy if not installed
 [[ ! -x /usr/bin/dnscrypt-proxy ]] &&
-    exec_script ${BUILD_SETUP_DIR}/06-extra-pkgs.sh dnscrypt
+    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh dnscrypt
 
 check_file_inplace /etc/catcat-os/localdns.d/localdns-server.conf \
                    /etc/dnscrypt-proxy/dnscrypt-proxy.toml \

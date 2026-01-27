@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 TMP_DIR="/tmp/extra_pkgs"
@@ -53,15 +53,15 @@ ujust_setup() {
     log "INFO" "Categorizing justfiles"
 #    sed '/^\[group/d' ${import_dir}/*.just
     sed -i -E '/^configure-broadcom-wl/i [group\("hardware"\)]' \
-                            ${import_dir}/50-akmods.just || true
+                            "${import_dir}"/50-akmods.just || true
     sed -i -E '/^enroll-secure-boot-key/i [group\("utilities"\)]' \
-                            ${import_dir}/00-default.just || true
+                            "${import_dir}"/00-default.just || true
     sed -i -E '/^(toggle-nvk|configure-(nvidia|nvidia-optimus))/i [group\("nvidia"\)]' \
-                            ${import_dir}/40-nvidia.just || true
+                            "${import_dir}"/40-nvidia.just || true
     sed -i -E '/^install-resolve/i [group\("apps"\)]' \
-                            ${import_dir}/30-distrobox.just || true
+                            "${import_dir}"/30-distrobox.just || true
     sed -i 's|^toggle-user-motd|_toggle-user-motd|' \
-                            ${import_dir}/00-default.just || true
+                            "${import_dir}"/00-default.just || true
     sed -i -e 's|^changelogs-testing|_changelogs-testing|' \
            -e 's|^distrobox-assemble|_distrobox-assemble|' \
            -e 's|^distrobox-new|_distrobox-new|' \
@@ -74,7 +74,7 @@ ujust_setup() {
            -e 's|^configure-snapshots|_configure-snapshots|' \
            -e '/^alias.*distrobox-assemble/d' \
            -e '/^alias.*distrobox-new/d' \
-                            ${import_dir}/*.just || true
+                            "${import_dir}"/*.just || true
 
 
     # Import justfiles to ujust
@@ -84,12 +84,12 @@ ujust_setup() {
                   --repod "packages/ublue-os-just/src" -f "header.just"
 
     if [[ -f "${import_file}" ]]; then
-        mkdir -vp ${import_dir}
+        mkdir -vp "${import_dir}"
         local justfile import_line
-        for justfile in $(ls -A1 ${fetched_justfiles}/*.just | tac) \
-                        $(ls -A1 ${justfile_dir}/*.just | tac); do
+        for justfile in $(ls -A1 "${fetched_justfiles}"/*.just | tac) \
+                        $(ls -A1 "${justfile_dir}"/*.just | tac); do
             # Copy justfiles to ujust default directory
-            cp -dvf "${justfile}" ${import_dir}/
+            cp -dvf "${justfile}" "${import_dir}"/
             # Add import line if it does not exists already
             import_line="import \"${import_dir}/$(basename ${justfile})\""
             grep -w "${import_line}" "${import_file}" || {
@@ -98,7 +98,7 @@ ujust_setup() {
             }
         done
     fi
-    rm -rvf ${fetched_justfiles}
+    rm -rvf "${fetched_justfiles}"
     log "INFO" "Justfile(s) imported"
 
     log "INFO" "Full output of: ${import_file}"

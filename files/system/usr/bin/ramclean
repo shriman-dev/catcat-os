@@ -43,9 +43,8 @@ localsearch'
 #xdg-desktop-portal-gtk
 #gsd-xsettings
 
-for II in ${KILLP[*]}
-do
-  pkill -KILL -fe ${II}
+for II in ${KILLP[*]} do
+  pkill -KILL -fe "${II}"
 done
 
 sync; echo 3 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a

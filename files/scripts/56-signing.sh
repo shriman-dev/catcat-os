@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 log "INFO" "Configuring container image signing policy and placing cosign pub key"
@@ -27,7 +27,7 @@ jq --arg image_name "${IMAGE_NAME}" \
     { ($project_registry + "/" +  $image_name): [
         {
             "type": "sigstoreSigned",
-            "keyPath": "'${COSIGN_PUB_KEY}'",
+            "keyPath": "'"${COSIGN_PUB_KEY}"'",
             "signedIdentity": {
                 "type": "matchRepository"
             }

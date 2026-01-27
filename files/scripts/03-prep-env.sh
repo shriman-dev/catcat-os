@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${BUILD_SCRIPT_LIB}
+source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 log "INFO" "Preparing build environment"
@@ -18,6 +18,6 @@ chmod -vR 1777 /var/tmp
 rm -v /opt && mkdir -vp /opt
 
 log "INFO" "Adding Update SHA using the Commit SHA value"
-echo ${COMMIT_SHA} > /etc/catcat-os/update_sha
+echo "${COMMIT_SHA}" > /etc/catcat-os/update_sha
 
 log "INFO" "Build environment prepared"

@@ -75,7 +75,7 @@ err() { log "ERROR" "${1}"; return 1; }
 # echo "$CHOICE" will return "option 3"
 function Choose() {
     local CHOICE=$(ugum choose "$@")
-    echo "$CHOICE"
+    echo "${CHOICE}"
 }
 
 ## Function to generate a confirm dialog and return the selected choice
@@ -188,9 +188,20 @@ notify_users() {
 
 bak_before() {
     if [[ ! -e ${1}.og.bak ]]; then
-        cp ${VERBOSE:+-v} -drf ${1} ${1}.og.bak || err "Backup failed for orignal ${1}"
+        cp ${VERBOSE:+-v} -drf "${1}" "${1}".og.bak || err "Backup failed for orignal ${1}"
     fi
-    cp ${VERBOSE:+-v} -drf ${1} ${1}.bak || err "Backup failed for ${1}"
+    cp ${VERBOSE:+-v} -drf "${1}" "${1}".bak || err "Backup failed for ${1}"
+}
+
+check_file_inplace() {
+    local _file
+    for _file in "$@"; do
+        if [[ -f "${_file}" ]]; then
+            log "DEBUG" "File is in place: ${_file}"
+        else
+            die "File does not exist in place: ${_file}"
+        fi
+    done
 }
 
 # Check if a file is older than a specified number of seconds
@@ -200,7 +211,7 @@ is_file_older() {
 }
 
 replace_add() {
-    grep -qi "${1}" ${3} && sed -i -e "s|.*${1}.*|${2}|" ${3} || sh -c "echo '${2}' >> ${3}"
+    grep -qi "${1}" "${3}" && sed -i -e "s|.*${1}.*|${2}|" "${3}" || sh -c "echo '${2}' >> ${3}"
 }
 
 one_filesystem() {
@@ -277,7 +288,7 @@ check_network_connection() {
           return 0
         else
           log "DEBUG" "Network connection is not available. Waiting..."
-          sleep ${sleep_time}
+          sleep "${sleep_time}"
           (( attempt++ ))
         fi
     done

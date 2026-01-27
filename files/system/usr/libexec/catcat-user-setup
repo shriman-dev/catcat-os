@@ -73,7 +73,7 @@ gnome_shell_setup() {
     # Syncthing style
     if [[ -n ${CATCAT_DESKTOP_UPDATED} ]]; then
         sed -i 's|#FFFFFF|#cdd6f4|;s|#ffffff|#cdd6f4|' \
-            ${LOCALSHARE}/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons/*.svg ||
+            "${LOCALSHARE}/gnome-shell/extensions/syncthing@gnome.2nv2u.com/icons"/*.svg ||
                 err "Syncthing style setup failed"
     fi
 
@@ -106,8 +106,8 @@ gnome_shell_setup() {
     local vitals_schema="${LOCALSHARE}/gnome-shell/extensions/Vitals@CoreCoding.com/schemas/org.gnome.shell.extensions.vitals.gschema.xml"
     if [[ -f "${vitals_schema}" ]] && ! grep 'net.nokyan.Resources' "${vitals_schema}"; then
         if [[ "${FLATPAK_APPS}" =~ "net.nokyan.Resources" ]]; then
-            sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' ${vitals_schema} && {
-                glib-compile-schemas $(dirname ${vitals_schema}) &&
+            sed -i '/<key type="s" name="monitor-cmd">/,/<\/key>/ s|<default>.*</default>|<default>"/usr/bin/flatpak run net.nokyan.Resources"</default>|' "${vitals_schema}" && {
+                glib-compile-schemas "$(dirname ${vitals_schema})" &&
                 gnome-extensions disable Vitals@CoreCoding.com &&
                 gnome-extensions enable Vitals@CoreCoding.com
             } || err "Resources app integration with vitals failed"
@@ -167,7 +167,7 @@ setup_bookmarks_userdirs() {
                 err "Failed to set default user directories"
     fi
 
-    mkdir -pv /tmp/tmp-${USER}
+    mkdir -pv "/tmp/tmp-${USER}"
     if systemctl is-active gdm; then
         if ! grep "admin:/// AdminRoot" "${bookmarks}"; then
         log "INFO" "Adding Bookmarks"
@@ -201,7 +201,7 @@ remove_unnecessary_directories() {
 
     [[ -d "${HOME_DIR}/Templates" ]] && rm -rf "${HOME_DIR}/Templates"
     for dir in "${dirlist[@]}"; do
-        [[ -d ${dir} ]] && rmdir -v ${dir}
+        [[ -d "${dir}" ]] && rmdir -v "${dir}"
     done
 
     [[ -d "${HOME_DIR}/.mozilla" && ! -f "${HOME_DIR}/.mozilla/firefox/profiles.ini" ]] &&
@@ -257,7 +257,7 @@ theme_flatpak_apps() {
     fi
 
     if [[ ! "$(ls -Al "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]]; then
-        mkdir -pv ${LOCALSHARE}/{themes,icons,fonts}
+        mkdir -pv "${LOCALSHARE}"/{themes,icons,fonts}
         for dir in themes icons; do
             [[ -d "${HOME_DIR}/.${dir}" ]] &&
             cp -drf "${HOME_DIR}/.${dir}"/* "${LOCALSHARE}/${dir}"/ &&
@@ -318,9 +318,9 @@ setup_apps() {
     # VSCodium extensions
     local vs_extdir="${HOME_DIR}/.vscode-oss/extensions"
     mkdir -pv "${vs_extdir}"
-    ls -A1d ${vs_extdir}/*atppuccin* || {
-        cp -drf ${SKEL}/.vscode-oss/extensions/* "${vs_extdir}"/ &&
-        cp -drf ${SKEL}/.config/VSCodium "${CONFIG}"/ || err "Failed to configure VSCodium"
+    ls -A1d "${vs_extdir}"/*atppuccin* || {
+        cp -drf "${SKEL}/.vscode-oss/extensions"/* "${vs_extdir}"/ &&
+        cp -drf "${SKEL}/.config/VSCodium" "${CONFIG}"/ || err "Failed to configure VSCodium"
     }
 
     log "INFO" "Done"

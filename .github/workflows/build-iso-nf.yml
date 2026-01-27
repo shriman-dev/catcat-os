@@ -1,4 +1,4 @@
-name: build iso no fl
+name: build iso no-flatpak
 
 on:
   workflow_call:
