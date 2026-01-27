@@ -16,6 +16,7 @@ DESKTOP_EXTRAS=(
     # Monitoring Tools
     #"htop"
     "s-tui"
+    "stress-ng"
     "wireshark"
     "++bandwhich"
     #amdgpu_top

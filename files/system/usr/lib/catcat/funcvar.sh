@@ -297,11 +297,11 @@ latest_ghpkg_url() {
     [[ -n "${JQ_FILTER:-}" ]] && jq_filter="${JQ_FILTER}"
 
     local ii
-    for ii in {1..10}; do
+    for ii in {1..5}; do
         url=$(curl_fetch "https://api.github.com/repos/${repo}/releases/latest" |
                 jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
         [[ -n "${url}" ]] && echo "${url}" && return 0
-        sleep 0.2
+        sleep 0.4
     done
     die "Unable to retrieve latest package URL"
 }

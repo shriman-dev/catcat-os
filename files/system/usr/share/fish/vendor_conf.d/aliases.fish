@@ -218,6 +218,7 @@ abbr -c sudo mount 'mount -vm'
 abbr sysd 'sudo systemctl'
 abbr sysdu 'systemctl --user'
 abbr mount 'sudo mount -vm'
+abbr sysctl 'sudo sysctl'
 abbr nethogs 'sudo nethogs -a -C -b -v 4'
 abbr bandwhich 'sudo bandwhich --processes --connections'
 

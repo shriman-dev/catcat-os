@@ -50,7 +50,7 @@ install_fonts() {
     log "INFO" "Defining Fonts"
     local -A EXTRA_FONTS=(
         # Nerd Fonts
-        # When Nerd Font name is correct, URL is not needed
+        # When Nerd Font name is correct, URL is not required
         ['AdwaitaMono']=
         ['FiraCode']=
         ['Hack']=
@@ -80,10 +80,8 @@ https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf"
     log "INFO" "Building font cache"
     # Permit global fonts to be used by all users
     # Directories: 755, Files: 644
-    if [[ -d "${FONTS_DIR}" ]]; then
-        find "${FONTS_DIR}" -type d -exec chmod 755 {} + || true
-        find "${FONTS_DIR}" -type f -exec chmod 644 {} + || true
-    fi
+    find "${FONTS_DIR}" -type d -exec chmod 755 {} + || true
+    find "${FONTS_DIR}" -type f -exec chmod 644 {} + || true
 
     fc-cache --system-only --really-force "${FONTS_DIR}"
     log "INFO" "Done"

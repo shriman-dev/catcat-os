@@ -46,7 +46,6 @@ log "INFO" "Debloating image"
         rar \
         snapper \
         steamdeck-backgrounds \
-        stress-ng \
         Sunshine \
         sunshine \
         tailscale \
