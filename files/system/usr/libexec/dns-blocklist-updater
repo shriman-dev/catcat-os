@@ -5,11 +5,13 @@ four_days=$((one_day * 4))
 blocklist_autoupdate_log="/etc/catcat-os/log/auto-dns-blocklist-update.log"
 
 if is_file_older ${four_days} "${blocklist_autoupdate_log}"; then
-    date "+%a %b %d %H:%M:%S %Y" > "${blocklist_autoupdate_log}"
-    localdnsctl -v --update | tee -a "${blocklist_autoupdate_log}"
-    localdnsctl -v --restart | tee -a "${blocklist_autoupdate_log}"
+    if check_network_connection; then
+        date "+%a %b %d %H:%M:%S %Y" > "${blocklist_autoupdate_log}"
+        localdnsctl -v --update | tee -a "${blocklist_autoupdate_log}"
+        localdnsctl -v --restart | tee -a "${blocklist_autoupdate_log}"
+    fi
 else
     log "INFO" "Nothing to do."
-    log "INFO" "DNS blocklist updates after every $((four_days / 86400)) days."
-    log "INFO" "Use 'localdnsctl' command to update DNS blocklist manually."
+    #log "INFO" "DNS blocklist updates after every $((four_days / 86400)) days."
+    #log "INFO" "Use 'localdnsctl' command to update DNS blocklist manually."
 fi

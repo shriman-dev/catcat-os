@@ -3,10 +3,10 @@ SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$(dirname ${SCRIPT_DIR})"
 source "${REPO_DIR}"/ENVAR
 
-PROJECT_NAME="origami"
-IMAGE_NAME="origami"
-BASE_IMAGE_URL="ghcr.io/blue-build/base-images/fedora-cosmic"
-PUSH_REGISTRY="registry.gitlab.com/origami-linux/images" # This script does not push built image
+PROJECT_NAME="catcat"
+IMAGE_NAME="catcat-os"
+BASE_IMAGE_URL="ghcr.io/ublue-os/bazzite-gnome"
+PUSH_REGISTRY="ghcr.io/shriman-dev" # This script does not push built image
 ALT_TAG="main"
 
 LABELS=(
@@ -38,7 +38,7 @@ podman build "${BUILD_ARGS[@]}" "${LABELS[@]}" \
 
 
 #buildah build "${BUILD_ARGS[@]}" "${LABELS[@]}" \
-#            --tag ${DEFAULT_TAG} \
+#            --tag "${DEFAULT_TAG}" \
 #            --format docker \
 #            --tls-verify=true \
-#            --file Containerfile .
+#            --file "${REPO_DIR}"/Containerfile .
