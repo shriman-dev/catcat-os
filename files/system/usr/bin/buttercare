@@ -39,17 +39,18 @@ balance() {
         log "INFO" "Mount points detected: ${mounts[@]}"
     fi
 
-    for mount in ${mounts[@]}; do
-        validate_path "btrfs" "${mount}"
-        log "INFO" "Starting balance on ${mount}"
+    local _mount
+    for _mount in ${mounts[@]}; do
+        validate_path "btrfs" "${_mount}"
+        log "INFO" "Starting balance on ${_mount}"
         [[ -n ${VERBOSE} ]] &&
-            { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
+            { log "INFO" "Pre-balance disk space usage (df):"; ${BTRFS} filesystem df "${_mount}"; }
         echo ""
-        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue "${mount}"
+        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue "${_mount}"
         echo ""
         [[ -n ${VERBOSE} ]] &&
-            { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${mount}"; }
-        log "INFO" "Balance completed for ${mount}"
+            { log "INFO" "Post-balance disk space usage (df):"; ${BTRFS} filesystem df "${_mount}"; }
+        log "INFO" "Balance completed for ${_mount}"
     done
 }
 

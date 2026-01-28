@@ -132,6 +132,9 @@ log "INFO" "Enabling localdns"
 # Set localdns as default dns server for blocking ads/malwares
 cp -vf "${localdns_confd}/localdns-server.conf" /etc/NetworkManager/conf.d/
 
+# Remove symlinked resolv conf in post setup
+[[ -L /etc/resolv.conf ]] && log "WARN" "/etc/resolv.conf is a symlink, remove it in post setup"
+
 # Disable and mask systemd-resolved.service
 systemctl disable systemd-resolved.service
 systemctl mask systemd-resolved.service
@@ -185,6 +188,6 @@ check_file_inplace "${mute_mic_file}"
 # Package Management #
 ######################
 log "INFO" "Setting all RPM repos to use HTTPS protocol"
-for repo in /etc/yum.repos.d/*.repo; do
-    sed -i 's/metalink?/metalink?protocol=https\&/g' "${repo}"
+for dnf_repo in /etc/yum.repos.d/*.repo; do
+    sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
 done

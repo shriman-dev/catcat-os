@@ -145,11 +145,12 @@ set_folder_icons() {
             ["Me/Secure"]="folder-locked"
             ["Me/Syncthing"]="folder-syncthing"
         )
-        for dir in "${!icons[@]}"; do
-            [[ ! -d "${HOME_DIR}/${dir}" ]] && mkdir -pv "${HOME_DIR}/${dir}"
-            { gio set "${HOME_DIR}/${dir}" metadata::custom-icon-name "${icons[${dir}]}" &&
-                log "INFO" "Folder icon '${icons[${dir}]}' set to ${HOME_DIR}/${dir}"
-            } || err "Failed to set Folder icon '${icons[${dir}]}' to ${HOME_DIR}/${dir}"
+        local _dir
+        for _dir in "${!icons[@]}"; do
+            [[ ! -d "${HOME_DIR}/${_dir}" ]] && mkdir -pv "${HOME_DIR}/${_dir}"
+            { gio set "${HOME_DIR}/${_dir}" metadata::custom-icon-name "${icons[${_dir}]}" &&
+                log "INFO" "Folder icon '${icons[${_dir}]}' set to ${HOME_DIR}/${_dir}"
+            } || err "Failed to set Folder icon '${icons[${_dir}]}' to ${HOME_DIR}/${_dir}"
         done
         log "INFO" "Done"
     fi
@@ -200,8 +201,9 @@ remove_unnecessary_directories() {
     )
 
     [[ -d "${HOME_DIR}/Templates" ]] && rm -rf "${HOME_DIR}/Templates"
-    for dir in "${dirlist[@]}"; do
-        [[ -d "${dir}" ]] && rmdir -v "${dir}"
+    local _dir
+    for _dir in "${dirlist[@]}"; do
+        [[ -d "${_dir}" ]] && rmdir -v "${_dir}"
     done
 
     [[ -d "${HOME_DIR}/.mozilla" && ! -f "${HOME_DIR}/.mozilla/firefox/profiles.ini" ]] &&
@@ -258,11 +260,12 @@ theme_flatpak_apps() {
 
     if [[ ! "$(ls -Al "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]]; then
         mkdir -pv "${LOCALSHARE}"/{themes,icons,fonts}
-        for dir in themes icons; do
-            [[ -d "${HOME_DIR}/.${dir}" ]] &&
-            cp -drf "${HOME_DIR}/.${dir}"/* "${LOCALSHARE}/${dir}"/ &&
-            rm -rvf "${HOME_DIR}/.${dir}"
-            ln -srfTv "${LOCALSHARE}/${dir}" "${HOME_DIR}/.${dir}"
+        local _dir
+        for _dir in themes icons; do
+            [[ -d "${HOME_DIR}/.${_dir}" ]] &&
+            cp -drf "${HOME_DIR}/.${_dir}"/* "${LOCALSHARE}/${_dir}"/ &&
+            rm -rvf "${HOME_DIR}/.${_dir}"
+            ln -srfTv "${LOCALSHARE}/${_dir}" "${HOME_DIR}/.${_dir}"
         done
 
         [[ $(ls -A1 "${CONFIG}/gtk-4.0" | wc -l) -eq 0 ]] &&
@@ -294,12 +297,13 @@ setup_apps() {
         ["com.github.tenderowl.frog"]="com.endlessnetwork.frogsquash"
     )
 
-    for app in "${!app_icons[@]}"; do
-        if [[ ! -f "${apps_dir}/${app}.desktop" || ! -s "${apps_dir}/${app}.desktop" ]]; then
-            [[ "${FLATPAK_APPS}" =~ "${app}" ]] &&
-                sed "s|^Icon=.*|Icon=${app_icons[${app}]}|" \
-                    "/var/lib/flatpak/exports/share/applications/${app}.desktop" > \
-                        "${apps_dir}/${app}.desktop"
+    local _app
+    for _app in "${!app_icons[@]}"; do
+        if [[ ! -f "${apps_dir}/${_app}.desktop" || ! -s "${apps_dir}/${_app}.desktop" ]]; then
+            [[ "${FLATPAK_APPS}" =~ "${_app}" ]] &&
+                sed "s|^Icon=.*|Icon=${app_icons[${_app}]}|" \
+                    "/var/lib/flatpak/exports/share/applications/${_app}.desktop" > \
+                        "${apps_dir}/${_app}.desktop"
         fi
     done
 

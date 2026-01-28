@@ -71,6 +71,7 @@ remove_filesystem_access() {
     "re.sonny.Tangram"
   )
 
+  local app
   for app in "${nofilesystem_for_apps[@]}"; do
     if [[ "${FLATPAK_APPS}" =~ "${app}" && ! -f "/var/lib/flatpak/overrides/${app}" ]]; then
       log "INFO" "\nRemove existing filesystem permissions for app: ${app}"
@@ -79,12 +80,13 @@ remove_filesystem_access() {
 
       if [[ ! -z ${permitted_filesystem} ]]; then
         local perms=()
+        local _perm
         permitted_filesystem=${permitted_filesystem::-1}
-        for perm in ${permitted_filesystem}; do
-          perms+=("--nofilesystem=${perm}")
+        for _perm in ${permitted_filesystem}; do
+          perms+=("--nofilesystem=${_perm}")
         done
         log "INFO" "Removing permissions: '${permitted_filesystem}'"
-        flatpak override "${SCOPE}" "${perms[@]}" "${app}"
+        flatpak override "${SCOPE}" "${_perm[@]}" "${app}"
       fi
     fi
   done
@@ -119,6 +121,7 @@ allow_home() {
   )
 
   echo ''
+  local app
   for app in "${allowhome_for_apps[@]}"; do
     log "INFO" "Allowing home access for app: ${app}"
     flatpak override "${SCOPE}" --unshare=network --filesystem=home "${app}"
@@ -165,6 +168,7 @@ allow_gpu_acceleration() {
   )
 
   echo ''
+  local app
   for app in "${gpu_acceleration_for_apps[@]}"; do
     log "INFO" "Allowing gpu acceleration for app: ${app}"
     flatpak override "${SCOPE}" --device=dri "${app}"
@@ -174,6 +178,7 @@ allow_gpu_acceleration() {
 app_specific_perms() {
   # Allow all devices (cam) for camera apps
   echo ''
+  local app
   for app in org.gnome.Cheese \
              org.gnome.Snapshot; do
     log "INFO" "Permitting cam for app ${app}"
@@ -182,6 +187,7 @@ app_specific_perms() {
 
   # Enable kvm and gpu acceleration for virtualization apps
   echo ''
+  local app
   for app in org.gnome.Boxes \
              org.virt_manager.virt-manager; do
     log "INFO" "Enabling virtualization for app ${app}"
@@ -190,6 +196,7 @@ app_specific_perms() {
 
   # Fix qt apps on wayland
   echo ''
+  local app
   for app in org.videolan.VLC \
              org.shotcut.Shotcut \
              com.calibre_ebook.calibre \

@@ -6,7 +6,7 @@ sleep 5
 waydroid prop set persist.waydroid.uevent false
 waydroid prop set persist.waydroid.multi_windows false
 
-for file in "${HOME}/.local/share/applications"/waydroid.*.desktop; do
-    grep "NoDisplay=true" "${file}" ||
-        sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${file}"
+for _file in "${HOME}/.local/share/applications"/waydroid.*.desktop; do
+    grep "NoDisplay=true" "${_file}" ||
+        sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${_file}"
 done

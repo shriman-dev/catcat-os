@@ -229,9 +229,9 @@ install_vscodium_ext() {
     )
 
     mkdir -vp /tmp/vscodiumdata /etc/skel/.vscode-oss/extensions
-    for ext in "${vscodium_extlist[@]}"; do
+    for vsc_ext in "${vscodium_extlist[@]}"; do
         codium --no-sandbox --user-data-dir /tmp/vscodiumdata --extensions-dir \
-                            /etc/skel/.vscode-oss/extensions --install-extension "${ext}"
+                            /etc/skel/.vscode-oss/extensions --install-extension "${vsc_ext}"
     done
     rm -rf /tmp/vscodiumdata
     log "INFO" "Done."
