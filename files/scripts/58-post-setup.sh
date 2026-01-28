@@ -35,6 +35,10 @@ rm -rvf /boot/.*
 rm -rvf /boot/*
 rm -rvf /tmp/*
 
+# Remove symlinked resolv conf and create empty one
+[[ -L /etc/resolv.conf ]] && rm -v /etc/resolv.conf
+touch /etc/resolv.conf
+
 # Remove more stuffs in skel
 #/etc/skel/.config/autostart
 rm -rvf /etc/skel/.mozilla
