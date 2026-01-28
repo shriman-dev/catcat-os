@@ -4,10 +4,10 @@ set -ouex pipefail
 
 log "INFO" "Configuring container image signing policy and placing cosign pub key"
 
-OS_PROJECT_NAME="catcat-os"
-PROJECT_REGISTRY="ghcr.io/shriman-dev"
+PROJECT_NAME="${PROJECT_NAME}"
+PROJECT_REGISTRY="${PUSH_REGISTRY}"
 TEMPLATE_POLICY="${BUILD_SETUP_DIR}/setup_files/policy.json"
-COSIGN_PUB_KEY="/etc/pki/containers/${OS_PROJECT_NAME}.pub"
+COSIGN_PUB_KEY="/etc/pki/containers/${PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
 mkdir -vp /etc/pki/containers /etc/containers/registries.d
@@ -38,7 +38,7 @@ mv -v "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
 echo "docker:
   ${PROJECT_REGISTRY}:
-    use-sigstore-attachments: true" > "/etc/containers/registries.d/${OS_PROJECT_NAME}.yaml"
+    use-sigstore-attachments: true" > "/etc/containers/registries.d/${PROJECT_NAME}.yaml"
 
 log "INFO" "Done."
 

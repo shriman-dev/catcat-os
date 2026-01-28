@@ -6,7 +6,7 @@ log "INFO" "Applying custom image info and labels"
 declare -A IMAGE_INFO=(
     ["NAME"]="CatCat OS"
     ["PRETTY_NAME"]="CatCat OS ${MAJOR_VERSION}"
-    ["ID"]="catcat"
+    ["ID"]="${PROJECT_NAME}"
     ["ID_LIKE"]="fedora"
     ["IMAGE_ID"]="${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP}"
     ["VARIANT_ID"]="${IMAGE_NAME}${ALT_TAG:+:${ALT_TAG}}"

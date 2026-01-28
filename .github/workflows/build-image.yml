@@ -16,8 +16,9 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_DESC: "Meow"
-  PUSH_IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
+  PROJECT_NAME: "catcat-os"
+  PROJECT_DESC: "Meow"
+  PUSH_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
 concurrency:
   group: build-image-${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -36,22 +37,22 @@ jobs:
       matrix:
         include:
           - IMAGE_NAME: catcat-os
-            BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome
+            BASE_IMAGE_URL: ghcr.io/ublue-os/bazzite-gnome
 
           - IMAGE_NAME: catcat-os-mi
             ALT_TAG: mi
-            BASE_IMAGE_NAME: ghcr.io/ublue-os/silverblue-main
+            BASE_IMAGE_URL: ghcr.io/ublue-os/silverblue-main
 
           - IMAGE_NAME: catcat-os-nv
             ALT_TAG: nvidia
-            BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
+            BASE_IMAGE_URL: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
 
           - IMAGE_NAME: catcat-os-hh
             ALT_TAG: deck
-            BASE_IMAGE_NAME: ghcr.io/ublue-os/bazzite-deck-gnome
+            BASE_IMAGE_URL: ghcr.io/ublue-os/bazzite-deck-gnome
 
 #          - IMAGE_NAME: catcat-os-sv
-#            BASE_IMAGE_NAME: ghcr.io/ublue-os/ucore-minimal:stable
+#            BASE_IMAGE_URL: ghcr.io/ublue-os/ucore-minimal:stable
 
     steps:
       - name: Checkout Repo
@@ -87,17 +88,18 @@ jobs:
           echo "DATETIMESTAMP=${DATETIMESTAMP}" >> ${GITHUB_ENV}
           echo "AHHH_DATE=${AH_DATE}" >> ${GITHUB_ENV}
           echo "COMMIT_SHA=${GITHUB_SHA}" >> ${GITHUB_ENV}
-          echo "PUSH_IMAGE_REGISTRY=${PUSH_IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
+          echo "PUSH_REGISTRY=${PUSH_REGISTRY,,}" >> ${GITHUB_ENV}
           ALT_TAG="${{ matrix.ALT_TAG }}"
           [[ -n "${ALT_TAG}" ]] &&
               echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> ${GITHUB_ENV}
-          if [[ "${{ matrix.BASE_IMAGE_NAME }}" =~ "bazzite" ]]; then
+          if [[ "${{ matrix.BASE_IMAGE_URL }}" =~ "bazzite" ]]; then
               echo "TAG_VER=stable-${MAJOR_VERSION}" >> ${GITHUB_ENV}
-          elif [[ "${{ matrix.BASE_IMAGE_NAME }}" =~ "ucore" ]]; then
+          elif [[ "${{ matrix.BASE_IMAGE_URL }}" =~ "ucore" ]]; then
               echo "TAG_VER=stable" >> ${GITHUB_ENV}
           else
               echo "TAG_VER=${MAJOR_VERSION}" >> ${GITHUB_ENV}
           fi
+          # Get sbsign key
 
       # Build metadata
       - name: Image Metadata
@@ -115,7 +117,7 @@ jobs:
           labels: |
             io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/main/README.md
             org.opencontainers.image.created=${{ env.AHHH_DATE }}
-            org.opencontainers.image.description=${{ env.IMAGE_DESC }}
+            org.opencontainers.image.description=${{ env.PROJECT_DESC }}
             org.opencontainers.image.title=${{ matrix.IMAGE_NAME }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
             org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATETIMESTAMP }}
@@ -137,10 +139,12 @@ jobs:
             ${{ env.ALT_STAMP }}
             ${{ steps.metadata.outputs.tags }}
           build-args: |
-            BASE_IMAGE_NAME=${{ matrix.BASE_IMAGE_NAME }}
+            PROJECT_NAME=${{ env.PROJECT_NAME }}
             IMAGE_NAME=${{ matrix.IMAGE_NAME }}
-            ALT_TAG=${{ matrix.ALT_TAG }}
+            BASE_IMAGE_URL=${{ matrix.BASE_IMAGE_URL }}
+            PUSH_REGISTRY=${{ env.PUSH_REGISTRY }}
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+            ALT_TAG=${{ matrix.ALT_TAG }}
             TAG_VER=${{ env.TAG_VER }}
             DATESTAMP=${{ env.DATESTAMP }}
             TIMESTAMP=${{ env.TIMESTAMP }}
@@ -158,7 +162,7 @@ jobs:
       #   with:
       #     rechunk: 'ghcr.io/ublue-os/legacy-rechunk:v1.0.0-x86_64'
       #     ref: "localhost/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
-      #     prev-ref: "${{ env.PUSH_IMAGE_REGISTRY }}/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
+      #     prev-ref: "${{ env.PUSH_REGISTRY }}/${{ matrix.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
       #     skip_compression: false
       #     version: ${{ env.MAJOR_VERSION }}
       #     labels: ${{ steps.metadata.outputs.labels }} # Rechunk strips out all the labels during build, this needs to be reapplied here with newline separator
@@ -188,7 +192,7 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_PASSWORD: ${{ github.token }}
         with:
-          registry: ${{ env.PUSH_IMAGE_REGISTRY }}
+          registry: ${{ env.PUSH_REGISTRY }}
           image: ${{ matrix.IMAGE_NAME }}
           tags: |
             ${{ matrix.ALT_TAG }}
@@ -215,7 +219,7 @@ jobs:
           echo "Image Digest: $DIGEST"
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
         env:
-          IMAGE_FULL: ${{ env.PUSH_IMAGE_REGISTRY }}/${{ matrix.IMAGE_NAME }}
+          IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ matrix.IMAGE_NAME }}
           DIGEST: ${{ steps.push.outputs.digest }}
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
