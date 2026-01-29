@@ -113,6 +113,6 @@ sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minima
 
 # Fix iso build failing for the reason just having CN readme
 rpm -q just &&
-    mv '/usr/share/doc/just/README.中文.md' '/usr/share/doc/just/README.zh-cn.md'
+    rm -v /usr/share/doc/just/README.*.md
 
 log "INFO" "System fixes applied"
