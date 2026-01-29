@@ -17,7 +17,7 @@ services_enable() {
     systemctl --global -f enable \
         libadwaita-theme-sync.service \
         catcat-user-setup.service
-    log "INFO" "Done."
+    log "INFO" "Enabled system services"
 }
 
 #setroubleshootd.service
@@ -108,7 +108,7 @@ services_disable() {
     log "INFO" "Disabling and masking global services"
     systemctl --global disable ${GLOBAL_DISABLE_SERVICES[@]}
     systemctl --global mask ${GLOBAL_DISABLE_SERVICES[@]}
-    log "INFO" "Done."
+    log "INFO" "Disabled system services"
 }
 
 if [[ $# -eq 0 ]]; then

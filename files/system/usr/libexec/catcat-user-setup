@@ -225,7 +225,8 @@ shell_setup() {
 
     # Fish shell
     # To load fish config
-    ( [[ -n ${FIRSTBOOT} ]] && fish -C 'kill -9 $fish_pid' & ) 2>/dev/null
+    sed '/status is-interactive || exit 0/d' \
+            /usr/share/fish/vendor_conf.d/a-decor.fish | fish >/dev/null
     #
     if [[ -n ${CATCAT_SYSTEM_UPDATED} ]]; then
         [[ ! -d "${CONFIG}/fish/themes" ]] && mkdir -vp "${CONFIG}/fish/themes"

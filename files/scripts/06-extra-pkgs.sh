@@ -223,9 +223,9 @@ process_package() {
             chmod -v +x "${BIN_DIR}"/{buttersnap.sh,buttercopy.sh}
             ;;
         btdu)
-            curl_get "${BIN_DIR}/btdu" \
+            curl_get "${BIN_DIR}/${1}" \
                 "https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64"
-            chmod -v +x "${BIN_DIR}/btdu"
+            chmod -v +x "${BIN_DIR}/${1}"
             ;;
         gocryptfs)
             get_ghpkg --name "${1}" --repo "rfjakob/gocryptfs" \

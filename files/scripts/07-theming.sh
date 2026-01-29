@@ -34,7 +34,7 @@ desktop_files() {
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/amdgpu_top-tui.desktop || true
     sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/bottom.desktop || true
 
-    log "INFO" "Done."
+    log "INFO" "Done configuring desktop files"
 }
 
 set_plymouth_theme() {
@@ -43,7 +43,7 @@ set_plymouth_theme() {
     local plymouth_theme="catppuccin-mocha"
     plymouth-set-default-theme "${plymouth_theme}"
 
-    log "INFO" "Done."
+    log "INFO" "Plymouth theme applied"
 }
 
 install_fonts() {
@@ -197,8 +197,8 @@ $(find "${gmd_theme_tmp}/theme"/ -type f -not -wholename '*.gresource*' -printf 
     mv -v   "${gdm_resource}" "${gdm_resource}.og"
     ln -svf "/usr/local/share/gnome-shell/$(basename ${gdm_resource})" "${gdm_resource}"
 
-    log "INFO" "All done."
-    log "INFO" "Custom theme has been built and set for GDM."
+    log "INFO" "All done"
+    log "INFO" "Custom theme has been built and set for GDM"
 }
 
 apply_default_configs() {
@@ -214,7 +214,7 @@ apply_default_configs() {
     mkdir -vp /etc/skel/.config/dconf
     /usr/bin/dconf update
 
-    log "INFO" "Done."
+    log "INFO" "Done"
     log "INFO" "Tree of: /etc/dconf"
     tree /etc/dconf/
 }
@@ -234,13 +234,13 @@ install_vscodium_ext() {
                             /etc/skel/.vscode-oss/extensions --install-extension "${vsc_ext}"
     done
     rm -rf /tmp/vscodiumdata
-    log "INFO" "Done."
+    log "INFO" "Installed vscodium extensions"
 }
 
 gnome_shell_ext() {
     log "INFO" "Copying gnome shell extensions to system default path"
     cp -drf /etc/skel/.local/share/gnome-shell/extensions/* /usr/share/gnome-shell/extensions/
-    log "INFO" "Done."
+    log "INFO" "Gnome shell extensions copied"
 }
 
 desktop_files

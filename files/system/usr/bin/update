@@ -98,29 +98,32 @@ update_system() {
 show_help() {
     cat << EOF
 Usage: $(basename "$0") [command1] [command2] [command3] ...
+Global Options:
+    -h|--help       Display this help message
+    --net-type      Specify network type to perform updates (default: any)
+                    Network types: ethernet or wifi
+                    Note: For specific Wi-Fi network use 'wifi=<SSID>'
 
-Available commands:
-    all            Perform all update operations (System, Firmware, DNS blocklist,
-                   Flatpak, and Nixpkg updates for all users)
+Available update commands:
+    all             Perform all update operations (System, Firmware, DNS blocklist,
+                    Flatpak, and Nixpkg updates for all users)
 
-    extra          Update Flatpak and Nixpkg for all users
-                   If run as root, also updates Firmware and DNS blocklist
+    extra           Update Flatpak and Nixpkg for all users
+                    If run as root, also updates Firmware and DNS blocklist
 
-    flat-nix       Update both Flatpak and Nixpkg for current user
+    flat-nix        Update both Flatpak and Nixpkg for current user
 
-    flatpak        Update Flatpak packages for current user
-                   If run as root, updates system-wide packages
+    flatpak         Update Flatpak packages for current user
+                    If run as root, updates system-wide packages
 
-    nixpkg         Update Nixpkg packages for current user
-                   If run as root, updates system-wide packages
+    nixpkg          Update Nixpkg packages for current user
+                    If run as root, updates system-wide packages
 
-    dns-blocklist  Update DNS blocklist (requires root privileges)
+    dns-blocklist   Update DNS blocklist (requires root privileges)
 
-    system         Update system packages (default if no command is provided)
+    system          Update system packages (default if no command is provided)
 
-    firmware       Update device firmware (requires root privileges)
-
-    help           Display this help message
+    firmware        Update device firmware (requires root privileges)
 
 Note: Multiple commands can be provided and will be executed in sequence.
       Some operations require root privileges to update system-wide packages.
@@ -167,21 +170,64 @@ process_command() {
         firmware)
             update_firmware
             ;;
-        help)
-            show_help
-            ;;
         *)
             die "Error: Unknown argument ${1}" show_help
             ;;
     esac
 }
 
-if [[ $# -eq 0 ]]; then
-    update_system
-    exit 0
-fi
+on_connection() {
+    local net_type="${1}"
+
+    if [[ "${net_type}" =~ 'wifi=' ]]; then
+        local ssid="${net_type#*=}"
+        local connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
+        [[ "${connected_ssid}" =~ "${ssid}" ]] && return 0
+    elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${net_type}" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
 
 # Process all provided arguments
-for arg in "$@"; do
-    process_command "${arg}" || exit 1
-done
+main() {
+    if [[ $# -eq 0 ]]; then
+        update_system
+        exit 0
+    fi
+    # Parse global options
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -h|--help)
+                show_help; exit 0
+                ;;
+            --net-type)
+                NET_TYPE="${2}"
+                shift
+                ;;
+            *) break ;;
+        esac
+        shift
+    done
+
+    # Process update commands
+    if [[ -n "${NET_TYPE:-}" ]]; then
+        if on_connection "${NET_TYPE}"; then
+            log "INFO" "Network is active: ${NET_TYPE}"
+            log "INFO" "Performing updates"
+        else
+            log "INFO" "Network is not active: ${NET_TYPE}"
+            log "INFO" "Skipping updates"
+            exit 0 # Exit on function failure
+        fi
+    else
+        true # Continue if NET_TYPE is empty
+    fi
+
+    for arg in "$@"; do
+        process_command "${arg}"
+    done
+}
+
+main "$@"

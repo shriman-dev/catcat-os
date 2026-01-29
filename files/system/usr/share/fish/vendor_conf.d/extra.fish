@@ -80,6 +80,7 @@ begin
         -e 's|"'"/var/home/$USER"'\([^"]*\)"|"$HOME\1"|g' \
         -e 's|'"/var/home/$USER"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1 &
 
-    sed -i -e "s|'$HOME\([^']*\)'|\"\$HOME\1\"|g" -e 's|"'"$HOME"'\([^"]*\)"|"$HOME\1"|g' \
+    sed -i -e "s|'$HOME\([^']*\)'|\"\$HOME\1\"|g" \
+        -e 's|"'"$HOME"'\([^"]*\)"|"$HOME\1"|g' \
         -e 's|'"$HOME"'|\$HOME|g' $HOME/.local/share/fish/fish_history >/dev/null 2>&1 &
 end

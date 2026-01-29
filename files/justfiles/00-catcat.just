@@ -281,6 +281,15 @@ toggle-updates ACTION="prompt":
       sudo systemctl disable --force --now catcat-os-update.timer
     fi
 
+# Automatic updates only on specific connection. Connection types: ethernet or wifi. For specific Wi-Fi network use 'wifi=<SSID>'
+[group("system")]
+auto-update-on-connection CONNECTION:
+    #!/usr/bin/env -S sudo -- /bin/bash
+    CONNECTION={{ CONNECTION }}
+    mkdir -p /etc/catcat-os/
+    echo "${CONNECTION}" > /etc/catcat-os/auto_update_on_connection
+
+
 # Turn automatic updates on or off
 _toggle-updates:
     #!/usr/bin/bash

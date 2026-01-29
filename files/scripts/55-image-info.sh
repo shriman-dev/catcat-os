@@ -24,7 +24,7 @@ for key in "${!IMAGE_INFO[@]}"; do
     # If the key does not exist, append it to the os-release file
     grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" >> "${OS_RELEASE_FILE}"
 done
-log "INFO" "Applied."
+log "INFO" "Applied image info"
 
 log "INFO" "Full output of: ${OS_RELEASE_FILE}"
 cat "${OS_RELEASE_FILE}"

@@ -221,6 +221,7 @@ abbr mount 'sudo mount -vm'
 abbr sysctl 'sudo sysctl'
 abbr nethogs 'sudo nethogs -a -C -b -v 4'
 abbr bandwhich 'sudo bandwhich --processes --connections'
+abbr localdnsctl 'sudo localdnsctl -v'
 
 # Help wrapper with bat
 abbr -a --position anywhere -- --help '--help | bat -fpplhelp'
