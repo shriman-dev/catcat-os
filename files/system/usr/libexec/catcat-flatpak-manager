@@ -202,13 +202,15 @@ app_specific_perms() {
              com.calibre_ebook.calibre \
              net.pcsx2.PCSX2 \
              net.rpcs3.RPCS3 \
-             org.libretro.RetroArch; do
+             org.libretro.RetroArch \
+             io.github.benjamimgois.goverlay; do
     log "INFO" "Disabling wayland socket for app ${app}"
     flatpak override "${SCOPE}" --nosocket=wayland "${app}"
   done
 
-  # Allow host for GPU screen recorder
+  # Allow host for LACT and GPU screen recorder
   flatpak override "${SCOPE}" --unshare=network --filesystem=host com.dec05eba.gpu_screen_recorder
+  flatpak override "${SCOPE}" --unshare=network --filesystem=host io.github.ilya_zlobintsev.LACT
 
   # Allow gedit to edit files all over system
   log "INFO" "\nAllow gedit to edit files all over system"
@@ -224,6 +226,14 @@ configure_gaming_apps() {
     --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro},xdg-data/{umu:create,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
     --env=DXVK_ASYNC=1 \
   com.usebottles.bottles
+
+  log "INFO" "\nGiving necessary permissions for gaming to: io.github.Faugus.faugus-launcher"
+  flatpak override "${SCOPE}" \
+    --device={input,dri} \
+    --allow={devel,multiarch,per-app-dev-shm} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro} \
+    --env=DXVK_ASYNC=1 \
+  io.github.Faugus.faugus-launcher
 
   log "INFO" "\nGiving necessary permissions for gaming to: net.lutris.Lutris"
   flatpak override "${SCOPE}" \
@@ -241,6 +251,13 @@ configure_gaming_apps() {
     --env=DXVK_ASYNC=1 \
   com.valvesoftware.Steam
 
+  log "INFO" "\nGiving necessary permissions for gaming to: io.github.benjamimgois.goverlay"
+  flatpak override "${SCOPE}" \
+    --device={input,dri} \
+    --allow={devel,multiarch,per-app-dev-shm} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt},xdg-data/{umu,Steam},~/.steam,~/.var/app/com.valvesoftware.Steam/data/Steam} \
+    --env=DXVK_ASYNC=1 \
+  io.github.benjamimgois.goverlay
 
   log "INFO" "\nGiving necessary permissions for gaming to: com.heroicgameslauncher.hgl"
   flatpak override "${SCOPE}" \

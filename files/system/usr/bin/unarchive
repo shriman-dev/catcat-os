@@ -1,4 +1,5 @@
 #!/usr/bin/bash
 source /usr/lib/catcat/funcvar.sh
+VERBOSE=
 
-unarchive "${1}" "${2}"
+unarchive "${1}" "${2}" >/dev/null

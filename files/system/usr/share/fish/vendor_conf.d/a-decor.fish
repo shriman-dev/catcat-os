@@ -32,7 +32,7 @@ type -q zoxide && zoxide init fish | source
 set -gx FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS\
 --color=bg+:bright-black,gutter:-1,spinner:bright-magenta,hl:bright-blue \
 --color=fg:bright-white,header:bright-red,info:bright-yellow,pointer:blue \
---color=marker:bright-blue,fg+:bright-white:bold,prompt:bright-yellow,hl+:bright-cyan \
+--color=marker:bright-blue,fg+:bright-white:bold,prompt:bright-yellow,hl+:bright-blue \
 --color=selected-bg:bright-black \
 --color=border:bright-black,label:bright-magenta"
 
