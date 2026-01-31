@@ -1,6 +1,5 @@
 #!/bin/bash
 source /usr/lib/catcat/funcvar.sh
-
 runtimes() {
   local runtimes=(
     'org.kde.KStyle.Kvantum'
@@ -231,7 +230,7 @@ configure_gaming_apps() {
   flatpak override "${SCOPE}" \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro} \
+    --filesystem=~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro} \
     --env=DXVK_ASYNC=1 \
   io.github.Faugus.faugus-launcher
 
@@ -316,6 +315,14 @@ show_help() {
 }
 
 main() {
+  if [[ $# -eq 0 ]]; then
+    SCOPE="--system"
+    grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
+        mkdir -pv /var/lib/flatpak/overrides
+        apply_global_restrictions
+    }
+  fi
+
   while [[ $# -gt 0 ]]; do
     case ${1} in
       -h|--help)
@@ -360,14 +367,6 @@ main() {
     shift
   done
 }
-
-if [[ $# -eq 0 ]]; then
-    SCOPE="--system"
-    grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-        mkdir -pv /var/lib/flatpak/overrides
-        apply_global_restrictions
-    }
-fi
 
 main "$@"
 
