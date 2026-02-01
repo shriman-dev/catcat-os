@@ -30,35 +30,66 @@ if check_network_connection; then
     done
 fi
 
+##########################################################################################
+
 notify_all() {
     notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
 }
 
-UPDATE_CMD="/usr/bin/update"
-one_day=86400
-one_week=$((one_day * 7))
-autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
-firstboot_file="/etc/catcat-os/log/.first-boot-done"
+on_connection() {
+    local net_type="${1}"
 
-if [[ -f /etc/catcat-os/auto_update_on_connection ]]; then
-    UPDATE_CMD="/usr/bin/update --net-type $(cat /etc/catcat-os/auto_update_on_connection)"
-fi
-
-# Auto update if system is one week old
-if is_file_older ${one_week} "${autoupdate_log_file}"; then
-    if check_network_connection; then
-        is_file_older ${one_day} "${firstboot_file}" ||
-            notify_all "Weekly automatic update has started."
-
-        date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
-
-        ${UPDATE_CMD} extra >> "${autoupdate_log_file}"
-
-        is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
-             ${UPDATE_CMD} >> "${autoupdate_log_file}"
-
-        is_file_older ${one_day} "${firstboot_file}" ||
-            notify_all "Weekly automatic update is done."
+    if [[ "${net_type}" =~ 'wifi=' ]]; then
+        local ssid="${net_type#*=}"
+        local connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
+        [[ "${connected_ssid}" =~ "${ssid}" ]] && return 0
+    elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${net_type}" ]]; then
+        return 0
+    else
+        return 1
     fi
-fi
+}
 
+update_cmd() {
+    local one_day=86400
+    local one_week=$((one_day * 7))
+    local autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
+    local firstboot_file="/etc/catcat-os/log/.first-boot-done"
+
+    # Auto update if system is one week old
+    if is_file_older ${one_week} "${autoupdate_log_file}"; then
+        if check_network_connection; then
+            is_file_older ${one_day} "${firstboot_file}" ||
+                notify_all "Weekly automatic update has started."
+
+            date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
+
+            /usr/bin/update extra >> "${autoupdate_log_file}"
+
+            is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
+                 /usr/bin/update >> "${autoupdate_log_file}"
+
+            is_file_older ${one_day} "${firstboot_file}" ||
+                notify_all "Weekly automatic update is done."
+        fi
+    fi
+}
+
+
+allowed_connection_file="/etc/catcat-os/auto_update_on_connection"
+connection_list=($(cat "${allowed_connection_file}"))
+if [[ ${#connection_list[@]} -gt 0 ]]; then
+    for conn in ${connection_list[@]}; do
+        if on_connection "${conn}"; then
+            log "INFO" "Network is active: ${conn}"
+            log "INFO" "Performing updates"
+            update_cmd
+        else
+            log "INFO" "Network is not active: ${conn}"
+            log "INFO" "Skipping updates"
+            continue
+        fi
+    done
+else
+    update_cmd
+fi
