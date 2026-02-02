@@ -230,7 +230,7 @@ configure_gaming_apps() {
   flatpak override "${SCOPE}" \
     --device={input,dri} \
     --allow={devel,multiarch,per-app-dev-shm} \
-    --filesystem=~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro} \
+    --filesystem={~/Me/Games,xdg-config/{MangoHud:ro,vkBasalt:ro}} \
     --env=DXVK_ASYNC=1 \
   io.github.Faugus.faugus-launcher
 
