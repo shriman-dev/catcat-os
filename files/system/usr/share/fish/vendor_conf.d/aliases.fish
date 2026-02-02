@@ -33,9 +33,10 @@ alias usorted="sort | uniq -c | sort --ignore-leading-blanks --numeric-sort"
 
 # Use some more things with better alternatives
 alias l.='eza -A1'
-alias la='eza -A  --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first'
-alias ll='eza -Al --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --header --git --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
-alias lt='eza -AT --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git'
+alias la='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first'
+alias lt='la --tree --git'
+alias ll='la --long --git --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
+alias lll='ll --header'
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias pscpu='procs --sortd cpu'
 alias psmem='procs --sortd rss'
