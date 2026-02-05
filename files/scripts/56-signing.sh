@@ -118,7 +118,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
                --cert "${SBMOK_CRT}" \
                --output "${vmlinuz_image}" \
                         "${vmlinuz_image}" || sign_fail "${vmlinuz_image}"
-        sbsign_extra_modules "${kernel_path}"
+        #sbsign_extra_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"
         sbverify --list "${vmlinuz_image}"
     done

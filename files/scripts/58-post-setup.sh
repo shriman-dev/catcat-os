@@ -39,11 +39,9 @@ rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
 log "INFO" "Running post package removal"
 if [[ ${IMAGE_NAME} =~ (-mi|-sv) ]]; then
     dnf5 -y remove \
-        make \
-        gcc \
-        gcc-c++ \
+        make gcc gcc-c++ \
         kernel-headers \
-        kernel-devel-"${ker}"
+        kernel-devel-"$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
 fi
 
 if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
