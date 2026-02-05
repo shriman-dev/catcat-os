@@ -35,9 +35,6 @@ jobs:
       - name: Checkout Repo
       - uses: actions/checkout@v6
 
-      - name: Maximize build space
-        uses: ublue-os/remove-unwanted-software@v9
-
       - name: Prepare environment
         id: prepare-environment
         shell: bash
