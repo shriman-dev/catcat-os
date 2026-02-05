@@ -98,7 +98,6 @@ DESKTOP_EXTRAS=(
     #"$(latest_ghpkg_url 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
 
     # Extras
-    "++wldrivers"
     "++extras"
 )
 
@@ -227,6 +226,7 @@ DESKTOP_COMMON=(
     "yad"
     "zenity"
     "i2c-tools"
+    "++wldrivers"
     "alsa-firmware"
     "grub2-tools-extra"
     "google-noto-fonts-all"
@@ -388,10 +388,6 @@ log "INFO" "Disabled unneeded repos"
 
 
 log "INFO" "Installing External Packages"
-
-[[ "${IMAGE_NAME}" =~ "-mi" ]] &&
-    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh wldrivers
-
 exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh \
         $(printf '%s\n' "${COMMON[@]}" | sed -n 's|++||gp')
 
