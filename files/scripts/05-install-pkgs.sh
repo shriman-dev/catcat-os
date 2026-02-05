@@ -310,7 +310,7 @@ COMMON=(
     "sbsigntools" # tools to add signatures to efi binaries and drivers
     "wireguard-tools"
     "kernel-headers"
-    "kernel-devel-$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
+    "kernel-devel"
     "fwupd"
     "fwupd-plugin-flashrom"
     "fwupd-plugin-modem-manager"
