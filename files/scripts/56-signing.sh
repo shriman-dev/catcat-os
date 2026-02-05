@@ -40,7 +40,7 @@ echo "docker:
 log "INFO" "Container signing policy updated"
 
 
-#set +x
+set +x
 # Sign kernel and kernel modules for secureboot
 SBMOK_KEY="${BUILD_ROOT}/sbmok.priv" # Placed by build yaml
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
@@ -52,16 +52,12 @@ KERNEL_PATH=(
 sign_fail() { die "Failed to sign: ${1}"; }
 
 sbsign_extra_modules() {
-    local kernel_path="${1}" kernel_ver="$(basename ${kernel_path})"
-    local extra_modules module
-
-    time find /usr/src/kernels/${kernel_ver} -type f -name 'sign-file' -print
-    time rpm -ql kernel-devel-${kernel_ver} | grep sign-file
-
+    local kernel_path="${1}" extra_modules module
+    local kernel_ver="$(basename ${kernel_path})"
     local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
-        sign_file="$(find /usr/src -type f -name 'sign-file' -print -quit)"
+        sign_file="$(rpm -ql kernel-devel-${kernel_ver} | grep 'sign-file$')"
         [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
     fi
 

@@ -8,6 +8,13 @@ bios:
       echo "Rebooting to legacy BIOS from OS is not supported."
     fi
 
+
+# Enroll signing key for secure boot - Enter password "catcat" when prompted
+enroll-secure-boot-key:
+    #!/usr/bin/bash
+    /usr/bin/enroll-sbmok
+
+
 # Automatically manage power profiles
 [group("utilities")]
 toggle-auto-power-profile ACTION="prompt":

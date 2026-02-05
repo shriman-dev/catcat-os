@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+ENROLL_PASS="catcat"
+SBMOK_DER="/usr/share/catcat-os/certs/catcat-os-mok.der"
+sudo mokutil --timeout -1
+echo -e "${ENROLL_PASS}\n${ENROLL_PASS}" | sudo mokutil --import "${SBMOK_DER}"
+echo -e "At next reboot, the UEFI menu UI will be displayed.\nThen, select \"Enroll MOK\", and input \"${ENROLL_PASS}\" as the password"

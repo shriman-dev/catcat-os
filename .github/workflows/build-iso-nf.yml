@@ -65,9 +65,9 @@ jobs:
           image_tag: ${{ env.DEFAULT_TAG }}
           variant: 'Kinoite'
           version: ${{ env.MAJOR_VERSION }}
-          secure_boot_key_url: "https://github.com/ublue-os/akmods/raw/main/certs/public_key.der"
+          secure_boot_key_url: "https://github.com/shriman-dev/catcat-os/raw/main/sbmok.der"
           enrollment_password: "universalblue"
-          iso_name: ${{ matrix.image_name }}-nofl-${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}.iso
+          iso_name: ${{ matrix.image_name }}-no-flatpak-${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}.${{ env.TIMESTAMP }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           enable_flatpak_dependencies: "false"
