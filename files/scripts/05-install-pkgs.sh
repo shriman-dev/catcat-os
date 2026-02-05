@@ -98,6 +98,7 @@ DESKTOP_EXTRAS=(
     #"$(latest_ghpkg_url 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
 
     # Extras
+    "++wldrivers"
     "++extras"
 )
 
