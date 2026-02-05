@@ -54,7 +54,7 @@ sign_fail() { die "Failed to sign: ${1}"; }
 sbsign_extra_modules() {
     local kernel_path="${1}" kernel_ver="$(basename ${kernel_path})"
     local extra_modules="" module
-    local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
+    local sign_file="$(find /usr/lib/modules -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
         sign_file="$(find /usr/src/ -type f -name 'sign-file' -print -quit)"
