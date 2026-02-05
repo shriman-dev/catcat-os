@@ -57,39 +57,41 @@ sbsign_extra_modules() {
     local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
-        sign_file="$(find /usr/src/kernel*/"${kernel_ver}" -type f -name 'sign-file' -print -quit)"
+        sign_file="$(find /usr/src/ -type f -name 'sign-file' -print -quit)"
         [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
     fi
 
     mapfile -t extra_modules < <(find "${kernel_path}/extra" -type f -name '*\.ko*')
 
-    log "DEBUG" "Signing kernel modules, total count: ${#extra_modules[@]}"
-    for module in "${extra_modules[@]}"; do
-        case "${module}" in
-            *.ko)
-                ${sign_file} sha512 \
-                    "${SBMOK_KEY}" "${SBMOK_CRT}" "${module}" || sign_fail "${module}"
-                ;;
-            *.ko.gz)
-                gzip --quiet --force --decompress "${module}"
-                ${sign_file} sha512 \
-                    "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.gz}" || sign_fail "${module}"
-                gzip --quiet --force --best "${module%.gz}"
-                ;;
-            *.ko.xz)
-                xz --quiet --force --decompress "${module}"
-                ${sign_file} sha512 \
-                    "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.xz}" || sign_fail "${module}"
-                xz --quiet --force --check=crc32 "${module%.xz}"
-                ;;
-            *.ko.zst)
-                zstd --quiet --force --decompress --rm "${module}"
-                ${sign_file} sha512 \
-                    "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.zst}" || sign_fail "${module}"
-                zstd --quiet --force --rm "${module%.zst}"
-                ;;
-        esac
-    done
+    if [[ "${#extra_modules[@]}" -gt 0 ]]; then
+        log "DEBUG" "Signing kernel modules, total count: ${#extra_modules[@]}"
+        for module in "${extra_modules[@]}"; do
+            case "${module}" in
+                *.ko)
+                    ${sign_file} sha512 \
+                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module}" || sign_fail "${module}"
+                    ;;
+                *.ko.gz)
+                    gzip --quiet --force --decompress "${module}"
+                    ${sign_file} sha512 \
+                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.gz}" || sign_fail "${module}"
+                    gzip --quiet --force --best "${module%.gz}"
+                    ;;
+                *.ko.xz)
+                    xz --quiet --force --decompress "${module}"
+                    ${sign_file} sha512 \
+                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.xz}" || sign_fail "${module}"
+                    xz --quiet --force --check=crc32 "${module%.xz}"
+                    ;;
+                *.ko.zst)
+                    zstd --quiet --force --decompress --rm "${module}"
+                    ${sign_file} sha512 \
+                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.zst}" || sign_fail "${module}"
+                    zstd --quiet --force --rm "${module%.zst}"
+                    ;;
+            esac
+        done
+    fi
 }
 
 if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
