@@ -57,8 +57,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
-        persist-credentials: false
-        fetch-depth: 0
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Prepare environment
         id: prepare-environment
