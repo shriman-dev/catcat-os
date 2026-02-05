@@ -49,8 +49,6 @@ KERNEL_PATH=(
     $(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -exec test -e "{}/vmlinuz" \; -print)
 )
 
-sign_fail() { die "Failed to sign: ${1}"; }
-
 sbsign_extra_modules() {
     local kernel_path="${1}" extra_modules module
     local kernel_ver="$(basename ${kernel_path})"
@@ -63,30 +61,34 @@ sbsign_extra_modules() {
 
     mapfile -t extra_modules < <(find "${kernel_path}/extra" -type f -name '*\.ko*')
 
+    sign_module() {
+        ${sign_file} sha512 "${SBMOK_KEY}" "${SBMOK_CRT}" "${1}" || die "Failed to sign: ${1}"
+    }
     if [[ "${#extra_modules[@]}" -gt 0 ]]; then
         log "DEBUG" "Signing kernel modules, total count: ${#extra_modules[@]}"
         for module in "${extra_modules[@]}"; do
             case "${module}" in
                 *.ko)
-                    ${sign_file} sha512 \
-                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module}" || sign_fail "${module}"
+                    sign_module "${module}"
+                    ;;
+                *.ko.bz*)
+                    bzip2 --quiet --force --decompress "${module}"
+                    sign_module "${module%.bz*}"
+                    bzip2 --quiet --force --best "${module%.bz*}"
                     ;;
                 *.ko.gz)
                     gzip --quiet --force --decompress "${module}"
-                    ${sign_file} sha512 \
-                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.gz}" || sign_fail "${module}"
+                    sign_module "${module%.gz}"
                     gzip --quiet --force --best "${module%.gz}"
                     ;;
                 *.ko.xz)
                     xz --quiet --force --decompress "${module}"
-                    ${sign_file} sha512 \
-                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.xz}" || sign_fail "${module}"
+                    sign_module "${module%.xz}"
                     xz --quiet --force --check=crc32 "${module%.xz}"
                     ;;
                 *.ko.zst)
                     zstd --quiet --force --decompress --rm "${module}"
-                    ${sign_file} sha512 \
-                        "${SBMOK_KEY}" "${SBMOK_CRT}" "${module%.zst}" || sign_fail "${module}"
+                    sign_module "${module%.zst}"
                     zstd --quiet --force --rm "${module%.zst}"
                     ;;
             esac
@@ -117,7 +119,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
         sbsign --key  "${SBMOK_KEY}" \
                --cert "${SBMOK_CRT}" \
                --output "${vmlinuz_image}" \
-                        "${vmlinuz_image}" || sign_fail "${vmlinuz_image}"
+                        "${vmlinuz_image}" || die "Failed to sign: ${vmlinuz_image}"
         sbsign_extra_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"
         sbverify --list "${vmlinuz_image}"
