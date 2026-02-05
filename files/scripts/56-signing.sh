@@ -51,7 +51,7 @@ KERNEL_PATH=(
 
 sign_fail() { die "Failed to sign: ${1}"; }
 
-find ${kernel_path} -type f -name 'sign-file' -print
+find /usr/lib/modules -type f -name 'sign-file' -print
 
 find /usr/src -type f -name 'sign-file' -print
 
