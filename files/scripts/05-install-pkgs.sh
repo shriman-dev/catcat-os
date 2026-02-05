@@ -359,6 +359,10 @@ log "INFO" "Installing RPM Packages"
 dnf5 -y --setopt=install_weak_deps=True install \
         $(printf '%s\n' "${COMMON[@]}" | grep -v "^++")
 
+exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh wldrivers
+
+exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
+
 [[ ! "${IMAGE_NAME}" =~ "-sv" ]] &&
     dnf5 -y install \
         $(printf '%s\n' "${DESKTOP_COMMON[@]}" | grep -v "^++")
