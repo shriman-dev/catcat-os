@@ -150,8 +150,7 @@ wldrivers() {
 
     # Clean up
     # kernel-headers "kernel-devel-${ker}"
-    dnf5 -y remove make gcc gcc-c++ \
-                   gtk3-devel pkg-config qrencode-devel libpng-devel
+    dnf5 -y remove gtk3-devel pkg-config qrencode-devel libpng-devel
     rm -rf /tmp/wldrivers
 }
 
