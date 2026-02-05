@@ -57,7 +57,7 @@ sbsign_extra_modules() {
     local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
-        sign_file="$(find /usr/src/kernel*/${kernel_ver} -name sign-file | head -n 1)"
+        sign_file="$(find /usr/src -name 'sign-file' -print -quit)"
         [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
     fi
 
