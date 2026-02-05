@@ -57,6 +57,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Prepare environment
         id: prepare-environment
@@ -64,8 +67,8 @@ jobs:
         env:
           SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
         run: |
-          # Get sbmok key
           set -oue pipefail
+          # Get sbmok key
           printf '%s\n' "${SBMOK_KEY}" > sbmok.priv
           chmod -v 600 sbmok.priv
           # Add variables to GITHUB_ENV
