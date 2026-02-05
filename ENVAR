@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-DEFAULT_TAG="latest"
 MAJOR_VERSION=43
+DEFAULT_TAG="latest"
+AH_DATE="$(TZ="Asia/Kolkata" date +%Y\-%m\-%d\T%H\:%M\:%S\Z)"
 DATESTAMP="$(TZ="Asia/Kolkata" date "+%Y%m%d")"
 TIMESTAMP="$(TZ="Asia/Kolkata" date "+%H%M%S")"
-AH_DATE="$(TZ="Asia/Kolkata" date +%Y\-%m\-%d\T%H\:%M\:%S\Z)"
+DATETIMESTAMP="${DATESTAMP}.${TIMESTAMP}"

@@ -3,22 +3,15 @@ source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 log "INFO" "Regenerating initramfs"
+KERNEL_PATH=(
+    $(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -exec test -e "{}/initramfs.img" \; -print)
+)
+
+DRACUT="/usr/bin/dracut"
 
 # Use dracut cliwrap if already installed
-if [[ -f "/usr/libexec/rpm-ostree/wrapped/dracut" ]]; then
+[[ -f "/usr/libexec/rpm-ostree/wrapped/dracut" ]] &&
     DRACUT="/usr/libexec/rpm-ostree/wrapped/dracut"
-else
-    DRACUT="/usr/bin/dracut"
-fi
-
-KERNEL_MODULES_PATH="/usr/lib/modules"
-#dnf5 repoquery --installed --queryformat='%{evr}.%{arch}' kernel
-readarray -t QUALIFIED_KERNEL < <(find "${KERNEL_MODULES_PATH}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
-
-if [[ "${#QUALIFIED_KERNEL[@]}" -gt 1 ]]; then
-    log "INFO" "NOTE: There are several versions of kernel's initramfs."
-    log "INFO" "      It is most ideal to have only 1 kernel, to make initramfs regeneration faster."
-fi
 
 # Set dracut log levels via temporary config file
 # To prevent performance issues from default journal logging
@@ -30,12 +23,20 @@ kmsgloglvl=0
 fileloglvl=0
 EOF
 
-for qual_kernel in "${QUALIFIED_KERNEL[@]}"; do
-    INITRAMFS_IMAGE="${KERNEL_MODULES_PATH}/${qual_kernel}/initramfs.img"
-    log "INFO" "Starting initramfs regeneration for kernel version: ${qual_kernel}"
-    "${DRACUT}" --kver "${qual_kernel}" \
-                --no-hostonly --reproducible --add ostree --force "${INITRAMFS_IMAGE}"
-    chmod -v 0600 "${INITRAMFS_IMAGE}"
+if [[ "${#KERNEL_PATH[@]}" -gt 1 ]]; then
+    log "WARN" "Multiple kernel versions found"
+    log "WARN" "Single kernel recommended for faster initramfs regeneration"
+elif [[ "${#KERNEL_PATH[@]}" -eq 0 ]]; then
+    die "Failed to find kernel"
+fi
+
+for kernel_path in "${KERNEL_PATH[@]}"; do
+    kernel_ver="$(basename ${kernel_path})"
+    initramfs_image="${kernel_path}/initramfs.img"
+    log "INFO" "Starting initramfs regeneration for kernel version: ${kernel_ver}"
+    ${DRACUT} --kver "${kernel_ver}" \
+              --no-hostonly --reproducible --add ostree --force "${initramfs_image}"
+    chmod -v 0600 "${initramfs_image}"
 done
 
 rm -vf -- "${temp_conf_file}"

@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 
 SYSTEM_LOAD_THRESHOLD_LOW=1.5
 SYSTEM_LOAD_THRESHOLD_HIGH=3

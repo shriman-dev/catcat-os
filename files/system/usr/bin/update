@@ -1,8 +1,8 @@
 #!/usr/bin/bash
-source /usr/lib/catcat/funcvar.sh >/dev/null 2>&1
+source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
 
 update_flatpak() {
-    source /usr/lib/catcat/funcvar.sh >/dev/null 2>&1
+    source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
     local scope="--user"
     [[ $(id -u) -eq 0 ]] && scope="--system"
 
@@ -32,7 +32,7 @@ update_flatpak() {
 }
 
 update_nixpkg() {
-    source /usr/lib/catcat/funcvar.sh >/dev/null 2>&1
+    source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
     local scope="user"
     local cmdpath="${HOME}/.local/state/nix/profile/bin"
 

@@ -9,7 +9,7 @@ LIBEXEC_DIR="/usr/libexec"
 ujust_setup() {
     local import_dir="/usr/share/ublue-os/just"
     local import_file="${import_dir}file"
-    local justfile_dir="$(dirname ${BUILD_SETUP_DIR})/justfiles"
+    local justfile_dir="${BUILD_ROOT}/files/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
     rpm -q just || {
@@ -44,7 +44,7 @@ ujust_setup() {
                   --repod "system_files/desktop/shared/usr/share/ublue-os/just" \
                   -f "82-bazzite-waydroid.just"
         sed -i '/waydroid-container-restart.desktop/d' "${fetched_justfiles}/82-bazzite-waydroid.just"
-        sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat/funcvar.sh|' \
+        sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat-os/funcvar.sh|' \
                         "${fetched_justfiles}/82-bazzite-waydroid.just"
     }
 

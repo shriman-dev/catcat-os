@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 one_day=86400
 four_days=$((one_day * 4))
 blocklist_autoupdate_log="/etc/catcat-os/log/auto-dns-blocklist-update.log"

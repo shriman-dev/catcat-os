@@ -7,6 +7,7 @@ export LS_COLORS="$(sed '/^$/d; /^#/d' ${HOME}/.local/share/catcat-os/LS_COLORS_
 export MICRO_TRUECOLOR=1
 #export EDITOR="micro"
 
+export XCURSOR_SIZE="$(gsettings get org.gnome.desktop.interface cursor-size)"
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_QPA_PLATFORM=xcb
 export QT_STYLE_OVERRIDE=kvantum

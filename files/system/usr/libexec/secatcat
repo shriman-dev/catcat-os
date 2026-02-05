@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 
 # Selinux fix
 #restorecon  -vR /home/${U1000}/.local/share/icc

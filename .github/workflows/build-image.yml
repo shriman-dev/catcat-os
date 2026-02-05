@@ -57,6 +57,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
+        persist-credentials: false
+        fetch-depth: 0
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v9
@@ -64,32 +66,36 @@ jobs:
       - name: Prepare environment
         id: prepare-environment
         shell: bash
+        env:
+          SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
         run: |
-          set -ouex pipefail
+          # Get sbmok key
+          set -oue pipefail
+          printf '%s\n' "${SBMOK_KEY}" > sbmok.priv
+          chmod -v 600 sbmok.priv
+          # Add variables to GITHUB_ENV
+          set -x
           pwd
-          ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          free -hm
+          nproc --all
+          ls -A1
           source ${{ github.workspace }}/ENVAR
-          DATETIMESTAMP="${DATESTAMP}.${TIMESTAMP}"
-          echo "DEFAULT_TAG=${DEFAULT_TAG}" >> ${GITHUB_ENV}
-          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> ${GITHUB_ENV}
-          echo "DATESTAMP=${DATESTAMP}" >> ${GITHUB_ENV}
-          echo "TIMESTAMP=${TIMESTAMP}" >> ${GITHUB_ENV}
-          echo "DATETIMESTAMP=${DATETIMESTAMP}" >> ${GITHUB_ENV}
-          echo "AHHH_DATE=${AH_DATE}" >> ${GITHUB_ENV}
-          echo "COMMIT_SHA=${GITHUB_SHA}" >> ${GITHUB_ENV}
-          echo "PUSH_REGISTRY=${PUSH_REGISTRY,,}" >> ${GITHUB_ENV}
-          ALT_TAG="${{ matrix.ALT_TAG }}"
-          [[ -n "${ALT_TAG}" ]] &&
-              echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> ${GITHUB_ENV}
-          if [[ "${{ matrix.BASE_IMAGE_URL }}" =~ "bazzite" ]]; then
-              echo "TAG_VER=stable-${MAJOR_VERSION}" >> ${GITHUB_ENV}
-          elif [[ "${{ matrix.BASE_IMAGE_URL }}" =~ "ucore" ]]; then
-              echo "TAG_VER=stable" >> ${GITHUB_ENV}
-          else
-              echo "TAG_VER=${MAJOR_VERSION}" >> ${GITHUB_ENV}
-          fi
-          # Get sbsign key
+          printf '%s\n' \
+            "DEFAULT_TAG=${DEFAULT_TAG}" \
+            "MAJOR_VERSION=${MAJOR_VERSION}" \
+            "DATESTAMP=${DATESTAMP}" \
+            "TIMESTAMP=${TIMESTAMP}" \
+            "DATETIMESTAMP=${DATETIMESTAMP}" \
+            "AHHH_DATE=${AH_DATE}" \
+            "COMMIT_SHA=${GITHUB_SHA}" \
+            "PUSH_REGISTRY=${PUSH_REGISTRY,,}" \
+            "TAG_VER=$(case ${{ matrix.BASE_IMAGE_URL }} in
+              *bazzite*) echo "stable-${MAJOR_VERSION}" ;;
+              *ucore*) echo "stable" ;;
+              *) echo "${MAJOR_VERSION}" ;; esac)" >> ${GITHUB_ENV}
+          [[ -n "${{ matrix.ALT_TAG }}" ]] &&
+            echo "ALT_STAMP=${{ matrix.ALT_TAG }}.${DATETIMESTAMP}" >> ${GITHUB_ENV}
 
       # Build metadata
       - name: Image Metadata

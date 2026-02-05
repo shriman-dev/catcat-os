@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 runtimes() {
   local runtimes=(
     'org.kde.KStyle.Kvantum'

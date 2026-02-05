@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 KARGS=$(rpm-ostree kargs)
 NEEDED_KARGS=()
 

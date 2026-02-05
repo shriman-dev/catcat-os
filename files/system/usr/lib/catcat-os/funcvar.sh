@@ -164,7 +164,7 @@ run_as_users() {
         local some_user="$(id -un ${some_user_id})"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "DEBUG" "Running given command as user: ${some_user}"
-            sudo -u "${some_user}"  bash -c "$(declare -f $@); $@"
+            sudo -u "${some_user}" bash -c "$(declare -f $@); $@"
         fi
     done
 }

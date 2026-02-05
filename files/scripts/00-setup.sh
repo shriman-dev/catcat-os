@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -oue pipefail
-export BUILD_SETUP_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+export BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
 export BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 source "${BUILD_SCRIPT_LIB}"
 
@@ -64,7 +64,7 @@ ostree container commit
 exec_script "${BUILD_SETUP_DIR}/55-image-info.sh"
 ostree container commit
 
-{ enclosed_heading_this "Configuring Signing Policy"; } 2>/dev/null
+{ enclosed_heading_this "Container Image And Kernel Signing"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
 ostree container commit
 

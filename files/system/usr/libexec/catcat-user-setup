@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 shopt -s extglob nocasematch
-source /usr/lib/catcat/funcvar.sh
+source /usr/lib/catcat-os/funcvar.sh
 exit_if_root
 HOME_DIR="${HOME}"
 CONFIG="${HOME_DIR}/.config"

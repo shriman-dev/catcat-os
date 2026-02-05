@@ -12,7 +12,7 @@ bios:
 [group("utilities")]
 toggle-auto-power-profile ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled auto-power-profile.service | grep -q enabled; then
       CURRENT_STATE="Enabled"
@@ -78,7 +78,7 @@ install-catcat-flatpaks:
 [group("apps")]
 install-mcontrolcenter:
     #!/usr/bin/env -S sudo -- /bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     log "INFO" "Installing mcontrolcenter"
     TMP_DIR="/tmp/extra_pkgs"
     pkg_name="mcontrolcenter"
@@ -209,7 +209,7 @@ device-info:
 [group("system info")]
 debug-info:
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     sudo fastfetch
     symmetric_heading "Detailed Sys+Hardware Information" "="
     sudo inxi --basic --expanded -xxxa --verbosity 8
@@ -258,7 +258,7 @@ update-firmware:
 [group("system")]
 toggle-updates ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled catcat-os-update.timer | grep -q enabled; then
       CURRENT_STATE="Enabled"
@@ -299,7 +299,7 @@ _toggle-updates:
 [group("network")]
 toggle-ssh ACTION="":
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     # Get hostname and IP address
     HOSTNAME=$(hostname)
     IP_ADDRESS=$(hostname -I | awk '{print $1}') # First IP address
@@ -365,7 +365,7 @@ toggle-ssh ACTION="":
 [group("nightly reboot")]
 toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled nightly-reboot.timer | grep -q enabled; then
       CURRENT_STATE="Enabled"
@@ -410,7 +410,7 @@ toggle-gnome-extension EXTENSION_ID:
 [group("gnome desktop")]
 restore-gnome-de-settings:
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome settings..."
@@ -423,7 +423,7 @@ restore-gnome-de-settings:
 [group("gnome desktop")]
 restore-gnome-folders:
     #!/usr/bin/bash
-    source /usr/lib/catcat/funcvar.sh
+    source /usr/lib/catcat-os/funcvar.sh
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome folders..."

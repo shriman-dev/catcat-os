@@ -9,8 +9,10 @@ ARG DATESTAMP
 ARG TIMESTAMP
 ARG COMMIT_SHA
 
-# Allow build scripts to be referenced without being copied into the final image
-FROM scratch AS ctx
+### COPY FILES
+## Allow build files to be referenced without being copied into the final image
+ARG BUILD_ROOT="ctx"
+FROM scratch AS ${BUILD_ROOT}
 COPY / /
 
 ### BASE IMAGE
@@ -25,6 +27,7 @@ ARG ALT_TAG
 ARG DATESTAMP
 ARG TIMESTAMP
 ARG COMMIT_SHA
+ARG BUILD_ROOT
 
 ENV PROJECT_NAME="${PROJECT_NAME}"
 ENV IMAGE_NAME="${IMAGE_NAME}"
@@ -35,11 +38,14 @@ ENV ALT_TAG="${ALT_TAG}"
 ENV DATESTAMP="${DATESTAMP}"
 ENV TIMESTAMP="${TIMESTAMP}"
 ENV COMMIT_SHA="${COMMIT_SHA}"
+ENV BUILD_ROOT="${BUILD_ROOT}"
 
 ### MODIFICATIONS
-RUN --mount=type=cache,dst=/var/cache --mount=type=cache,dst=/var/log \
-    --mount=type=tmpfs,dst=/tmp --mount=type=bind,from=ctx,source=/,target=/ctx \
-    /ctx/files/scripts/00-setup.sh
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    --mount=type=bind,from=${BUILD_ROOT},source=/,target=/${BUILD_ROOT} \
+    ${BUILD_ROOT}/files/scripts/00-setup.sh
 
 ### LINTING
 ## Verify final image and contents are correct.
