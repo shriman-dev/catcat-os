@@ -40,6 +40,10 @@ ostree container commit
 exec_script "${BUILD_SETUP_DIR}/04-copy-files.sh"
 ostree container commit
 
+{ enclosed_heading_this "Container Image And Kernel Signing"; } 2>/dev/null
+exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
+ostree container commit
+
 { enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/05-install-pkgs.sh"
 ostree container commit
@@ -62,10 +66,6 @@ ostree container commit
 
 { enclosed_heading_this "Applying Image Info"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/55-image-info.sh"
-ostree container commit
-
-{ enclosed_heading_this "Container Image And Kernel Signing"; } 2>/dev/null
-exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
 ostree container commit
 
 { enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
