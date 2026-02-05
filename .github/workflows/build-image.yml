@@ -93,7 +93,7 @@ jobs:
               *ucore*) echo "stable" ;;
               *) echo "${MAJOR_VERSION}" ;; esac)" >> ${GITHUB_ENV}
           ALT_TAG="${{ matrix.ALT_TAG }}"
-          [[ -n "${ALT_TAG:-}" ]] &&
+          [[ -n "${ALT_TAG}" ]] &&
             echo "ALT_STAMP=${ALT_TAG}.${DATETIMESTAMP}" >> ${GITHUB_ENV}
 
       # Build metadata
