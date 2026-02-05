@@ -51,13 +51,16 @@ KERNEL_PATH=(
 
 sign_fail() { die "Failed to sign: ${1}"; }
 
-find /usr/lib/modules -type f -name 'sign-file' -print
-
-find /usr/src -type f -name 'sign-file' -print
-
 sbsign_extra_modules() {
     local kernel_path="${1}" kernel_ver="$(basename ${kernel_path})"
     local extra_modules module
+
+    find /usr/lib/modules -type f -name 'sign-file' -print
+
+    find /usr/src -type f -name 'sign-file' -print
+
+    rpm -ql kernel-devel-${kernel_ver} | grep sign-file
+
     local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
