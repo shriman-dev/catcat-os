@@ -126,8 +126,8 @@ waydroid_setup() {
 wldrivers() {
     local ker="$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
 
-    dnf5 -y install make gcc kernel-headers "kernel-devel-${ker}" \
-                    haveged hostapd gcc-c++ gtk3-devel pkg-config qrencode-devel libpng-devel
+    dnf5 -y install make gcc gcc-c++ kernel-headers "kernel-devel-${ker}" \
+                    haveged hostapd gtk3-devel pkg-config qrencode-devel libpng-devel
 
     # Rtw89 drivers
     mkdir -vp /tmp/wldrivers
