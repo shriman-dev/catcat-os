@@ -40,6 +40,8 @@ ENV TIMESTAMP="${TIMESTAMP}"
 ENV COMMIT_SHA="${COMMIT_SHA}"
 ENV BUILD_ROOT="${BUILD_ROOT}"
 
+RUN echo ${BUILD_ROOT}
+
 ### MODIFICATIONS
 RUN --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
