@@ -34,9 +34,6 @@ jobs:
     steps:
       - name: Checkout Repo
       - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          fetch-depth: 0
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v9
