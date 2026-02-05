@@ -55,10 +55,11 @@ sbsign_extra_modules() {
     local kernel_path="${1}" kernel_ver="$(basename ${kernel_path})"
     local extra_modules module
 
-    find /usr/lib/modules -type f -name 'sign-file' -print
+    find /usr/ -type f -name 'sign-file' -print
 
-    find /usr/src -type f -name 'sign-file' -print
-
+    rpm -q kernel-headers
+    rpm -q kernel-devel-$(rpm -q --queryformat='%{evr}.%{arch}' kernel)
+    rpm -ql kernel-devel-${kernel_ver}
     rpm -ql kernel-devel-${kernel_ver} | grep sign-file
 
     local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
