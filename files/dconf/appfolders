@@ -37,7 +37,7 @@ name='Disk & Backup'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/SysSecurity]
-apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'com.mitchellh.ghostty.desktop', 'firewall-config.desktop', 'org.openrgb.OpenRGB.desktop', 'org.coolercontrol.CoolerControl.desktop', 'io.github.ilya_zlobintsev.LACT.desktop', 'org.corectrl.CoreCtrl.desktop', 'hhd-ui.desktop', 'app.drey.KeyRack.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'org.freedesktop.MalcontentControl.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'mcontrolcenter.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'io.github.linx_systems.ClamUI.desktop', 'org.openrgb.OpenRGB.desktop', 'io.github.ilya_zlobintsev.LACT.desktop', 'app.drey.KeyRack.desktop', 'wihotspot.desktop', 'org.freedesktop.MalcontentControl.desktop', 'org.corectrl.CoreCtrl.desktop', 'hhd-ui.desktop', 'mcontrolcenter.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'ddcui.desktop', 'com.mitchellh.ghostty.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
 name='Sys & Security'
 translate=false
 

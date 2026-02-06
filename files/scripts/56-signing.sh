@@ -98,7 +98,7 @@ sbsign_modules() {
 if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
     log "INFO" "Signing kernel and kernel modules with secureboot keys"
 
-    mkdir -vp "$(dirname ${SBMOK_DER})"
+    mkdir -vp "$(dirname ${SBMOK_DER})" "/etc/pki/akmods/certs"
     cp -vf "${BUILD_ROOT}/sbmok.der" "${SBMOK_DER}"
     cp -vf "${SBMOK_DER}" "/etc/pki/akmods/certs"/
 
