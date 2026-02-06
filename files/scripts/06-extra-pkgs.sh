@@ -12,12 +12,6 @@ ujust_setup() {
     local justfile_dir="${BUILD_ROOT}/files/justfiles"
 
     mkdir -vp /usr/share/ublue-os/{just,lib-ujust}
-    rpm -q just || {
-        log "INFO" "Installing just"
-        get_ghpkg --name "just" --repo "casey/just" \
-                  --regx 'x86_64-unknown-linux-musl\.tar\.gz$' --negx '~~'
-        log "INFO" "Done."
-    }
 
     [[ ! -x "${BIN_DIR}/ujust" ]] && {
         log "INFO" "Installing ujust and ugum"
@@ -25,16 +19,6 @@ ujust_setup() {
                   --repod "packages/ublue-os-just/src" --flist "ujust" "ugum"
         chmod -v +x "${BIN_DIR}"/{ujust,ugum}
         log "INFO" "Done."
-    }
-
-    # Needed files for luks tpm2 autounlock recipe
-    [[ ! -f "${LIBEXEC_DIR}/luks-enable-tpm2-autounlock" ]] && {
-        get_ghraw --dstd "/usr/lib/dracut/dracut.conf.d" --repo "ublue-os/packages" \
-                  --repod "packages/ublue-os-luks/src" -f "90-ublue-luks.conf"
-        get_ghraw --dstd "${LIBEXEC_DIR}" --repo "ublue-os/packages" \
-                  --repod "packages/ublue-os-luks/src" \
-                  --flist "luks-enable-tpm2-autounlock" "luks-disable-tpm2-autounlock"
-        chmod -v +x "${BIN_DIR}"/luks-{enable,disable}-tpm2-autounlock
     }
 
     # Fetch just recipes
@@ -48,20 +32,12 @@ ujust_setup() {
                         "${fetched_justfiles}/82-bazzite-waydroid.just"
     }
 
-
     # Organize ujust
     log "INFO" "Categorizing justfiles"
-#    sed '/^\[group/d' ${import_dir}/*.just
-    sed -i -E '/^configure-broadcom-wl/i [group\("hardware"\)]' \
-                            "${import_dir}"/50-akmods.just || true
-    sed -i -E '/^enroll-secure-boot-key/i [group\("utilities"\)]' \
-                            "${import_dir}"/00-default.just || true
     sed -i -E '/^(toggle-nvk|configure-(nvidia|nvidia-optimus))/i [group\("nvidia"\)]' \
                             "${import_dir}"/40-nvidia.just || true
     sed -i -E '/^install-resolve/i [group\("apps"\)]' \
                             "${import_dir}"/30-distrobox.just || true
-    sed -i 's|^toggle-user-motd|_toggle-user-motd|' \
-                            "${import_dir}"/00-default.just || true
     sed -i -e 's|^changelogs-testing|_changelogs-testing|' \
            -e 's|^distrobox-assemble|_distrobox-assemble|' \
            -e 's|^distrobox-new|_distrobox-new|' \
@@ -72,6 +48,8 @@ ujust_setup() {
            -e 's|^changelogs-testing|_changelogs-testing|' \
            -e 's|^configure-grub|_configure-grub|' \
            -e 's|^configure-snapshots|_configure-snapshots|' \
+           -e 's|^configure-broadcom-wl|_configure-broadcom-wl|' \
+           -e 's|^toggle-user-motd|_toggle-user-motd|' \
            -e '/^alias.*distrobox-assemble/d' \
            -e '/^alias.*distrobox-new/d' \
                             "${import_dir}"/*.just || true

@@ -10,6 +10,7 @@ bios:
 
 
 # Enroll signing key for secure boot - Enter password "catcat" when prompted
+[group("utilities")]
 enroll-secure-boot-key:
     #!/usr/bin/bash
     /usr/bin/enroll-sbmok

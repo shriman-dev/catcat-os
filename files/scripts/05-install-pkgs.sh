@@ -297,6 +297,7 @@ COMMON=(
     "jq"
     "pv" # tool for monitoring the progress of data through a pipeline
     "gum"
+    "just"
     "kmscon"
     "kmscon-gl"
 
