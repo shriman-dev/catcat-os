@@ -230,7 +230,7 @@ DESKTOP_COMMON=(
     "i2c-tools"
     "++wldrivers"
     "alsa-firmware"
-    "pipewire-libs-extra"
+    #"pipewire-libs-extra"
     "steam-devices"
     "grub2-tools-extra"
     "google-noto-fonts-all"
