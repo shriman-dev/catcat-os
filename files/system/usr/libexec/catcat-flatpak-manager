@@ -16,7 +16,6 @@ runtimes() {
 
 install_flatpaks() {
 # Install flatpaks if system is updated
-#  if ! diff -q /etc/catcat-os/update_sha /etc/catcat-os/flatpak-list/previous_update_sha; then
     # Install flatpaks in list
     source /etc/catcat-os/flatpak-list/flatpak-pkg-list.sh
     #[[ $(ls -A1 /var/lib/flatpak/app/ | wc -l) -gt 1 ]]
@@ -27,9 +26,7 @@ install_flatpaks() {
       flatpak remote-modify --system --prio=9 flathub
       flatpak install --system -y --noninteractive flathub ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}
       runtimes
-#      cat /etc/catcat-os/update_sha > /etc/catcat-os/flatpak-list/previous_update_sha
     fi
-#  fi
 }
 
 

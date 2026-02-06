@@ -48,6 +48,7 @@ if [[ ${IMAGE_NAME} =~ "-nv" ]]; then
     log "INFO" "Removing packages unneeded on NVIDIA image"
     #nvidia-gpu-firmware
     dnf5 -y remove \
+        amdgpu_top \
         rocm-hip \
         rocm-opencl \
         rocm-clinfo \

@@ -103,6 +103,7 @@ DESKTOP_EXTRAS=(
 
 DESKTOP_COMMON=(
     # Secure
+    #bubblejail
     "firewall-config"
     "usbguard-notifier"
     #opensnitch
@@ -200,7 +201,7 @@ DESKTOP_COMMON=(
     "gnome-shell-extension-common"
     "gnome-shell-extension-gsconnect"
 
-    # Themeing and Extension Deps
+    # Themeing Deps
     "adwaita-fonts-all"
     "adwaita-gtk2-theme"
     "gnome-themes-extra"
@@ -214,6 +215,7 @@ DESKTOP_COMMON=(
     "gnome-menus"
     "glib2-devel"
     "libgtop2"
+    "ffmpegthumbnailer"
     "libappindicator-gtk3"
 
     # Yubikey Deps
@@ -228,6 +230,8 @@ DESKTOP_COMMON=(
     "i2c-tools"
     "++wldrivers"
     "alsa-firmware"
+    "pipewire-libs-extra"
+    "steam-devices"
     "grub2-tools-extra"
     "google-noto-fonts-all"
 )
@@ -284,13 +288,14 @@ COMMON=(
     "rsync"
     "unrar"
     "unzip"
-    "p7zip"
-    "p7zip-plugins"
+    "7zip"
+    "7zip-standalone-all"
     "fscrypt"
     "zstd"
 
     # More Terminal Tools
     "jq"
+    "pv" # tool for monitoring the progress of data through a pipeline
     "gum"
     "kmscon"
     "kmscon-gl"
@@ -304,14 +309,16 @@ COMMON=(
     # Needed Deps
     #cosign
     "bootc"
-    "gettext"
+    "gettext" # libraries for localized translated messages
     "openssl"
-    "lsb_release"
+    "lsb_release" # os-release
+    "dnf5-plugins"
     "sbsigntools" # tools to add signatures to efi binaries and drivers
     "wireguard-tools"
     "kernel-headers"
     "kernel-devel-matched"
     "fwupd"
+    "fwupd-efi"
     "fwupd-plugin-flashrom"
     "fwupd-plugin-modem-manager"
     "fwupd-plugin-uefi-capsule-data"

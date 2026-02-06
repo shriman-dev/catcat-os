@@ -49,47 +49,46 @@ KERNEL_PATH=(
     $(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -exec test -e "{}/vmlinuz" \; -print)
 )
 
-sbsign_extra_modules() {
-    local kernel_path="${1}" extra_modules module
-    local kernel_ver="$(basename ${kernel_path})"
-    local sign_file="$(find ${kernel_path} -type f -name 'sign-file' -print -quit)"
+sbsign_modules() {
+    local kver="$(basename ${1})" modules_dir="${1}/extra" _kmodules _kmod
+    local sign_file="$(find /usr/src/kernels/${kver} -type f -name 'sign-file' -print -quit)"
 
     if [[ ! -x "${sign_file}" ]]; then
-        sign_file="$(rpm -ql kernel-devel-${kernel_ver} | grep 'sign-file$')"
+        sign_file="$(find ${1} -type f -name 'sign-file' -print -quit)"
+        [[ ! -x "${sign_file}" ]] && sign_file="$(rpm -qal 'kernel*' | grep "${kver}.*sign-file$")"
         [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
     fi
-
-    mapfile -t extra_modules < <(find "${kernel_path}/extra" -type f -name '*\.ko*')
 
     sign_module() {
         ${sign_file} sha512 "${SBMOK_KEY}" "${SBMOK_CRT}" "${1}" || die "Failed to sign: ${1}"
     }
-    if [[ "${#extra_modules[@]}" -gt 0 ]]; then
-        log "DEBUG" "Signing kernel modules, total count: ${#extra_modules[@]}"
-        for module in "${extra_modules[@]}"; do
-            case "${module}" in
+    if [[ -d "${modules_dir}" && $(ls -A1 "${modules_dir}" | wc -l) -gt 0 ]]; then
+        mapfile -t _kmodules < <(find "${modules_dir}" -type f -name '*\.ko*')
+        log "DEBUG" "Signing kernel modules, total count: ${#_kmodules[@]}"
+        for _kmod in "${_kmodules[@]}"; do
+            case "${_kmod}" in
                 *.ko)
-                    sign_module "${module}"
+                    sign_module "${_kmod}"
                     ;;
                 *.ko.bz*)
-                    bzip2 --quiet --force --decompress "${module}"
-                    sign_module "${module%.bz*}"
-                    bzip2 --quiet --force --best "${module%.bz*}"
+                    bzip2 --quiet --force --decompress "${_kmod}"
+                    sign_module "${_kmod%.bz*}"
+                    bzip2 --quiet --force --best "${_kmod%.bz*}"
                     ;;
                 *.ko.gz)
-                    gzip --quiet --force --decompress "${module}"
-                    sign_module "${module%.gz}"
-                    gzip --quiet --force --best "${module%.gz}"
+                    gzip --quiet --force --decompress "${_kmod}"
+                    sign_module "${_kmod%.gz}"
+                    gzip --quiet --force --best "${_kmod%.gz}"
                     ;;
                 *.ko.xz)
-                    xz --quiet --force --decompress "${module}"
-                    sign_module "${module%.xz}"
-                    xz --quiet --force --check=crc32 "${module%.xz}"
+                    xz --quiet --force --decompress "${_kmod}"
+                    sign_module "${_kmod%.xz}"
+                    xz --quiet --force --check=crc32 "${_kmod%.xz}"
                     ;;
                 *.ko.zst)
-                    zstd --quiet --force --decompress --rm "${module}"
-                    sign_module "${module%.zst}"
-                    zstd --quiet --force --rm "${module%.zst}"
+                    zstd --quiet --force --decompress --rm "${_kmod}"
+                    sign_module "${_kmod%.zst}"
+                    zstd --quiet --force --rm "${_kmod%.zst}"
                     ;;
             esac
         done
@@ -108,7 +107,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
 
     if [[ "${#KERNEL_PATH[@]}" -gt 1 ]]; then
         log "WARN" "Multiple kernel versions found"
-        log "WARN" "Single kernel recommended for faster secureboot signing"
+        log "WARN" "Single kernel recommended for efficient secureboot signing"
     elif [[ "${#KERNEL_PATH[@]}" -eq 0 ]]; then
         die "Failed to find kernel"
     fi
@@ -120,7 +119,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
                --cert "${SBMOK_CRT}" \
                --output "${vmlinuz_image}" \
                         "${vmlinuz_image}" || die "Failed to sign: ${vmlinuz_image}"
-        sbsign_extra_modules "${kernel_path}"
+        sbsign_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"
         sbverify --list "${vmlinuz_image}"
     done

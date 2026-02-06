@@ -23,7 +23,10 @@ chmod -vR 1777 /var/tmp
 # To make /opt immutable, needed for some rpm? packages (browsers, docker-desktop)
 rm -v /opt && mkdir -vp /opt
 
-log "INFO" "Adding Update SHA using the Commit SHA value"
-echo "${COMMIT_SHA}" > "/etc/${PROJECT_NAME}/update_sha"
+log "INFO" "Adding build info"
+echo \
+"BUILD_EPOCH=$(date +%s)
+COMMIT_SHA='${COMMIT_SHA}'
+DATETIMESTAMP='${DATESTAMP}.${TIMESTAMP}'" > "/etc/${PROJECT_NAME}/build_info"
 
 log "INFO" "Build environment prepared"

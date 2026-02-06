@@ -190,6 +190,7 @@ audio/x-gsm=com.github.rafostar.Clapper.desktop
 application/x-zerosize=org.gnome.gedit.desktop
 image/qoi=org.gnome.Loupe.desktop
 text/x-makefile=org.gnome.gedit.desktop
+application/pkcs8+pem=org.gnome.gedit.desktop
 
 [Added Associations]
 application/x-shellscript=org.gnome.gedit.desktop;
@@ -345,3 +346,4 @@ image/qoi=org.gnome.Loupe.desktop;
 video/x-mpeg-system=io.github.celluloid_player.Celluloid.desktop;
 video/x-ms-wmx=io.github.celluloid_player.Celluloid.desktop;
 text/x-makefile=org.gnome.gedit.desktop;
+application/pkcs8+pem=org.gnome.gedit.desktop;

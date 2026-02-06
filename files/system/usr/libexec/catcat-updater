@@ -1,5 +1,6 @@
 #!/bin/bash
 source /usr/lib/catcat-os/funcvar.sh
+source /etc/catcat-os/build_info
 
 REG_FLATPAK_APPS_UPDATE=(
     "org.mozilla.firefox"
@@ -66,7 +67,7 @@ update_cmd() {
 
             /usr/bin/update extra >> "${autoupdate_log_file}"
 
-            is_file_older ${one_week} "/etc/catcat-os/update_sha" &&
+            [[ ${BUILD_EPOCH} -lt $(( $(date +%s) - one_week )) ]] &&
                  /usr/bin/update >> "${autoupdate_log_file}"
 
             is_file_older ${one_day} "${firstboot_file}" ||

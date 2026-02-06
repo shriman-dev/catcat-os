@@ -34,16 +34,16 @@ alias usorted="sort | uniq -c | sort --ignore-leading-blanks --numeric-sort"
 # Use some more things with better alternatives
 alias l.='eza -A1'
 alias la='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first'
-alias lt='la --tree --git'
-alias ll='la --long --git --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
-alias lll='ll --header'
+alias lt='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --tree'
+alias ll='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --long --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
+alias lll='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --long --header --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
 alias procs="procs --load-config $PROCS_CONFIG_FILE"
-alias pscpu='procs --sortd cpu'
-alias psmem='procs --sortd rss'
-alias proctree='procs --tree'
+alias pscpu="procs --load-config $PROCS_CONFIG_FILE --sortd cpu"
+alias psmem="procs --load-config $PROCS_CONFIG_FILE --sortd rss"
+alias proctree="procs --load-config $PROCS_CONFIG_FILE --tree"
 alias btm="btm --config_location $BOTTOM_CONFIG_FILE"
-alias btop='btm'
-alias htop='btm --basic'
+alias btop="btm --config_location $BOTTOM_CONFIG_FILE"
+alias htop="btm --config_location $BOTTOM_CONFIG_FILE --basic"
 
 
 #function grubup

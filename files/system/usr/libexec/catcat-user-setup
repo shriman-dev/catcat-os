@@ -21,11 +21,11 @@ on_first_boot() {
 
 # sync default configs for user home
 sync_default_configs() {
-    local update_sha="/usr/etc/catcat-os/update_sha"
-    local prev_sha="${CATCAT_CONFD}/log/.update_sha_previous"
+    local update_info="/usr/etc/catcat-os/build_info"
+    local lastup_info="${CATCAT_CONFD}/log/.build_info_previous"
 
     log "INFO" "Updating configs..."
-    if ! diff -q "${update_sha}" "${prev_sha}" >/dev/null 2>&1; then
+    if ! diff -q "${update_info}" "${lastup_info}" >/dev/null 2>&1; then
         CATCAT_SYSTEM_UPDATED=true
         mkdir -pv "${CATCAT_CONFD}"/{log,LS_COLORS_DIR}
         cp -fv /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
@@ -34,11 +34,11 @@ sync_default_configs() {
         rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
             err "Skel update failed"
 
-        cp -fv "${update_sha}" "${prev_sha}" || err "SHA update failed"
+        cp -fv "${update_info}" "${lastup_info}" || err "SHA update failed"
     fi
 
     if systemctl is-active display-manager; then
-        if ! diff -q "${update_sha}" "${prev_sha}_ii" >/dev/null 2>&1; then
+        if ! diff -q "${update_info}" "${lastup_info}_ii" >/dev/null 2>&1; then
             CATCAT_DESKTOP_UPDATED=true
             systemctl is-active gdm &&
                 rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/
@@ -46,7 +46,7 @@ sync_default_configs() {
             { rm -rf "${LOCALSHARE}/themes"/*{Catppuccin,Lavanda}*
               cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/; } ||
                 err "Theme update failed"
-            cp -fv "${update_sha}" "${prev_sha}_ii" || err "SHA update failed"
+            cp -fv "${update_info}" "${lastup_info}_ii" || err "SHA update failed"
         fi
     fi
     log "INFO" "Configs updated"

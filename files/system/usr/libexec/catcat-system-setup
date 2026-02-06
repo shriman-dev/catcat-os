@@ -46,9 +46,9 @@ fi
 /usr/libexec/catcat-flatpak-manager
 
 # Sync configs on update
-update_sha="/usr/etc/catcat-os/update_sha"
-prev_sha="/etc/catcat-os/log/.update_sha_previous"
-if ! diff -q "${update_sha}" "${prev_sha}"; then
+update_info="/usr/etc/catcat-os/build_info"
+lastup_info="/etc/catcat-os/log/.build_info_previous"
+if ! diff -q "${update_info}" "${lastup_info}"; then
     ru_config_d="/root/.config"
     ru_local_share="/root/.local/share"
     ru_catcat_d="${ru_local_share}/catcat-os"
@@ -75,7 +75,7 @@ if ! diff -q "${update_sha}" "${prev_sha}"; then
         /usr/bin/dconf update
     fi
 
-    cp -fv "${update_sha}" "${prev_sha}"
+    cp -fv "${update_info}" "${lastup_info}"
 fi
 
 # Sync main user's monitors.xml with GDM
