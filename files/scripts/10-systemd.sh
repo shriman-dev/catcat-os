@@ -8,6 +8,7 @@ services_enable() {
     log "INFO" "Enabling system services"
     systemctl -f enable \
         nix.mount \
+        podman.socket \
         catcat-system-setup.service \
         catcat-os-update.timer \
         catcat-maintenance.timer

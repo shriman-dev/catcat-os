@@ -22,7 +22,7 @@ toggle-auto-power-profile ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
-    if systemctl is-enabled auto-power-profile.service | grep -q enabled; then
+    if systemctl is-enabled --quiet auto-power-profile.service; then
       CURRENT_STATE="Enabled"
     fi
     OPTION={{ ACTION }}
@@ -268,7 +268,7 @@ toggle-updates ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
-    if systemctl is-enabled catcat-os-update.timer | grep -q enabled; then
+    if systemctl is-enabled --quiet catcat-os-update.timer; then
       CURRENT_STATE="Enabled"
     fi
     OPTION={{ ACTION }}
@@ -314,7 +314,7 @@ toggle-ssh ACTION="":
     # Get current SSH status
     SSH_STATUS_RUNNING=$(systemctl is-active sshd)
     SSH_STATUS="Disabled And ${SSH_STATUS_RUNNING[@]^}"
-    if systemctl is-enabled sshd | grep -q enabled; then
+    if systemctl is-enabled --quiet sshd; then
       SSH_STATUS="Enabled And ${SSH_STATUS_RUNNING[@]^}"
     fi
     OPTION="{{ ACTION }}"
@@ -375,7 +375,7 @@ toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
     source /usr/lib/catcat-os/funcvar.sh
     CURRENT_STATE="Disabled"
-    if systemctl is-enabled nightly-reboot.timer | grep -q enabled; then
+    if systemctl is-enabled --quiet nightly-reboot.timer; then
       CURRENT_STATE="Enabled"
     fi
     OPTION={{ ACTION }}

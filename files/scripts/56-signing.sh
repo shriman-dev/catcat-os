@@ -50,14 +50,12 @@ KERNEL_PATH=(
 )
 
 sbsign_modules() {
-    local kver="$(basename ${1})" modules_dir="${1}/extra" _kmodules _kmod
+    local kpath="${1}" kver="$(basename ${1})" modules_dir="${1}/extra" _kmodules _kmod
     local sign_file="$(find /usr/src/kernels/${kver} -type f -name 'sign-file' -print -quit)"
 
-    if [[ ! -x "${sign_file}" ]]; then
-        sign_file="$(find ${1} -type f -name 'sign-file' -print -quit)"
-        [[ ! -x "${sign_file}" ]] && sign_file="$(rpm -qal 'kernel*' | grep "${kver}.*sign-file$")"
-        [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
-    fi
+    [[ ! -x "${sign_file}" ]] && sign_file="$(find ${kpath} -type f -name 'sign-file' -print -quit)"
+    [[ ! -x "${sign_file}" ]] && sign_file="$(rpm -qal 'kernel*' | grep "${kver}.*sign-file$")"
+    [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
 
     sign_module() {
         ${sign_file} sha512 "${SBMOK_KEY}" "${SBMOK_CRT}" "${1}" || die "Failed to sign: ${1}"
