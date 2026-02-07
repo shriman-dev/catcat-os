@@ -35,7 +35,7 @@ rm -rvf /etc/skel/.config/user-tmpfiles.d
 rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vapor.palette
 rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
 
-# Remove unneeded packages
+# Remove packages no longer needed
 log "INFO" "Running post package removal"
 if [[ ${IMAGE_NAME} =~ (-mi|-sv) ]]; then
     dnf5 -y remove \
@@ -59,3 +59,12 @@ fi
 log "INFO" "Post setup configuration"
 mkdir -vp /var/tmp
 chmod -vR 1777 /var/tmp
+
+# Kernel sign checks
+if [[ -d "/tmp/kernel_sigsha" ]]; then
+    for sha in /tmp/kernel_sigsha/*.sha; do
+        sha256sum -c "${sha}" || die "Kernel was modified, shasum mismatch: ${sha}"
+    done
+    rm -rf "/tmp/kernel_sigsha"
+fi
+

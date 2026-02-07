@@ -64,7 +64,7 @@ ostree container commit
 exec_script "${BUILD_SETUP_DIR}/55-image-info.sh"
 ostree container commit
 
-{ enclosed_heading_this "Container Image And Kernel Signing"; } 2>/dev/null
+{ enclosed_heading_this "Signing Image Container and Kernel"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
 ostree container commit
 

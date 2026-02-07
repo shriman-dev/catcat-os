@@ -111,7 +111,7 @@ log "INFO" "Fixing librewolf/firefox delayed launch issue"
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
-# Fix iso build failing for the reason just having CN readme
+# Fix iso installation failing for the reason just having CN readme
 rpm -q just &&
     rm -v /usr/share/doc/just/README.*.md
 

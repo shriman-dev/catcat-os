@@ -41,4 +41,4 @@ done
 
 rm -vf -- "${temp_conf_file}"
 
-log "INFO" "All done."
+log "INFO" "Initramfs regeneration completed"

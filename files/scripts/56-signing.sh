@@ -96,7 +96,7 @@ sbsign_modules() {
 if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
     log "INFO" "Signing kernel and kernel modules with secureboot keys"
 
-    mkdir -vp "$(dirname ${SBMOK_DER})" "/etc/pki/akmods/certs"
+    mkdir -vp "$(dirname ${SBMOK_DER})" "/etc/pki/akmods/certs" "/tmp/kernel_sigsha"
     cp -vf "${BUILD_ROOT}/sbmok.der" "${SBMOK_DER}"
     cp -vf "${SBMOK_DER}" "/etc/pki/akmods/certs"/
 
@@ -120,6 +120,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${BUILD_ROOT}/sbmok.der" ]]; then
         sbsign_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"
         sbverify --list "${vmlinuz_image}"
+        sha256sum "${vmlinuz_image}" > "/tmp/kernel_sigsha/kernel-ver-${kernel_ver}.sha"
     done
     log "INFO" "Successfully signed kernel and kernel modules"
 fi
