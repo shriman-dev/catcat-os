@@ -22,7 +22,7 @@ install_flatpaks() {
     if check_network_connection; then
       log "INFO" "Installing system flatpaks from config list (requires internet)"
       # Add and set flathub
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo --system
+      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --system
       flatpak remote-modify --system --prio=9 flathub
       flatpak install --system -y --noninteractive flathub ${DESKTOP_COMMON[@]} ${DESKTOP_EXTRAS[@]}
       runtimes

@@ -28,8 +28,7 @@ sync_default_configs() {
     if ! diff -q "${update_info}" "${lastup_info}" >/dev/null 2>&1; then
         CATCAT_SYSTEM_UPDATED=true
         mkdir -pv "${CATCAT_CONFD}"/{log,LS_COLORS_DIR}
-        cp -fv /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
-                "${CATCAT_CONFD}/LS_COLORS_DIR/catppuccin-mocha-peach"
+        cp -fv /usr/share/catcat-os/LS_COLORS_DIR/* "${CATCAT_CONFD}/LS_COLORS_DIR"/
 
         rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
             err "Skel update failed"

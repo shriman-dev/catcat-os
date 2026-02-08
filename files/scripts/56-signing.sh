@@ -11,7 +11,7 @@ COSIGN_PUB_KEY="/etc/pki/containers/${PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
 mkdir -vp /etc/pki/containers /etc/containers/registries.d
-cp -vf "/ctx/cosign.pub" "${COSIGN_PUB_KEY}"
+cp -vf "${BUILD_ROOT}/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # Copy the template policy.json if the file is missing or lacks 'reject' default policy
 [[ ! -f "${POLICY_FILE}" ]] && cp -v "${TEMPLATE_POLICY}" "${POLICY_FILE}"

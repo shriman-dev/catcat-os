@@ -10,22 +10,22 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
 alias c='clear'
-alias ip='ip -color=auto'
-alias ls='ls --color=auto'
-alias tc='tc -color=auto'
+alias ip='ip -color=always'
+alias ls='ls --color=always'
+alias tc='tc -color=always'
 alias hw='inxi --expanded -J'
 alias fcc='fc-cache -fvr --really-force'
-alias dir='dir --color=auto'
+alias dir='dir --color=always'
 alias vim='nvim'
-alias vdir='vdir --color=auto'
+alias vdir='vdir --color=always'
 alias tree='tree -a --dirsfirst'
-alias diff='diff --color=auto'
+alias diff='diff --color=always'
 alias wget='curl -LO'
 alias jctl="journalctl -xe" # Get the error messages from journalctl
-alias grep='grep --color=auto'
-alias egrep='grep --color=auto -E'
-alias fgrep='grep --color=auto -F'
-alias rgrep='grep --color=auto -r'
+alias grep='grep --color=always'
+alias egrep='grep --color=always -E'
+alias fgrep='grep --color=always -F'
+alias rgrep='grep --color=always -r'
 alias unarcv='unarchive'
 alias ramcln="sudo /usr/bin/ramclean"
 alias killall='killall -vw'
@@ -33,18 +33,17 @@ alias usorted="sort | uniq -c | sort --ignore-leading-blanks --numeric-sort"
 
 # Use some more things with better alternatives
 alias l.='eza -A1'
-alias la='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first'
-alias lt='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --tree'
-alias ll='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --long --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
-alias lll='eza -A --classify=auto --color=auto --icons=auto --hyperlink --group-directories-first --git --long --header --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
-alias procs="procs --load-config $PROCS_CONFIG_FILE"
+alias la='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first'
+alias lt='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --tree'
+alias ll='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --long --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
+alias lll='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --long --header --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
 alias pscpu="procs --load-config $PROCS_CONFIG_FILE --sortd cpu"
 alias psmem="procs --load-config $PROCS_CONFIG_FILE --sortd rss"
 alias proctree="procs --load-config $PROCS_CONFIG_FILE --tree"
-alias btm="btm --config_location $BOTTOM_CONFIG_FILE"
+alias procs="procs --load-config $PROCS_CONFIG_FILE"
 alias btop="btm --config_location $BOTTOM_CONFIG_FILE"
 alias htop="btm --config_location $BOTTOM_CONFIG_FILE --basic"
-
+alias btm="btm --config_location $BOTTOM_CONFIG_FILE"
 
 #function grubup
 #  if command -v update-grub

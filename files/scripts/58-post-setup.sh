@@ -62,8 +62,9 @@ chmod -vR 1777 /var/tmp
 
 # Kernel sign checks
 if [[ -d "/tmp/kernel_sigsha" ]]; then
-    for sha in /tmp/kernel_sigsha/*.sha; do
-        sha256sum -c "${sha}" || die "Kernel was modified, shasum mismatch: ${sha}"
+    for kver_sha in /tmp/kernel_sigsha/*.sha; do
+        sha256sum -c "${kver_sha}" ||
+            die "Kernel was modified, shasum mismatch for kernel version: ${kver_sha}"
     done
     rm -rf "/tmp/kernel_sigsha"
 fi

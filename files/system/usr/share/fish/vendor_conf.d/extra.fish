@@ -47,8 +47,8 @@ abbr -a hisync --position command ' hisync'
 
 # Run fish functions and aliases with sudo
 function sudo --wraps sudo
-    set sudo_args
-    set sudo_args_with_value (
+    set -f sudo_args
+    set -f sudo_args_with_value (
             LANG=C command sudo --help | string match -gr '^\s*(-\w),\s*(--\w[\w-]*)=')
 
     while set -q argv[1]

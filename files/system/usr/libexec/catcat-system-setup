@@ -54,7 +54,7 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
     ru_catcat_d="${ru_local_share}/catcat-os"
     [[ ! -d "${ru_catcat_d}/LS_COLORS_DIR" ]] &&
             mkdir -vp "${ru_catcat_d}/LS_COLORS_DIR"
-    cp -dvf /usr/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach \
+    cp -dvf /usr/share/catcat-os/LS_COLORS_DIR/* \
             "${ru_catcat_d}/LS_COLORS_DIR"/
 
     [[ ! -e "${ru_config_d}/bat" ]] &&
