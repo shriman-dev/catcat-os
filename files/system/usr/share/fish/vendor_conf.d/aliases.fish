@@ -37,13 +37,17 @@ alias la='eza -A --classify=auto --color=always --icons=auto --hyperlink --group
 alias lt='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --tree'
 alias ll='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --long --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
 alias lll='eza -A --classify=auto --color=always --icons=auto --hyperlink --group-directories-first --git --long --header --octal-permissions --group --smart-group --binary --blocksize --links --time-style="+%a %H:%M:%S %Y.%m.%d"'
-alias pscpu="procs --load-config $PROCS_CONFIG_FILE --sortd cpu"
-alias psmem="procs --load-config $PROCS_CONFIG_FILE --sortd rss"
-alias proctree="procs --load-config $PROCS_CONFIG_FILE --tree"
-alias procs="procs --load-config $PROCS_CONFIG_FILE"
-alias btop="btm --config_location $BOTTOM_CONFIG_FILE"
-alias htop="btm --config_location $BOTTOM_CONFIG_FILE --basic"
+
+alias rg='rg --color=always'
+alias fd='fd --color=always'
 alias btm="btm --config_location $BOTTOM_CONFIG_FILE"
+alias btop="btm"
+alias htop="btm --basic"
+alias procs="procs --load-config $PROCS_CONFIG_FILE"
+alias pscpu="procs --sortd cpu"
+alias psmem="procs --sortd rss"
+alias proctree="procs --tree"
+
 
 #function grubup
 #  if command -v update-grub

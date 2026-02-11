@@ -4,7 +4,7 @@ set -ouex pipefail
 
 log "INFO" "Cleaning image"
 
-if [[ -d /usr/share/ublue-os ]]; then
+if [[ -d /usr/share/ublue-os && ! -d "/etc/${PROJECT_NAME}" ]]; then
     log "INFO" "Removing homebrew"
     rm -rf /home/linuxbrew
     rm -vf /usr/bin/bbrew-helper
@@ -22,8 +22,9 @@ if [[ -d /usr/share/ublue-os ]]; then
     rm -rf /usr/share/ublue-os/homebrew
 
     log "INFO" "Removing ublue/bazzite defaults"
-    [[ ! -d /etc/catcat-os ]] && rm -rvf /usr/share/glib-2.0/schemas/zz*
-    [[ ! -d /etc/catcat-os ]] && rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
+    rm -rvf /usr/share/glib-2.0/schemas/zz*
+    rm -vf  /usr/share/ublue-os/firstboot/yafti.yml
+    rm -vf  /usr/libexec/ntfs_exfat_monitor_script
     rm -vf  /usr/libexec/bazzite-user-setup
     rm -vf  /usr/libexec/topgrade/mozilla-gnome-theme-update
     rm -vf  /usr/share/applications/bazzite-steam-bpm.desktop
@@ -45,32 +46,35 @@ if [[ -d /usr/share/ublue-os ]]; then
     rm -vf /etc/profile.d/user-motd.sh
 fi
 
-log "INFO" "Removing profile.d scripts"
-rm -vf /etc/profile.d/toolbox.sh
+if [[ ! -d "/etc/${PROJECT_NAME}" ]]; then
+    log "INFO" "Removing dconf and skel defaults"
+    rm -rvf /etc/skel/*
+    rm -rvf /etc/skel/.*
+    rm -rvf /etc/dconf/db/distro.d/*
+    rm -rvf /usr/etc/skel/*
+    rm -rvf /usr/etc/skel/.*
+    rm -rvf /usr/etc/dconf/db/distro.d/*
 
-log "INFO" "Removing localsearch db miner"
-rm -vf /usr/lib/systemd/user/tracker*3.service
-rm -vf /usr/lib/systemd/user/localsearch*3.service
+    log "INFO" "Removing profile.d scripts"
+    rm -vf /etc/profile.d/toolbox.sh
 
-log "INFO" "Removing dconf and skel defaults"
-[[ ! -d /etc/catcat-os ]] && rm -rvf /etc/skel/*
-[[ ! -d /etc/catcat-os ]] && rm -rvf /etc/dconf/db/distro.d/*
-[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/skel/*
-[[ ! -d /etc/catcat-os ]] && rm -rvf /usr/etc/dconf/db/distro.d/*
+    log "INFO" "Removing localsearch db miner"
+    rm -vf /usr/lib/systemd/user/tracker*3.service
+    rm -vf /usr/lib/systemd/user/localsearch*3.service
 
-log "INFO" "Removing desktop files in xdg autostart directory"
-[[ ! -d /etc/catcat-os ]] && rm -rvf /etc/skel/.config/autostart
-rm -vf  /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
-rm -vf  /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop
-rm -vf  /etc/xdg/autostart/org.gnome.Software.desktop
-rm -vf  /etc/xdg/autostart/nvidia-settings-load.desktop
-rm -vf  /etc/xdg/autostart/localsearch*3.desktop
-rm -vf  /etc/xdg/autostart/tracker*3.desktop
-rm -vf  /etc/xdg/autostart/steam.desktop
+    log "INFO" "Removing desktop files in xdg autostart directory"
+    rm -vf /etc/xdg/autostart/ibus-mozc-launch-xwayland.desktop
+    rm -vf /etc/xdg/autostart/org.gnome.Evolution-alarm-notify.desktop
+    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
+    rm -vf /etc/xdg/autostart/nvidia-settings-load.desktop
+    rm -vf /etc/xdg/autostart/localsearch*3.desktop
+    rm -vf /etc/xdg/autostart/tracker*3.desktop
+    rm -vf /etc/xdg/autostart/steam.desktop
 
-log "INFO" "Removing unneeded repos"
-rm -vf /etc/yum.repos.d/charm.repo
-rm -vf /etc/yum.repos.d/google-chrome.repo
-rm -vf /etc/yum.repos.d/tailscale.repo
+    log "INFO" "Removing unneeded repos"
+    rm -vf /etc/yum.repos.d/charm.repo
+    rm -vf /etc/yum.repos.d/google-chrome.repo
+    rm -vf /etc/yum.repos.d/tailscale.repo
+fi
 
 log "INFO" "Cleanup done"

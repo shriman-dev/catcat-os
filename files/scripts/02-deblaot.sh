@@ -5,6 +5,7 @@ set -ouex pipefail
 log "INFO" "Debloating image"
 #avahi avahi-libs fuse-sshfs irqbalance
 #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
+[[ ! -d "/etc/${PROJECT_NAME}" ]] &&
     dnf5 -y remove \
         azure-vm-utils \
         bazaar \
