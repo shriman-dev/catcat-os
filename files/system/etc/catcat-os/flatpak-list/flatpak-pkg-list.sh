@@ -25,7 +25,6 @@ DESKTOP_EXTRAS=(
 
     # Gaming Apps
     "app/com.usebottles.bottles/x86_64/stable"
-    "app/io.github.Faugus.faugus-launcher/x86_64/stable"
     "app/com.vysp3r.ProtonPlus/x86_64/stable"
     "app/page.kramo.Cartridges/x86_64/stable"
     "app/io.github.radiolamp.mangojuice/x86_64/stable"

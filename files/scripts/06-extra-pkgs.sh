@@ -52,6 +52,7 @@ ujust_setup() {
            -e 's|^toggle-user-motd|_toggle-user-motd|' \
            -e '/^alias.*distrobox-assemble/d' \
            -e '/^alias.*distrobox-new/d' \
+           -e '/^alias.*broadcom-wl/d' \
                             "${import_dir}"/*.just || true
 
 

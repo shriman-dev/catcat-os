@@ -79,6 +79,6 @@ name='Optimize'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/Others]
-apps=['oneko.desktop', 'Cmatrix.desktop', 'Asciiquarium.desktop', 'Pipes.desktop', 'Cmatrix_Bold_Rainbow.desktop', 'Cbonsai.desktop', 'com.github.alex11br.themechanger.desktop', 'bazzite-documentation.desktop', 'yelp.desktop', 'discourse.desktop', 'yafti.desktop', 'discover_overlay_configure.desktop', 'org.gnome.Tour.desktop']
+apps=['oneko.desktop', 'Cmatrix.desktop', 'Asciiquarium.desktop', 'Pipes.desktop', 'Cmatrix_Bold_Rainbow.desktop', 'Cbonsai.desktop', 'com.github.alex11br.themechanger.desktop', 'bazzite-documentation.desktop', 'yelp.desktop', 'discourse.desktop', 'yafti.desktop', 'io.github.ublue_os.yafti_gtk.desktop', 'discover_overlay_configure.desktop', 'org.gnome.Tour.desktop']
 name='Others'
 translate=false
