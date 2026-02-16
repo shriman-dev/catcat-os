@@ -2,7 +2,7 @@
 source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
-# No need to run cleanup when rebuilding image of current project
+# Cleanup is not required when rebuilding image of current project
 if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then
     log "INFO" "Cleaning up system"
 

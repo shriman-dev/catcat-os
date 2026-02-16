@@ -2,7 +2,7 @@
 source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
-# No need to run debloat when rebuilding image of current project
+# Debloat is not required when rebuilding image of current project
 if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then
     log "INFO" "Debloating system"
     #avahi avahi-libs fuse-sshfs irqbalance
