@@ -3,9 +3,13 @@ set -ouex pipefail
 export BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
 export BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 source "${BUILD_SCRIPT_LIB}"
+
 # This is useful when rebuilding image or caching
-[[ -d "/etc/${PROJECT_NAME}" ]] &&
-export REBUILDING_IMAGE=1
+if [[ -d "/etc/${PROJECT_NAME}" ]]; then
+    export REBUILDING_IMAGE=1
+else
+    export REBUILDING_IMAGE=0
+fi
 
 enclosed_heading_this() {
     local text="${1}" padding_char="${2:-=}" output_width=${3:-120}
