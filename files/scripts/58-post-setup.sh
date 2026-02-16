@@ -2,9 +2,18 @@
 source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
+# Kernel sign checks
+if [[ -d "/tmp/kernel_sigsha" ]]; then
+    log "INFO" "Verifying kernel checksum after signing"
+    for kver_sha in /tmp/kernel_sigsha/*.sha; do
+        sha256sum -c "${kver_sha}" ||
+            die "Kernel was modified, shasum mismatch for kernel version: ${kver_sha}"
+    done
+    rm -rf "/tmp/kernel_sigsha"
+    log "INFO" "Kernel checksum verified"
+fi
+
 log "INFO" "Running post setup cleanup"
-
-
 # Disable gnome software running in background
 if rpm -q gnome-software; then
     log "INFO" "Disabling gnome software from running in background"
@@ -59,13 +68,3 @@ fi
 log "INFO" "Post setup configuration"
 mkdir -vp /var/tmp
 chmod -vR 1777 /var/tmp
-
-# Kernel sign checks
-if [[ -d "/tmp/kernel_sigsha" ]]; then
-    for kver_sha in /tmp/kernel_sigsha/*.sha; do
-        sha256sum -c "${kver_sha}" ||
-            die "Kernel was modified, shasum mismatch for kernel version: ${kver_sha}"
-    done
-    rm -rf "/tmp/kernel_sigsha"
-fi
-

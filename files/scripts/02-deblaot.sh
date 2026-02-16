@@ -2,10 +2,11 @@
 source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
-log "INFO" "Debloating image"
-#avahi avahi-libs fuse-sshfs irqbalance
-#ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
-[[ ! -d "/etc/${PROJECT_NAME}" ]] &&
+# No need to run debloat when rebuilding image of current project
+if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then
+    log "INFO" "Debloating system"
+    #avahi avahi-libs fuse-sshfs irqbalance
+    #ibus-libpinyin ibus-hangul ibus-m17n ibus-mozc ibus-typing-booster
     dnf5 -y remove \
         azure-vm-utils \
         bazaar \
@@ -66,4 +67,5 @@ log "INFO" "Debloating image"
 
     dnf5 -y autoremove
 
-log "INFO" "Debloat Done"
+    log "INFO" "Debloat Done"
+fi

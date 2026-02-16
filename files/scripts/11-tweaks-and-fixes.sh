@@ -3,7 +3,7 @@ source "${BUILD_SCRIPT_LIB}"
 set -ouex pipefail
 
 # TWEAKS
-log "INFO" "Making system tweaks"
+log "INFO" "Applying system tweaks"
 
 # Tweak ublue defaults
 if [[ -d /usr/share/ublue-os ]]; then
@@ -39,6 +39,9 @@ mkdir -vp /etc/systemd/{logind.conf.d,sleep.conf.d}
 cp -drvf /usr/lib/systemd/logind.conf /etc/systemd/logind.conf.d/
 cp -drvf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/
 
+
+# PERFORMANCE TWEAKS
+log "INFO" "Applying performance tweaks"
 # Configure zram and reduce ram consumption by disabling unneeded process
 log "INFO" "Checking zram compression"
 check_file_inplace /etc/systemd/zram-generator.conf
