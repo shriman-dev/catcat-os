@@ -4,7 +4,7 @@ export BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
 export BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 source "${BUILD_SCRIPT_LIB}"
 # This is useful when rebuilding image or caching
-[[ ! -d "/etc/${PROJECT_NAME}" ]] &&
+[[ -d "/etc/${PROJECT_NAME}" ]] &&
 export REBUILDING_IMAGE=1
 
 enclosed_heading_this() {
