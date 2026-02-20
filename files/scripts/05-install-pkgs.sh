@@ -339,7 +339,7 @@ log "INFO" "Adding extra RPM repos"
 COPR_LIST=(
     "bazzite-org/bazzite"
 #    "bazzite-org/bazzite-multilib"
-    "bazzite-org/rom-properties"
+#    "bazzite-org/rom-properties"
 #    "bazzite-org/obs-vkcapture"
 #    "hhd-dev/hhd"
 #    "ublue-os/staging"
