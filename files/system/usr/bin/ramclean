@@ -44,7 +44,7 @@ localsearch'
 #gsd-xsettings
 
 for II in ${KILLP[*]}; do
-  pkill -KILL -fe "${II}"
+    pkill -KILL -fe "${II}"
 done
 
 sync; echo 2 > '/proc/sys/vm/drop_caches' #&& swapoff -a && swapon -a

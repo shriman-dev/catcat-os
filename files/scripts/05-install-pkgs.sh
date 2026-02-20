@@ -163,9 +163,9 @@ DESKTOP_COMMON=(
     # Dev Tools
     "git"
     "glow"
+    "++uv"
     "micro"
     "neovim"
-    "python3-pip"
     "inotify-tools"
     #vscodium
     "$(latest_ghpkg_url 'VSCodium/vscodium' 'x86_64\.rpm$')"
@@ -231,6 +231,7 @@ DESKTOP_COMMON=(
     # Needed Deps
     "yad"
     "zenity"
+    "espeak-ng"
     "i2c-tools"
     "++wldrivers"
     "alsa-firmware"

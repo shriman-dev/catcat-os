@@ -217,6 +217,11 @@ process_package() {
             ln -svf "${LIBEXEC_DIR}/${1}/${1}" "${BIN_DIR}/${1}"
             ln -svf "${BIN_DIR}/adb" "${LIBEXEC_DIR}/${1}/adb"
             ;;
+        uv)
+            get_ghpkg --name "${1}" --repo "astral-sh/uv" \
+                      --regx 'x86_64-unknown-linux-gnu\.tar\.gz$'
+            place_executable "${auto_fold_dir[0]}" "uvx"
+            ;;
         llama-cpp)
             get_ghpkg --name "${1}" --repo "ggml-org/llama.cpp" \
                       --regx 'ubuntu-x64\.tar\.gz$' --negx 'vulkan' --libexec

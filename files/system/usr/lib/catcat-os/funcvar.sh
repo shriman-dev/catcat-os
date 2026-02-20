@@ -301,17 +301,26 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
 
 latest_ghpkg_url() {
-    local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" url
+    local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" sha="${4:-}"
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
     [[ -n "${JQ_FILTER:-}" ]] && jq_filter="${JQ_FILTER}"
 
-    local ii
+    local ii response url vals=()
     for ii in {1..5}; do
-        url=$(curl_fetch "https://api.github.com/repos/${repo}/releases/latest" |
-                jq -r --arg inc "${include_pattern}" --arg exc "${exclude_pattern}" "${jq_filter}")
-        [[ -n "${url}" ]] && echo "${url}" && return 0
+        response="$(curl_fetch https://api.github.com/repos/${repo}/releases/latest)"
+        url=$(jq -r --arg inc "${include_pattern}" \
+                    --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
+        vals+=("${url}")
+
+        [[ "${sha:-}" == "sha" ]] && {
+            jq_filter="${jq_filter%.br*_*}.digest"
+            sha=$(jq -r --arg inc "${include_pattern}" \
+                    --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
+            vals+=("${sha}")
+        }
+        [[ -n "${vals[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
         sleep 0.4
     done
     die "Unable to retrieve latest package URL"
@@ -348,11 +357,14 @@ get_ghpkg() {
         esac
         shift
     done
-    local latest_pkg_url="$(latest_ghpkg_url ${pkg_repo} ${pkg_regx} ${pkg_negx:-musl})"
-    local pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/$(basename ${latest_pkg_url})"
+    local pkg_vals=($(latest_ghpkg_url "${pkg_repo}" "${pkg_regx}" "${pkg_negx:-musl}" "sha"))
+    local pkg_url="${pkg_vals[0]}"
+    local pkg_sha="${pkg_vals[1]#*:}"
+    local pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/$(basename ${pkg_url})"
 
     mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
-    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    curl_get "${pkg_archive}" "${pkg_url}"
+    sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" || die "Checksum mismatch for package: ${pkg_name}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     # Detect top populated directories

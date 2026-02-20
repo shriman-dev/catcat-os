@@ -57,6 +57,7 @@ DISABLE_SERVICES=(
     "nfs-idmapd.service"
     "nfs-mountd.service"
     "nfsdcld.service"
+    "ntfs-nag.service"
     "rpc-gssd.service"
     "rpc-statd-notify.service"
     "rpc-statd.service"
