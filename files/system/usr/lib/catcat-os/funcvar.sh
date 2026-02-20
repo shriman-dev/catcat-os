@@ -45,7 +45,6 @@ declare -r unhide=$'\033[28m'
 
 QUIET=false
 VERBOSE=2
-
 # Logging with optional verbose output
 log() {
     local color level="${1}" msg="${@:2}"
@@ -68,6 +67,19 @@ die() {
 }
 
 err() { log "ERROR" "${1}"; return 1; }
+
+# Keep setx state
+ksx() {
+    if [[ $- == *x* ]]; then
+        setx=true
+        set +x
+    else
+        if [[ ${setx:-} == true ]]; then
+            set -x
+            unset setx
+        fi
+    fi
+}
 
 ## Function to generate a choice selection and return the selected choice
 # CHOICE=$(Choice option1 option2 "option 3")
@@ -309,17 +321,19 @@ latest_ghpkg_url() {
 
     local ii response url vals=()
     for ii in {1..5}; do
+        { ksx; } 2>/dev/null
         response="$(curl_fetch https://api.github.com/repos/${repo}/releases/latest)"
+        { ksx; } 2>/dev/null
         url=$(jq -r --arg inc "${include_pattern}" \
                     --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
         vals+=("${url}")
 
-        [[ "${sha:-}" == "sha" ]] && {
+        if [[ "${sha:-}" == "sha" ]]; then
             jq_filter="${jq_filter%.br*_*}.digest"
             sha=$(jq -r --arg inc "${include_pattern}" \
-                    --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
+                        --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
             vals+=("${sha}")
-        }
+        fi
         [[ -n "${vals[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
         sleep 0.4
     done
@@ -364,7 +378,23 @@ get_ghpkg() {
 
     mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${pkg_url}"
-    sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" || die "Checksum mismatch for package: ${pkg_name}"
+    if [[ -n "${pkg_url}" && -n "${pkg_sha}" ]]; then
+        sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" ||
+        for ii in {1..4}; do
+            if [[ ${ii} -lt 4 ]]; then
+                err "Checksum mismatch for package: ${pkg_name}"
+                log "INFO" "Retrying ${ii}..."
+                rm "${pkg_archive}"
+                curl_get "${pkg_archive}" "${pkg_url}"
+                sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" && break || continue
+            else
+                die "Max retries reached, package checksum verification failed: ${pkg_name}"
+            fi
+        done
+        unset ii
+    else
+        log "WARN" "Checksum skipped, package digest unavailable in repo: ${pkg_repo}"
+    fi
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     # Detect top populated directories
