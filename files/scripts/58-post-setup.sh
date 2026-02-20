@@ -70,3 +70,10 @@ mkdir -vp /var/tmp
 chmod -vR 1777 /var/tmp
 
 gdu /usr --non-interactive
+gdu /usr/etc --non-interactive
+gdu /usr/src --non-interactive
+gdu /usr/libexec --non-interactive
+gdu /usr/bin --non-interactive
+gdu /usr/lib --non-interactive
+gdu /usr/lib64 --non-interactive
+gdu /usr/share --non-interactive
