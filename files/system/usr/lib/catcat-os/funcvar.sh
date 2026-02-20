@@ -378,7 +378,7 @@ get_ghpkg() {
 
     mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
     curl_get "${pkg_archive}" "${pkg_url}"
-    if [[ "${pkg_sha}" != "null" ]]; then
+    if [[ -n "${pkg_sha}" && "${pkg_sha}" != "null" ]]; then
         sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" ||
         for ii in {1..4}; do
             if [[ ${ii} -lt 4 ]]; then
