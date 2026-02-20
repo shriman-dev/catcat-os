@@ -68,3 +68,5 @@ fi
 log "INFO" "Post setup configuration"
 mkdir -vp /var/tmp
 chmod -vR 1777 /var/tmp
+
+gdu /usr --non-interactive
