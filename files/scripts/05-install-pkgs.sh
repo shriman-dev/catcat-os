@@ -191,7 +191,7 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-    "rom-properties-gtk3" # from bazzite-org/rom-properties
+#    "rom-properties-gtk3" # from bazzite-org/rom-properties
 
     # Gnome Apps and Extensions
     "xed"
@@ -329,6 +329,9 @@ COMMON=(
     "fwupd-plugin-modem-manager"
     "fwupd-plugin-uefi-capsule-data"
 )
+
+log "INFO" "Locking kernel version before updating or installing"
+dnf5 versionlock add kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
 
 #log "INFO" "Performing updates"
 #rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
