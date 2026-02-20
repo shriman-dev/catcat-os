@@ -336,7 +336,7 @@ COMMON=(
 )
 
 log "INFO" "Locking kernel version before updating or installing"
-dnf5 versionlock add kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
+dnf5 -y versionlock add kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
 
 #log "INFO" "Performing updates"
 #rpm -q dnf5-plugins || rpm-ostree install dnf5 dnf5-plugins
