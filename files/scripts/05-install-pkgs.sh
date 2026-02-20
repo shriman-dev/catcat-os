@@ -97,11 +97,16 @@ DESKTOP_EXTRAS=(
     #lact
     #"$(latest_ghpkg_url 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
 
-    # Extras
+    # Extras deps
+    "rocm"
+    "rocm-core"
     "rocm-hip"
     "rocm-opencl"
+    "rocminfo"
     "rocm-clinfo"
     "rocm-smi"
+    "hipblas"
+    "hipblaslt"
     "++extras"
 )
 
