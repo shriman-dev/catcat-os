@@ -196,7 +196,7 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-#    "rom-properties-gtk3" # from bazzite-org/rom-properties
+    "rom-properties-gtk4" # from bazzite-org/rom-properties
 
     # Gnome Apps and Extensions
     "xed"
@@ -347,7 +347,7 @@ log "INFO" "Adding extra RPM repos"
 COPR_LIST=(
     "bazzite-org/bazzite"
 #    "bazzite-org/bazzite-multilib"
-#    "bazzite-org/rom-properties"
+    "bazzite-org/rom-properties"
 #    "bazzite-org/obs-vkcapture"
 #    "hhd-dev/hhd"
 #    "ublue-os/staging"
