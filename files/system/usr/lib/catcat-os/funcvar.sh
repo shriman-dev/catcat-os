@@ -321,7 +321,9 @@ latest_ghpkg_url() {
 
     local ii response url vals=()
     for ii in {1..5}; do
-        response="$(ksx; curl_fetch https://api.github.com/repos/${repo}/releases/latest; ksx)"
+        { ksx; } 2>/dev/null
+        response="$(curl_fetch https://api.github.com/repos/${repo}/releases/latest)"
+        { ksx; } 2>/dev/null
         url=$(jq -r --arg inc "${include_pattern}" \
                     --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
         vals+=("${url}")
