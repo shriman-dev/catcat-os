@@ -22,51 +22,51 @@ toggle_localdns() {
             log "INFO" "Enabling local DNS..."
             { cp ${VERBOSE:+-v} -f "/usr/${CONFIG_DIR}/localdns-server.conf" \
                             /etc/NetworkManager/conf.d/ &&
-              ${SYSTEMCTL} enable --force --now dns-blocklist-updater.timer &&
+              systemctl enable --force --now dns-blocklist-updater.timer &&
               if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  touch "${DNSCRYPTDIR}/domains-blocklist.txt"
-                 ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
-                    ${SYSTEMCTL} disable --force --now dnsmasq.service
-                 ${SYSTEMCTL} enable --force --now dnscrypt-proxy.service
+                 systemctl is-enabled dnsmasq.service >/dev/null 2>&1 &&
+                    systemctl disable --force --now dnsmasq.service
+                 systemctl enable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
                  touch "${DNSMASQDIR}/domains-blocklist.conf"
-                 ${SYSTEMCTL} is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
-                    ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
-                 ${SYSTEMCTL} enable --force --now dnsmasq.service
+                 systemctl is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
+                    systemctl disable --force --now dnscrypt-proxy.service
+                 systemctl enable --force --now dnsmasq.service
               fi &&
-              ${SYSTEMCTL} restart NetworkManager.service } ||
+              systemctl restart NetworkManager.service; } ||
                 die "Failed to enable DNS services"
             ;;
         disable)
             log "INFO" "Disabling local DNS..."
             { rm -f ${VERBOSE:+-v} /etc/NetworkManager/conf.d/localdns-server.conf &&
-              ${SYSTEMCTL} disable --force --now dns-blocklist-updater.timer &&
+              systemctl disable --force --now dns-blocklist-updater.timer &&
               if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-                 ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
+                 systemctl disable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                 ${SYSTEMCTL} disable --force --now dnsmasq.service
-              fi } &&
-                ${SYSTEMCTL} restart NetworkManager.service ||
+                 systemctl disable --force --now dnsmasq.service
+              fi &&
+              systemctl restart NetworkManager.service; } ||
                 die "Failed to disable DNS services"
             ;;
         restart)
             log "INFO" "Restarting DNS services..."
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-                ${SYSTEMCTL} is-enabled dnsmasq.service >/dev/null 2>&1 &&
-                    ${SYSTEMCTL} disable --force --now dnsmasq.service
-                ${SYSTEMCTL} restart dnscrypt-proxy.service
+                systemctl is-enabled dnsmasq.service >/dev/null 2>&1 &&
+                    systemctl disable --force --now dnsmasq.service
+                systemctl restart dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                ${SYSTEMCTL} is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
-                    ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
-                ${SYSTEMCTL} restart dnsmasq.service
-              fi } ||
+                systemctl is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
+                    systemctl disable --force --now dnscrypt-proxy.service
+                systemctl restart dnsmasq.service
+              fi; } ||
                 die "Failed to restart DNS services"
             ;;
-        *) 
+        *)
             die "Invalid service action. Use 'enable', 'disable', or 'restart'"
             ;;
     esac
-    ${SYSTEMCTL} daemon-reload
+    systemctl daemon-reload
     log "INFO" "Operation completed successfully"
 }
 
