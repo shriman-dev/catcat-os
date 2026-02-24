@@ -105,7 +105,7 @@ update_blocklist() {
 }
 
 
-switch_blocklist() {
+switch_backend() {
     need_root
     [[ ! -d "${CONFIG_DIR}" ]] && mkdir ${VERBOSE:+-v} -p "${CONFIG_DIR}"
     case "${1,,}" in
@@ -292,32 +292,32 @@ show_help() {
     echo "Configure and manage DNS to block Ad/Malware using blocklist or monitor DNS logs with localdns"
     echo
     echo "Options:"
-    echo " -h, --help                                Show this help message"
-    echo " -v, --verbose                             Enable verbose output"
-    echo " -u, --update                              Update DNS blocklist"
-    echo " --enable                                  Enable localdns"
-    echo " --disable                                 Disable localdns"
-    echo " --restart                                 Restart localdns"
-    echo " --switch-blocklist-backend BACKEND        Change blocklist backend 'dnsmasq|dnscrypt' (default: dnscrypt)"
-#    echo "  --set-blocklist-size SIZE                 Set blocklist size 'mini|large' (default: mini)"
+    echo " -h, --help                Show this help message"
+    echo " -v, --verbose             Enable verbose output"
+    echo " -u, --update              Update DNS blocklist"
+    echo " --enable                  Enable localdns"
+    echo " --disable                 Disable localdns"
+    echo " --restart                 Restart localdns"
+    echo " --switch-backend BACKEND  Change blocklist backend 'dnsmasq|dnscrypt'"
+#    echo " --blocklist-size SIZE     Set blocklist size 'mini|large' (default: mini)"
     echo
     echo "Log Options:"
-    echo " --flush-logs TIME                         Remove logs older than TIME"
-    echo "                                           TIME format: N 'day(s)|week(s)|month(s)|year(s)' (default: 3 months)"
-    echo " -n, --lines NUMBER                        Show last N lines of log (default: 5999)"
-    echo " -l, --log TYPE                            Specify log type to display"
+    echo " --flush-logs TIME         Remove logs older than TIME"
+    echo "                           TIME format: N 'day(s)|week(s)|month(s)|year(s)' (default: 3 months)"
+    echo " -n, --lines NUMBER        Show last N lines of log (default: 5999)"
+    echo " -l, --log TYPE            Specify log type to display"
     echo
     echo "Log types:"
-    echo " dnsmasq-detailed         Show detailed DNSMasq logs"
-    echo " dnsmasq-queries          Show DNSMasq queries"
-    echo " dnsmasq-blocked          Show blocked DNSMasq queries"
-    echo " dnscrypt-queries         Show DNSCrypt queries"
-    echo " dnscrypt-blocked         Show blocked DNSCrypt queries"
-    echo " dnscrypt-allowed         Show allowed DNSCrypt queries"
-    echo " dnscrypt-blocked-ips     Show blocked IPs in DNSCrypt"
-    echo " dnscrypt-allowed-ips     Show allowed IPs in DNSCrypt"
-    echo " dnscrypt-nxdomains       Show DNSCrypt NXDOMAIN responses"
-    echo " dnscrypt-launch          Show DNSCrypt launch logs"
+    echo " dnsmasq-detailed          Show detailed DNSMasq logs"
+    echo " dnsmasq-queries           Show DNSMasq queries"
+    echo " dnsmasq-blocked           Show blocked DNSMasq queries"
+    echo " dnscrypt-queries          Show DNSCrypt queries"
+    echo " dnscrypt-blocked          Show blocked DNSCrypt queries"
+    echo " dnscrypt-allowed          Show allowed DNSCrypt queries"
+    echo " dnscrypt-blocked-ips      Show blocked IPs in DNSCrypt"
+    echo " dnscrypt-allowed-ips      Show allowed IPs in DNSCrypt"
+    echo " dnscrypt-nxdomains        Show DNSCrypt NXDOMAIN responses"
+    echo " dnscrypt-launch           Show DNSCrypt launch logs"
 }
 
 # Main argument parsing
@@ -341,9 +341,9 @@ while [[ $# -gt 0 ]]; do
             toggle_localdns "${1:2}"
             exit 0
             ;;
-        --switch-blocklist-backend)
+        --switch-backend)
             shift
-            [[ -n ${1} ]] && switch_blocklist "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
+            [[ -n ${1} ]] && switch_backend "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
             shift
             ;;
 #        --set-blocklist-size)
