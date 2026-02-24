@@ -323,7 +323,7 @@ setup_apps() {
     local vs_extdir="${HOME_DIR}/.vscode-oss/extensions"
     mkdir -pv "${vs_extdir}"
     ls -A1d "${vs_extdir}"/*atppuccin* || {
-        cp -drf "${SKEL}/.vscode-oss/extensions"/* "${vs_extdir}"/ &&
+        cp -drf "${SKEL}/.vscode-oss/extensions"/* "${vs_extdir}"/
         cp -drf "${SKEL}/.config/VSCodium" "${CONFIG}"/ || err "Failed to configure VSCodium"
     }
 

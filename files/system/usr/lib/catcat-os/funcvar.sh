@@ -187,7 +187,6 @@ notify_users() {
         for running_user in /run/user/*; do
             local some_user_id="$(basename ${running_user})"
             local some_user="$(id -un ${some_user_id})"
-            exit_if_root
             log "DEBUG" "Sending notification to user: ${some_user}"
             sudo -u "${some_user}" \
                     DBUS_SESSION_BUS_ADDRESS=unix:path="/run/user/${some_user_id}/bus" \

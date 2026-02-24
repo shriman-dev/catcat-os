@@ -38,19 +38,22 @@ ushare_localdns="/usr/share/localdns.d"
 resolv_conf="/etc/resolv.conf"
 
 # Extract blocklist
-if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
+if [[ -f "${dnsmasq_confd}/domains-blocklist.conf" || -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
     mkdir -pv "${tmp_localdns}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
-    cat "${ushare_localdns}/dnscrypt"/domains-filtered-subdomains.tar.zst* | \
+    [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+        cat "${ushare_localdns}/dnscrypt"/domains-filtered-subdomains.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
-    cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
-    localdnsctl --restart
-    rm -rvf "${tmp_localdns}"
-elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" && ! -f "${dnsmasq_confd}/domains-blocklist.conf" ]]; then
-    mkdir -pv "${tmp_localdns}"
-    cat "${ushare_localdns}/dnsmasq"/blocklist.conf.tar.zst* | \
+        cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
+    }
+
+    [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
+        cat "${ushare_localdns}/dnsmasq"/blocklist.conf.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -
-    cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
-    restorecon -vR "${dnsmasq_confd}"/
+        cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
+        restorecon -vR "${dnsmasq_confd}"/
+    }
+    rm -fv /etc/resolv.conf
+    systemctl restart NetworkManager.service
     localdnsctl --restart
     rm -rvf "${tmp_localdns}"
 fi

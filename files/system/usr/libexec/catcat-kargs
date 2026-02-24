@@ -18,14 +18,16 @@ COMMON_KARGS=(
     "luks.options=discard"
 )
 
-if command -v nvidia-smi; then
-    COMMON_KARGS+=(
-        "nvidia-drm.modeset=1"
-        "nvidia-drm.fbdev=1"
-        "rd.driver.blacklist=nouveau"
-        "modprobe.blacklist=nouveau"
-    )
-fi
+NVIDIA_KARGS=(
+    "nvidia-drm.modeset=1"
+    "nvidia-drm.fbdev=1"
+    "rd.driver.blacklist=nouveau"
+    "modprobe.blacklist=nouveau"
+)
+
+#if command -v nvidia-smi; then
+#    COMMON_KARGS+=(${NVIDIA_KARGS[@]})
+#fi
 
 for karg in "${COMMON_KARGS[@]}"; do
     if [[ ! ${KARGS} =~ ${karg} ]]; then
