@@ -104,10 +104,10 @@ log "INFO" "Get DNS Ad and Malware blocklist"
 mkdir -vp "${tmp_localdns}" "${ushare_localdns}"/{dnscrypt,dnsmasq}
 
 if [[ "${IMAGE_NAME}" =~ (-mi|-sv) ]]; then
-    /usr/bin/localdnsctl -v --switch-blocklist-backend dnsmasq
+    /usr/bin/localdnsctl -v --switch-backend dnsmasq
     systemctl -f enable dnsmasq.service
 else
-    /usr/bin/localdnsctl -v --switch-blocklist-backend dnscrypt
+    /usr/bin/localdnsctl -v --switch-backend dnscrypt
     systemctl -f enable dnscrypt-proxy.service
 fi
 
