@@ -33,7 +33,8 @@ toggle_localdns() {
                  ${SYSTEMCTL} is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
                     ${SYSTEMCTL} disable --force --now dnscrypt-proxy.service
                  ${SYSTEMCTL} enable --force --now dnsmasq.service
-              fi } ||
+              fi &&
+              ${SYSTEMCTL} restart NetworkManager.service } ||
                 die "Failed to enable DNS services"
             ;;
         disable)

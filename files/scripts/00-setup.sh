@@ -11,7 +11,7 @@ else
     export REBUILDING_IMAGE=0
 fi
 
-enclosed_heading_this() {
+step_heading() {
     local text="${1}" padding_char="${2:-=}" output_width=${3:-120}
     enclosed_heading "${text}" "${padding_char}" ${output_width}
 }
@@ -27,58 +27,58 @@ exec_script() {
 
 export -f exec_script
 
-enclosed_heading_this "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
+step_heading "Building CatCat OS Image: ${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP} | With Commit: ${COMMIT_SHA}" "#"
 
 set -x
 
-{ enclosed_heading_this "Cleaning Up"; } 2>/dev/null
+{ step_heading "Cleaning Up"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/01-cleanup.sh"
 ostree container commit
 
-{ enclosed_heading_this "Debloating"; } 2>/dev/null
+{ step_heading "Debloating"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/02-deblaot.sh"
 ostree container commit
 
-{ enclosed_heading_this "Preparing System Environment"; } 2>/dev/null
+{ step_heading "Preparing System Environment"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/03-prep-env.sh"
 ostree container commit
 
-{ enclosed_heading_this "Copying Over System Default Files"; } 2>/dev/null
+{ step_heading "Copying Over System Default Files"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/04-copy-files.sh"
 ostree container commit
 
-{ enclosed_heading_this "Updating And Installing Packages"; } 2>/dev/null
+{ step_heading "Updating And Installing Packages"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/05-install-pkgs.sh"
 ostree container commit
 
-{ enclosed_heading_this "Applying Various Themes"; } 2>/dev/null
+{ step_heading "Applying Various Themes"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/07-theming.sh"
 ostree container commit
 
-{ enclosed_heading_this "Enhancing Security With Secatcat"; } 2>/dev/null
+{ step_heading "Enhancing Security With Secatcat"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/08-secatcat.sh"
 ostree container commit
 
-{ enclosed_heading_this "Configuring Systemd Services"; } 2>/dev/null
+{ step_heading "Configuring Systemd Services"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/10-systemd.sh"
 ostree container commit
 
-{ enclosed_heading_this "Refining System With Tweaks And Fixes"; } 2>/dev/null
+{ step_heading "Refining System With Tweaks And Fixes"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/11-tweaks-and-fixes.sh"
 ostree container commit
 
-{ enclosed_heading_this "Applying Image Info"; } 2>/dev/null
+{ step_heading "Applying Image Info"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/55-image-info.sh"
 ostree container commit
 
-{ enclosed_heading_this "Signing Image Container and Kernel"; } 2>/dev/null
+{ step_heading "Signing Image Container and Kernel"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/56-signing.sh"
 ostree container commit
 
-{ enclosed_heading_this "Regenerating Initramfs"; } 2>/dev/null
+{ step_heading "Regenerating Initramfs"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/57-initramfs.sh"
 ostree container commit
 
-{ enclosed_heading_this "Post Build Setup"; } 2>/dev/null
+{ step_heading "Post Build Setup"; } 2>/dev/null
 exec_script "${BUILD_SETUP_DIR}/58-post-setup.sh"
 ostree container commit

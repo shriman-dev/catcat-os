@@ -202,8 +202,12 @@ process_package() {
             chmod -v +x "${BIN_DIR}"/{buttersnap.sh,buttercopy.sh}
             ;;
         btdu)
-            curl_get "${BIN_DIR}/${1}" \
+            curl_get "${TMP_DIR}/btdu-static-x86_64" \
                 "https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64"
+            curl_get "${TMP_DIR}/btdu-static-x86_64.sha256sum" \
+                "https://github.com/CyberShadow/btdu/releases/latest/download/btdu-static-x86_64.sha256sum"
+            cd "${TMP_DIR}" && sha256sum -c btdu-static-x86_64.sha256sum && cd -
+            cp -vf "${TMP_DIR}/btdu-static-x86_64" "${BIN_DIR}/${1}"
             chmod -v +x "${BIN_DIR}/${1}"
             ;;
         gocryptfs)

@@ -310,7 +310,7 @@ check_network_connection() {
 
 curl_fetch() { curl -fsS --retry 5 "${1}"; }
 
-curl_get() { curl -fLsS --retry 5 "${2}" -o "${1}"; }
+curl_get() { curl -fLsS --retry 5 -o "${1}" "${2}"; }
 
 latest_ghpkg_url() {
     local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" sha="${4:-}"

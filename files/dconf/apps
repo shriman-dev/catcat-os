@@ -178,8 +178,8 @@ captions=['size', 'date_modified', 'none']
 default-zoom-level='medium'
 
 [org/gnome/nautilus/list-view]
-default-column-order=['size', 'name', 'type', 'owner', 'mime_type', 'where', 'date_modified', 'date_modified_with_time', 'date_accessed', 'date_created', 'recency', 'permissions', 'group', 'starred']
-default-visible-columns=['name', 'size', 'date_modified_with_time', 'permissions', 'group']
+default-column-order=['size', 'name', 'type', 'owner', 'date_modified', 'date_accessed', 'date_created', 'recency', 'permissions', 'group', 'detailed_type', 'rp-game-id', 'rp-title-id', 'rp-media-id', 'rp-os-version', 'rp-encryption-key', 'rp-pixel-format', 'rp-region-code', 'rp-category']
+default-visible-columns=['size', 'name', 'date_modified', 'permissions', 'group']
 default-zoom-level='medium'
 use-tree-view=true
 

@@ -41,7 +41,6 @@ if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then
         mod_http2 \
         mod_lua \
         NetworkManager-cloud-setup \
-        nvtop \
         openssh-askpass \
         passim \
         plocate \
@@ -64,6 +63,9 @@ if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then
         ydotool \
         yelp \
         zincati
+
+    [[ ! "${IMAGE_NAME}" =~ "-nv" ]] &&
+        dnf5 -y remove nvtop
 
     dnf5 -y autoremove
 
