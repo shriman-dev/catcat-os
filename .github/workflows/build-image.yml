@@ -41,7 +41,7 @@ jobs:
 
           - IMAGE_NAME: catcat-os-mi
             ALT_TAG: mi
-            BASE_IMAGE_URL: ghcr.io/blue-build/base-images/fedora-silverblue-nvidia-open
+            BASE_IMAGE_URL: quay.io/fedora-ostree-desktops/silverblue
 
           - IMAGE_NAME: catcat-os-nv
             ALT_TAG: nvidia
