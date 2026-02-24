@@ -251,5 +251,5 @@ install_icon_themes
 install_gtk_themes
 build_gdm_theme
 apply_default_configs
-install_vscodium_ext
+#install_vscodium_ext
 gnome_shell_ext
