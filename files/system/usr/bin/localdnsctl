@@ -15,8 +15,18 @@ SYSTEMCTL="systemctl"
 
 toggle_localdns() {
     need_root
-    [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] && die "localdns-resolv.conf is missing"
+    [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] &&
+        die "localdns-resolv.conf is missing"
 
+    if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
+        systemctl -q is-enabled dnsmasq.service &&
+        systemctl disable --force --now dnsmasq.service
+    elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
+        systemctl -q is-enabled dnscrypt-proxy.service &&
+        systemctl disable --force --now dnscrypt-proxy.service
+    fi
+
+    systemctl daemon-reload
     case "${1}" in
         enable)
             log "INFO" "Enabling local DNS..."
@@ -25,13 +35,9 @@ toggle_localdns() {
               systemctl enable --force --now dns-blocklist-updater.timer &&
               if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
                  touch "${DNSCRYPTDIR}/domains-blocklist.txt"
-                 systemctl is-enabled dnsmasq.service >/dev/null 2>&1 &&
-                    systemctl disable --force --now dnsmasq.service
                  systemctl enable --force --now dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
                  touch "${DNSMASQDIR}/domains-blocklist.conf"
-                 systemctl is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
-                    systemctl disable --force --now dnscrypt-proxy.service
                  systemctl enable --force --now dnsmasq.service
               fi &&
               systemctl restart NetworkManager.service; } ||
@@ -52,12 +58,8 @@ toggle_localdns() {
         restart)
             log "INFO" "Restarting DNS services..."
             { if [[ ${BACKEND_TYPE} == "dnscrypt" ]]; then
-                systemctl is-enabled dnsmasq.service >/dev/null 2>&1 &&
-                    systemctl disable --force --now dnsmasq.service
                 systemctl restart dnscrypt-proxy.service
               elif [[ ${BACKEND_TYPE} == "dnsmasq" ]]; then
-                systemctl is-enabled dnscrypt-proxy.service >/dev/null 2>&1 &&
-                    systemctl disable --force --now dnscrypt-proxy.service
                 systemctl restart dnsmasq.service
               fi; } ||
                 die "Failed to restart DNS services"
@@ -112,12 +114,12 @@ switch_backend() {
         dnscrypt)
             touch "${CONFIG_DIR}/only-dnscrypt-blocklist"
             log "INFO" "Switched to DNSCrypt backend"
-            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            log "INFO" "Update DNS blocklist and restart localdns to make changes take effect"
             ;;
         dnsmasq)
             rm ${VERBOSE:+-v} -f "${CONFIG_DIR}/only-dnscrypt-blocklist"
             log "INFO" "Switched to DNSMasq backend"
-            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            log "INFO" "Update DNS blocklist and restart localdns to make changes take effect"
             ;;
         *)
             die "Invalid backend. Use 'dnscrypt' or 'dnsmasq'"
@@ -131,12 +133,12 @@ set_size() {
         mini)
             rm ${VERBOSE:+-v} -f "${CONFIG_DIR}/large-dns-blocklist"
             log "INFO" "Set blocklist size to mini"
-            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+             log "INFO" "Update DNS blocklist and restart localdns to make changes take effect"
             ;;
         large)
             touch "${CONFIG_DIR}/large-dns-blocklist"
             log "INFO" "Set blocklist size to large"
-            log "INFO" "Update DNS blocklist to apply changes and restart localdns to make changes take effect"
+            log "INFO" "Update DNS blocklist and restart localdns to make changes take effect"
             ;;
         *) 
             die "Invalid size. Use 'mini' or 'large'"
