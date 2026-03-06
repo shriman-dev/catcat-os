@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -oue pipefail
+set -ouex pipefail
 declare -r BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
 declare -r BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 
