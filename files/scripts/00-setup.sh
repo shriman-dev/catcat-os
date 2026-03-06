@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
-set -ouex pipefail
-declare -r BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
-declare -r BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
-
-export "${BUILD_SETUP_DIR}" "${BUILD_SCRIPT_LIB}"
-
+set -oue pipefail
+declare -xr BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
+declare -xr BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
 source "${BUILD_SCRIPT_LIB}"
 
 # This is useful when rebuilding image or caching
 if [[ -d "/etc/${PROJECT_NAME}" ]]; then
-    export REBUILDING_IMAGE=1
+    declare -xr REBUILDING_IMAGE=1
 else
-    export REBUILDING_IMAGE=0
+    declare -xr REBUILDING_IMAGE=0
 fi
 
 step_heading() {
