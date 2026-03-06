@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -oue pipefail
-export BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
-export BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
+declare -r BUILD_SETUP_DIR="${BUILD_ROOT}/files/scripts"
+declare -r BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/funcvar.sh"
+
+export "${BUILD_SETUP_DIR}" "${BUILD_SCRIPT_LIB}"
+
 source "${BUILD_SCRIPT_LIB}"
 
 # This is useful when rebuilding image or caching

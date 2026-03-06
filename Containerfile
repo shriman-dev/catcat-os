@@ -39,7 +39,8 @@ ENV COMMIT_SHA="${COMMIT_SHA}"
 ENV BUILD_ROOT="/ctx"
 
 ### MODIFICATIONS
-RUN --mount=type=cache,dst=/var/cache \
+RUN --mount=type=secret,id=sbmok_priv \
+    --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
     --mount=type=bind,from=ctx,source=/,target=/ctx \

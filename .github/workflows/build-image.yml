@@ -74,15 +74,9 @@ jobs:
       - name: Prepare environment
         id: prepare-environment
         shell: bash
-        env:
-          SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
         run: |
-          set -oue pipefail
-          # Get sbmok key
-          printf '%s\n' "${SBMOK_KEY}" > sbmok.priv
-          chmod -v 600 sbmok.priv
+          set -ouex pipefail
           # Add variables to GITHUB_ENV
-          set -x
           pwd
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           free -hm
@@ -153,6 +147,8 @@ jobs:
             DATESTAMP=${{ env.DATESTAMP }}
             TIMESTAMP=${{ env.TIMESTAMP }}
             COMMIT_SHA=${{ env.COMMIT_SHA }}
+          extra-args: |
+            --secret id=sbmok_priv,env=${{ secrets.SBMOK_KEY }}
           oci: false
 
 
