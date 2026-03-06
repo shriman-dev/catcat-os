@@ -77,7 +77,7 @@ jobs:
         env:
           SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
         run: |
-          set -oue pipefail
+          set -euo pipefail
           # Get sbmok key
           printf '%s\n' "${SBMOK_KEY}" > sbmok.priv
           chmod -v 600 sbmok.priv

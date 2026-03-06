@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 
 # TWEAKS
 log "INFO" "Applying system tweaks"

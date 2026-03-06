@@ -45,7 +45,7 @@ jobs:
         id: prepare-environment
         shell: bash
         run: |
-          set -ouex pipefail
+          set -euox pipefail
           pwd
           ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE

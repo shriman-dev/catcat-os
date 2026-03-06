@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 
 log "INFO" "Preparing build environment"
 
@@ -21,12 +21,17 @@ mkdir -vp /etc/environment.d \
 chmod -vR 1777 /var/tmp
 
 # To make /opt immutable, needed for some rpm? packages (browsers, docker-desktop)
-rm -v /opt && mkdir -vp /opt
+if [[ -L /opt ]]; then
+    rm -v /opt
+    mkdir -vp /opt
+fi
 
 log "INFO" "Adding build info"
-echo \
-"BUILD_EPOCH=$(date +%s)
+
+cat <<EOF >"/etc/${PROJECT_NAME}/build_info"
+BUILD_EPOCH=$(date +%s)
 COMMIT_SHA='${COMMIT_SHA}'
-DATETIMESTAMP='${DATESTAMP}.${TIMESTAMP}'" > "/etc/${PROJECT_NAME}/build_info"
+DATETIMESTAMP='${DATESTAMP}.${TIMESTAMP}'
+EOF
 
 log "INFO" "Build environment prepared"

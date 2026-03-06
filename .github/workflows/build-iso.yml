@@ -45,7 +45,7 @@ jobs:
         id: prepare-environment
         shell: bash
         run: |
-          set -ouex pipefail
+          set -euox pipefail
           pwd
           ls -A1
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
@@ -59,7 +59,7 @@ jobs:
         id: flatpak_dependencies
         shell: bash
         run: |
-          set -ouex pipefail
+          set -euox pipefail
           pwd
           IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ matrix.image_name }}:${{ env.DEFAULT_TAG }}"
           # Make temp space

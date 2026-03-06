@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 
 TMP_DIR="/tmp/extra_pkgs"
 BIN_DIR="/usr/bin"

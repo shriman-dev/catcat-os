@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 
 # Cleanup is not required when rebuilding image of current project
 if [[ ${REBUILDING_IMAGE} -ne 1 ]]; then

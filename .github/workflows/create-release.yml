@@ -35,7 +35,7 @@ jobs:
         id: prepare-release
         shell: bash
         run: |
-          set -ouex pipefail
+          set -euox pipefail
           source ${{ github.workspace }}/ENVAR
           pwd
           TITLE="CatCat OS ${MAJOR_VERSION} (${DATESTAMP})"

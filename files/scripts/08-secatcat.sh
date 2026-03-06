@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 
 #############################
 # Boot, Services and System #
@@ -92,7 +92,7 @@ dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/
 
 # Install dnscrypt-proxy if not installed
 [[ ! -x /usr/bin/dnscrypt-proxy ]] &&
-    exec_script "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh dnscrypt
+    "${BUILD_SETUP_DIR}"/06-extra-pkgs.sh dnscrypt
 
 check_file_inplace /etc/catcat-os/localdns.d/localdns-server.conf \
                    /etc/dnscrypt-proxy/dnscrypt-proxy.toml \

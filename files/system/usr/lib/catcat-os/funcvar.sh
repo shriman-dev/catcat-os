@@ -47,6 +47,8 @@ QUIET=false
 VERBOSE=2
 # Logging with optional verbose output
 log() {
+    # Disable log message tracing by running in subshell
+    ( { set +x; } 2>/dev/null
     local color level="${1}" msg="${@:2}"
     local datetime="$([[ ${VERBOSE} -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
 
@@ -57,19 +59,19 @@ log() {
         "ERROR") color=${red} ;;
     esac
 
-    echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
+    echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}" )
 }
 
 # Error handling with optional pre-exit function call
 die() {
     local pre_exit_hook="${2:-}"
-    log "ERROR" "${1}"; [[ -n "${pre_exit_hook}" ]] && ${pre_exit_hook}; exit 1
+    log "ERROR" "${1}" >&2; [[ -n "${pre_exit_hook}" ]] && ${pre_exit_hook}; exit 1
 }
 
-err() { log "ERROR" "${1}"; }
+err() { log "ERROR" "${1}" >&2; }
 
 # Keep setx state
-ksx() {
+rex() {
     if [[ $- == *x* ]]; then
         setx=true
         set +x
@@ -263,21 +265,21 @@ unarchive() {
 
     case "${archive}" in
         *.zip|*.ZIP)
-            { log "DEBUG" "Extracting ZIP archive in: ${dest}"; } 2>/dev/null
+            log "DEBUG" "Extracting ZIP archive in: ${dest}"
             unzip "${archive}" -d "${dest}"
             ;;
         *.7z)
-            { log "DEBUG" "Extracting 7Z archive in: ${dest}"; } 2>/dev/null
+            log "DEBUG" "Extracting 7Z archive in: ${dest}"
             7z x -o"${dest}" "${archive}"
             ;;
         *.rar)
-            { log "DEBUG" "Extracting RAR archive in: ${dest}"; } 2>/dev/null
+            log "DEBUG" "Extracting RAR archive in: ${dest}"
             cd "${dest}"
             unrar x "${archive}"
             cd -
             ;;
         *.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-            { log "DEBUG" "Extracting TAR archive in: ${dest}"; } 2>/dev/null
+            log "DEBUG" "Extracting TAR archive in: ${dest}"
             tar ${VERBOSE:+-v} -xf "${archive}" -C "${dest}"
             ;;
         *)
@@ -320,9 +322,9 @@ latest_ghpkg_url() {
 
     local ii response url vals=()
     for ii in {1..5}; do
-        { ksx; } 2>/dev/null
+        { rex; } 2>/dev/null
         response="$(curl_fetch https://api.github.com/repos/${repo}/releases/latest)"
-        { ksx; } 2>/dev/null
+        { rex; } 2>/dev/null
         url=$(jq -r --arg inc "${include_pattern}" \
                     --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
         vals+=("${url}")
@@ -336,7 +338,8 @@ latest_ghpkg_url() {
         [[ -n "${vals[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
         sleep 0.4
     done
-    die "Unable to retrieve latest package URL"
+    err "Max attempts reached.."
+    die "Unable to retrieve latest package URL from repo: ${repo}"
 }
 
 place_executable() {
@@ -346,8 +349,7 @@ place_executable() {
                             grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
 
     if [[ ${#found_execs[@]} -eq 1 ]]; then
-        { log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_execs[0]})"
-        } 2>/dev/null
+        log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_execs[0]})"
         cp ${VERBOSE:+-v} -f "${found_execs[0]}" "${bin_dir}"/
         chmod ${VERBOSE:+-v} +x "${bin_dir}/${exec_name}"
     elif [[ ${#found_execs[@]} -gt 1 ]]; then
@@ -387,7 +389,7 @@ get_ghpkg() {
                 curl_get "${pkg_archive}" "${pkg_url}"
                 sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" && break || continue
             else
-                die "Max retries reached, package checksum verification failed: ${pkg_name}"
+                die "Max attempts reached, package checksum verification failed: ${pkg_name}"
             fi
         done
         unset ii
@@ -403,8 +405,7 @@ get_ghpkg() {
         place_executable "${auto_fold_dir[0]}" "${pkg_name}"
     else
         local libexec_dir="${LIBEXEC_DIR:-/usr/libexec}"
-        { log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
-        } 2>/dev/null
+        log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
         mkdir -vp "${libexec_dir}/${pkg_name}"
         cp -dvf "${auto_fold_dir[0]}"/* "${libexec_dir}/${pkg_name}"/
     fi
@@ -448,8 +449,8 @@ get_fonts() {
         fi
     fi
     local url_file="$(basename ${font_url})" fontfile
-    { log "INFO" "Adding font(s): ${font_name}"; } 2>/dev/null
-    { log "INFO" "From URL: ${font_url}"; } 2>/dev/null
+    log "INFO" "Adding font(s): ${font_name}"
+    log "INFO" "From URL: ${font_url}"
 
     mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
     case "${font_url}" in

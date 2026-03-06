@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
-set -ouex pipefail
+set -euox pipefail
 log "INFO" "Applying custom image info and labels"
 
 declare -A IMAGE_INFO=(
