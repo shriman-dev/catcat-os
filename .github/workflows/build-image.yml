@@ -148,7 +148,7 @@ jobs:
             TIMESTAMP=${{ env.TIMESTAMP }}
             COMMIT_SHA=${{ env.COMMIT_SHA }}
           extra-args: |
-            --secret id=sbmok_priv,env=${{ secrets.SBMOK_KEY }}
+            --secret id=sbmok_priv,env="${{ secrets.SBMOK_KEY }}"
           oci: false
 
 
