@@ -52,7 +52,8 @@ update_nixpkg() {
 
 update_dns_blocklist() {
     enclosed_heading "DNS blocklist update" "="
-    /usr/libexec/dns-blocklist-updater
+    localdnsctl -v --update
+    localdnsctl --restart
 }
 
 update_firmware() {

@@ -40,6 +40,7 @@ resolv_conf="/etc/resolv.conf"
 # Extract blocklist
 if [[ -f "${dnsmasq_confd}/domains-blocklist.conf" || -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
     mkdir -pv "${tmp_localdns}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
+    chmod -v 700 "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
     [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
         cat "${ushare_localdns}/dnscrypt"/domains-filtered-subdomains.tar.zst* | \
             tar -C "${tmp_localdns}"/ --zstd -xvf -

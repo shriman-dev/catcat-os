@@ -89,10 +89,7 @@ fi
 
 # Nvidia specific
 if command -v nvidia-smi; then
-    if grep '//"hideType":' /etc/fastfetch/config.jsonc; then
-        sed -i '/gpu driver/,/^$/ { s/^\/\///;s/gpu driver// }' /etc/fastfetch/config.jsonc
-        sed -i 's|//"hideType": "none"|"hideType": "none"|' /etc/fastfetch/config.jsonc
-    fi
+    echo
     # Enable nvidia optimus if device is laptop and has nvidia dgpu
 #   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
 #       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then

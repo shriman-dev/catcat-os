@@ -44,7 +44,7 @@ DESKTOP_EXTRAS=(
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
     "buildah"
-    "++llama-cpp"
+    #"++llama-cpp"
 
     # Rocm lib
     #rocm-hip

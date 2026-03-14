@@ -222,6 +222,8 @@ abbr -c sudo mount 'mount -vm'
 abbr -c sudo umount 'umount -v'
 abbr -c sudo compsize 'compsize -x'
 
+abbr -c git clone 'clone --depth 1'
+
 abbr btdu 'sudo btdu'
 abbr stui 'sudo s-tui'
 abbr sysd 'sudo systemctl'

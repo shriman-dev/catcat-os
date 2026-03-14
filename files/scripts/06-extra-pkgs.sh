@@ -227,8 +227,6 @@ process_package() {
             place_executable "${auto_fold_dir[0]}" "uvx"
             ;;
         llama-cpp)
-            get_ghpkg --name "${1}" --repo "ggml-org/llama.cpp" \
-                      --regx 'ubuntu-x64\.tar\.gz$' --negx 'vulkan' --libexec
             get_ghpkg --name "${1}-vk" --repo "ggml-org/llama.cpp" \
                       --regx 'ubuntu-vulkan-x64\.tar\.gz$' --libexec
             ;;

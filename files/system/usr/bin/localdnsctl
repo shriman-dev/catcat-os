@@ -14,7 +14,6 @@ VERBOSE=
 SYSTEMCTL="systemctl"
 
 toggle_localdns() {
-    need_root
     [[ ! -f "/usr/etc/catcat-os/localdns.d/localdns-resolv.conf" ]] &&
         die "localdns-resolv.conf is missing"
 
@@ -73,7 +72,6 @@ toggle_localdns() {
 }
 
 update_blocklist() {
-    need_root
     mkdir -p "${CONFIG_DIR}" "${TMPDIR}" || die "Failed to create directories"
 
     local mini='' #$([[ -f "$CONFIG_DIR/large-dns-blocklist" ]] || echo "-mini")
@@ -108,7 +106,6 @@ update_blocklist() {
 
 
 switch_backend() {
-    need_root
     [[ ! -d "${CONFIG_DIR}" ]] && mkdir ${VERBOSE:+-v} -p "${CONFIG_DIR}"
     case "${1,,}" in
         dnscrypt)
@@ -128,7 +125,6 @@ switch_backend() {
 }
 
 set_size() {
-    need_root
     case "${1,,}" in
         mini)
             rm ${VERBOSE:+-v} -f "${CONFIG_DIR}/large-dns-blocklist"
@@ -187,7 +183,6 @@ RG_RED="${RG_BASE} --colors match:fg:red"
 RG_RED_BG_BLACK="${RG_RED} --colors match:bg:black"
 
 dnsmasq_logs() {
-  need_root
   local LAST_LINES=5999
   local path="${DNSMASQLOGDIR}"
   local base_cmd="tail -n ${LAST_LINES} -f"
@@ -336,15 +331,18 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -u|--update)
+            need_root
             update_blocklist
             exit 0
             ;;
         --enable|--disable|--restart)
+            need_root
             toggle_localdns "${1:2}"
             exit 0
             ;;
         --switch-backend)
             shift
+            need_root
             [[ -n ${1} ]] && switch_backend "${1}" || die "Backend type required (dnsmasq|dnscrypt)"
             shift
             ;;
@@ -356,6 +354,7 @@ while [[ $# -gt 0 ]]; do
         --flush-logs)
             shift
             [[ $# -eq 0 ]] && { log "INFO" "Using default retention period"; clean_old_logs; } ||
+            need_root
             if [[ $# -ge 2 ]]; then
                 clean_old_logs "${1} ${2}"; shift 2
             else
@@ -370,6 +369,7 @@ while [[ $# -gt 0 ]]; do
         -l|--log)
             shift
             LOG_TYPE="${1}"
+            need_root
             [[ -n ${LOG_TYPE} ]] && log_types ||
                 die "Log type required" show_help
             shift
