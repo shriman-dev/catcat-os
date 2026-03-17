@@ -93,6 +93,7 @@ install-mcontrolcenter:
     latest_pkg_url="$(latest_ghpkg_url 'dmitry-s93/MControlCenter' 'bin\.tar\.gz$')"
     pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
+    umask 0022
     mkdir -vp "${pkg_archive}.extract"
     curl_get "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
@@ -321,9 +322,9 @@ toggle-ssh ACTION="":
     if [[ "${OPTION}" == "help" ]]; then
       echo "Usage: ujust toggle-ssh <option>"
       echo "  <option>: Specify the option to skip the interactive prompt"
-      echo "  Use 'start' to start SSH till next reboot"
-      echo "  Use 'enable' to enable SSH persistently on boot"
-      echo "  Use 'disable' to disable SSH"
+      echo "  Use 'start' to start SSH service till next reboot"
+      echo "  Use 'enable' to enable SSH service persistently on boot"
+      echo "  Use 'disable' to mask and disable SSH service"
       exit 0
     elif [[ "${OPTION}" == "" ]]; then
       # Display current status
@@ -336,7 +337,10 @@ toggle-ssh ACTION="":
       fi
       # Prompt user for action
       echo "Choose an option:"
-      OPTION=$(ugum choose "Start SSH Till Next Reboot" "Enable SSH Persistently" "Disable SSH" "Exit Without Saving")
+      OPTION=$(ugum choose "Start SSH Till Next Reboot" \
+                           "Enable SSH Persistently" \
+                           "Mask and Disable SSH" \
+                           "Exit Without Saving")
     fi
     case "${OPTION}" in
       "Start SSH Till Next Reboot"|start)
@@ -352,7 +356,7 @@ toggle-ssh ACTION="":
         sudo systemctl disable sshd.service sshd-unix-local.socket
         sudo systemctl stop sshd.service sshd-unix-local.socket
         sudo systemctl mask sshd.service sshd.socket sshd-unix-local.socket
-        echo -e "SSH is now ${yellow}Disabled${normal}."
+        echo -e "SSH is now ${yellow}Masked and Disabled${normal}."
         echo " "
         ;;
       "Enable SSH Persistently"|enable)

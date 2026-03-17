@@ -1,5 +1,6 @@
 #!/bin/bash
 source /usr/lib/catcat-os/funcvar.sh
+set -x
 source /etc/catcat-os/build_info
 
 REG_FLATPAK_APPS_UPDATE=(
@@ -38,13 +39,13 @@ notify_all() {
 }
 
 on_connection() {
-    local net_type="${1}"
+    local conn_type="${1}"
 
-    if [[ "${net_type}" =~ 'wifi=' ]]; then
-        local ssid="${net_type#*=}"
+    if [[ "${conn_type}" =~ 'wifi=' ]]; then
+        local ssid="${conn_type#*=}"
         local connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
         [[ "${connected_ssid}" =~ "${ssid}" ]] && return 0
-    elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${net_type}" ]]; then
+    elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${conn_type}" ]]; then
         return 0
     else
         return 1
