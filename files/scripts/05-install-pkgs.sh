@@ -142,7 +142,7 @@ DESKTOP_COMMON=(
     #wlr-randr
     "wmctrl"
     "wl-clipboard"
-    "gnome-randr-rust" # from bazzite-org/bazzite
+    #"gnome-randr-rust" # from bazzite-org/bazzite
 
     # More Terminal Tools
     ##poppler # pdf rendering library
@@ -200,7 +200,7 @@ DESKTOP_COMMON=(
 
     # Gnome Apps and Extensions
     "xed"
-    "menulibre"
+    #"menulibre"
     "gnome-tweaks"
     "dconf-editor"
     "gnome-software"
@@ -212,8 +212,8 @@ DESKTOP_COMMON=(
 
     # Themeing Deps
     "adwaita-fonts-all"
-    "adwaita-gtk2-theme"
-    "gnome-themes-extra"
+    #"adwaita-gtk2-theme"
+    #"gnome-themes-extra"
     "gtk-murrine-engine"
     "gtk2-engines"
     "sassc"
