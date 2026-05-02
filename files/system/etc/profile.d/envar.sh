@@ -14,6 +14,7 @@ export QT_STYLE_OVERRIDE=kvantum
 export GNOME_SHELL_SLOWDOWN_FACTOR=0.6
 export JavaScriptCoreUseJIT=0
 export GJS_DISABLE_JIT=1
+export SYSTEMD_PAGER=
 
 [[ ! -d ${HOME}/.config/bat ]] && export BAT_CONFIG_DIR="/etc/bat"
 [[ ! -d ${HOME}/.config/eza ]] && export EZA_CONFIG_DIR="/etc/eza"

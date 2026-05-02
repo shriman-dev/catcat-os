@@ -45,6 +45,7 @@ declare -r unhide=$'\033[28m'
 
 QUIET=false
 VERBOSE=2
+
 # Logging with optional verbose output
 log() {
     # Disable log message tracing by running in subshell
@@ -261,8 +262,9 @@ populated_or_afile_dirs() {
 unarchive() {
     local archive="${1}" dest="${2}"
 
-    [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
+    [[ -z "${archive}" || -z "${dest}" ]] && die "No archive or destination path was provided"
 
+    [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
     case "${archive}" in
         *.zip|*.ZIP)
             log "DEBUG" "Extracting ZIP archive in: ${dest}"
@@ -335,10 +337,10 @@ latest_ghpkg_url() {
                         --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
             vals+=("${sha}")
         fi
-        [[ -n "${vals[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
+        [[ -n "${url[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
         sleep 0.4
     done
-    err "Max attempts reached.."
+    err "Max attempts reached..."
     die "Unable to retrieve latest package URL from repo: ${repo}"
 }
 

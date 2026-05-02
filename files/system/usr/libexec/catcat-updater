@@ -1,6 +1,5 @@
 #!/bin/bash
 source /usr/lib/catcat-os/funcvar.sh
-set -x
 source /etc/catcat-os/build_info
 
 REG_FLATPAK_APPS_UPDATE=(

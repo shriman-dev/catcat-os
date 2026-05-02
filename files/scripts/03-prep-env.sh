@@ -28,7 +28,7 @@ fi
 
 log "INFO" "Adding build info"
 
-cat <<EOF >"/etc/${PROJECT_NAME}/build_info"
+cat <<EOF > "/etc/${PROJECT_NAME}/build_info"
 BUILD_EPOCH=$(date +%s)
 COMMIT_SHA='${COMMIT_SHA}'
 DATETIMESTAMP='${DATESTAMP}.${TIMESTAMP}'

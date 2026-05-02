@@ -42,7 +42,7 @@ log "INFO" "Container signing policy updated"
 
 set +x
 # Sign kernel and kernel modules for secureboot
-SBMOK_KEY="/run/secrets/sbmok_priv" # Assigned via opt --secret in podman build
+SBMOK_KEY="/run/secrets/sbmok_priv" # Placed via podman build --secret or build yaml
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
 SBMOK_CRT="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.pem"
 KERNEL_PATH=(
