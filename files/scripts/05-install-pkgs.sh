@@ -238,7 +238,7 @@ DESKTOP_COMMON=(
     "zenity"
     "espeak-ng"
     "i2c-tools"
-    "++wldrivers"
+    #"++wldrivers"
     "alsa-firmware"
     #"pipewire-libs-extra"
     "steam-devices"
