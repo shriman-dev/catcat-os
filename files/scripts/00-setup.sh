@@ -36,10 +36,6 @@ ostree container commit
 "${BUILD_SETUP_DIR}/04-copy-files.sh"
 ostree container commit
 
-{ step_heading "Configuring Systemd Services"; } 2>/dev/null
-"${BUILD_SETUP_DIR}/10-systemd.sh"
-ostree container commit
-
 { step_heading "Updating And Installing Packages"; } 2>/dev/null
 "${BUILD_SETUP_DIR}/05-install-pkgs.sh"
 ostree container commit
@@ -50,6 +46,10 @@ ostree container commit
 
 { step_heading "Enhancing Security With Secatcat"; } 2>/dev/null
 "${BUILD_SETUP_DIR}/08-secatcat.sh"
+ostree container commit
+
+{ step_heading "Configuring Systemd Services"; } 2>/dev/null
+"${BUILD_SETUP_DIR}/10-systemd.sh"
 ostree container commit
 
 { step_heading "Refining System With Tweaks And Fixes"; } 2>/dev/null
