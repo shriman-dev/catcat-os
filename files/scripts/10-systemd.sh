@@ -25,8 +25,8 @@ services_enable() {
 #packagekitd.service
 #sshd-keygen.target
 DISABLE_SERVICES=(
-#    "avahi-daemon.service"
-#    "avahi-daemon.socket"
+    "avahi-daemon.service"
+    "avahi-daemon.socket"
     "bazzite-flatpak-manager.service"
     "bazzite-libvirtd-setup.service"
     "brew-dir-fix.service"
