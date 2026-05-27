@@ -52,6 +52,12 @@ class AzClockWeatherSubPage extends SubPage {
         this.add(displayOptionsGroup);
 
         const showCurrentConditionRow = this._createExpanderRow(_('Current Weather'), 'show-current-conditions');
+        const showCurrentBothTempsRow = this._createSwitchRow(_('Show F and C Temperature'), 'current-conditions-show-both-temps');
+        showCurrentConditionRow.add_row(showCurrentBothTempsRow);
+        const showCurrentTempUnitsRow = this._createSwitchRow(_('Show Temperature Units'), 'current-conditions-show-temp-unit');
+        showCurrentConditionRow.add_row(showCurrentTempUnitsRow);
+        const showCurrentTempDegreeRow = this._createSwitchRow(_('Show Temperature Degree Sign'), 'current-conditions-show-temp-degree-sign');
+        showCurrentConditionRow.add_row(showCurrentTempDegreeRow);
         const currentWeatherIconType = this._createIconTypeRow(_('Icon Type'), 'current-weather-icon-type');
         showCurrentConditionRow.add_row(currentWeatherIconType);
         const showHumiditySwitchRow = this._createSwitchRow(_('Humidity'), 'show-current-humidity');
@@ -65,6 +71,12 @@ class AzClockWeatherSubPage extends SubPage {
         displayOptionsGroup.add(showCurrentConditionRow);
 
         const showHourlyForecastRow = this._createExpanderRow(_('Hourly Forecast'), 'show-hourly-forecast');
+        const showHourlyBothTempsRow = this._createSwitchRow(_('Show F and C Temperature'), 'hourly-forecast-show-both-temps');
+        showHourlyForecastRow.add_row(showHourlyBothTempsRow);
+        const showHourlyTempUnitsRow = this._createSwitchRow(_('Show Temperature Units'), 'hourly-forecast-show-temp-unit');
+        showHourlyForecastRow.add_row(showHourlyTempUnitsRow);
+        const showHourlyTempDegreeRow = this._createSwitchRow(_('Show Temperature Degree Sign'), 'hourly-forecast-show-temp-degree-sign');
+        showHourlyForecastRow.add_row(showHourlyTempDegreeRow);
         const hourlyForecastIconType = this._createIconTypeRow(_('Icon Type'), 'hourly-weather-icon-type');
         showHourlyForecastRow.add_row(hourlyForecastIconType);
         const maxHourlyForecastsRow = this._createSpinRow(_('Max Hourly Forecasts'), 'max-hourly-forecasts', 3, 12);
@@ -72,6 +84,12 @@ class AzClockWeatherSubPage extends SubPage {
         displayOptionsGroup.add(showHourlyForecastRow);
 
         const showDailyForecastRow = this._createExpanderRow(_('Daily Forecast'), 'show-daily-forecast');
+        const showDailyBothTempsRow = this._createSwitchRow(_('Show F and C Temperature'), 'daily-forecast-show-both-temps');
+        showDailyForecastRow.add_row(showDailyBothTempsRow);
+        const showDailyTempUnitsRow = this._createSwitchRow(_('Show Temperature Units'), 'daily-forecast-show-temp-unit');
+        showDailyForecastRow.add_row(showDailyTempUnitsRow);
+        const showDailyTempDegreeRow = this._createSwitchRow(_('Show Temperature Degree Sign'), 'daily-forecast-show-temp-degree-sign');
+        showDailyForecastRow.add_row(showDailyTempDegreeRow);
         const dailyForecastIconType = this._createIconTypeRow(_('Icon Type'), 'daily-weather-icon-type');
         showDailyForecastRow.add_row(dailyForecastIconType);
         const showThermometerScaleRow = this._createSwitchRow(_('Thermometer Scale'), 'show-daily-forecast-thermometer-scale');

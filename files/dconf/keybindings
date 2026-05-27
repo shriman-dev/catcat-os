@@ -1,19 +1,21 @@
 [org/gnome/desktop/wm/keybindings]
 activate-window-menu=['<Alt><Super>space']
+maximize=@as []
 move-to-workspace-left=['<Control>Left']
 move-to-workspace-right=['<Control>Right']
 panel-run-dialog=['<Super>r']
 switch-to-workspace-left=['<Control>Up']
 switch-to-workspace-right=['<Control>Down']
 toggle-fullscreen=['<Control><Super>f']
+unmaximize=@as []
 
 [org/gnome/shell/keybindings]
 screenshot=['<Control>Print']
 show-screenshot-ui=['<Shift>Print']
 
 [org/gnome/mutter/keybindings]
-toggle-tiled-left=['<Super>Left']
-toggle-tiled-right=['<Super>Right']
+toggle-tiled-left=@as []
+toggle-tiled-right=@as []
 
 
 [org/gnome/settings-daemon/plugins/media-keys]

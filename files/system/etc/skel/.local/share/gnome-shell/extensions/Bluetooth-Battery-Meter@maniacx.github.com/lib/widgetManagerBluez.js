@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import {BluetoothIndicator} from './widgets/bluetoothIndicator.js';
+import {BluetoothGnomePopupMenuItem} from './widgets/bluetoothGnomePopupMenu.js';
 import {BluetoothPopupMenuItem} from './widgets/bluetoothPopupMenu.js';
 import {BluetoothPopupSubMenuItem} from './widgets/bluetoothPopupSubMenu.js';
 import {OnHoverMenu} from './widgets/onHoverMenu.js';
@@ -36,13 +37,14 @@ export const WidgetManagerBluez = GObject.registerClass({
 
         this._checkLateBluezBatteryReporting();
 
-        if (this.toggle.usePopupInQuickSettings) {
-            this.popupMenuItem =
-                new BluetoothPopupSubMenuItem(this);
-        } else {
-            this.popupMenuItem =
-                new BluetoothPopupMenuItem(this);
-        }
+        if (!this.toggle.modifyQuickSettings)
+            this.popupMenuItem = new BluetoothGnomePopupMenuItem(this);
+        else if (this.toggle.usePopupInQuickSettings)
+            this.popupMenuItem = new BluetoothPopupSubMenuItem(this);
+        else
+            this.popupMenuItem = new BluetoothPopupMenuItem(this);
+
+
 
 
         this.device.connectObject(
@@ -170,7 +172,7 @@ export const WidgetManagerBluez = GObject.registerClass({
         if (!this.hoverModeEnabled || this._onHoverMenu)
             return;
 
-        if (this.isUnlockSession || this.indicatorMode === 2)
+        if (this.isUnlockSession || this.indicatorMode !== 2)
             return;
 
         this._onHoverMenu = new OnHoverMenu(this.indicator, this.settings, this.gIcon,

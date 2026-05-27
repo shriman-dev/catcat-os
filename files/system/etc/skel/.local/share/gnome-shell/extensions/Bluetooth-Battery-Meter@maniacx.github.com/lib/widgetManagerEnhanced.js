@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import {BluetoothIndicator} from './widgets/bluetoothIndicator.js';
+import {BluetoothGnomePopupMenuItem} from './widgets/bluetoothGnomePopupMenu.js';
 import {BluetoothPopupMenuItem} from './widgets/bluetoothPopupMenu.js';
 import {BluetoothPopupSubMenuItem} from './widgets/bluetoothPopupSubMenu.js';
 import {OnHoverMenu} from './widgets/onHoverMenu.js';
@@ -37,13 +38,14 @@ export const WidgetManagerEnhanced = GObject.registerClass({
 
         if (this._dataHandler)
             this._updateUI();
-        if (this.toggle.usePopupInQuickSettings) {
-            this.popupMenuItem =
-                new BluetoothPopupSubMenuItem(this);
-        } else {
-            this.popupMenuItem =
-                new BluetoothPopupMenuItem(this);
-        }
+
+        if (!this.toggle.modifyQuickSettings)
+            this.popupMenuItem = new BluetoothGnomePopupMenuItem(this);
+        else if (this.toggle.usePopupInQuickSettings)
+            this.popupMenuItem = new BluetoothPopupSubMenuItem(this);
+        else
+            this.popupMenuItem = new BluetoothPopupMenuItem(this);
+
 
         this.device.connectObject(
             'notify::alias', () => this._aliasUpdated(this.alias),
@@ -72,6 +74,7 @@ export const WidgetManagerEnhanced = GObject.registerClass({
             const extIcon = this._dataHandler.getConfig().commonIcon;
             if (this.deviceIcon !== extIcon) {
                 this.deviceIcon = extIcon;
+                this.popupMenuItem?.updateProperties(this.qsLevelEnabled, this.deviceIcon);
                 const props = this.toggle.deviceList.get(this.path);
                 this.toggle.deviceList.set(this.path, {...props, icon: extIcon});
                 this.toggle.delayedUpdateDeviceGsettings();
@@ -118,9 +121,7 @@ export const WidgetManagerEnhanced = GObject.registerClass({
             this._dataHandler.connectObject(
                 'configuration-changed', () => {
                     if (this.type) {
-                        this.deviceIcon = this._dataHandler.getConfig().commonIcon;
-                        this.popupMenuItem?.updateProperties(
-                            this.qsLevelEnabled, this.deviceIcon);
+                        this._setDevIcon();
                         this.indicator?.updateProperties(this.indicatorMode, this.deviceIcon);
                     }
                 },

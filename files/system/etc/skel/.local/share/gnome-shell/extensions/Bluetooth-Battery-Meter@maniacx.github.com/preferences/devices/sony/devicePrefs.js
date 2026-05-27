@@ -29,7 +29,7 @@ const  DeviceItem = GObject.registerClass({
         this._customiseButton.connect('clicked', () => {
             const parentWindow = this._customiseButton.get_ancestor(Gtk.Window);
             const configureWindow = new ConfigureWindow(settings, this._macAddress,
-                pathInfo.path, parentWindow, _);
+                pathInfo.path, parentWindow, _, true);
 
             configureWindow.present();
         });
@@ -70,6 +70,7 @@ const  DeviceItem = GObject.registerClass({
         this.title = pathInfo.alias;
         this.subtitle = this._macAddress;
         this._deleteButton.sensitive = !this._settings.get_boolean('enable-sony-device');
+        this._icon.icon_name = `bbm-${pathInfo.icon}-symbolic`;
     }
 
     _pathToMacAddress(path) {

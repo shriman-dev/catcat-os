@@ -77,7 +77,7 @@ inhibit-apps=@as []
 prefs-default-height=591
 prefs-default-width=570
 restore-state=true
-show-indicator='never'
+show-indicator='only-active'
 
 [org/gnome/shell/extensions/dash-to-panel]
 animate-appicon-hover=true
@@ -101,7 +101,7 @@ dot-position='BOTTOM'
 dot-size=2
 dot-style-focused='METRO'
 enter-peek-mode-timeout=100
-extension-version=72
+extension-version=73
 focus-highlight=true
 focus-highlight-dominant=true
 focus-highlight-opacity=30
@@ -274,7 +274,7 @@ ctrl=true
 
 [org/gnome/shell/extensions/custom-hot-corners-extended/monitor-0-top-left-0]
 action='disabled'
-barrier-size-h=25
+barrier-size-h=1
 barrier-size-v=1
 pressure-threshold=500
 
@@ -319,6 +319,7 @@ ctrl=true
 
 [org/gnome/shell/extensions/blur-my-shell]
 pipelines={'pipeline_default': {'name': <'Default'>, 'effects': <[<{'type': <'native_static_gaussian_blur'>, 'id': <'effect_000000000000'>, 'params': <{'radius': <30>, 'brightness': <0.59999999999999998>}>}>]>}, 'pipeline_default_rounded': {'name': <'Default rounded'>, 'effects': <[<{'type': <'corner'>, 'id': <'effect_000000000002'>, 'params': <{'radius': <18>}>}>, <{'type': <'native_static_gaussian_blur'>, 'id': <'effect_89048584225338'>, 'params': <{'unscaled_radius': <12>, 'brightness': <0.59999999999999998>}>}>]>}}
+rounded-blur-found=false
 settings-version=2
 
 [org/gnome/shell/extensions/blur-my-shell/appfolder]

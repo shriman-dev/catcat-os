@@ -202,10 +202,8 @@ class AzClockImageElement extends Clutter.Actor {
                 let contentType = message.response_headers.get_content_type();
                 if (!contentType) {
                     // Fallback to guessing if no content type header
-                    const [guessedType, uncertain] = Gio.content_type_guess(null, data);
+                    const [guessedType] = Gio.content_type_guess(null, data);
                     contentType = guessedType;
-                    if (uncertain)
-                        console.log(`Content type guess for ${url} is uncertain: ${contentType}`);
                 } else {
                     contentType = contentType[0];
                 }
@@ -222,8 +220,7 @@ class AzClockImageElement extends Clutter.Actor {
 
                 return this._getPixbufFromFile(this._tempImageFile.get_path());
             } else {
-                console.log(`AzClock: failed to download image - ${message.statusCode}`);
-                return null;
+                throw new Error(`${message.statusCode}`);
             }
         } catch (e) {
             console.log(`AzClock: failed to download image - ${e}`);

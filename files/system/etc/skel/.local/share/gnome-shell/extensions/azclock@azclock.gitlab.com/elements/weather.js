@@ -26,8 +26,104 @@ const IconType = {
     FULL_COLOR: 1,
 };
 
-function formatTemperature(value) {
-    return typeof value === 'number' ? `${Math.round(value).toFixed(0)}°` : undefined;
+function convertUnit(value, toUnit) {
+    if (toUnit === GWeather.TemperatureUnit.FAHRENHEIT)
+        return (value * 9 / 5) + 32;
+    else if (toUnit === GWeather.TemperatureUnit.CENTIGRADE)
+        return (value - 32) * 5 / 9;
+    else
+        return value;
+}
+
+function getTemperatureUnit(unit) {
+    const temperatureUnit = WeatherUtils.getTemperatureUnit(unit);
+    const main = GWeather.temperature_unit_to_real(temperatureUnit);
+    const F = GWeather.TemperatureUnit.FAHRENHEIT;
+    const C = GWeather.TemperatureUnit.CENTIGRADE;
+    const alt = main === F ? C : F;
+
+    return {main, alt};
+}
+
+function formatTemperature(value, showDegreeSign = false, unit = null) {
+    if (typeof value !== 'number')
+        return '--';
+
+    const roundedTemp = Math.round(value).toFixed(0);
+
+    // '\u00B0' - Degree Sign
+    const tempString = showDegreeSign ? `${roundedTemp}\u00B0` : `${roundedTemp}`;
+
+    if (!unit)
+        return tempString;
+
+    /** TRANSLATORS: F AND C represent temperature unit labels for Fahrenheit and Celsius*/
+    const unitChar = unit === GWeather.TemperatureUnit.FAHRENHEIT ? _('F')
+    /** TRANSLATORS: F AND C represent temperature unit labels for Fahrenheit and Celsius*/
+        : _('C');
+    return tempString.concat('', unitChar);
+}
+
+function buildTemperatureString(temperatureUnit, showBothTempUnits, value, formatText, newLine = true) {
+    const {main, alt} = getTemperatureUnit(temperatureUnit);
+
+    const mainTempString = formatText(value, main);
+    const altTempRaw = convertUnit(value, alt);
+    const altTempStringRaw = formatText(altTempRaw, alt);
+    const altTempString = newLine ? `\n${altTempStringRaw}` : ` (${altTempStringRaw})`;
+
+    const tempString = mainTempString + (showBothTempUnits ? `${altTempString}` : '');
+    return tempString;
+}
+
+function setActorStyle(settings, actor, style = '') {
+    const [shadowEnabled, shadowColor, shadowX, shadowY,
+        shadowSpread, shadowBlur] = settings.get_value('weather-actor-shadow').deepUnpack();
+    const [customFontEnabled, customFontFamily] = settings.get_value('font-family-override').deepUnpack();
+    const textColor = settings.get_string('foreground-color');
+    const iconColor = settings.get_string('icon-color');
+
+    let shadowType, color;
+
+    if (actor instanceof St.Label) {
+        shadowType = 'text-shadow';
+        color = textColor;
+    } else if (actor instanceof St.Icon) {
+        shadowType = 'icon-shadow';
+        color = iconColor;
+    } else {
+        shadowType = 'box-shadow';
+        color = textColor;
+    }
+
+    style += `color: ${color};`;
+
+    if (actor instanceof St.Label) {
+        actor.clutter_text.set({
+            ellipsize: Pango.EllipsizeMode.NONE,
+        });
+        style += ' font-feature-settings: "tnum";';
+    }
+
+    if (shadowEnabled)
+        style += `${shadowType}: ${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor};`;
+
+    if (customFontEnabled && actor instanceof St.Label) {
+        const fontStyleEnum = settings.get_enum('font-style');
+        const fontStyle = Utils.fontStyleEnumToString(fontStyleEnum);
+        const fontWeight = settings.get_int('font-weight');
+
+        style += ` font-family: "${customFontFamily}";`;
+
+        if (fontWeight)
+            style += ` font-weight: ${fontWeight};`;
+        if (fontStyle)
+            style += ` font-style: ${fontStyle};`;
+    }
+    if (!actor.style)
+        actor.style = style;
+    else
+        actor.style += style;
 }
 
 export const WeatherElement = GObject.registerClass(
@@ -50,6 +146,7 @@ class AzClockWeatherElement extends St.Widget {
         this._extension = extension;
         this._world = GWeather.Location.get_world();
 
+        this._setTemperatureUnits();
         this._createWeatherGrids();
 
         this._settings.connectObject('changed::polling-interval', () => this.refreshWeather(), this);
@@ -254,8 +351,14 @@ class AzClockWeatherElement extends St.Widget {
         if (!this._weatherInfo)
             return;
 
-        const id = this._weatherInfo.connect('updated', () => {
-            this._weatherInfo.disconnect(id);
+        if (this._loadingId) {
+            this._weatherInfo.disconnect(this._loadingId);
+            this._loadingId = null;
+        }
+
+        this._loadingId = this._weatherInfo.connect('updated', () => {
+            this._weatherInfo.disconnect(this._loadingId);
+            this._loadingId = null;
             this._isLoading = false;
         });
 
@@ -264,6 +367,8 @@ class AzClockWeatherElement extends St.Widget {
     }
 
     _sync() {
+        this._setTemperatureUnits();
+
         if (!this._weatherInfo)
             return;
 
@@ -283,6 +388,13 @@ class AzClockWeatherElement extends St.Widget {
             this._setStatusLabel(_('Go Online for Weather Information'));
         else
             this._setStatusLabel(_('Weather Information Unavailable'));
+    }
+
+    _setTemperatureUnits() {
+        const temperatureUnit = this._settings.get_enum('temperature-unit');
+        const {main, alt} = getTemperatureUnit(temperatureUnit);
+        this._mainTempUnit = main;
+        this._altTempUnit = alt;
     }
 
     _displayWeather() {
@@ -315,10 +427,18 @@ class AzClockWeatherElement extends St.Widget {
         if (!layout)
             return;
 
-        const location = this._weatherInfo.get_location_name();
-        const temperatureUnit = WeatherUtils.getTemperatureUnit(this._settings.get_enum('temperature-unit'));
-        const [, tempApparentValue] = this._weatherInfo.get_value_apparent(temperatureUnit);
-        const [, tempValue] = this._weatherInfo.get_value_temp(temperatureUnit);
+        const formatTempText = (temp, unit) => {
+            const showDegreeSign = this._settings.get_boolean('current-conditions-show-temp-degree-sign');
+            const showUnit = this._settings.get_boolean('current-conditions-show-temp-unit');
+            return formatTemperature(temp, showDegreeSign, showUnit ? unit : null);
+        };
+
+        const showBothTempUnits = this._settings.get_boolean('current-conditions-show-both-temps');
+
+        const [, temp] = this._weatherInfo.get_value_temp(this._mainTempUnit);
+        const tempAlt = convertUnit(temp, this._altTempUnit);
+        const [, tempApparent] = this._weatherInfo.get_value_apparent(this._mainTempUnit);
+
         const iconName = this._weatherInfo.get_icon_name();
         const iconSymbolicName = this._weatherInfo.get_symbolic_icon_name();
         const summary = this._weatherInfo.get_weather_summary();
@@ -330,65 +450,83 @@ class AzClockWeatherElement extends St.Widget {
         const showApparentTemp = this._settings.get_boolean('show-current-apparent-temp');
         const showLocation = this._settings.get_boolean('show-location');
 
-        const locationLabel = new St.Label({
-            text: location,
-            x_align: Clutter.ActorAlign.START,
-        });
-        this._setActorStyle(locationLabel, 'text-align: center; font-size: 12pt;');
+        const temperatureUnit = this._settings.get_enum('temperature-unit');
+        const location = this._weatherInfo.get_location_name();
+
+        if (showLocation) {
+            const locationLabel = new St.Label({
+                text: location,
+                x_align: Clutter.ActorAlign.START,
+            });
+            setActorStyle(this._settings, locationLabel, 'text-align: center; font-size: 12pt;');
+            layout.attach(locationLabel, 1, 0, 1, 3);
+        }
+
         const icon = new St.Icon({
             icon_name: iconType === IconType.SYMBOLIC ? iconSymbolicName : iconName,
             x_align: Clutter.ActorAlign.START,
             x_expand: false,
             icon_size: 62,
         });
-        this._setActorStyle(icon);
+        setActorStyle(this._settings, icon);
+        layout.attach(icon, 0, 0, 1, 3);
 
         const padding = showLocation ? ' padding-top: 12px;' : ' padding-top: 0px;';
 
-        const temp = new St.Label({
-            text: `${formatTemperature(tempValue)}`,
+        const formattedTempText = formatTempText(temp, this._mainTempUnit);
+        const tempLabel = new St.Label({
+            text: formattedTempText,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this._setActorStyle(temp, `text-align: center; font-size: 32pt;${padding}`);
+        setActorStyle(this._settings, tempLabel, `text-align: center; font-size: 32pt;${padding}`);
+        layout.attach(tempLabel, 1, 0, 1, 3);
 
-        const conditions = new St.Label({
-            text: `${summary.replace(`${location}: `, '')}`,
-            x_align: Clutter.ActorAlign.END,
-            x_expand: true,
-        });
-        this._setActorStyle(conditions, 'text-align: center; font-size: 9pt;');
-
-        const humidityLabel = new St.Label({
-            text: _('Humidity: %s').format(humidity),
-            x_align: Clutter.ActorAlign.END,
-            x_expand: true,
-        });
-        this._setActorStyle(humidityLabel, 'text-align: center; font-size: 9pt;');
-
-        const feelsLike = new St.Label({
-            text: _('Feels like %s').format(formatTemperature(tempApparentValue)),
-            x_align: Clutter.ActorAlign.END,
-            x_expand: true,
-        });
-        this._setActorStyle(feelsLike, 'text-align: center; font-size: 9pt;');
-
-        layout.attach(icon, 0, 0, 1, 3);
-        if (showLocation)
-            layout.attach(locationLabel, 1, 0, 1, 3);
-        layout.attach(temp, 1, 0, 1, 3);
+        if (showBothTempUnits) {
+            const tempAltText = formatTempText(tempAlt, this._altTempUnit);
+            const tempAltLabel = new St.Label({
+                text: tempAltText,
+                x_align: Clutter.ActorAlign.START,
+                y_align: Clutter.ActorAlign.CENTER,
+            });
+            setActorStyle(this._settings, tempAltLabel, `text-align: center; font-size: 9pt;${padding}`);
+            layout.attach(tempAltLabel, 1, 2, 1, 3);
+        }
 
         let y = 0;
+
         if (showHumidity) {
+            const humidityLabel = new St.Label({
+                text: _('Humidity: %s').format(humidity),
+                x_align: Clutter.ActorAlign.END,
+                x_expand: true,
+            });
+            setActorStyle(this._settings, humidityLabel, 'text-align: center; font-size: 9pt;');
             layout.attach(humidityLabel, 2, y, 1, 1);
             y++;
         }
+
         if (showConditions) {
+            const conditions = new St.Label({
+                text: `${summary.replace(`${location}: `, '')}`,
+                x_align: Clutter.ActorAlign.END,
+                x_expand: true,
+            });
+            setActorStyle(this._settings, conditions, 'text-align: center; font-size: 9pt;');
             layout.attach(conditions, 2, y, 1, 1);
             y++;
         }
-        if (showApparentTemp)
+
+        if (showApparentTemp) {
+            const tempApparentText = buildTemperatureString(temperatureUnit, showBothTempUnits, tempApparent, formatTempText, false);
+            const feelsLike = new St.Label({
+                text: _('Feels like %s').format(tempApparentText),
+                x_align: Clutter.ActorAlign.END,
+                x_expand: true,
+            });
+            setActorStyle(this._settings, feelsLike, 'text-align: center; font-size: 9pt;');
             layout.attach(feelsLike, 2, y, 1, 1);
+        }
     }
 
     _getHourlyForecast() {
@@ -398,14 +536,23 @@ class AzClockWeatherElement extends St.Widget {
         if (!forecast)
             return;
 
+        const formatTempText = (temp, unit) => {
+            const showDegreeSign = this._settings.get_boolean('hourly-forecast-show-temp-degree-sign');
+            const showUnit = this._settings.get_boolean('hourly-forecast-show-temp-unit');
+            return formatTemperature(temp, showDegreeSign, showUnit ? unit : null);
+        };
+
+        const temperatureUnit = this._settings.get_enum('temperature-unit');
+        const showBothTempUnits = this._settings.get_boolean('hourly-forecast-show-both-temps');
         const iconType = this._settings.get_enum('hourly-weather-icon-type');
+
         const layout = this._forecastGrid.layout_manager;
         let col = 0;
         forecast.forEach(data => {
             const iconName = data.get_icon_name();
             const iconSymbolicName = data.get_symbolic_icon_name();
-            const temperatureUnit = WeatherUtils.getTemperatureUnit(this._settings.get_enum('temperature-unit'));
-            const [, tempValue] = data.get_value_temp(temperatureUnit);
+
+            const [, temp] = data.get_value_temp(this._mainTempUnit);
             const [valid_, timestamp] = data.get_value_update();
             const timeStr = formatTime(new Date(timestamp * 1000), {
                 timeOnly: true,
@@ -417,24 +564,26 @@ class AzClockWeatherElement extends St.Widget {
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.START,
             });
-            this._setActorStyle(time, 'text-align: center; font-size: 9pt;');
+            setActorStyle(this._settings, time, 'text-align: center; font-size: 9pt;');
             const icon = new St.Icon({
                 icon_name: iconType === IconType.SYMBOLIC ? iconSymbolicName : iconName,
                 x_align: Clutter.ActorAlign.CENTER,
                 x_expand: true,
                 icon_size: 34,
             });
-            this._setActorStyle(icon);
-            const temp = new St.Label({
-                text: `${formatTemperature(tempValue)}`,
+            setActorStyle(this._settings, icon);
+
+            const tempText = buildTemperatureString(temperatureUnit, showBothTempUnits, temp, formatTempText);
+            const tempLabel = new St.Label({
+                text: tempText,
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.START,
             });
-            this._setActorStyle(temp, 'text-align: center; font-size: 9pt;');
+            setActorStyle(this._settings, tempLabel, 'text-align: center; font-size: 9pt;');
 
             layout.attach(time, col, 0, 1, 1);
             layout.attach(icon, col, 1, 1, 1);
-            layout.attach(temp, col, 2, 1, 1);
+            layout.attach(tempLabel, col, 2, 1, 1);
             col++;
         });
     }
@@ -442,23 +591,29 @@ class AzClockWeatherElement extends St.Widget {
     _getDailyForecast() {
         const forecasts = this._weatherInfo.get_forecast_list();
         const maxForecasts = this._settings.get_int('max-daily-forecasts');
-        const temperatureUnit = WeatherUtils.getTemperatureUnit(this._settings.get_enum('temperature-unit'));
-        const forecast = WeatherUtils.getDailyForecast(forecasts, maxForecasts, temperatureUnit);
+        const forecast = WeatherUtils.getDailyForecast(forecasts, maxForecasts, this._mainTempUnit);
         if (!forecast)
             return;
 
+        const formatTempText = (temp, unit) => {
+            const showDegreeSign = this._settings.get_boolean('daily-forecast-show-temp-degree-sign');
+            const showUnit = this._settings.get_boolean('daily-forecast-show-temp-unit');
+            return formatTemperature(temp, showDegreeSign, showUnit ? unit : null);
+        };
+
+        const temperatureUnit = this._settings.get_enum('temperature-unit');
+        const showBothTempUnits = this._settings.get_boolean('daily-forecast-show-both-temps');
         const iconType = this._settings.get_enum('daily-weather-icon-type');
         const showThermometerScale = this._settings.get_boolean('show-daily-forecast-thermometer-scale');
+
         let weeklyMax, weeklyMin;
         const layout = this._dailyForecastGrid.layout_manager;
         let row = 0;
         forecast.forEach(dayData => {
             const dateFormat = this._settings.get_string('daily-forecast-date-format');
             const dateString = `${dayData.datetime.format(dateFormat)}`;
-            const dayHigh = Math.round(dayData.maxTemp).toFixed(0);
-            const dayMin = Math.round(dayData.minTemp).toFixed(0);
-            const maxTemp = formatTemperature(dayData.maxTemp);
-            const minTemp = formatTemperature(dayData.minTemp);
+            const maxTemp = dayData.maxTemp;
+            const minTemp = dayData.minTemp;
             weeklyMax = Math.round(dayData.weekHighestTemp).toFixed(0);
             weeklyMin = Math.round(dayData.weekLowestTemp).toFixed(0);
 
@@ -468,104 +623,37 @@ class AzClockWeatherElement extends St.Widget {
             const dateLabel = new St.Label({
                 text: dateString,
                 x_align: Clutter.ActorAlign.START,
+                y_align: Clutter.ActorAlign.CENTER,
             });
-            this._setActorStyle(dateLabel, 'text-align: center; font-size: 9pt;');
+            setActorStyle(this._settings, dateLabel, 'text-align: center; font-size: 9pt;');
             const icon = new St.Icon({
                 icon_name: iconType === IconType.SYMBOLIC ? iconSymbolicName : iconName,
                 x_align: Clutter.ActorAlign.CENTER,
                 x_expand: true,
+                y_align: Clutter.ActorAlign.CENTER,
                 icon_size: 16,
             });
-            this._setActorStyle(icon);
+            setActorStyle(this._settings, icon);
 
-            const tempMax = new St.Label({
-                text: `${maxTemp}`,
-                x_align: Clutter.ActorAlign.END,
-                x_expand: false,
-            });
-            this._setActorStyle(tempMax, 'text-align: center; font-size: 9pt;');
-            const tempMin = new St.Label({
-                text: `${minTemp}`,
-                x_align: Clutter.ActorAlign.END,
-                x_expand: true,
-            });
-            this._setActorStyle(tempMin, 'text-align: center; font-size: 9pt;');
-
-            const tempScale = new ThermometerScale(dayHigh, dayMin, weeklyMax, weeklyMin);
-            this._setActorStyle(tempScale);
-
-            const temperatureBox = new St.BoxLayout({
-                style: 'spacing: 4px;',
-            });
-            temperatureBox.add_child(tempMin);
-            temperatureBox.add_child(tempScale);
-            temperatureBox.add_child(tempMax);
-
-            const tempMinMax = new St.Label({
-                text: `${maxTemp} | ${minTemp}`,
-                x_align: Clutter.ActorAlign.END,
-                x_expand: true,
-            });
-            this._setActorStyle(tempMinMax, 'text-align: center; font-size: 9pt;');
+            let temperatureWidget = null;
+            if (showThermometerScale) {
+                temperatureWidget = new ThermometerWidget(this._settings, maxTemp, minTemp, weeklyMax, weeklyMin);
+            } else {
+                const maxTempTextAlt = buildTemperatureString(temperatureUnit, showBothTempUnits, maxTemp, formatTempText, false);
+                const minTempTextAlt = buildTemperatureString(temperatureUnit, showBothTempUnits, minTemp, formatTempText, false);
+                temperatureWidget = new St.Label({
+                    text: `${maxTempTextAlt} | ${minTempTextAlt}`,
+                    x_align: Clutter.ActorAlign.END,
+                    x_expand: true,
+                });
+                setActorStyle(this._settings, temperatureWidget, 'text-align: center; font-size: 9pt;');
+            }
 
             layout.attach(dateLabel, 0, row, 1, 1);
             layout.attach(icon, 1, row, 1, 1);
-            if (showThermometerScale)
-                layout.attach(temperatureBox, 2, row, 1, 1);
-            else
-                layout.attach(tempMinMax, 2, row, 1, 1);
+            layout.attach(temperatureWidget, 2, row, 1, 1);
             row++;
         });
-    }
-
-    _setActorStyle(actor, style = '') {
-        const [shadowEnabled, shadowColor, shadowX, shadowY,
-            shadowSpread, shadowBlur] = this._settings.get_value('weather-actor-shadow').deepUnpack();
-        const [customFontEnabled, customFontFamily] = this._settings.get_value('font-family-override').deepUnpack();
-        const textColor = this._settings.get_string('foreground-color');
-        const iconColor = this._settings.get_string('icon-color');
-
-        let shadowType, color;
-
-        if (actor instanceof St.Label) {
-            shadowType = 'text-shadow';
-            color = textColor;
-        } else if (actor instanceof St.Icon) {
-            shadowType = 'icon-shadow';
-            color = iconColor;
-        } else {
-            shadowType = 'box-shadow';
-            color = textColor;
-        }
-
-        style += `color: ${color};`;
-
-        if (actor instanceof St.Label) {
-            actor.clutter_text.set({
-                ellipsize: Pango.EllipsizeMode.NONE,
-            });
-            style += ' font-feature-settings: "tnum";';
-        }
-
-        if (shadowEnabled)
-            style += `${shadowType}: ${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor};`;
-
-        if (customFontEnabled && actor instanceof St.Label) {
-            const fontStyleEnum = this._settings.get_enum('font-style');
-            const fontStyle = Utils.fontStyleEnumToString(fontStyleEnum);
-            const fontWeight = this._settings.get_int('font-weight');
-
-            style += ` font-family: "${customFontFamily}";`;
-
-            if (fontWeight)
-                style += ` font-weight: ${fontWeight};`;
-            if (fontStyle)
-                style += ` font-style: ${fontStyle};`;
-        }
-        if (!actor.style)
-            actor.style = style;
-        else
-            actor.style += style;
     }
 
     _onDestroy() {
@@ -573,10 +661,17 @@ class AzClockWeatherElement extends St.Widget {
         this._settings.disconnectObject(this);
         this._removePollingInterval();
         this._removeReconnectId();
+
         if (this._updatedId) {
             this._weatherInfo.disconnect(this._updatedId);
             this._updatedId = null;
         }
+
+        if (this._loadingId) {
+            this._weatherInfo.disconnect(this._loadingId);
+            this._loadingId = null;
+        }
+
         this._world = null;
         this._client = null;
         this._weatherInfo = null;
@@ -585,34 +680,25 @@ class AzClockWeatherElement extends St.Widget {
     }
 });
 
-var ThermometerScale = GObject.registerClass(
-class AzClockThermometerScale extends St.Widget {
+const ThermometerScale = GObject.registerClass(
+class AzClockThermometerScale extends St.DrawingArea {
     _init(dayHigh, dayLow, weeklyHigh, weeklyLow) {
         super._init({
-            x_expand: false,
-            x_align: Clutter.ActorAlign.CENTER,
-            y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-
-        this._dayHigh = dayHigh;
-        this._dayLow = dayLow;
-        this._weeklyHigh = weeklyHigh;
-        this._weeklyLow = weeklyLow;
-
-        this._drawingArea = new St.DrawingArea({
             x_expand: true,
             x_align: Clutter.ActorAlign.FILL,
             width: 140,
             height: 6,
         });
-        this._drawingArea.connect('repaint', this._onRepaint.bind(this));
-        this.add_child(this._drawingArea);
+
+        this._dayHigh = Math.round(dayHigh).toFixed(0);
+        this._dayLow = Math.round(dayLow).toFixed(0);
+        this._weeklyHigh = weeklyHigh;
+        this._weeklyLow = weeklyLow;
     }
 
-    _onRepaint(area) {
-        const cr = area.get_context();
-        const [width, height] = area.get_surface_size();
+    vfunc_repaint() {
+        const cr = this.get_context();
+        const [width, height] = this.get_surface_size();
 
         const weeklyRange = (this._weeklyHigh - this._weeklyLow) || 1;
         const factor = width / weeklyRange;
@@ -637,6 +723,54 @@ class AzClockThermometerScale extends St.Widget {
     }
 });
 
+const ThermometerWidget = GObject.registerClass(
+class AzClockThermometerWidget extends St.BoxLayout {
+    _init(settings, dayHigh, dayLow, weeklyHigh, weeklyLow) {
+        super._init({
+            style: 'spacing: 4px;',
+        });
+
+        const formatTempText = (temp, unit) => {
+            const showDegreeSign = settings.get_boolean('daily-forecast-show-temp-degree-sign');
+            const showUnit = settings.get_boolean('daily-forecast-show-temp-unit');
+            return formatTemperature(temp, showDegreeSign, showUnit ? unit : null);
+        };
+
+        const temperatureUnit = settings.get_enum('temperature-unit');
+        const showBothTempUnits = settings.get_boolean('daily-forecast-show-both-temps');
+
+        const maxtempText = buildTemperatureString(temperatureUnit, showBothTempUnits, dayHigh, formatTempText);
+        const tempMax = new St.Label({
+            text: `${maxtempText}`,
+            x_align: Clutter.ActorAlign.END,
+            x_expand: false,
+        });
+        setActorStyle(settings, tempMax, 'text-align: right; font-size: 9pt;');
+
+        const minTempText = buildTemperatureString(temperatureUnit, showBothTempUnits, dayLow, formatTempText);
+        const tempMin = new St.Label({
+            text: `${minTempText}`,
+            x_align: Clutter.ActorAlign.END,
+            x_expand: true,
+        });
+        setActorStyle(settings, tempMin, 'text-align: right; font-size: 9pt;');
+
+        const thermometerScale = new ThermometerScale(dayHigh, dayLow, weeklyHigh, weeklyLow);
+        const thermometerScaleWidget = new St.Widget({
+            x_expand: false,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        thermometerScaleWidget.add_child(thermometerScale);
+        setActorStyle(settings, thermometerScaleWidget);
+
+        this.add_child(tempMin);
+        this.add_child(thermometerScaleWidget);
+        this.add_child(tempMax);
+    }
+});
+
 function drawRoundedLine(cr, x, y, width, height, fill) {
     const DEGREES = Math.PI / 180;
     const RADIUS = height / 2.0;
@@ -646,7 +780,7 @@ function drawRoundedLine(cr, x, y, width, height, fill) {
     cr.arc(x + width - RADIUS, y + RADIUS, RADIUS, 270 * DEGREES, 90 * DEGREES);
     cr.closePath();
 
-    if (fill !== null) {
+    if (fill) {
         cr.setSource(fill);
         cr.fillPreserve();
     }

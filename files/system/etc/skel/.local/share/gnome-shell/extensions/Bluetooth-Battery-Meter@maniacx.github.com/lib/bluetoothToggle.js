@@ -4,7 +4,6 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
-import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {ngettext} from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -20,8 +19,6 @@ import {
 } from './widgets/colorHelpers.js';
 
 const QuickSettingsMenu = Main.panel.statusArea.quickSettings;
-const [major] = Config.PACKAGE_VERSION.split('.');
-const shellVersion = Number.parseInt(major);
 
 export const BluetoothBatteryMeter = GObject.registerClass({
     GTypeName: 'BluetoothBatteryMeter_BluetoothToggle',
@@ -56,6 +53,7 @@ export const BluetoothBatteryMeter = GObject.registerClass({
         this._pullDevicesFromGsetting();
         this.gIcon = iconName => Gio.icon_new_for_string(
             `${this.extPath}/icons/hicolor/scalable/actions/${iconName}`);
+        this.modifyQuickSettings = this.settings.get_boolean('modify-quick-settings');
         this.usePopupInQuickSettings = this.settings.get_boolean('popup-in-quick-settings');
         this.showBatteryPercentage = this.settings.get_boolean('enable-battery-level-text');
         this.showBatteryIcon = this.settings.get_boolean('enable-battery-level-icon');
@@ -83,6 +81,8 @@ export const BluetoothBatteryMeter = GObject.registerClass({
 
         this.airpodsEnabled = this.settings.get_boolean('enable-airpods-device');
         this.sonyEnabled = this.settings.get_boolean('enable-sony-device');
+        this.galaxyBudsEnabled = this.settings.get_boolean('enable-galaxy-buds-device');
+        this.nothingBudsEnabled = this.settings.get_boolean('enable-nothing-buds-device');
         this.gattBasEnabled = this.settings.get_boolean('enable-gattbas-device');
 
         this._updateColors();
@@ -120,6 +120,11 @@ export const BluetoothBatteryMeter = GObject.registerClass({
         }, this);
 
         this.settings.connectObject(
+            'changed::modify-quick-settings', () => {
+                this.modifyQuickSettings =
+                    this.settings.get_boolean('modify-quick-settings');
+                this._onActiveChanged();
+            },
             'changed::popup-in-quick-settings', () => {
                 this.usePopupInQuickSettings =
                     this.settings.get_boolean('popup-in-quick-settings');
@@ -229,6 +234,16 @@ export const BluetoothBatteryMeter = GObject.registerClass({
             },
             'changed::enable-sony-device', () => {
                 this.sonyEnabled = this.settings.get_boolean('enable-sony-device');
+                this._setEnhancedDeviceMode();
+                this._onActiveChanged();
+            },
+            'changed::enable-galaxy-buds-device', () => {
+                this.galaxyBudsEnabled = this.settings.get_boolean('enable-galaxy-buds-device');
+                this._setEnhancedDeviceMode();
+                this._onActiveChanged();
+            },
+            'changed::enable-nothing-buds-device', () => {
+                this.nothingBudsEnabled = this.settings.get_boolean('enable-nothing-buds-device');
                 this._setEnhancedDeviceMode();
                 this._onActiveChanged();
             },
@@ -556,13 +571,12 @@ export const BluetoothBatteryMeter = GObject.registerClass({
             this._indicatorBox.quickSettingsItems = [];
             Main.panel.statusArea.quickSettings.addExternalIndicator(this._indicatorBox);
         }
-        const removedSignal = shellVersion > 45 ? 'child-removed' : 'actor-removed';
-        this._indicatorBox.connectObject(
-            removedSignal, () => {
-                if (this._indicatorBox.get_n_children() === 0)
-                    this._removeIndicatorBoxLayout();
-            },
-            this
+
+        this._indicatorBox.connectObject('child-removed', () => {
+            if (this._indicatorBox.get_n_children() === 0)
+                this._removeIndicatorBoxLayout();
+        },
+        this
         );
     }
 
@@ -582,7 +596,7 @@ export const BluetoothBatteryMeter = GObject.registerClass({
         this.enhancedDeviceManager?.destroy();
         this.enhancedDeviceManager = null;
         const enableEnhancedDeviceMode = this.airpodsEnabled || this.sonyEnabled ||
-                    this.gattBasEnabled;
+            this.galaxyBudsEnabled || this.nothingBudsEnabled || this.gattBasEnabled;
 
         if (enableEnhancedDeviceMode && !this.enhancedDeviceManager)
             this.enhancedDeviceManager = new EnhancedDeviceSupportManager(this);

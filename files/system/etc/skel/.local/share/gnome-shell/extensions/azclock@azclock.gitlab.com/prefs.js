@@ -17,16 +17,22 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 const WidgetType = {
     DIGITAL: 0,
     ANALOG: 1,
-    CUSTOM: 2,
-    WEATHER: 3,
-    IMAGE: 4,
+    TEXT: 2,
+    COMMAND: 3,
+    WEATHER: 4,
+    IMAGE: 5,
+    EMPTY: 6,
 };
 
 export default class AzClockPrefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
+        const resourcePath = '/org/gnome/shell/extensions/azclock/icons';
         const iconTheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
-        if (!iconTheme.get_search_path().includes(`${this.path}/media`))
-            iconTheme.add_search_path(`${this.path}/media`);
+        if (!iconTheme.get_resource_path().includes(resourcePath))
+            iconTheme.add_resource_path(resourcePath);
+
+        const resource = Gio.Resource.load(`${this.path}/data/resources.gresource`);
+        Gio.resources_register(resource);
 
         const settings = this.getSettings();
 
@@ -39,6 +45,7 @@ export default class AzClockPrefs extends ExtensionPreferences {
                 settings.disconnect(pageChangedId);
                 pageChangedId = null;
             }
+            Gio.resources_unregister(resource);
         });
 
         window.set_default_size(750, 800);
@@ -74,7 +81,7 @@ export default class AzClockPrefs extends ExtensionPreferences {
     }
 }
 
-var HomePage = GObject.registerClass(
+const HomePage = GObject.registerClass(
 class azClockHomePage extends Adw.PreferencesPage {
     _init(extension, settings) {
         super._init({
@@ -87,14 +94,14 @@ class azClockHomePage extends Adw.PreferencesPage {
         this._settings = settings;
         this._widgetRows = [];
 
-        const addClockButton = new Gtk.Button({
+        const addWidgetsButton = new Gtk.Button({
             halign: Gtk.Align.START,
             icon_name: 'list-add-symbolic',
             valign: Gtk.Align.CENTER,
             css_classes: ['suggested-action'],
-            label: _('Add Widget...'),
+            tooltip_text: _('Add Widget...'),
         });
-        addClockButton.connect('clicked', () => {
+        addWidgetsButton.connect('clicked', () => {
             const dialog = new AddWidgetsDialog(this._extension, this._settings, this);
             dialog.show();
             dialog.connect('response', (_w, response) => {
@@ -104,9 +111,39 @@ class azClockHomePage extends Adw.PreferencesPage {
                 }
             });
         });
-        this.clocksGroup = new Adw.PreferencesGroup();
-        this.add(this.clocksGroup);
-        this.clocksGroup.set_header_suffix(addClockButton);
+
+        const cloneWidgetsButton = new Gtk.Button({
+            halign: Gtk.Align.START,
+            icon_name: 'edit-copy-symbolic',
+            valign: Gtk.Align.CENTER,
+            css_classes: ['suggested-action'],
+            tooltip_text: _('Clone Widget...'),
+        });
+        cloneWidgetsButton.connect('clicked', () => {
+            const dialog = new CloneWidgetsDialog(this._extension, this._settings, this);
+            dialog.show();
+            dialog.connect('response', (_w, response) => {
+                if (response === Gtk.ResponseType.APPLY) {
+                    this.createRows();
+                    dialog.destroy();
+                }
+            });
+        });
+
+        this._widgetsGroup = new Adw.PreferencesGroup({
+            title: _('Widgets'),
+            description: _('Click rows to edit widgets. Drag an drop to reorder by z-index.'),
+        });
+        this.add(this._widgetsGroup);
+
+        const headerSuffixBox = new Gtk.Box({
+            spacing: 6,
+            orientation: Gtk.Orientation.HORIZONTAL,
+        });
+        headerSuffixBox.append(cloneWidgetsButton);
+        headerSuffixBox.append(addWidgetsButton);
+
+        this._widgetsGroup.set_header_suffix(headerSuffixBox);
         this.createRows();
     }
 
@@ -116,7 +153,7 @@ class azClockHomePage extends Adw.PreferencesPage {
 
     createRows() {
         for (let row of this._widgetRows) {
-            this.clocksGroup.remove(row);
+            this._widgetsGroup.remove(row);
             row = null;
         }
         this._widgetRows = [];
@@ -125,7 +162,7 @@ class azClockHomePage extends Adw.PreferencesPage {
         widgets.forEach(widget => {
             for (const [widgetId] of Object.entries(widget)) {
                 const widgetRow = this._createWidgetRow(widgetId);
-                this.clocksGroup.add(widgetRow);
+                this._widgetsGroup.add(widgetRow);
             }
         });
     }
@@ -138,7 +175,7 @@ class azClockHomePage extends Adw.PreferencesPage {
         const name = widgetSettings.get_string('name');
 
         // Data for the widget is always the first element in array.
-        const widgetRow = new WidgetRow(this._settings, widgetSettings, widgetId, {
+        const widgetRow = new WidgetRow(this._extension, this._settings, widgetSettings, widgetId, {
             title: `<b>${_(name)}</b>`,
         });
         widgetRow.use_markup = true;
@@ -159,18 +196,18 @@ class azClockHomePage extends Adw.PreferencesPage {
     }
 });
 
-var WidgetRow = GObject.registerClass({
+const WidgetRow = GObject.registerClass({
     Signals: {
         'drag-drop-done': {param_types: [GObject.TYPE_UINT, GObject.TYPE_UINT]},
         'drag-drop-prepare': {},
     },
 }, class AzClockWidgetRow extends Adw.ActionRow {
-    _init(settings, widgetSettings, schemaId, params) {
+    _init(extension, settings, widgetSettings, schemaId, params) {
         super._init({
             activatable: true,
             ...params,
         });
-
+        this._extension = extension;
         this._params = params;
         this._settings = settings;
         this._widgetSettings = widgetSettings;
@@ -248,7 +285,7 @@ var WidgetRow = GObject.registerClass({
         });
 
         this.connect('activated', () => {
-            const widgetSettingsWindow = new WidgetSettingsPage(this._settings, this._widgetSettings, {
+            const widgetSettingsWindow = new WidgetSettingsPage(this._extension, this._settings, this._widgetSettings, {
                 title: this._widgetSettings.get_string('name'),
                 schema_id: this._schemaId,
                 transient_for: this.get_root(),
@@ -261,15 +298,6 @@ var WidgetRow = GObject.registerClass({
             widgetSettingsWindow.connect('notify::title', () => (this.title = `<b>${widgetSettingsWindow.title}</b>`));
             widgetSettingsWindow.present();
         });
-
-        const configureLabel = new Gtk.Label({
-            label: _('Configure'),
-            halign: Gtk.Align.END,
-            valign: Gtk.Align.CENTER,
-            hexpand: false,
-            vexpand: false,
-        });
-        this.add_suffix(configureLabel);
 
         const goNextImage = new Gtk.Image({
             gicon: Gio.icon_new_for_string('go-next-symbolic'),
@@ -293,7 +321,7 @@ var WidgetRow = GObject.registerClass({
     }
 });
 
-var AddWidgetsDialog = GObject.registerClass(
+const AddWidgetsDialog = GObject.registerClass(
 class AzClockAddWidgetsDialog extends DialogWindow {
     _init(extension, settings, parent) {
         super._init(_('Add Widget'), parent);
@@ -302,33 +330,17 @@ class AzClockAddWidgetsDialog extends DialogWindow {
         this.search_enabled = false;
         this.set_default_size(550, -1);
 
-        this.pageGroup.title = _('Preset Widgets');
-        this.pageGroup.add(this.addPresetWidget(_('Digital Clock Widget'), WidgetType.DIGITAL));
-        this.pageGroup.add(this.addPresetWidget(_('Analog Clock Widget'), WidgetType.ANALOG));
-        this.pageGroup.add(this.addPresetWidget(_('Weather Widget'), WidgetType.WEATHER));
-        this.pageGroup.add(this.addPresetWidget(_('Custom Widget'), WidgetType.CUSTOM,
-            _('Add your own custom elements')));
-
-        this.cloneGroup = new Adw.PreferencesGroup({
-            title: _('Clone existing Widget'),
-        });
-        this.cloneGroup.use_markup = true;
-        this.page.add(this.cloneGroup);
-
-        const widgets = this._settings.get_value('widgets').recursiveUnpack();
-        widgets.forEach(widget => {
-            for (const [widgetId] of Object.entries(widget)) {
-                const widgetSchema = `${this._settings.schema_id}.widget-data`;
-                const widgetPath = `${this._settings.path}widget-data/${widgetId}/`;
-                const widgetSettings = Utils.getSettings(this._extension, widgetSchema, widgetPath);
-
-                const name = widgetSettings.get_string('name');
-                this.cloneGroup.add(this.addPresetWidget(name, widgetSettings));
-            }
-        });
+        this.pageGroup.add(this._createWidgetRow(_('Digital Clock'), WidgetType.DIGITAL));
+        this.pageGroup.add(this._createWidgetRow(_('Analog Clock'), WidgetType.ANALOG));
+        this.pageGroup.add(this._createWidgetRow(_('Text'), WidgetType.TEXT));
+        this.pageGroup.add(this._createWidgetRow(_('Command'), WidgetType.COMMAND));
+        this.pageGroup.add(this._createWidgetRow(_('Image'), WidgetType.IMAGE));
+        this.pageGroup.add(this._createWidgetRow(_('Weather'), WidgetType.WEATHER));
+        this.pageGroup.add(this._createWidgetRow(_('Empty Widget'), WidgetType.EMPTY,
+            _('Start with an empty widget and choose which elements to add.')));
     }
 
-    addPresetWidget(title, widgetType, subtitle) {
+    _createWidgetRow(title, widgetType, subtitle) {
         const addButton = new Gtk.Button({
             icon_name: 'list-add-symbolic',
             valign: Gtk.Align.CENTER,
@@ -349,102 +361,175 @@ class AzClockAddWidgetsDialog extends DialogWindow {
             const widgetSettings = Utils.getSettings(this._extension, widgetSchema, widgetPath);
 
             const elements = [];
-            const elementSchema = `${this._settings.schema_id}.element-data`;
-            const elementPath = `${widgetSettings.path}element-data/`;
-            let randomId;
 
             if (widgetType === WidgetType.DIGITAL) {
-                try {
-                    widgetSettings.set_string('name', _('Digital Clock Widget'));
-                    let element = {};
-                    randomId = GLib.uuid_string_random();
-                    let elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
-                    element[randomId] = new GLib.Variant('a{sv}', {
-                        enabled: GLib.Variant.new_boolean(true),
-                    });
-                    elements.push(element);
-                    elementSettings.set_string('name', _('Time Label'));
+                widgetSettings.set_string('name', _('Digital Clock Widget'));
 
-                    element = {};
-                    randomId = GLib.uuid_string_random();
-                    elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
-                    element[randomId] = new GLib.Variant('a{sv}', {
-                        enabled: GLib.Variant.new_boolean(true),
-                    });
-                    elements.push(element);
-                    elementSettings.set_string('name', _('Date Label'));
-                    elementSettings.set_string('date-format', '%A %b %d');
-                    elementSettings.set_int('font-size', 32);
+                let elementData = this._createElement(widgetSettings);
+                elements.push(elementData.element);
+                elementData.settings.set_string('name', _('Time Label'));
 
-                    widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
-                } catch (e) {
-                    console.log(`Error creating New Digital Clock Widget: ${e}`);
-                }
+                elementData = this._createElement(widgetSettings);
+                elements.push(elementData.element);
+                elementData.settings.set_string('name', _('Date Label'));
+                elementData.settings.set_string('date-format', '%A %b %d');
+                elementData.settings.set_int('font-size', 32);
             } else if (widgetType === WidgetType.ANALOG) {
                 widgetSettings.set_string('name', _('Analog Clock Widget'));
 
-                const element = {};
-                randomId = GLib.uuid_string_random();
-                const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
-                element[randomId] = new GLib.Variant('a{sv}', {
-                    enabled: GLib.Variant.new_boolean(true),
-                });
+                const {element, settings} = this._createElement(widgetSettings);
                 elements.push(element);
-                elementSettings.set_string('name', _('Analog Clock'));
-                elementSettings.set_enum('element-type', Utils.ElementType.ANALOG_CLOCK);
-                elementSettings.set_value('shadow', new GLib.Variant('(bsiiii)', [true, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 0]));
-                elementSettings.set_int('border-radius', 999);
-                elementSettings.set_int('border-width', 2);
-                elementSettings.set_string('background-color', 'white');
-                elementSettings.set_boolean('show-border', true);
-                elementSettings.set_string('border-color', 'black');
-                elementSettings.set_string('foreground-color', 'black');
-                widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
+                settings.set_string('name', _('Analog Clock'));
+                settings.set_enum('element-type', Utils.ElementType.ANALOG_CLOCK);
+                settings.set_value('shadow', new GLib.Variant('(bsiiii)', [true, 'rgba(55, 55, 55, 0.3)', 3, 3, 0, 0]));
+                settings.set_int('border-radius', 999);
+                settings.set_int('border-width', 2);
+                settings.set_string('background-color', 'white');
+                settings.set_boolean('show-border', true);
+                settings.set_string('border-color', 'black');
+                settings.set_string('foreground-color', 'black');
+            } else if (widgetType === WidgetType.TEXT) {
+                widgetSettings.set_string('name', _('Text Widget'));
+
+                const {element, settings} = this._createElement(widgetSettings);
+                elements.push(element);
+                settings.set_string('name', _('Text Label'));
+                settings.set_enum('element-type', Utils.ElementType.TEXT_LABEL);
+            } else if (widgetType === WidgetType.COMMAND) {
+                widgetSettings.set_string('name', _('Command Widget'));
+
+                const {element, settings} = this._createElement(widgetSettings);
+                elements.push(element);
+                settings.set_string('name', _('Command Label'));
+                settings.set_enum('element-type', Utils.ElementType.COMMAND_LABEL);
+            } else if (widgetType === WidgetType.IMAGE) {
+                widgetSettings.set_string('name', _('Image Widget'));
+
+                const {element, settings} = this._createElement(widgetSettings);
+                elements.push(element);
+                settings.set_string('name', _('Image'));
+                settings.set_enum('element-type', Utils.ElementType.IMAGE_ELEMENT);
             } else if (widgetType === WidgetType.WEATHER) {
                 widgetSettings.set_string('name', _('Weather Widget'));
                 widgetSettings.set_boolean('show-background', true);
                 widgetSettings.set_string('background-color', 'rgba(0, 0, 0, .6)');
 
-                const element = {};
-                randomId = GLib.uuid_string_random();
-                const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
-                element[randomId] = new GLib.Variant('a{sv}', {
-                    enabled: GLib.Variant.new_boolean(true),
-                });
+                const {element, settings} = this._createElement(widgetSettings);
                 elements.push(element);
-                elementSettings.set_string('name', _('Weather Forecast'));
-                elementSettings.set_enum('element-type', Utils.ElementType.WEATHER_ELEMENT);
-                elementSettings.set_int('polling-interval', 300);
-                widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
-            } else if (widgetType === WidgetType.CUSTOM) {
-                widgetSettings.set_string('name', _('Custom Widget'));
-            } else {
-                const setValue = (copySetting, newSetting, key) => {
-                    const defaultValue = copySetting.get_default_value(key);
-                    const value = copySetting.get_value(key);
-                    if (!defaultValue.equal(value))
-                        newSetting.set_value(key, value);
-                };
-
-                const copyWidgetSettings = widgetType;
-                const copyElements = copyWidgetSettings.get_value('elements').deepUnpack();
-                const copyElementPath = `${copyWidgetSettings.path}element-data/`;
-
-                const keys = copyWidgetSettings.settings_schema.list_keys();
-                for (const key of keys)
-                    setValue(copyWidgetSettings, widgetSettings, key);
-
-                copyElements.forEach(element => {
-                    for (const [elementId] of Object.entries(element)) {
-                        const copyElementSettings = Utils.getSettings(this._extension, elementSchema, `${copyElementPath}${elementId}/`);
-
-                        const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${elementId}/`);
-                        const elementKeys = copyElementSettings.settings_schema.list_keys();
-                        for (const key of elementKeys)
-                            setValue(copyElementSettings, elementSettings, key);
-                    }
-                });
+                settings.set_string('name', _('Weather Forecast'));
+                settings.set_enum('element-type', Utils.ElementType.WEATHER_ELEMENT);
+                settings.set_int('polling-interval', 300);
+            }  else if (widgetType === WidgetType.EMPTY) {
+                widgetSettings.set_string('name', _('Empty Widget'));
             }
+
+            if (elements.length > 0)
+                widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
+
+            newWidget[widgetFolderId] = new GLib.Variant('a{sv}', {
+                enabled: GLib.Variant.new_boolean(true),
+            });
+            widgets.push(newWidget);
+            this._settings.set_value('widgets', new GLib.Variant('aa{sv}', widgets));
+            this.emit('response', Gtk.ResponseType.APPLY);
+        });
+
+        const row = new Adw.ActionRow({
+            subtitle: subtitle ? _(subtitle) : '',
+            title: _(title),
+            activatable_widget: addButton,
+        });
+
+        row.add_suffix(addButton);
+        return row;
+    }
+
+    _createElement(widgetSettings) {
+        const randomId = GLib.uuid_string_random();
+        const elementSchema = `${this._settings.schema_id}.element-data`;
+        const elementPath = `${widgetSettings.path}element-data/`;
+
+        const element = {};
+        element[randomId] = new GLib.Variant('a{sv}', {
+            enabled: GLib.Variant.new_boolean(true),
+        });
+
+        const settings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
+
+        return {element, settings};
+    }
+});
+
+const CloneWidgetsDialog = GObject.registerClass(
+class AzClockCloneWidgetsDialog extends DialogWindow {
+    _init(extension, settings, parent) {
+        super._init(_('Clone Widget'), parent);
+        this._extension = extension;
+        this._settings = settings;
+        this.search_enabled = false;
+        this.set_default_size(550, -1);
+
+        const widgets = this._settings.get_value('widgets').recursiveUnpack();
+        widgets.forEach(widget => {
+            for (const [widgetId] of Object.entries(widget)) {
+                const widgetSchema = `${this._settings.schema_id}.widget-data`;
+                const widgetPath = `${this._settings.path}widget-data/${widgetId}/`;
+                const widgetSettings = Utils.getSettings(this._extension, widgetSchema, widgetPath);
+
+                const name = widgetSettings.get_string('name');
+                this.pageGroup.add(this._createWidgetRow(name, widgetSettings));
+            }
+        });
+    }
+
+    _createWidgetRow(title, widgetType, subtitle) {
+        const addButton = new Gtk.Button({
+            icon_name: 'list-add-symbolic',
+            valign: Gtk.Align.CENTER,
+        });
+
+        addButton.connect('clicked', () => {
+            const widgetIds = [];
+            const widgets = this._settings.get_value('widgets').deepUnpack();
+            widgets.forEach(widget => {
+                for (const [widgetId] of Object.entries(widget))
+                    widgetIds.push(widgetId);
+            });
+
+            const newWidget = {};
+            const widgetFolderId = GLib.uuid_string_random();
+            const widgetSchema = `${this._settings.schema_id}.widget-data`;
+            const widgetPath = `${this._settings.path}widget-data/${widgetFolderId}/`;
+            const widgetSettings = Utils.getSettings(this._extension, widgetSchema, widgetPath);
+
+            const elementSchema = `${this._settings.schema_id}.element-data`;
+            const elementPath = `${widgetSettings.path}element-data/`;
+
+            const setValue = (copySetting, newSetting, key) => {
+                const defaultValue = copySetting.get_default_value(key);
+                const value = copySetting.get_value(key);
+                if (!defaultValue.equal(value))
+                    newSetting.set_value(key, value);
+            };
+
+            const copyWidgetSettings = widgetType;
+            const copyElements = copyWidgetSettings.get_value('elements').deepUnpack();
+            const copyElementPath = `${copyWidgetSettings.path}element-data/`;
+
+            const keys = copyWidgetSettings.settings_schema.list_keys();
+            for (const key of keys)
+                setValue(copyWidgetSettings, widgetSettings, key);
+
+            copyElements.forEach(element => {
+                for (const [elementId] of Object.entries(element)) {
+                    const copyElementSettings = Utils.getSettings(this._extension, elementSchema, `${copyElementPath}${elementId}/`);
+
+                    const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${elementId}/`);
+                    const elementKeys = copyElementSettings.settings_schema.list_keys();
+                    for (const key of elementKeys)
+                        setValue(copyElementSettings, elementSettings, key);
+                }
+            });
 
             newWidget[widgetFolderId] = new GLib.Variant('a{sv}', {
                 enabled: GLib.Variant.new_boolean(true),

@@ -65,7 +65,7 @@ export const IndicatorIconWidget = GObject.registerClass({
         const binWidth = this._iconSize;
         const binHeight = this._iconSize;
         const displayScale = binHeight / svgSize;
-        const textureScale = Math.ceil(displayScale);
+        const maxTextureScale = 3;
         const maxHeight = 12;
         const maxWidth = 14.5;
         let scaleSvg = maxHeight / inkRect.height;
@@ -74,13 +74,13 @@ export const IndicatorIconWidget = GObject.registerClass({
         if (targetWidth >= maxWidth)
             scaleSvg = maxWidth / inkRect.width;
 
-        const textureSize = svgSize * textureScale;
+        const textureSize = svgSize * maxTextureScale;
         const correctedFactor = binHeight / textureSize;
         const finalScale = scaleSvg * correctedFactor * this._indicatorScale;
-        const inkWidthSurface = inkRect.width * textureScale;
-        const inkHeightSurface = inkRect.height * textureScale;
-        const inkRectXSurface = inkRect.x * textureScale;
-        const inkRectYSurface = inkRect.y * textureScale;
+        const inkWidthSurface = inkRect.width * maxTextureScale;
+        const inkHeightSurface = inkRect.height * maxTextureScale;
+        const inkRectXSurface = inkRect.x * maxTextureScale;
+        const inkRectYSurface = inkRect.y * maxTextureScale;
         const inkWidthDevice = inkWidthSurface * finalScale;
         const inkHeightDevice = inkHeightSurface * finalScale;
         const desiredInkLeftDevice = (binHeight - inkWidthDevice) / 2;
@@ -100,21 +100,17 @@ export const IndicatorIconWidget = GObject.registerClass({
             batteryScale,
         };
 
-        if (this._widgetInfo.levelIndicatorType === 0) {
-            const batteryWidth = 15;
-            const batteryHeight = 2.6;
-            const batteryX = (svgSize - batteryWidth) / 2;
-            const batteryY = svgSize - batteryHeight;
-            this._precomputeBarLayouts(batteryX, batteryY, batteryWidth, batteryHeight, false);
-        } else {
-            const batteryWidth = 15;
-            const batteryHeight = 2.6;
-            const batteryX = (svgSize - batteryWidth) / 2;
-            const batteryY = svgSize - batteryHeight;
-            this._precomputeDotLayouts(batteryX, batteryY, batteryWidth, batteryHeight);
-        }
+        const batteryWidth = 15;
+        const batteryHeight = 2.6;
+        const batteryX = (svgSize - batteryWidth) / 2;
+        const batteryY = svgSize - batteryHeight;
 
-        this._cairoCacheSurface = loadFileToCairoSurface(filePath, textureScale);
+        if (this._widgetInfo.levelIndicatorType === 0)
+            this._precomputeBarLayouts(batteryX, batteryY, batteryWidth, batteryHeight, false);
+        else
+            this._precomputeDotLayouts(batteryX, batteryY, batteryWidth, batteryHeight);
+
+        this._cairoCacheSurface = loadFileToCairoSurface(filePath, maxTextureScale);
 
         this.queue_repaint();
     }
@@ -126,13 +122,13 @@ export const IndicatorIconWidget = GObject.registerClass({
         const batteryHeight = 15;
         const svgHeight = svgSize;
         const displayScale = binHeight / svgSize;
-        const textureScale = Math.ceil(displayScale);
-        const textureSize = svgSize * textureScale;
+        const maxTextureScale = 3;
+        const textureSize = svgSize * maxTextureScale;
         const correctedFactor = binHeight / textureSize;
         const icon2Right = this._widgetInfo.levelBarPosition === 0;
         const initialOffset = icon2Right ? spacer + batBoxWidth : 0;
-        const offsetX = (initialOffset - inkRect.x) * textureScale;
-        const offsetY = (0 - inkRect.y + (svgHeight - inkRect.height) / 2) * textureScale;
+        const offsetX = (initialOffset - inkRect.x) * maxTextureScale;
+        const offsetY = (0 - inkRect.y + (svgHeight - inkRect.height) / 2) * maxTextureScale;
         const totalBinWidth = (inkRect.width + spacer + batBoxWidth) * displayScale;
         const batteryScale = displayScale;
 
@@ -151,7 +147,7 @@ export const IndicatorIconWidget = GObject.registerClass({
 
         this._precomputeBarLayouts(batteryX, batteryY, batBoxWidth, batteryHeight, true);
 
-        this._cairoCacheSurface = loadFileToCairoSurface(filePath, textureScale);
+        this._cairoCacheSurface = loadFileToCairoSurface(filePath, maxTextureScale);
 
         this.queue_repaint();
     }
@@ -281,6 +277,9 @@ export const IndicatorIconWidget = GObject.registerClass({
             {cx: startX + 2 * (d + spacer) + r, cy},
             {cx: startX + 3 * (d + spacer) + r, cy},
         ];
+
+        this._batteryBounds = this._batteryBounds || {};
+        this._batteryBounds.barX = x;
     }
 
     _drawDotLevel(cr) {
@@ -323,7 +322,8 @@ export const IndicatorIconWidget = GObject.registerClass({
             else
                 this._drawDotLevel(cr);
         } else if (this._indicatorMode === 1) {
-            cr.translate(this._batteryBounds.barX, 0);
+            const barX = this._batteryBounds?.barX ?? 0;
+            cr.translate(barX, 0);
             const placeImageBelowDeviceIcon = this._widgetInfo.levelIndicatorType === 1 ||
                     this._widgetInfo.levelBarPosition === 2;
             const vectorImage = placeImageBelowDeviceIcon ? 'h-non-battery' : 'v-non-battery';

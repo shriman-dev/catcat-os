@@ -1,11 +1,11 @@
 'use strict';
-import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {createLogger} from '../logger.js';
 import {getBluezDeviceProxy} from '../../bluezDeviceProxy.js';
-import {buds2to1BatteryLevel, validateProperties} from '../deviceUtils.js';
+import {buds2to1BatteryLevel, validateProperties, launchConfigureWindow} from '../deviceUtils.js';
 import {createConfig, createProperties, DataHandler} from '../../dataHandler.js';
 import {SonySocketV1} from './sonySocketV1.js';
 import {SonySocketV2} from './sonySocketV2.js';
@@ -69,10 +69,10 @@ export const SonyDevice = GObject.registerClass({
         this.updateDeviceMapCb = updateDeviceMapCb;
         this._usesProtocolV2 = false;
 
-        this._initialize();
+        this._initialize(profileManager);
     }
 
-    _initialize() {
+    _initialize(profileManager) {
         this._bluezDeviceProxy = getBluezDeviceProxy(this._devicePath);
         const uuids = this._bluezDeviceProxy.UUIDs;
         const name = this._bluezDeviceProxy.Name;
@@ -100,6 +100,7 @@ export const SonyDevice = GObject.registerClass({
         this._naSensitivity = AutoAsmSensitivity.STANDARD;
 
         this._callbacks = {
+            updateFirmwareVersion: this.updateFirmwareVersion.bind(this),
             updateCapabilities: this.updateCapabilities.bind(this),
             updateBatteryProps: this.updateBatteryProps.bind(this),
             updateCodecIndicator: this.updateCodecIndicator.bind(this),
@@ -117,7 +118,6 @@ export const SonyDevice = GObject.registerClass({
             updateVoiceNotificationsVolume: this.updateVoiceNotificationsVolume.bind(this),
             updatePauseWhenTakenOff: this.updatePauseWhenTakenOff.bind(this),
             updateAutomaticPowerOff: this.updateAutomaticPowerOff.bind(this),
-
         };
 
         this._batteryDualSupported = modelData.batteryDual ?? false;
@@ -218,7 +218,18 @@ export const SonyDevice = GObject.registerClass({
         this._monitorSonyListGsettings(true);
         this._updateIcons();
 
-        this._initializeProfile(modelData);
+        const type = this._usesProtocolV2 ? DeviceTypeSonyV2 : DeviceTypeSonyV1;
+        const uuid = this._usesProtocolV2 ? SonyUUIDv2 : SonyUUIDv1;
+        const SocketClass = this._usesProtocolV2 ? SonySocketV2 : SonySocketV1;
+        const profile = {type, uuid};
+
+        this._sonySocket = new SocketClass(
+            this._devicePath,
+            profileManager,
+            profile,
+            modelData,
+            this._callbacks
+        );
     }
 
     _updateIcons() {
@@ -246,6 +257,7 @@ export const SonyDevice = GObject.registerClass({
             name,
             alias: this._alias,
             icon: this._commonIcon,
+            'fw-version': '',
 
             ...this._batteryCaseSupported && {
                 'case': this._caseIcon,
@@ -524,64 +536,6 @@ export const SonyDevice = GObject.registerClass({
         this._monitorSonyListGsettings(true);
     }
 
-    async _initializeProfile(modelData) {
-        let fd = this._profileManager.getFd(this._devicePath);
-        if (fd !== -1) {
-            this._startSonySocket(fd, modelData);
-            return;
-        }
-
-        this._profileSignalId = this._profileManager.connect('new-connection', (o, path, newFd) => {
-            if (path !== this._devicePath)
-                return;
-
-            fd = newFd;
-
-            this._profileManager.disconnect(this._profileSignalId);
-            this._profileSignalId = null;
-
-            if (this._connectProfileTimeoutId)
-                GLib.source_remove(this._connectProfileTimeoutId);
-            this._connectProfileTimeoutId = null;
-
-            this._startSonySocket(fd, modelData);
-        }
-        );
-
-        const type = this._usesProtocolV2 ? DeviceTypeSonyV2 : DeviceTypeSonyV1;
-        const uuid = this._usesProtocolV2 ? SonyUUIDv2 : SonyUUIDv1;
-
-        const ok = await this._profileManager.registerProfile(type, uuid);
-        if (!ok || fd !== -1)
-            return;
-
-        await this._profileManager.connectProfile(type, this._devicePath, uuid);
-
-        let i = 0;
-        const interval = 500;
-        const maxTime = 7500;
-
-        this._connectProfileTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval, () => {
-            i++;
-            if (fd !== -1 || !this._bluezDeviceProxy.Connected || i * interval >= maxTime) {
-                this._connectProfileTimeoutId = null;
-                return GLib.SOURCE_REMOVE;
-            }
-
-            this._profileManager.connectProfile(type, this._devicePath, uuid);
-            return GLib.SOURCE_CONTINUE;
-        });
-    }
-
-    _startSonySocket(fd, modelData) {
-        const SocketClass = this._usesProtocolV2 ? SonySocketV2 : SonySocketV1;
-        this._sonySocket = new SocketClass(
-            this._devicePath,
-            fd,
-            modelData,
-            this._callbacks);
-    }
-
     _startConfiguration(battInfo) {
         const bat1level = battInfo.battery1Level  ?? 0;
         const bat2level = battInfo.battery2Level  ?? 0;
@@ -631,6 +585,11 @@ export const SonyDevice = GObject.registerClass({
             },
             this
         );
+    }
+
+    updateFirmwareVersion(fwVersion) {
+        this._settingsItems['fw-version'] = fwVersion;
+        this._updateGsettings();
     }
 
     updateCapabilities(supportsCodecIndicator, supportsUpscalingIndicator) {
@@ -1168,21 +1127,17 @@ export const SonyDevice = GObject.registerClass({
     }
 
     _settingsButtonClicked() {
-        const cmd = `gjs -m ${this._extPath}/script/moreSettings.js` +
-            ` --path ${this._devicePath} --type sony`;
-        GLib.spawn_command_line_async(cmd);
+        this._configureWindowLauncherCancellable = new Gio.Cancellable();
+        launchConfigureWindow(this._devicePath, 'sony', this._extPath,
+            this._configureWindowLauncherCancellable);
+        this._configureWindowLauncherCancellable = null;
     }
 
     destroy() {
-        if (this._profileManager && this._profileSignalId) {
-            this._profileManager.disconnect(this._profileSignalId);
-            this._profileSignalId = null;
-        }
+        this._configureWindowLauncherCancellable?.cancel();
+        this._configureWindowLauncherCancellable = null;
 
-        if (this._connectProfileTimeoutId)
-            GLib.source_remove(this._connectProfileTimeoutId);
-        this._connectProfileTimeoutId = null;
-
+        this.dataHandler?.disconnectObject(this);
         this._settings?.disconnectObject(this);
         this._bluezDeviceProxy = null;
         this._sonySocket?.destroy();

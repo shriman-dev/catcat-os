@@ -4,11 +4,18 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import {getBluezDeviceProxy} from './bluezDeviceProxy.js';
+import {Notifier} from './devices/notifier.js';
 import {ProfileManager} from './devices/profileManager.js';
 import {AirpodsDevice, isAirpods, DeviceTypeAirpods} from './devices/airpods/airpodsDevice.js';
 import {
     SonyDevice, isSonyV1, isSonyV2, DeviceTypeSonyV1, DeviceTypeSonyV2
 } from './devices/sony/sonyDevice.js';
+import {
+    GalaxyBudsDevice, isGalaxyLegacy, isGalaxyBuds, DeviceTypeGalaxyLegacy, DeviceTypeGalaxyBuds
+} from './devices/galaxyBuds/galaxyBudsDevice.js';
+import {
+    NothingBudsDevice, isNothingBuds, DeviceTypeNothingBuds
+} from './devices/nothingBuds/nothingBudsDevice.js';
 import {GattBasDevices, isGattBas, DeviceTypeGattBas} from './devices/gattBas/gattBasDevices.js';
 
 export const EnhancedDeviceSupportManager = GObject.registerClass({
@@ -20,8 +27,13 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
         this._settings = toggle.settings;
         this._extPath = toggle.extPath;
         this._deviceMap = new Map();
-        this._profileManager = new ProfileManager();
+        this._notifier = new Notifier(toggle);
+        this._profileManager = new ProfileManager(this._notifyCb.bind(this));
         this._createDesktopIconFiles();
+    }
+
+    _notifyCb(type) {
+        this._notifier.notifyProfileRegisteredError(type);
     }
 
     updateDeviceMapCb(path, dataHandler) {
@@ -34,16 +46,18 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
     }
 
     onDeviceSync(path, connected, icon, alias) {
-        let deviceProps = {
-            type: null, connected, dataHandler: null, deviceIcon: icon,
-            enhancedDevice: null, pendingDetection: true, bluezId: null,
-            bluezProxy: null, alias,
-        };
-
-        if (this._deviceMap.has(path)) {
+        let deviceProps = this._deviceMap.get(path);
+        if (!deviceProps) {
+            deviceProps = {
+                type: null, connected, dataHandler: null, deviceIcon: icon,
+                enhancedDevice: null, pendingDetection: true, bluezId: null,
+                bluezProxy: null, alias,
+            };
+            this._deviceMap.set(path, deviceProps);
+        } else {
             deviceProps = this._deviceMap.get(path);
             if (deviceProps.connected && !connected)
-                this._removedEnhancedDevice(path);
+                this._destroyEnhancedDevice(path);
 
             deviceProps.connected = connected;
         }
@@ -68,6 +82,21 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
                     enabled: this._toggle.sonyEnabled,
                     check: isSonyV2,
                     type: DeviceTypeSonyV2,
+                },
+                {
+                    enabled: this._toggle.galaxyBudsEnabled,
+                    check: isGalaxyLegacy,
+                    type: DeviceTypeGalaxyLegacy,
+                },
+                {
+                    enabled: this._toggle.galaxyBudsEnabled,
+                    check: isGalaxyBuds,
+                    type: DeviceTypeGalaxyBuds,
+                },
+                {
+                    enabled: this._toggle.nothingBudsEnabled,
+                    check: isNothingBuds,
+                    type: DeviceTypeNothingBuds,
                 },
                 {
                     enabled: this._toggle.gattBasEnabled,
@@ -96,7 +125,6 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
                 deviceProps.pendingDetection = false;
             }
         }
-        this._deviceMap.set(path, deviceProps);
         return {
             type: deviceProps.type, dataHandler: deviceProps.dataHandler,
             pendingDetection: deviceProps.pendingDetection,
@@ -146,8 +174,19 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
                 } else if (deviceProps.type === DeviceTypeSonyV1 ||
                         deviceProps.type === DeviceTypeSonyV2) {
                     deviceProps.enhancedDevice =
-                        new SonyDevice(this._settings, path, deviceProps.alias,  this._extPath,
+                        new SonyDevice(this._settings, path, deviceProps.alias, this._extPath,
                             this._profileManager, this.updateDeviceMapCb.bind(this));
+                } else if (deviceProps.type === DeviceTypeGalaxyBuds ||
+                        deviceProps.type === DeviceTypeGalaxyLegacy) {
+                    deviceProps.enhancedDevice =
+                        new GalaxyBudsDevice(this._settings, path, deviceProps.alias,
+                            this._extPath, this._profileManager,
+                            this.updateDeviceMapCb.bind(this));
+                } else if (deviceProps.type === DeviceTypeNothingBuds) {
+                    deviceProps.enhancedDevice =
+                        new NothingBudsDevice(this._settings, path, deviceProps.alias,
+                            this._extPath, this._profileManager,
+                            this.updateDeviceMapCb.bind(this));
                 } else if (deviceProps.type === DeviceTypeGattBas) {
                     deviceProps.enhancedDevice =
                         new GattBasDevices(this._settings, path, deviceProps.deviceIcon,
@@ -155,8 +194,7 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
                 }
                 /* ------------------------------------- */
             } else if (!deviceProps.connected && deviceProps.enhancedDevice) {
-                deviceProps.enhancedDevice?.destroy();
-                deviceProps.enhancedDevice = null;
+                this._destroyEnhancedDevice(path);
             }
         }
     }
@@ -199,33 +237,29 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
         this._ensureFileCopied(sourceIconFile, targetIconFile);
     }
 
-    _removedEnhancedDevice(path) {
-        if (this._deviceMap.has(path)) {
-            this._profileManager.deleteFD(path);
+    _destroyEnhancedDevice(path) {
+        if (!this._deviceMap.has(path))
+            return;
 
-            const deviceProps = this._deviceMap.get(path);
-            if (deviceProps.bluezId && deviceProps.bluezDeviceProxy) {
-                deviceProps.bluezDeviceProxy.disconnect(deviceProps.bluezId);
-                deviceProps.bluezDeviceProxy = null;
-                deviceProps.bluezId = null;
-            }
-            deviceProps.dataHandler = null;
-            deviceProps?.enhancedDevice?.destroy();
-            deviceProps.enhancedDevice = null;
-            const deviceType = deviceProps.type;
+        const deviceProps = this._deviceMap.get(path);
 
-            this._deviceMap.delete(path);
-
-            let lastDeviceType = true;
-            for (const props of this._deviceMap.values()) {
-                if (props.type === deviceType) {
-                    lastDeviceType = false;
-                    break;
-                }
-            }
-            if (lastDeviceType)
-                this._profileManager.unregisterProfile(deviceType);
+        if (deviceProps.bluezId && deviceProps.bluezDeviceProxy) {
+            deviceProps.bluezDeviceProxy.disconnect(deviceProps.bluezId);
+            deviceProps.bluezDeviceProxy = null;
+            deviceProps.bluezId = null;
         }
+
+        deviceProps.dataHandler = null;
+        deviceProps.enhancedDevice?.destroy();
+        deviceProps.enhancedDevice = null;
+    }
+
+    _removedEnhancedDevice(path) {
+        if (!this._deviceMap.has(path))
+            return;
+
+        this._destroyEnhancedDevice(path);
+        this._deviceMap.delete(path);
     }
 
     destroy() {
@@ -234,5 +268,7 @@ export const EnhancedDeviceSupportManager = GObject.registerClass({
             this._removedEnhancedDevice(path);
 
         this._profileManager = null;
+        this._notifier?.destroy();
+        this._notifier = null;
     }
 });

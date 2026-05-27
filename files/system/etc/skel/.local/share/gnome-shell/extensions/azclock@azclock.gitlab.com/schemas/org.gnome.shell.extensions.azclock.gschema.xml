@@ -169,6 +169,10 @@
             <default>false</default>
             <summary>Hide the command label element on error.</summary>
         </key>
+        <key type="b" name="polling-enabled">
+            <default>true</default>
+            <summary>If the Command Label should execute on an interval. See 'polling-interval'.</summary>
+        </key>
         <!---->
 
         <!--Specific to Command & Weather Element-->
@@ -183,51 +187,38 @@
             <default>[]</default>
             <summary>The location to gather weather info.</summary>
         </key>
-        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="current-weather-icon-type">
-            <default>'Full_Color'</default>
-            <summary>Icon type for weather icons</summary>
+        <key enum="org.gnome.shell.extensions.azclock.temperature-units" name="temperature-unit">
+            <default>'Default'</default>
+            <summary>Tempeature unit. Default/Celsius/Fahrenheit</summary>
         </key>
-        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="hourly-weather-icon-type">
-            <default>'Full_Color'</default>
-            <summary>Icon type for weather icons</summary>
+        <key type="(bsiiii)" name="weather-actor-shadow">
+            <default>(true, 'rgba(0, 0, 0, 0.4)', 0, 2, 0, 4)</default>
+            <summary>The drop shadow of the actors. (enabled, color, x, y, spread, blur).</summary>
         </key>
-        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="daily-weather-icon-type">
-            <default>'Full_Color'</default>
-            <summary>Icon type for weather icons</summary>
+        <key type="s" name="icon-color">
+            <default>'white'</default>
+            <summary>The text color.</summary>
         </key>
+            <!--Current Conditions-->
         <key type="b" name="show-current-conditions">
             <default>true</default>
             <summary>Show the current weather conditions.</summary>
         </key>
-        <key type="b" name="show-hourly-forecast">
+        <key type="b" name="current-conditions-show-both-temps">
+            <default>false</default>
+            <summary>Show temperature in C and F for current weather.</summary>
+        </key>
+        <key type="b" name="current-conditions-show-temp-degree-sign">
             <default>true</default>
-            <summary>Show the hourly weather forecast.</summary>
+            <summary>Show temperature degree sign for current weather.</summary>
         </key>
-        <key type="b" name="show-daily-forecast">
-            <default>true</default>
-            <summary>Show the daily weather forecast.</summary>
+        <key type="b" name="current-conditions-show-temp-unit">
+            <default>false</default>
+            <summary>Show temperature unit for current weather.</summary>
         </key>
-        <key type="s" name="daily-forecast-date-format">
-            <default>'%a'</default>
-            <summary>Date format on the daily forecast.</summary>
-        </key>
-        <key type="b" name="show-daily-forecast-thermometer-scale">
-            <default>true</default>
-            <summary>Show the daily weather forecast, with a thermometer scale range.</summary>
-        </key>
-        <key type="i" name="max-daily-forecasts">
-            <default>7</default>
-            <range min="1" max="7"/>
-            <summary>Max daily forecasts.</summary>
-        </key>
-        <key type="i" name="max-hourly-forecasts">
-            <default>6</default>
-            <range min="3" max="12"/>
-            <summary>Max hourly forecasts.</summary>
-        </key>
-        <key enum="org.gnome.shell.extensions.azclock.temperature-units" name="temperature-unit">
-            <default>'Default'</default>
-            <summary>Tempeature unit. Default/Celsius/Fahrenheit</summary>
+        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="current-weather-icon-type">
+            <default>'Full_Color'</default>
+            <summary>Icon type for weather icons</summary>
         </key>
         <key type="b" name="show-current-humidity">
             <default>true</default>
@@ -245,14 +236,69 @@
             <default>true</default>
             <summary>Show the location of the weather forecast.</summary>
         </key>
-        <key type="(bsiiii)" name="weather-actor-shadow">
-            <default>(true, 'rgba(0, 0, 0, 0.4)', 0, 2, 0, 4)</default>
-            <summary>The drop shadow of the actors. (enabled, color, x, y, spread, blur).</summary>
+            <!---->
+            <!--Hourly Forecast-->
+        <key type="b" name="show-hourly-forecast">
+            <default>true</default>
+            <summary>Show the hourly weather forecast.</summary>
         </key>
-        <key type="s" name="icon-color">
-            <default>'white'</default>
-            <summary>The text color.</summary>
+        <key type="b" name="hourly-forecast-show-both-temps">
+            <default>false</default>
+            <summary>Show temperature in C and F for hourly forecast.</summary>
         </key>
+        <key type="b" name="hourly-forecast-show-temp-degree-sign">
+            <default>true</default>
+            <summary>Show temperature degree sign for hourly forecast.</summary>
+        </key>
+        <key type="b" name="hourly-forecast-show-temp-unit">
+            <default>false</default>
+            <summary>Show temperature unit for hourly forecast.</summary>
+        </key>
+        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="hourly-weather-icon-type">
+            <default>'Full_Color'</default>
+            <summary>Icon type for weather icons</summary>
+        </key>
+        <key type="i" name="max-hourly-forecasts">
+            <default>6</default>
+            <range min="3" max="12"/>
+            <summary>Max hourly forecasts.</summary>
+        </key>
+            <!---->
+            <!--Daily Forecast-->
+        <key type="b" name="show-daily-forecast">
+            <default>true</default>
+            <summary>Show the daily weather forecast.</summary>
+        </key>
+        <key type="b" name="daily-forecast-show-both-temps">
+            <default>false</default>
+            <summary>Show temperature in C and F for daily forecast.</summary>
+        </key>
+        <key type="b" name="daily-forecast-show-temp-degree-sign">
+            <default>true</default>
+            <summary>Show temperature degree sign for daily forecast.</summary>
+        </key>
+        <key type="b" name="daily-forecast-show-temp-unit">
+            <default>false</default>
+            <summary>Show temperature unit for daily forecast.</summary>
+        </key>
+        <key enum="org.gnome.shell.extensions.azclock.icon-type" name="daily-weather-icon-type">
+            <default>'Full_Color'</default>
+            <summary>Icon type for weather icons</summary>
+        </key>
+        <key type="s" name="daily-forecast-date-format">
+            <default>'%a'</default>
+            <summary>Date format on the daily forecast.</summary>
+        </key>
+        <key type="b" name="show-daily-forecast-thermometer-scale">
+            <default>true</default>
+            <summary>Show the daily weather forecast, with a thermometer scale range.</summary>
+        </key>
+        <key type="i" name="max-daily-forecasts">
+            <default>7</default>
+            <range min="1" max="7"/>
+            <summary>Max daily forecasts.</summary>
+        </key>
+            <!---->
         <!---->
 
         <!--Specific to Image Element-->

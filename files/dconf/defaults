@@ -109,6 +109,7 @@ banner-message-enable=true
 banner-message-text='Meow'
 enable-fingerprint-authentication=true
 enable-smartcard-authentication=false
+enable-switchable-authentication=false
 fallback-logo=''
 logo=''
 

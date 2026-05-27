@@ -5,13 +5,9 @@
   "name": "DownFall",
   "settings-schema": "org.gnome.shell.extensions.downfall",
   "shell-version": [
-    "45",
-    "46",
-    "47",
-    "48",
-    "49"
+    "50"
   ],
   "url": "https://github.com/torculus/DownFall",
   "uuid": "downfall@torculus.github.com",
-  "version": 41
+  "version": 45
 }

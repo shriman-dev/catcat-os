@@ -222,6 +222,8 @@ class AzClockLabelSubPage extends SubPage {
             text: this.settings.get_string(setting) || '',
         });
         const textView = new Gtk.TextView({
+            hexpand: true,
+            halign: Gtk.Align.FILL,
             buffer,
             editable: true,
             wrap_mode: Gtk.WrapMode.WORD,
@@ -232,12 +234,32 @@ class AzClockLabelSubPage extends SubPage {
         });
         textView.get_style_context().add_class('card');
         buffer.connect('changed', () => {
+            applyButton.sensitive = true;
+        });
+
+        const applyButton = new Gtk.Button({
+            halign: Gtk.Align.END,
+            icon_name: 'dialog-apply-symbolic',
+            valign: Gtk.Align.END,
+            css_classes: ['suggested-action'],
+            sensitive: false,
+            tooltip_text: _('Apply'),
+        });
+        applyButton.connect('clicked', () => {
             const start = buffer.get_start_iter();
             const end = buffer.get_end_iter();
             const text = buffer.get_text(start, end, true);
             this.settings.set_string(setting, text);
+            applyButton.sensitive = false;
         });
-        scroll.set_child(textView);
+
+        const entryBox = new Gtk.Box({
+            halign: Gtk.Align.FILL,
+            orientation: Gtk.Orientation.HORIZONTAL,
+        });
+        entryBox.append(textView);
+        entryBox.append(applyButton);
+        scroll.set_child(entryBox);
         return scroll;
     }
 });

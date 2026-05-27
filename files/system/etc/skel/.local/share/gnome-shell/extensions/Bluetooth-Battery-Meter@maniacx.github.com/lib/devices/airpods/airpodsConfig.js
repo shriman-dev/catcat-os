@@ -5,6 +5,7 @@ import AirPods3rdGen from './deviceConfigs/AirPods3rdGen.js';
 import AirPods4thGen from './deviceConfigs/AirPods4thGen.js';
 import AirPods4thGenANC from './deviceConfigs/AirPods4thGenANC.js';
 import AirPodsMax from './deviceConfigs/AirPodsMax.js';
+import AirPodsMax2 from './deviceConfigs/AirPodsMax2.js';
 import AirPodsMaxUsbC from './deviceConfigs/AirPodsMaxUsbC.js';
 import AirPodsPro from './deviceConfigs/AirPodsPro.js';
 import AirPodsPro2ndGen from './deviceConfigs/AirPodsPro2ndGen.js';
@@ -13,6 +14,7 @@ import AirPodsPro3rdGen from './deviceConfigs/AirPodsPro3rdGen.js';
 import BeatsFitPro from './deviceConfigs/BeatsFitPro.js';
 import BeatsFlex from './deviceConfigs/BeatsFlex.js';
 import BeatsSolo3 from './deviceConfigs/BeatsSolo3.js';
+import BeatsSolo4 from './deviceConfigs/BeatsSolo4.js';
 import BeatsSoloBuds from './deviceConfigs/BeatsSoloBuds.js';
 import BeatsSoloPro from './deviceConfigs/BeatsSoloPro.js';
 import BeatsStudio3 from './deviceConfigs/BeatsStudio3.js';
@@ -32,6 +34,7 @@ export const AirpodsModelList = [
     AirPods4thGen,
     AirPods4thGenANC,
     AirPodsMax,
+    AirPodsMax2,
     AirPodsMaxUsbC,
     AirPodsPro,
     AirPodsPro2ndGen,
@@ -40,6 +43,7 @@ export const AirpodsModelList = [
     BeatsFitPro,
     BeatsFlex,
     BeatsSolo3,
+    BeatsSolo4,
     BeatsSoloBuds,
     BeatsSoloPro,
     BeatsStudio3,
@@ -78,6 +82,13 @@ export const ANCMode = {
     ANC_ON: 0x02,
     TRANSPARENCY: 0x03,
     ADAPTIVE: 0x04,
+};
+
+export const LongPressBits = {
+    off: 0x01,
+    anc: 0x02,
+    transparency: 0x04,
+    adaptive: 0x08,
 };
 
 export const AwarenessMode = {
@@ -210,5 +221,9 @@ PacketConstants.NOTI_VOLUME_HEADER = Uint8Array.from([
 
 PacketConstants.LONGPRESS_CYCLE_HEADER = Uint8Array.from([
     ...PacketConstants.PREFIX, ...PacketConstants.SETTINGS, 0x1a,
+]);
+
+PacketConstants.LISTENING_MODE_HEADER = Uint8Array.from([
+    ...PacketConstants.PREFIX, ...PacketConstants.SETTINGS, 0x34,
 ]);
 

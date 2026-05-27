@@ -5,9 +5,9 @@
   "name": "Color Picker",
   "settings-schema": "org.gnome.shell.extensions.color-picker",
   "shell-version": [
-    "49"
+    "50"
   ],
   "url": "https://github.com/tuberry/color-picker",
   "uuid": "color-picker@tuberry",
-  "version": 47
+  "version": 48
 }

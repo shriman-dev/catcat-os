@@ -87,21 +87,12 @@ const Indicator = GObject.registerClass(
     _initializeClient() {
       try {
         this._client = new GameMode.Client(null);
-        this._client.connect(
-          "count-changed",
-          this._updateClientList.bind(this)
-        );
-        this._client.connect(
-          "game-registered",
-          this._updateClientList.bind(this)
-        );
-        this._client.connect(
-          "game-unregistered",
-          this._updateClientList.bind(this)
-        );
-        this._client.connect(
-          "state-changed",
-          this._handleStatusChange.bind(this)
+        this._client.connectObject(
+          "count-changed", this._updateClientList.bind(this),
+          "game-registered", this._updateClientList.bind(this),
+          "game-unregistered", this._updateClientList.bind(this),
+          "state-changed", this._handleStatusChange.bind(this),
+          this
         );
       } catch (e) {
         this._handleClientInitializationError();
@@ -119,18 +110,18 @@ const Indicator = GObject.registerClass(
         _("GameMode is Enabled"),
         this._settings.get_boolean("show-launch-notification")
       );
-      this._notificationLaunchToggle.connect("toggled", (item, value) => {
+      this._notificationLaunchToggle.connectObject("toggled", (item, value) => {
         this._settings.set_boolean("show-launch-notification", value);
-      });
+      }, this);
       notificationSection.menu.addMenuItem(this._notificationLaunchToggle);
 
       this._notificationCloseToggle = new PopupMenu.PopupSwitchMenuItem(
         _("GameMode is Disabled"),
         this._settings.get_boolean("show-close-notification")
       );
-      this._notificationCloseToggle.connect("toggled", (item, value) => {
+      this._notificationCloseToggle.connectObject("toggled", (item, value) => {
         this._settings.set_boolean("show-close-notification", value);
-      });
+      }, this);
       notificationSection.menu.addMenuItem(this._notificationCloseToggle);
 
       notificationSection.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -139,9 +130,9 @@ const Indicator = GObject.registerClass(
         _("Enable Do Not Disturb Mode"),
         this._settings.get_boolean("enable-do-not-disturb")
       );
-      this._doNotDisturbToggle.connect("toggled", (item, value) => {
+      this._doNotDisturbToggle.connectObject("toggled", (item, value) => {
         this._settings.set_boolean("enable-do-not-disturb", value);
-      });
+      }, this);
       notificationSection.menu.addMenuItem(this._doNotDisturbToggle);
     }
 
@@ -155,16 +146,16 @@ const Indicator = GObject.registerClass(
         _("Show Icon Only When Active"),
         this._settings.get_boolean("show-icon-only-when-active")
       );
-      this._iconVisibilityToggle.connect("toggled", (item, value) => {
+      this._iconVisibilityToggle.connectObject("toggled", (item, value) => {
         this._settings.set_boolean("show-icon-only-when-active", value);
-      });
+      }, this);
       visibilitySection.menu.addMenuItem(this._iconVisibilityToggle);
 
       const colorSettingsItem = new PopupMenu.PopupMenuItem(_("Color Settings"));
       this.menu.addMenuItem(colorSettingsItem);
-      colorSettingsItem.connect('activate', () => {
+      colorSettingsItem.connectObject('activate', () => {
         this._extension.openPreferences();
-      });
+      }, this);
     }
 
     _addPreferencesButton() {
@@ -183,12 +174,12 @@ const Indicator = GObject.registerClass(
       this.menu._getMenuItems().forEach((item) => {
         if (item !== unavailableItem) item.setSensitive(false);
       });
-      unavailableItem.connect("activate", () => {
+      unavailableItem.connectObject("activate", () => {
         Gio.app_info_launch_default_for_uri(
           "https://github.com/FeralInteractive/gamemode",
           null
         );
-      });
+      }, this);
     }
 
     _handleStatusChange() {
@@ -272,55 +263,53 @@ const Indicator = GObject.registerClass(
     }
 
     _observeSettings() {
-      this._settings.connect("changed::show-icon-only-when-active", () => {
-        const iconVisibilitySetting = this._settings.get_boolean(
-          "show-icon-only-when-active"
-        );
-        this._iconVisibilityToggle.setToggleState(iconVisibilitySetting);
-        this.visible = !iconVisibilitySetting;
-      });
-      
-      this._settings.connect("changed::show-launch-notification", () => {
-        const showLaunchNotification = this._settings.get_boolean(
-          "show-launch-notification"
-        );
-        this._notificationLaunchToggle.setToggleState(showLaunchNotification);
-      });
-      
-      this._settings.connect("changed::show-close-notification", () => {
-        const showCloseNotification = this._settings.get_boolean(
-          "show-close-notification"
-        );
-        this._notificationCloseToggle.setToggleState(showCloseNotification);
-      });
-      
-      this._settings.connect("changed::active-color", () => {
-        if (this._client && this._client.current_state) {
-          const activeColor = this._settings.get_string("active-color");
-          this._icon.set_style('color: ' + activeColor + ';');
-        }
-      });
-      
-      this._settings.connect("changed::inactive-color", () => {
-        if (this._client && !this._client.current_state) {
-          const inactiveColor = this._settings.get_string("inactive-color");
-          this._icon.set_style('color: ' + inactiveColor + ';');
-        }
-      });
-      
-      this._settings.connect("changed::enable-do-not-disturb", () => {
-        const enableDoNotDisturb = this._settings.get_boolean("enable-do-not-disturb");
-        this._doNotDisturbToggle.setToggleState(enableDoNotDisturb);
-
-        if (this._client && this._client.current_state) {
-          if (enableDoNotDisturb) {
-            this._scheduleDoNotDisturbActivation();
-          } else {
-            this._clearDoNotDisturbTimeout();
-            this._disableDoNotDisturb();
+      this._settings.connectObject(
+        "changed::show-icon-only-when-active", () => {
+          const iconVisibilitySetting = this._settings.get_boolean(
+            "show-icon-only-when-active"
+          );
+          this._iconVisibilityToggle.setToggleState(iconVisibilitySetting);
+          this.visible = !iconVisibilitySetting;
+        },
+        "changed::show-launch-notification", () => {
+          const showLaunchNotification = this._settings.get_boolean(
+            "show-launch-notification"
+          );
+          this._notificationLaunchToggle.setToggleState(showLaunchNotification);
+        },
+        "changed::show-close-notification", () => {
+          const showCloseNotification = this._settings.get_boolean(
+            "show-close-notification"
+          );
+          this._notificationCloseToggle.setToggleState(showCloseNotification);
+        },
+        "changed::active-color", () => {
+          if (this._client && this._client.current_state) {
+            const activeColor = this._settings.get_string("active-color");
+            this._icon.set_style('color: ' + activeColor + ';');
           }
-        }
-      });
+        },
+        "changed::inactive-color", () => {
+          if (this._client && !this._client.current_state) {
+            const inactiveColor = this._settings.get_string("inactive-color");
+            this._icon.set_style('color: ' + inactiveColor + ';');
+          }
+        },
+        "changed::enable-do-not-disturb", () => {
+          const enableDoNotDisturb = this._settings.get_boolean("enable-do-not-disturb");
+          this._doNotDisturbToggle.setToggleState(enableDoNotDisturb);
+
+          if (this._client && this._client.current_state) {
+            if (enableDoNotDisturb) {
+              this._scheduleDoNotDisturbActivation();
+            } else {
+              this._clearDoNotDisturbTimeout();
+              this._disableDoNotDisturb();
+            }
+          }
+        },
+        this
+      );
     }
 
     _updateIcon(isActive) {
@@ -346,12 +335,12 @@ const Indicator = GObject.registerClass(
 
       const clientCount = this._client.process_map.size;
       this._clientSection.label.set_text(
-        _("Active Clients: " + (clientCount || 0))
+        _("Active Clients: ") + (clientCount || 0)
       );
-
+      const strClient = _("Client");
       this._client.process_map.forEach((client, index) => {
         const clientItem = new PopupMenu.PopupMenuItem(
-          `Client ${index}: ${client.name}`
+          `${strClient} ${index}: ${client.name}`
         );
         this._clientSection.menu.addMenuItem(clientItem);
       });

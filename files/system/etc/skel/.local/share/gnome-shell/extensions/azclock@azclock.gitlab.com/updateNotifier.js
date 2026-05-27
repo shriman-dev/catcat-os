@@ -7,7 +7,7 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const PROJECT_NAME = 'Desktop Widgets';
-const PROJECT_ICON = '/media/azclock-logo.svg';
+const PROJECT_ICON = 'icons/azclock-logo.svg';
 
 const [ShellVersion] = Config.PACKAGE_VERSION.split('.').map(s => Number(s));
 
@@ -28,7 +28,7 @@ export class UpdateNotification {
 
         this._version = metadata.version ?? 0;
         this._versionName = metadata['version-name'] ?? this._version.toString();
-        this._iconPath = `${extension.path}/${PROJECT_ICON}`;
+        this._iconPath = `resource:///org/gnome/shell/extensions/azclock/${PROJECT_ICON}`;
 
         this._maybeShowNotification();
     }

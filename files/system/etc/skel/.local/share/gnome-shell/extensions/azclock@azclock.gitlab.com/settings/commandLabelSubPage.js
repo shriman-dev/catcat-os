@@ -39,15 +39,28 @@ class AzClockCommandLabelSubPage extends LabelSubPage {
         hideOnErrorRow.add_suffix(hideOnErrorSwitch);
         this._customGroup.add(hideOnErrorRow);
 
+        const pollingIntervalExpanderRow = new Adw.ExpanderRow({
+            title: _('Run Command Repeatedly'),
+            subtitle: _('Disable to run once on load. Enable to run periodically.'),
+            show_enable_switch: true,
+            expanded: this.settings.get_boolean('polling-enabled'),
+            enable_expansion: this.settings.get_boolean('polling-enabled'),
+        });
+        this._customGroup.add(pollingIntervalExpanderRow);
+
+        pollingIntervalExpanderRow.connect('notify::enable-expansion', widget => {
+            this.settings.set_boolean('polling-enabled', widget.enable_expansion);
+        });
+
         const pollingIntervalButton = this.createSpinButton(this.settings.get_int('polling-interval'), 250, 2000000);
         pollingIntervalButton.connect('value-changed', widget => {
             this.settings.set_int('polling-interval', widget.get_value());
         });
         const pollingIntervalRow = new Adw.ActionRow({
-            title: _('Polling Interval (ms)'),
+            title: _('Interval (ms)'),
             activatable_widget: pollingIntervalButton,
         });
         pollingIntervalRow.add_suffix(pollingIntervalButton);
-        this._customGroup.add(pollingIntervalRow);
+        pollingIntervalExpanderRow.add_row(pollingIntervalRow);
     }
 });

@@ -80,8 +80,7 @@ class AzClockAnalogClock extends Clutter.Actor {
     }
 
     setAnalogClockStyle(actor, namePrefix) {
-        const directoryName = 'analog-clock-components';
-        const filePath = `${this._extension.path}/media/${directoryName}/`;
+        const resourcePath = 'resource:///org/gnome/shell/extensions/azclock/clock';
 
         actor.style = this.getStyle(namePrefix);
 
@@ -89,7 +88,7 @@ class AzClockAnalogClock extends Clutter.Actor {
             actor.visible = this._settings.get_boolean(`${namePrefix}-visible`);
 
         const iconStyle = this._settings.get_int(`${namePrefix}-style`);
-        actor.gicon = Gio.icon_new_for_string(`${filePath}/${namePrefix}-${iconStyle}-symbolic.svg`);
+        actor.gicon = Gio.icon_new_for_string(`${resourcePath}/${namePrefix}-${iconStyle}-symbolic.svg`);
 
         actor.icon_size = this._settings.get_int('clock-size');
     }
@@ -164,7 +163,6 @@ class AzClockAnalogClock extends Clutter.Actor {
         if (date.getHours() >= 12)
             date.setHours(date.getHours() - 12);
 
-
         const smoothTicks = this._settings.get_boolean('smooth-hand-ticks');
         if (smoothTicks)
             date.setSeconds(date.getSeconds() + 1);
@@ -205,7 +203,6 @@ class AzClockAnalogClock extends Clutter.Actor {
             rotationDegree = 360;
             hand.checkRotationDegree = true;
         }
-
 
         hand.ease({
             opacity: 255, // onComplete() seems to trigger instantly without this.

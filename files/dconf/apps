@@ -168,7 +168,7 @@ col-6-width=90
 col-8-visible=true
 col-8-width=79
 columns-order=[12, 1, 15, 8, 0, 14, 23, 22, 18, 26, 2, 3, 4, 6, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 7]
-sort-col=12
+sort-col=15
 sort-order=0
 
 [org/gnome/nautilus/compression]

@@ -21,12 +21,12 @@ attach-modal-dialogs=false
 auto-maximize=false
 center-new-windows=true
 dynamic-workspaces=false
-edge-tiling=true
+edge-tiling=false
 experimental-features=['scale-monitor-framebuffer', 'variable-refresh-rate']
 overlay-key='Super'
 workspaces-only-on-primary=false
 
 [org/gnome/mutter/keybindings]
-toggle-tiled-left=['<Super>Left']
-toggle-tiled-right=['<Super>Right']
+toggle-tiled-left=@as []
+toggle-tiled-right=@as []
 

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
-import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 import {CommandLabelSubPage} from './commandLabelSubPage.js';
 import {DialogWindow} from './dialogWindow.js';
@@ -41,12 +41,12 @@ export const WidgetSettingsPage = GObject.registerClass({
             0, GLib.MAXINT32, 0),
     },
 }, class AzClockWidgetSettingsPage extends Adw.ApplicationWindow {
-    _init(settings, widgetSettings, params) {
+    _init(extension, settings, widgetSettings, params) {
         super._init({
             ...params,
         });
 
-        this._extension = ExtensionPreferences.lookupByURL(import.meta.url);
+        this._extension = extension;
         this._settings = settings;
         this._widgetSettings = widgetSettings;
         this._pages = [];
@@ -92,6 +92,7 @@ export const WidgetSettingsPage = GObject.registerClass({
             deleteElementButton.visible = row.get_index() !== 0;
             deleteWidgetButton.visible = row.get_index() === 0;
             addButton.visible = row.get_index() === 0;
+            cloneButton.visible = row.get_index() === 0;
         });
         this._sidebarListBox.set_header_func(row => {
             if (row.get_index() === 1) {
@@ -116,7 +117,9 @@ export const WidgetSettingsPage = GObject.registerClass({
         });
 
         // Content ToolbarView
-        this._contentToolBarView = new Adw.ToolbarView();
+        this._contentToolBarView = new Adw.ToolbarView({
+            bottom_bar_style: Adw.ToolbarStyle.RAISED,
+        });
         const contentHeaderBar = new Adw.HeaderBar({
             show_back_button: false,
         });
@@ -127,7 +130,8 @@ export const WidgetSettingsPage = GObject.registerClass({
             halign: Gtk.Align.START,
             valign: Gtk.Align.CENTER,
             hexpand: false,
-            label: _('Delete Widget'),
+            icon_name: 'user-trash-symbolic',
+            tooltip_text: _('Delete Widget'),
             css_classes: ['destructive-action'],
         });
         deleteWidgetButton.connect('clicked', () => {
@@ -164,7 +168,8 @@ export const WidgetSettingsPage = GObject.registerClass({
             halign: Gtk.Align.START,
             valign: Gtk.Align.CENTER,
             hexpand: false,
-            label: _('Delete Element'),
+            icon_name: 'user-trash-symbolic',
+            tooltip_text: _('Delete Element'),
             css_classes: ['destructive-action'],
             visible: false,
         });
@@ -202,9 +207,11 @@ export const WidgetSettingsPage = GObject.registerClass({
         });
 
         const addButton = new Gtk.Button({
+            halign: Gtk.Align.START,
+            icon_name: 'list-add-symbolic',
             valign: Gtk.Align.CENTER,
-            label: _('Add Element'),
             css_classes: ['suggested-action'],
+            tooltip_text: _('Add Element...'),
         });
         addButton.connect('clicked', () => {
             const dialog = new AddElementsDialog(this._settings, this._widgetSettings, this, {
@@ -218,7 +225,28 @@ export const WidgetSettingsPage = GObject.registerClass({
                 }
             });
         });
+        const cloneButton = new Gtk.Button({
+            halign: Gtk.Align.START,
+            icon_name: 'edit-copy-symbolic',
+            valign: Gtk.Align.CENTER,
+            css_classes: ['suggested-action'],
+            tooltip_text: _('Clone Element...'),
+        });
+        cloneButton.connect('clicked', () => {
+            const dialog = new CloneElementsDialog(this._settings, this._widgetSettings, this, {
+                widget_title: this.title,
+            });
+            dialog.show();
+            dialog.connect('response', (_w, response) => {
+                if (response === Gtk.ResponseType.APPLY) {
+                    this._repopulatePages(dialog.elementIndex);
+                    dialog.destroy();
+                }
+            });
+        });
+
         actionBar.pack_end(addButton);
+        actionBar.pack_end(cloneButton);
         actionBar.pack_start(deleteWidgetButton);
         actionBar.pack_start(deleteElementButton);
         this._contentToolBarView.add_bottom_bar(actionBar);
@@ -346,7 +374,7 @@ export const WidgetSettingsPage = GObject.registerClass({
     }
 });
 
-var AddElementsDialog = GObject.registerClass(
+const AddElementsDialog = GObject.registerClass(
 class AzClockAddElementsDialog extends DialogWindow {
     _init(settings, widgetSettings, parent, params) {
         super._init(_('Add Element to %s').format(params.widget_title), parent, params);
@@ -356,45 +384,16 @@ class AzClockAddElementsDialog extends DialogWindow {
         this.search_enabled = false;
         this.set_default_size(550, -1);
 
-        this.pageGroup.title = _('Preset Elements');
-        this.pageGroup.add(this.addPresetElement(_('Date Label'), ElementType.DATE));
-        this.pageGroup.add(this.addPresetElement(_('Time Label'), ElementType.TIME));
-        this.pageGroup.add(this.addPresetElement(_('Text Label'), ElementType.TEXT));
-        this.pageGroup.add(this.addPresetElement(_('Command Label'), ElementType.COMMAND));
-        this.pageGroup.add(this.addPresetElement(_('Analog Clock'), ElementType.ANALOG));
-        this.pageGroup.add(this.addPresetElement(_('Weather Forecast'), ElementType.WEATHER));
-        this.pageGroup.add(this.addPresetElement(_('Image'), ElementType.IMAGE));
-
-        this.cloneGroup = new Adw.PreferencesGroup({
-            title: _('Clone existing Element'),
-        });
-        this.cloneGroup.use_markup = true;
-        this.page.add(this.cloneGroup);
-
-        const widgets = this._settings.get_value('widgets').recursiveUnpack();
-        widgets.forEach(widget => {
-            for (const [widgetId] of Object.entries(widget)) {
-                const wSchema = `${this._settings.schema_id}.widget-data`;
-                const wPath = `${this._settings.path}widget-data/${widgetId}/`;
-                const wSettings = Utils.getSettings(this._extension, wSchema, wPath);
-
-                const name = wSettings.get_string('name');
-                const elements = wSettings.get_value('elements').recursiveUnpack();
-                elements.forEach(element => {
-                    for (const [elementId] of Object.entries(element)) {
-                        const widgetName = name;
-                        const elementSchema = `${this._settings.schema_id}.element-data`;
-                        const elementPath = `${wSettings.path}element-data/`;
-                        const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${elementId}/`);
-                        const elementName = elementSettings.get_string('name');
-                        this.cloneGroup.add(this.addPresetElement(`${_(elementName)} <span font-size='small'><i>(${_(widgetName)})</i></span>`, elementSettings));
-                    }
-                });
-            }
-        });
+        this.pageGroup.add(this._createElementRow(_('Date'), ElementType.DATE));
+        this.pageGroup.add(this._createElementRow(_('Time'), ElementType.TIME));
+        this.pageGroup.add(this._createElementRow(_('Analog Clock'), ElementType.ANALOG));
+        this.pageGroup.add(this._createElementRow(_('Text'), ElementType.TEXT));
+        this.pageGroup.add(this._createElementRow(_('Command'), ElementType.COMMAND));
+        this.pageGroup.add(this._createElementRow(_('Image'), ElementType.IMAGE));
+        this.pageGroup.add(this._createElementRow(_('Weather'), ElementType.WEATHER));
     }
 
-    addPresetElement(title, widgetType, subtitle) {
+    _createElementRow(title, widgetType, subtitle) {
         const addButton = new Gtk.Button({
             icon_name: 'list-add-symbolic',
             valign: Gtk.Align.CENTER,
@@ -442,20 +441,87 @@ class AzClockAddElementsDialog extends DialogWindow {
             }  else if (widgetType === ElementType.IMAGE) {
                 elementSettings.set_string('name', _('Image'));
                 elementSettings.set_enum('element-type', Utils.ElementType.IMAGE_ELEMENT);
-            } else {
-                const setValue = (copySetting, newSetting, key) => {
-                    const defaultValue = copySetting.get_default_value(key);
-                    const value = copySetting.get_value(key);
-                    if (!defaultValue.equal(value))
-                        newSetting.set_value(key, value);
-                };
-
-                const copyElementSettings = widgetType;
-
-                const elementKeys = copyElementSettings.settings_schema.list_keys();
-                for (const key of elementKeys)
-                    setValue(copyElementSettings, elementSettings, key);
             }
+
+            this._widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
+            this.emit('response', Gtk.ResponseType.APPLY);
+        });
+
+        const row = new Adw.ActionRow({
+            subtitle: subtitle ? _(subtitle) : '',
+            title: _(title),
+            activatable_widget: addButton,
+        });
+
+        row.add_suffix(addButton);
+        return row;
+    }
+});
+
+const CloneElementsDialog = GObject.registerClass(
+class AzClockCloneElementsDialog extends DialogWindow {
+    _init(settings, widgetSettings, parent, params) {
+        super._init(_('Clone Element to %s').format(params.widget_title), parent, params);
+        this._settings = settings;
+        this._widgetSettings = widgetSettings;
+        this._extension = parent._extension;
+        this.search_enabled = false;
+        this.set_default_size(550, -1);
+
+        const widgets = this._settings.get_value('widgets').recursiveUnpack();
+        widgets.forEach(widget => {
+            for (const [widgetId] of Object.entries(widget)) {
+                const wSchema = `${this._settings.schema_id}.widget-data`;
+                const wPath = `${this._settings.path}widget-data/${widgetId}/`;
+                const wSettings = Utils.getSettings(this._extension, wSchema, wPath);
+
+                const name = wSettings.get_string('name');
+                const elements = wSettings.get_value('elements').recursiveUnpack();
+                elements.forEach(element => {
+                    for (const [elementId] of Object.entries(element)) {
+                        const widgetName = name;
+                        const elementSchema = `${this._settings.schema_id}.element-data`;
+                        const elementPath = `${wSettings.path}element-data/`;
+                        const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${elementId}/`);
+                        const elementName = elementSettings.get_string('name');
+                        this.pageGroup.add(this._createElementRow(`${_(elementName)} <span font-size='small'><i>(${_(widgetName)})</i></span>`, elementSettings));
+                    }
+                });
+            }
+        });
+    }
+
+    _createElementRow(title, widgetType, subtitle) {
+        const addButton = new Gtk.Button({
+            icon_name: 'list-add-symbolic',
+            valign: Gtk.Align.CENTER,
+        });
+
+        addButton.connect('clicked', () => {
+            const elements = this._widgetSettings.get_value('elements').deepUnpack();
+            const elementSchema = `${this._settings.schema_id}.element-data`;
+            const elementPath = `${this._widgetSettings.path}element-data/`;
+
+            const element = {};
+            const randomId = GLib.uuid_string_random();
+            const elementSettings = Utils.getSettings(this._extension, elementSchema, `${elementPath}${randomId}/`);
+            element[randomId] = new GLib.Variant('a{sv}', {
+                enabled: GLib.Variant.new_boolean(true),
+            });
+            elements.push(element);
+
+            const setValue = (copySetting, newSetting, key) => {
+                const defaultValue = copySetting.get_default_value(key);
+                const value = copySetting.get_value(key);
+                if (!defaultValue.equal(value))
+                    newSetting.set_value(key, value);
+            };
+
+            const copyElementSettings = widgetType;
+
+            const elementKeys = copyElementSettings.settings_schema.list_keys();
+            for (const key of elementKeys)
+                setValue(copyElementSettings, elementSettings, key);
 
             this._widgetSettings.set_value('elements', new GLib.Variant('aa{sv}', elements));
             this.emit('response', Gtk.ResponseType.APPLY);

@@ -6,8 +6,9 @@ import Gtk from 'gi://Gtk';
 import {
     supportedAudioSingleIcons, supportedAudioDualIcons, supportedCaseIcons
 } from '../../../lib/widgets/iconGroups.js';
-import {AirpodsModelList} from '../../../lib/devices/airpods/airpodsConfig.js';
-import {CheckBoxesGroupWidget} from './../../widgets/checkBoxesGroupWidget.js';
+import {AirpodsModelList, LongPressBits} from '../../../lib/devices/airpods/airpodsConfig.js';
+import {CheckBoxesRowWidget} from './../../widgets/checkBoxesRowWidget.js';
+import {RadioButtonRowWidget} from './../../widgets/radioButtonRowWidget.js';
 import {SliderRowWidget} from './../../widgets/sliderRowWidget.js';
 import {DropDownRowWidget} from './../../widgets/dropDownRowWidget.js';
 import {IconSelectorWidget} from './../../widgets/iconSelectorWidget.js';
@@ -15,13 +16,39 @@ import {IconSelectorWidget} from './../../widgets/iconSelectorWidget.js';
 export const  ConfigureWindow = GObject.registerClass({
     GTypeName: 'BluetoothBatteryMeter_AirpodsConfigureWindow',
 }, class ConfigureWindow extends Adw.Window {
-    _init(settings, mac, devicePath, parentWindow, _) {
+    _init(settings, mac, devicePath, parentWindow, _, modal = false) {
         super._init({
             default_width: 650,
             default_height: 650,
-            modal: true,
+            width_request: 320,
+            height_request: 100,
+            modal,
             transient_for: parentWindow ?? null,
         });
+
+        this._isCompactMode = false;
+
+        this._breakpointCompact = new Adw.Breakpoint({
+            condition: Adw.BreakpointCondition.parse('max-width: 500px'),
+        });
+
+        this._breakpointExpanded = new Adw.Breakpoint({
+            condition: Adw.BreakpointCondition.parse('min-width: 550px'),
+        });
+
+        this.add_breakpoint(this._breakpointCompact);
+        this.add_breakpoint(this._breakpointExpanded);
+
+        this._breakpointCompact.connect('apply', () => {
+            this._isCompactMode = true;
+            this._updateCompactStatus();
+        });
+
+        this._breakpointExpanded.connect('apply', () => {
+            this._isCompactMode = false;
+            this._updateCompactStatus();
+        });
+
         this._settings = settings;
         this._devicePath = devicePath;
 
@@ -34,7 +61,7 @@ export const  ConfigureWindow = GObject.registerClass({
         const toolViewBar = new Adw.ToolbarView();
 
         const headerBar = new Adw.HeaderBar({
-            decoration_layout: 'icon:close',
+            decoration_layout: ':close',
             show_end_title_buttons: true,
         });
 
@@ -43,12 +70,6 @@ export const  ConfigureWindow = GObject.registerClass({
         toolViewBar.add_top_bar(headerBar);
         toolViewBar.set_content(page);
         this.set_content(toolViewBar);
-
-        const aliasGroup = new Adw.PreferencesGroup({
-            title: `MAC: ${mac}`,
-        });
-
-        page.add(aliasGroup);
 
         const iconList = modelData.batteryType === 1 ? supportedAudioSingleIcons
             : supportedAudioDualIcons;
@@ -61,6 +82,7 @@ export const  ConfigureWindow = GObject.registerClass({
         }
 
         const iconSelector = new IconSelectorWidget({
+            gtxt: _,
             grpTitle: _('Icon'),
             rowTitle: _('Select Icon'),
             rowSubtitle: _('Select the icon used for the indicator and quick menu'),
@@ -68,6 +90,7 @@ export const  ConfigureWindow = GObject.registerClass({
             initialIcon: this._settingsItems['icon'],
             caseIconList,
             initialCaseIcon,
+            mac,
         });
 
         iconSelector.connect('notify::selected-icon', () => {
@@ -91,23 +114,20 @@ export const  ConfigureWindow = GObject.registerClass({
             _('Resume when worn'),
         ] : [
             _('Default behavior'),
-            _('Resume with both earbuds'),
-            _('Resume with any earbud'),
+            _('Resume with both earbuds, Pause if any removed'),
+            _('Resume with any earbud, Pause if both removed'),
         ];
 
-        const inEarValues = modelData.batteryType === 1 ? [0, 1] : [0, 1, 2];
-
-        this._inEarDropdown = new DropDownRowWidget({
+        this._inEarDropdown = new RadioButtonRowWidget({
             title: _('Choose playback behaviour for Ear detection'),
             subtitle: _('Automatically pause or resume playback ' +
                 'based on wearing detection.'),
             options: inEarOptions,
-            values: inEarValues,
             initialValue: this._settingsItems['wear-detection-mode'],
         });
 
-        this._inEarDropdown.connect('notify::selected-item', () => {
-            this._updateGsettings('wear-detection-mode', this._inEarDropdown.selected_item);
+        this._inEarDropdown.connect('notify::toggled-value', () => {
+            this._updateGsettings('wear-detection-mode', this._inEarDropdown.toggled_value);
         });
 
         inEarSettingsGroup.add(this._inEarDropdown);
@@ -162,37 +182,109 @@ export const  ConfigureWindow = GObject.registerClass({
             page.add(awarnessVolumeGroup);
         }
 
+        if (modelData.enableTurnOffListeningMode) {
+            const listeningModeGrp = new Adw.PreferencesGroup({
+                title: _('Turn off listening modes'),
+            });
+
+            this._listeningModeRow = new Adw.SwitchRow({
+                title: _('Allows to turn off all listening mode technology'),
+                subtitle: _('Allows Noise Cancellation, Transparency, ' +
+                    'and Adaptive modes to be fully disabled. ' +
+                    'Disabling listening modes also turns off Hearing Aid features ' +
+                    'and reduces power usage.'),
+            });
+
+            this._currentListeningMode = this._settingsItems['listening-mode'];
+            this._listeningModeRow.active = this._currentListeningMode;
+            this._listeningModeRow.connect('notify::active', () => {
+                const mode = this._listeningModeRow.active;
+                this._updateGsettings('listening-mode', mode);
+                if (this._currentListeningMode !== mode) {
+                    this._currentListeningMode = mode;
+                    if (modelData.longPressCycleSupported) {
+                        this._buildLongPressItems();
+                        this._longPressCycleWidget?.updateItems(this._longPressItems);
+                    }
+                }
+            });
+
+            listeningModeGrp.add(this._listeningModeRow);
+            page.add(listeningModeGrp);
+        }
+
         if (modelData.longPressCycleSupported) {
-            const items = [
-                {name: _('Off'), icon: 'bbm-anc-off-symbolic'},
-                {name: _('Transparency'), icon: 'bbm-transperancy-symbolic'},
-                {name: _('Noise Cancellation'), icon: 'bbm-anc-on-symbolic'},
-            ];
+            this._buildLongPressItems = () => {
+                const items = [];
 
-            if (modelData.adaptiveSupported)
-                items.push({name: _('Adaptive'), icon: 'bbm-adaptive-symbolic'});
+                const allowOff = !modelData.enableTurnOffListeningMode ||
+                    modelData.enableTurnOffListeningMode && this._currentListeningMode;
 
-            this._longPressCycleWidget = new CheckBoxesGroupWidget({
-                groupTitle: _('Press and Hold Cycle'),
+                if (allowOff) {
+                    items.push({
+                        mode: 'off',
+                        name: _('Off'),
+                        icon: 'bbm-anc-off-symbolic',
+                    });
+                }
+
+                items.push({
+                    mode: 'transparency',
+                    name: _('Transparency'),
+                    icon: 'bbm-transperancy-symbolic',
+                });
+
+                items.push({
+                    mode: 'anc',
+                    name: _('Noise Cancellation'),
+                    icon: 'bbm-anc-on-symbolic',
+                });
+
+                if (modelData.adaptiveSupported) {
+                    items.push({
+                        mode: 'adaptive',
+                        name: _('Adaptive'),
+                        icon: 'bbm-adaptive-symbolic',
+                    });
+                }
+                this._longPressItems = items;
+            };
+
+            this._buildLongPressItems();
+
+            const longPressCycleGrp = new Adw.PreferencesGroup({title: _('Press and Hold Cycle')});
+
+            this._longPressCycleWidget = new CheckBoxesRowWidget({
                 rowTitle: _('Press and hold cycles between'),
                 rowSubtitle: _('Settings don’t reflect current state'),
-                items,
+                items: this._longPressItems,
                 applyBtnName: _('Apply'),
                 resetOnApply: true,
             });
 
+            this._longPressCycleWidget.compact_mode = this._isCompactMode;
+
             this._longPressCycleWidget.connect('notify::toggled-value', () => {
-                this._updateGsettings('lp-value', this._longPressCycleWidget.toggled_value);
+                const toggled = this._longPressCycleWidget.toggled_value;
+                let mask = 0;
+
+                this._longPressItems.forEach((item, index) => {
+                    if (toggled & 1 << index)
+                        mask |= LongPressBits[item.mode];
+                });
+
+                this._updateGsettings('lp-value', mask);
             });
 
-            page.add(this._longPressCycleWidget);
+            longPressCycleGrp.add(this._longPressCycleWidget);
+
+            page.add(longPressCycleGrp);
         }
 
         if (modelData.toneVolumeSupported) {
             const toneGroup = new Adw.PreferencesGroup({
                 title: _('Notification Volume'),
             });
-
 
             this._toneWidget = new SliderRowWidget({
                 rowTitle: _('Tone Volume'),
@@ -204,6 +296,8 @@ export const  ConfigureWindow = GObject.registerClass({
                 ],
                 initialValue: this._settingsItems['noti-vol'],
             });
+
+            this._toneWidget.compact_mode = this._isCompactMode;
 
             this._toneWidget.connect('notify::value', () => {
                 this._updateGsettings('noti-vol', this._toneWidget.value);
@@ -302,6 +396,8 @@ export const  ConfigureWindow = GObject.registerClass({
         settings.connect('changed::airpods-list', () => {
             const updatedList = settings.get_strv('airpods-list').map(JSON.parse);
             this._settingsItems = updatedList.find(info => info.path === devicePath);
+            if (!this._settingsItems)
+                return;
 
             this.title = this._settingsItems.alias;
             this._inEarDropdown.selected_item = this._settingsItems['wear-detection-mode'];
@@ -309,6 +405,18 @@ export const  ConfigureWindow = GObject.registerClass({
             if (modelData.awarenessSupported) {
                 this._awarenessSwitchRow.active = this._settingsItems['ca-volume-enabled'];
                 this._adjustment.value = this._settingsItems['ca-volume'];
+            }
+
+            if (modelData.enableTurnOffListeningMode) {
+                const mode = this._settingsItems['listening-mode'];
+
+                if (modelData.longPressCycleSupported) {
+                    this._currentListeningMode = mode;
+                    this._buildLongPressItems();
+                    this._longPressCycleWidget?.updateItems(this._longPressItems);
+                }
+
+                this._listeningModeRow.active = mode;
             }
 
             if (modelData.toneVolumeSupported)
@@ -336,7 +444,10 @@ export const  ConfigureWindow = GObject.registerClass({
             this._settings.set_strv('airpods-list', pairedDevice);
         }
     }
-}
-);
 
+    _updateCompactStatus() {
+        this._longPressCycleWidget?.set_property('compact-mode', this._isCompactMode);
+        this._toneWidget?.set_property('compact-mode', this._isCompactMode);
+    }
+});
 

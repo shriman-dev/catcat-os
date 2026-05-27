@@ -459,7 +459,7 @@ export const SubPage = GObject.registerClass({
     }
 });
 
-var TimeZoneDialog = GObject.registerClass({
+const TimeZoneDialog = GObject.registerClass({
     Signals: {
         'time-zone-changed': {param_types: [GObject.TYPE_STRING, GObject.TYPE_STRING]},
     },
@@ -544,8 +544,8 @@ var TimeZoneDialog = GObject.registerClass({
             stack.set_visible_child_name('MainPage');
 
             this._locationsRows.sort((a, b) => {
-                var nameA = a.location.get_sort_name();
-                var nameB = b.location.get_sort_name();
+                const nameA = a.location.get_sort_name();
+                const nameB = b.location.get_sort_name();
                 return nameA.localeCompare(nameB);
             });
 
@@ -625,7 +625,7 @@ var TimeZoneDialog = GObject.registerClass({
     }
 });
 
-var LocationDialog = GObject.registerClass({
+const LocationDialog = GObject.registerClass({
     Signals: {
         'time-zone-changed': {param_types: [GWeather.Location.$gtype, GObject.TYPE_STRING]},
     },
@@ -710,8 +710,8 @@ var LocationDialog = GObject.registerClass({
             stack.set_visible_child_name('MainPage');
 
             this._locationsRows.sort((a, b) => {
-                var nameA = a.location.get_sort_name();
-                var nameB = b.location.get_sort_name();
+                const nameA = a.location.get_sort_name();
+                const nameB = b.location.get_sort_name();
                 return nameA.localeCompare(nameB);
             });
 

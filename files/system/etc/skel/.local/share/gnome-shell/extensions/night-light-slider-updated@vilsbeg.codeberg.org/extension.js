@@ -105,8 +105,8 @@ class TemperatureItem extends QuickSettings.QuickSlider {
         this._settings.set_uint('night-light-temperature', temperature);
 
     
-        if (brightnessSync && this._brightnessProxy.Brightness >= 0)
-            this._brightnessProxy.Brightness = this.slider.value * 100;
+        if (brightnessSync && Main.brightnessManager.globalScale.value >= 0)
+            Main.brightnessManager.globalScale.value = this.slider.value;
 
     }
 

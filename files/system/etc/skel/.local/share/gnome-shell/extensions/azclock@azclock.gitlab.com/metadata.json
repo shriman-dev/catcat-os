@@ -13,10 +13,11 @@
     "46",
     "47",
     "48",
-    "49"
+    "49",
+    "50"
   ],
   "url": "https://gitlab.com/AndrewZaech/azclock",
   "uuid": "azclock@azclock.gitlab.com",
-  "version": 18,
-  "version-name": "15.3"
+  "version": 20,
+  "version-name": "16.0"
 }

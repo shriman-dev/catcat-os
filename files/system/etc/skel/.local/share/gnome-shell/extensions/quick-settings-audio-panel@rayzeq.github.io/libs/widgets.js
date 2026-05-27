@@ -539,11 +539,13 @@ export const ApplicationsMixerToggle = GObject.registerClass(class ApplicationsM
     }
 });
 const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSlider extends StreamSlider {
+    _settings;
     _pactl_path;
     _pactl_path_changed_id;
     _label;
     constructor(control, stream, settings) {
         super(control);
+        this._settings = settings;
         this.menu.setHeader('audio-headphones-symbolic', _('Output Device'));
         this._pactl_path_changed_id = settings.connect("changed::pactl-path", () => {
             this._pactl_path = get_pactl_path(settings)[0];
@@ -567,7 +569,7 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         this.stream = stream;
         // And this one need to be after this.stream assignment.
         this._icon.fallback_icon_name = stream.icon_name;
-        if (this._pactl_path) {
+        if (this._pactl_path && this._settings.get_boolean("applications-volume-sliders-allow-automatic-pactl")) {
             this._checkUsedSink();
         }
         this._iconButton.y_expand = false;
@@ -587,26 +589,11 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         this._menuButton.y_expand = false;
         this._label = new St.Label({ natural_width: 0, track_hover: true, reactive: true });
         this._label.style_class = "QSAP-application-volume-slider-label";
-        this._label.clutter_text.line_wrap = true;
+        this._label.clutter_text.line_wrap = false;
+        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._label.connect("notify::hover", () => {
-            if (this._label.__qsap_hover_timeout_id) {
-                clearTimeout(this._label.__qsap_hover_timeout_id);
-            }
-            if (this._label.hover) {
-                this._label.__qsap_hover_timeout_id = setTimeout(() => {
-                    if (this._label.hover) {
-                        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-                    }
-                }, 1000);
-            }
-            else {
-                this._label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-            }
-        });
-        this._label.connect("destroy", () => {
-            if (this._label.__qsap_hover_timeout_id) {
-                clearTimeout(this._label.__qsap_hover_timeout_id);
-            }
+            this._label.clutter_text.line_wrap = this._label.hover ? true : false;
+            this._label.clutter_text.ellipsize = this._label.hover ? Pango.EllipsizeMode.NONE : Pango.EllipsizeMode.END;
         });
         const n_desc_handler_id = stream.connect("notify::description", stream => this._update_label(stream));
         this.connect("destroy", () => stream.disconnect(n_desc_handler_id));
@@ -617,7 +604,7 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
     _update_label(stream) {
         const { name, description } = stream;
         this._label.text = name === null ? description : `${name} - ${description}`;
-        if (name && name.startsWith("Chromium") && this._pactl_path) {
+        if (name && name.startsWith("Chromium") && this._pactl_path && this._settings.get_boolean("applications-volume-sliders-allow-automatic-pactl")) {
             spawn([this._pactl_path, "-f", "json", "list", "sink-inputs"]).then(stdout_str => {
                 const stdout = JSON.parse(stdout_str);
                 for (const sink_input of stdout) {
@@ -646,7 +633,7 @@ const ApplicationVolumeSlider = GObject.registerClass(class ApplicationVolumeSli
         if (this._deviceItems.has(id))
             return;
         const device = this._lookupDevice(id);
-        if (!device)
+        if (!device || !device.port_available)
             return;
         const item = new PopupImageMenuItem("", device.get_gicon());
         // using the text from the output switcher of the master slider to allow compatibility with extensions

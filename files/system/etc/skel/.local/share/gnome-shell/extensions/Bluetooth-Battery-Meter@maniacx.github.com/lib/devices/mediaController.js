@@ -5,6 +5,8 @@ import GObject from 'gi://GObject';
 import Gvc from 'gi://Gvc';
 import * as Volume from 'resource:///org/gnome/shell/ui/status/volume.js';
 
+import {createLogger} from './logger.js';
+
 const MEDIA_PLAYER_PREFIX = 'org.mpris.MediaPlayer2.';
 
 export const MediaController = GObject.registerClass({
@@ -17,10 +19,11 @@ export const MediaController = GObject.registerClass({
 }, class MediaController extends GObject.Object {
     _init(settings, devicePath, previousOnDestroyVolume) {
         super._init();
+        this._log = createLogger('MediaController');
         this._settings = settings;
         this._devicePath = devicePath;
-        const indexMacAddress = devicePath.indexOf('dev_') + 4;
-        this._macAddress = devicePath.substring(indexMacAddress);
+        this._noSymbolMac = devicePath.substring(devicePath.indexOf('dev_') + 4)
+            .replace(/_/g, '').toUpperCase();
 
         this._controllerReady = false;
         this._previousVolume = previousOnDestroyVolume;
@@ -129,7 +132,9 @@ export const MediaController = GObject.registerClass({
     _findA2dpSinkForMac() {
         const sinks = this._control.get_sinks();
         for (const sink of sinks) {
-            if (!sink.get_name().includes(this._macAddress))
+            const name = sink.get_name() || '';
+            const noSymbolName = name.replace(/[_\-.:]/g, '').toUpperCase();
+            if (!noSymbolName.includes(this._noSymbolMac))
                 continue;
             const device = this._control.lookup_device_from_stream(sink);
             if (device?.get_active_profile() === 'a2dp-sink')
@@ -169,9 +174,14 @@ export const MediaController = GObject.registerClass({
             this._control.disconnect(this._defaultSinkChangedId);
     }
 
-    lowerAirpodsVolume(attenuated, caVolume) {
+    setConversationAwarenessVolume(attenuated, caVolume) {
         if (!this._controllerReady || !this._sink || !this._sinkStateIsRunning || this._sinkIsMuted)
             return;
+
+        if (this._attenuated === attenuated)
+            return;
+
+        this._attenuated = attenuated;
 
         if (attenuated && this._previousVolume >= 0)
             return;
@@ -189,8 +199,6 @@ export const MediaController = GObject.registerClass({
             GLib.source_remove(this._volumeRampTimeoutId);
         this._volumeRampTimeoutId = null;
 
-        this._unmonitorSinkVolume();
-
         if (attenuated) {
             const maxVolume = this._control.get_vol_max_norm();
             const fadeOutTargetVolume = Math.floor(caVolume * maxVolume / 100);
@@ -204,6 +212,8 @@ export const MediaController = GObject.registerClass({
             const steps = 50;
             const interval = duration / steps;
             let step = 0;
+
+            this._unmonitorSinkVolume();
 
             this._volumeRampTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval, () => {
                 if (step >= steps) {
@@ -232,6 +242,8 @@ export const MediaController = GObject.registerClass({
             const steps = 50;
             const interval = duration / steps;
             let step = 0;
+
+            this._unmonitorSinkVolume();
 
             this._volumeRampTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval, () => {
                 if (step >= steps) {
@@ -277,8 +289,8 @@ export const MediaController = GObject.registerClass({
                         -1,
                         null
                     );
-                } catch {
-                    console.error('Bluetooth-Battery-Meter: Error call Mpris Pause method');
+                } catch (e) {
+                    this._log.error(`Error call Mpris Pause method. Error: ${e}`);
                 }
                 const status = this._playerProxy?.get_cached_property('PlaybackStatus')?.unpack();
                 this._playbackStatusChangePending = status !== 'Paused';
@@ -293,8 +305,8 @@ export const MediaController = GObject.registerClass({
                         -1,
                         null
                     );
-                } catch {
-                    console.error('Bluetooth-Battery-Meter: Error calling Mpris Play method');
+                } catch (e) {
+                    this._log.error(`Error call Mpris Play method. Error: ${e}`);
                 }
             }
         }
@@ -330,8 +342,8 @@ export const MediaController = GObject.registerClass({
                 'org.mpris.MediaPlayer2.Player',
                 null
             );
-        } catch {
-            console.error('Bluetooth-Battery-Meter: Failed to initialize proxy in player proxy');
+        } catch (e) {
+            this._log.error(`Failed to initialize proxy in player proxy. Error: ${e}`);
             return;
         }
         this._onPlayerProxyReady();
@@ -376,8 +388,8 @@ export const MediaController = GObject.registerClass({
 
             if (res)
                 [names] = res.deepUnpack();
-        } catch {
-            console.error('Bluetooth-Battery-Meter: Error calling ListNames');
+        } catch (e) {
+            this._log.error(`Bluetooth-Battery-Meter: Error calling ListNames. Error: ${e}`);
             return;
         }
 
@@ -391,7 +403,7 @@ export const MediaController = GObject.registerClass({
     }
 
     _onDestroy() {
-        if (this._previousVolume !== null) {
+        if (this._previousVolume > -1) {
             const lastAttenuationInfo = {
                 path: this._devicePath,
                 timestamp: Date.now(),

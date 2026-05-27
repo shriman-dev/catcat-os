@@ -8,7 +8,7 @@ import {
 import {DropDownRowWidget} from './../../widgets/dropDownRowWidget.js';
 import {SliderRowWidget} from './../../widgets/sliderRowWidget.js';
 import {EqualizerWidget} from './../../widgets/equalizerWidget.js';
-import {CheckBoxesGroupWidget} from './../../widgets/checkBoxesGroupWidget.js';
+import {CheckBoxesRowWidget} from './../../widgets/checkBoxesRowWidget.js';
 import {IconSelectorWidget} from './../../widgets/iconSelectorWidget.js';
 import {
     SonyConfiguration, EqualizerPreset, ListeningMode, BgmDistance, ButtonModes, AutoPowerOffTime
@@ -18,12 +18,37 @@ import {
 export const ConfigureWindow = GObject.registerClass({
     GTypeName: 'BluetoothBatteryMeter_SonyConfigureWindow',
 }, class ConfigureWindow extends Adw.Window {
-    _init(settings, mac, devicePath, parentWindow, _) {
+    _init(settings, mac, devicePath, parentWindow, _, modal = false) {
         super._init({
             default_width: 650,
             default_height: 650,
-            modal: true,
+            width_request: 320,
+            height_request: 100,
+            modal,
             transient_for: parentWindow ?? null,
+        });
+
+        this._isCompactMode = false;
+
+        this._breakpointCompact = new Adw.Breakpoint({
+            condition: Adw.BreakpointCondition.parse('max-width: 500px'),
+        });
+
+        this._breakpointExpanded = new Adw.Breakpoint({
+            condition: Adw.BreakpointCondition.parse('min-width: 550px'),
+        });
+
+        this.add_breakpoint(this._breakpointCompact);
+        this.add_breakpoint(this._breakpointExpanded);
+
+        this._breakpointCompact.connect('apply', () => {
+            this._isCompactMode = true;
+            this._updateCompactStatus();
+        });
+
+        this._breakpointExpanded.connect('apply', () => {
+            this._isCompactMode = false;
+            this._updateCompactStatus();
         });
 
         this._settings = settings;
@@ -31,13 +56,16 @@ export const ConfigureWindow = GObject.registerClass({
 
         const pathsString = settings.get_strv('sony-list').map(JSON.parse);
         this._settingsItems = pathsString.find(info => info.path === devicePath);
+        if (!this._settingsItems)
+            return;
+
         this.title = this._settingsItems.alias;
 
         const modelData = SonyConfiguration.find(cfg => cfg.pattern.test(this._settingsItems.name));
 
         const toolViewBar = new Adw.ToolbarView();
         const headerBar = new Adw.HeaderBar({
-            decoration_layout: 'icon:close',
+            decoration_layout: ':close',
             show_end_title_buttons: true,
         });
         const page = new Adw.PreferencesPage();
@@ -45,9 +73,6 @@ export const ConfigureWindow = GObject.registerClass({
         toolViewBar.add_top_bar(headerBar);
         toolViewBar.set_content(page);
         this.set_content(toolViewBar);
-
-        const aliasGroup = new Adw.PreferencesGroup({title: `MAC: ${mac}`});
-        page.add(aliasGroup);
 
         const iconList = modelData.batteryDual ? supportedAudioDualIcons
             : supportedAudioSingleIcons;
@@ -60,6 +85,7 @@ export const ConfigureWindow = GObject.registerClass({
         }
 
         const iconSelector = new IconSelectorWidget({
+            gtxt: _,
             grpTitle: _('Icon'),
             rowTitle: _('Select Icon'),
             rowSubtitle: _('Select the icon used for the indicator and quick menu'),
@@ -67,6 +93,8 @@ export const ConfigureWindow = GObject.registerClass({
             initialIcon: this._settingsItems['icon'],
             caseIconList,
             initialCaseIcon,
+            mac,
+            fw: this._settingsItems['fw-version'],
         });
 
         iconSelector.connect('notify::selected-icon', () => {
@@ -249,7 +277,7 @@ export const ConfigureWindow = GObject.registerClass({
         }
 
         if (modelData.audioUpsampling) {
-            const upscalingGrp = new Adw.PreferencesGroup({title: 'Button/Touch Settings'});
+            const upscalingGrp = new Adw.PreferencesGroup({title: _('DSEE')});
             page.add(upscalingGrp);
 
             this._upscalingSwitchRow = new DropDownRowWidget({
@@ -266,12 +294,10 @@ export const ConfigureWindow = GObject.registerClass({
             upscalingGrp.add(this._upscalingSwitchRow);
         }
 
-        if (modelData.buttonModesLeftRight || modelData.ambientSoundControlButtonMode) {
-            this._btnTchGroup = new Adw.PreferencesGroup({title: 'Button/Touch Settings'});
-            page.add(this._btnTchGroup);
-        }
-
         if (modelData.buttonModesLeftRight) {
+            this._btnTchGroup = new Adw.PreferencesGroup({title: _('Button/Touch Settings')});
+            page.add(this._btnTchGroup);
+
             const buttonModeMap = {
                 amb: [_('Ambient Sound Control'), ButtonModes.AMBIENT_SOUND_CONTROL],
                 ambqa: [_('Ambient Sound Control / Quick Access'),
@@ -325,14 +351,18 @@ export const ConfigureWindow = GObject.registerClass({
 
 
         if (modelData.ambientSoundControlButtonMode) {
+            const ancToggleButtonGrp = new Adw.PreferencesGroup({
+                title: _('ANC Button Configuration'),
+            });
+            page.add(ancToggleButtonGrp);
+
             const items = [
                 {name: _('Noise Cancellation'), icon: 'bbm-anc-on-symbolic'},
                 {name: _('Ambient'), icon: 'bbm-transperancy-symbolic'},
                 {name: _('Off'), icon: 'bbm-anc-off-symbolic'},
             ];
 
-            this._ancToggleButtonWidget = new CheckBoxesGroupWidget({
-                groupTitle: _('ANC Button Configuration'),
+            this._ancToggleButtonWidget = new CheckBoxesRowWidget({
                 rowTitle: _('[NC/AMB] Button Settings'),
                 rowSubtitle: _('Select the modes to toggle when the button is pressed'),
                 items,
@@ -340,12 +370,14 @@ export const ConfigureWindow = GObject.registerClass({
                 initialValue: this._settingsItems['amb-btn-mode'],
             });
 
+            this._ancToggleButtonWidget.compact_mode = this._isCompactMode;
+
             this._ancToggleButtonWidget.connect('notify::toggled-value', () => {
                 const val = this._ancToggleButtonWidget.toggled_value;
                 this._updateGsettings('amb-btn-mode', val);
             });
 
-            this._btnTchGroup.add(this._ancToggleButtonWidget);
+            ancToggleButtonGrp.add(this._ancToggleButtonWidget);
         }
 
         if (modelData.voiceNotifications) {
@@ -385,6 +417,8 @@ export const ConfigureWindow = GObject.registerClass({
                     range: [-2, 2, 1],
                     snapOnStep: true,
                 });
+
+                this._voiceNotificationsVolume.compact_mode = this._isCompactMode;
 
                 this._voiceNotificationsVolume.sensitive = this._voiceNotificationsSwitchRow.active;
                 this._voiceNotificationsVolume.connect('notify::value', () => {
@@ -467,6 +501,9 @@ export const ConfigureWindow = GObject.registerClass({
         settings.connect('changed::sony-list', () => {
             const updatedList = settings.get_strv('sony-list').map(JSON.parse);
             this._settingsItems = updatedList.find(info => info.path === devicePath);
+            if (!this._settingsItems)
+                return;
+
             this.title = this._settingsItems.alias;
 
             if (modelData.speakToChatConfig) {
@@ -555,4 +592,9 @@ export const ConfigureWindow = GObject.registerClass({
             EqualizerPreset.CUSTOM_2,
         ].includes(val);
     };
+
+    _updateCompactStatus() {
+        this._ancToggleButtonWidget?.set_property('compact-mode', this._isCompactMode);
+        this._voiceNotificationsVolume?.set_property('compact-mode', this._isCompactMode);
+    }
 });

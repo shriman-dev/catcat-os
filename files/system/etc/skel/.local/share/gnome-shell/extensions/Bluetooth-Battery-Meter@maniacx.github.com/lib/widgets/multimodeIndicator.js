@@ -1,13 +1,9 @@
 'use strict';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
-import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 import {BluetoothIndicator} from './bluetoothIndicator.js';
 import {OnHoverMenu} from './onHoverMenu.js';
-
-const [major] = Config.PACKAGE_VERSION.split('.');
-const shellVersion = Number.parseInt(major);
 
 const BatteryLevelProxy = GObject.registerClass({
     GTypeName: 'BluetoothBatteryMeter_BatteryLevelProxy',
@@ -64,13 +60,12 @@ export const MultimodeIndicator = GObject.registerClass({
             this._onHoverMenu = new OnHoverMenu(this._indicatorBox, this._settings, this._gIcon,
                 this._path, this._alias, this._widgetInfo, this._dataHandler);
         }
-        const removedSignal = shellVersion > 45 ? 'child-removed' : 'actor-removed';
-        this._indicatorBox.connectObject(
-            removedSignal, () => {
-                if (this._indicatorBox.get_n_children() === 0)
-                    this._removeIndicatorBoxLayout();
-            },
-            this
+
+        this._indicatorBox.connectObject('child-removed', () => {
+            if (this._indicatorBox.get_n_children() === 0)
+                this._removeIndicatorBoxLayout();
+        },
+        this
         );
     }
 
@@ -93,6 +88,7 @@ export const MultimodeIndicator = GObject.registerClass({
             if (!this._bat1Indicator) {
                 this._bat1Proxy = new BatteryLevelProxy();
                 this._bat1Proxy.settings = this._settings;
+                this._bat1Proxy.gIcon = this._gIcon;
                 this._bat1Proxy.widgetInfo = this._widgetInfo;
                 this._bat1Proxy.indicatorMode = this._indicatorMode;
                 this._bat1Proxy.deviceIcon = this._config.battery1Icon;
@@ -113,6 +109,7 @@ export const MultimodeIndicator = GObject.registerClass({
             if (!this._bat2Indicator) {
                 this._bat2Proxy = new BatteryLevelProxy();
                 this._bat2Proxy.settings = this._settings;
+                this._bat2Proxy.gIcon = this._gIcon;
                 this._bat2Proxy.widgetInfo = this._widgetInfo;
                 this._bat2Proxy.indicatorMode = this._indicatorMode;
                 this._bat2Proxy.deviceIcon = this._config.battery2Icon;
@@ -134,6 +131,7 @@ export const MultimodeIndicator = GObject.registerClass({
             if (!this._bat3Indicator) {
                 this._bat3Proxy = new BatteryLevelProxy();
                 this._bat3Proxy.settings = this._settings;
+                this._bat3Proxy.gIcon = this._gIcon;
                 this._bat3Proxy.widgetInfo = this._widgetInfo;
                 this._bat3Proxy.indicatorMode = this._indicatorMode;
                 this._bat3Proxy.deviceIcon = this._config.battery3Icon;

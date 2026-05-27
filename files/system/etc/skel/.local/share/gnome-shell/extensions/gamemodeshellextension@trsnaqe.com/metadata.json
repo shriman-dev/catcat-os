@@ -4,6 +4,7 @@
   "donations": {
     "buymeacoffee": "trsnaqe"
   },
+  "gettext-domain": "gamemode-shell-extension",
   "name": "GameMode Shell Extension",
   "settings-schema": "org.gnome.shell.extensions.gamemodeshellextension",
   "shell-version": [
@@ -11,9 +12,10 @@
     "46",
     "47",
     "48",
-    "49"
+    "49",
+    "50"
   ],
   "url": "https://github.com/trsnaqe/gamemode-shell-extension",
   "uuid": "gamemodeshellextension@trsnaqe.com",
-  "version": 15
+  "version": 20
 }

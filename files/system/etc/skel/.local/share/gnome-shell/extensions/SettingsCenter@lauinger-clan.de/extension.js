@@ -17,8 +17,8 @@ const QuickSettingsMenu = Main.panel.statusArea.quickSettings;
 
 const SettingsCenterMenuToggle = GObject.registerClass(
     class SettingsCenterMenuToggle extends QuickSettings.QuickMenuToggle {
-        constructor(Me) {
-            const { _settings } = Me;
+        constructor(extension) {
+            const { _settings } = extension;
             const labelmenu = _(_settings.get_string("label-menu"));
             super({
                 title: labelmenu,
@@ -36,30 +36,45 @@ const SettingsCenterMenuToggle = GObject.registerClass(
 
                 if (this._items.length > 0) {
                     for (const [index, item] of this._items.entries()) {
-                        const menuItem = new PopupMenu.PopupMenuItem(_(item.label), 0);
+                        let strIcon,
+                            strLabel = null;
+                        if (item["cmd"].match(/.desktop$/)) {
+                            const app = Shell.AppSystem.get_default().lookup_app(item["cmd"]);
+                            if (app !== null) {
+                                strLabel = app.get_name();
+                                strIcon = app.icon.to_string();
+                            }
+                        }
+                        const menuItem = new PopupMenu.PopupImageMenuItem(
+                            strLabel || item.label,
+                            strIcon || "image-missing-symbolic"
+                        );
                         menuItem.connect("activate", () => this.launch(item));
                         this.menu.addMenuItem(menuItem, index);
                     }
                 }
 
                 this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-                const settingsItem = this.menu.addAction(_("Settings"), () => Me._openPreferences());
+                const settingsItem = this.menu.addAction(_("Settings"), () => {
+                    extension.openPreferences();
+                    QuickSettingsMenu.menu.close(PopupAnimation.FADE);
+                });
 
                 settingsItem.visible = Main.sessionMode.allowSettings;
-                this.menu._settingsActions[Me.uuid] = settingsItem;
+                this.menu._settingsActions[extension.uuid] = settingsItem;
             } catch (error) {
-                this.getLogger().error(`Error in SettingsCenterMenuToggle constructor: ${error}`);
+                extension.getLogger().error(`Error in SettingsCenterMenuToggle constructor: ${error}`);
             }
         }
 
         launch(settingItem) {
             if (settingItem["cmd"].match(/.desktop$/)) {
-                let app = Shell.AppSystem.get_default().lookup_app(settingItem["cmd"]);
+                const app = Shell.AppSystem.get_default().lookup_app(settingItem["cmd"]);
 
                 if (app !== null) app.activate();
                 else if (settingItem["cmd-alt"] !== null) Util.spawn([settingItem["cmd-alt"]]);
             } else {
-                let cmdArray = settingItem["cmd"].split(" ");
+                const cmdArray = settingItem["cmd"].split(" ");
                 Util.spawn(cmdArray);
             }
             QuickSettingsMenu.menu.close(PopupAnimation.FADE);
@@ -69,8 +84,8 @@ const SettingsCenterMenuToggle = GObject.registerClass(
 
 const SettingsCenterIndicator = GObject.registerClass(
     class SettingsCenterIndicator extends QuickSettings.SystemIndicator {
-        constructor(Me) {
-            const { _settings } = Me;
+        constructor(extension) {
+            const { _settings } = extension;
             super();
             // Create the icon for the indicator
             this._indicator = this._addIndicator();
@@ -79,7 +94,7 @@ const SettingsCenterIndicator = GObject.registerClass(
 
             // Create the toggle menu and associate it with the indicator, being
             // sure to destroy it along with the indicator
-            this.quickSettingsItems.push(new SettingsCenterMenuToggle(Me));
+            this.quickSettingsItems.push(new SettingsCenterMenuToggle(extension));
 
             this.connect("destroy", () => {
                 for (const item of this.quickSettingsItems) {
@@ -106,11 +121,6 @@ export default class SettingsCenter extends Extension {
 
     _onParamChangedIndicator() {
         this._indicator.setIndicatorVisible(this._settings.get_boolean("show-systemindicator"));
-    }
-
-    _openPreferences() {
-        this.openPreferences();
-        QuickSettingsMenu.menu.close(PopupAnimation.FADE);
     }
 
     enable() {

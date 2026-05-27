@@ -65,6 +65,7 @@ class AzClockLabel extends St.Label {
 
         });
 
+        this._useClutterCursor = !Meta.Cursor;
         this._settings = settings;
         this._extension = extension;
         this._lastStyleHash = null;
@@ -265,16 +266,26 @@ class AzClockLabel extends St.Label {
 
         const urlId = this._findUrlAtPos(event);
         if (urlId !== -1 && !this._cursorChanged && isCtrlPressed) {
-            global.display.set_cursor(Meta.Cursor.POINTER ?? Meta.Cursor.POINTING_HAND);
+            const cursorType = this._useClutterCursor ? Clutter.CursorType.POINTER : Meta.Cursor.POINTER ?? Meta.Cursor.POINTING_HAND;
+            this._setCursor(cursorType);
             this._cursorChanged = true;
         } else if (urlId !== -1 && this._cursorChanged && !isCtrlPressed) {
-            global.display.set_cursor(Meta.Cursor.DEFAULT);
+            const cursorType = this._useClutterCursor ? Clutter.CursorType.DEFAULT : Meta.Cursor.DEFAULT;
+            this._setCursor(cursorType);
             this._cursorChanged = false;
         } else if (urlId === -1) {
-            global.display.set_cursor(Meta.Cursor.DEFAULT);
+            const cursorType = this._useClutterCursor ? Clutter.CursorType.DEFAULT : Meta.Cursor.DEFAULT;
+            this._setCursor(cursorType);
             this._cursorChanged = false;
         }
         return Clutter.EVENT_PROPAGATE;
+    }
+
+    _setCursor(cursorType) {
+        if (this._useClutterCursor)
+            this.set_cursor_type(cursorType);
+        else
+            global.display.set_cursor(cursorType);
     }
 
     setStyle() {

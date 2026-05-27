@@ -25,9 +25,10 @@ https://github.com/Plutoberth/SonyHeadphonesClient
 https://github.com/andreasolofsson/MDR-protocol
 **/
 export const SonySocketV1 = GObject.registerClass({
+    GTypeName: 'BluetoothBatteryMeter_SonySocketV1',
 }, class SonySocketV1 extends SonySocketBase {
-    _init(devicePath, fd, modelData, callbacks) {
-        super._init(devicePath, fd);
+    _init(devicePath, profileManager, profile, modelData, callbacks) {
+        super._init(devicePath, profileManager, profile);
         const identifier = devicePath.slice(-2);
         const tag = `SonySocketV1-${identifier}`;
         this._log = createLogger(tag);
@@ -60,7 +61,7 @@ export const SonySocketV1 = GObject.registerClass({
         this._automaticPowerOffWhenTakenOff = modelData.automaticPowerOffWhenTakenOff ?? false;
         this._automaticPowerOffByTime = modelData.automaticPowerOffByTime ?? false;
 
-        this.startSocket(fd);
+        this.startSocket();
     }
 
     _supports(funcType) {
@@ -107,6 +108,7 @@ export const SonySocketV1 = GObject.registerClass({
         const fwVersion = new TextDecoder().decode(new Uint8Array(fwBytes));
 
         this._log.info('Device Firmware Version:', fwVersion);
+        this._callbacks?.updateFirmwareVersion?.(fwVersion);
     }
 
     _getSupportInfo() {
@@ -874,10 +876,6 @@ export const SonySocketV1 = GObject.registerClass({
     }
 
     destroy() {
-        if (this._sonySocketV1Destroyed)
-            return;
-        this._sonySocketV1Destroyed = true;
-
         super.destroy();
     }
 });

@@ -1,263 +1,203 @@
-/*
- * Eye on Cursor GNOME Shell extension
- *
- * SPDX-FileCopyrightText: 2024-2025 djinnalexio
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-'use strict';
+// SPDX-FileCopyrightText: 2024-2026 djinnalexio
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-//#region Import libraries
-import GLib from 'gi://GLib';
+//#region Imports
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-
-import * as Timeout from './timeout.js';
 //#endregion
 
-const BLINK_DURATION = 250;
-const DEBOUNCE_DELAY = 100;
+const BLINK_CHANGE_DELAY = 100; // Make sure the eyeArray is created before starting blink routine
+const EYE_ARRAY_SETTINGS = [
+    'eye-active',
+    'eye-count',
+    'eye-index',
+    'eye-position',
+    'eye-blink-mode',
+];
 
-//#region Define Blinking Controller
+/**
+ * An object that controls blinking actions for the Eye instances.
+ *
+ * @param {EyeOnCursorExtension} extension - The extension instance.
+ * @param {Eye[]} eyeArray - The array that stores created Eye instances.
+ */
 export class BlinkController {
-    /**
-     * Creates an instance of BlinkController, which controls blinking functions.
-     *
-     * @param {Extension} extensionObject - The extension object.
-     * @param {Array} eyeArray - The array of eye objects.
-     */
-
     //#region Constructor
-    constructor(extensionObject, eyeArray) {
-        // Get extension object properties
-        this.settings = extensionObject.settings;
+    constructor(extension, eyeArray) {
+        this.settings = extension.getSettings();
 
         // Attach eye array
         this.eyeArray = eyeArray;
 
         // Initialize state variables
-        this.blinkAllTimeoutID = {id: null};
-        this.syncedRoutineID = {id: null};
-        this.unsyncedDebounceID = {id: null};
+        this.syncedRoutine = null;
+        this.blinkChangeDelay = null;
+        this.keybindingConnected = false;
 
         // Initialize settings values
         this.blinkMode = this.settings.get_string('eye-blink-mode');
         this.blinkInterval = this.settings.get_double('eye-blink-interval');
         this.blinkIntervalRange = this.settings.get_value('eye-blink-interval-range').deep_unpack();
 
-        // Connect change in settings to update functions
-        this.settingsHandlers = [
-            this.settings.connect('changed::eye-blink-mode', () => {
-                this.blinkMode = this.settings.get_string('eye-blink-mode');
-                this.selectBlinkMode();
-            }),
+        // Connect changes in eye array or blink mode settings to update methods
+        this.settingsHandlers = EYE_ARRAY_SETTINGS.map((key) =>
+            this.settings.connect(`changed::${key}`, () => {
+            // Delay reset so that the eye array gets updated before blink routine
+                this.blinkChangeDelay = clearTimeout(this.blinkChangeDelay);
+                this.blinkChangeDelay = setTimeout(
+                    this.startBlinkMode.bind(this),
+                    BLINK_CHANGE_DELAY
+                );
+            })
+        );
+
+        // Connect routine-specific changes in settings to update methods
+        this.settingsHandlers.push(
             this.settings.connect('changed::eye-blink-interval', () => {
                 this.blinkInterval = this.settings.get_double('eye-blink-interval');
-                if (this.blinkMode === 'synced') {
-                    this.stopSyncedBlink();
-                    this.startSyncedBlink();
-                }
+                this.startBlinkMode();
             }),
             this.settings.connect('changed::eye-blink-interval-range', () => {
                 this.blinkIntervalRange = this.settings
                     .get_value('eye-blink-interval-range')
                     .deep_unpack();
-                if (this.blinkMode === 'unsynced') {
-                    this.stopUnsyncedBlink();
-                    this.startUnsyncedBlink();
-                }
-            }),
-        ];
-
-        // Restart Unsynced routine if eye array changes
-        this.eyePlacementSettings = ['eye-position', 'eye-index', 'eye-count'];
-        this.eyePlacementSettings.forEach(key => {
-            this.settingsHandlers.push(
-                this.settings.connect(`changed::${key}`, () => {
-                    if (this.blinkMode === 'unsynced') {
-                        // debounce reset so that the eye array gets updated first
-                        Timeout.setTimeout(
-                            this.unsyncedDebounceID,
-                            () => {
-                                this.stopUnsyncedBlink();
-                                this.startUnsyncedBlink();
-                            },
-                            DEBOUNCE_DELAY
-                        );
-                    }
-                })
-            );
-        });
-
-        // Connect blinking shortcut
-        Main.wm.addKeybinding(
-            'eye-blink-keybinding',
-            this.settings,
-            Meta.KeyBindingFlags.NONE,
-            Shell.ActionMode.ALL,
-            () => {
-                if (this.blinkMode === 'manual') this.blinkAll();
-            }
+                this.startBlinkMode();
+            })
         );
 
-        this.selectBlinkMode();
+        this.startBlinkMode();
     }
     //#endregion
 
-    //#region Blink Functions
+    //#region Blink methods
     blinkAll() {
-        const refreshRate = this.eyeArray[0].refreshRate;
-        const blinkInterval = 1000 / refreshRate;
-        const totalFrames = Math.ceil(refreshRate * (BLINK_DURATION / 1000));
-        const halfFrames = totalFrames / 2;
-
-        Timeout.clearInterval(this.blinkAllTimeoutID);
-
-        this.eyeArray.forEach(eye => (eye.blinking = true));
-
-        let currentFrame = 0;
-        this.blinkAllTimeoutID.id = GLib.timeout_add(GLib.PRIORITY_DEFAULT, blinkInterval, () => {
-            // Increment frame
-            currentFrame++;
-
-            // Calculate eyelid level based on if the animation is past the halfway point or not
-            const eyelidLevel =
-                currentFrame <= halfFrames
-                    ? currentFrame / halfFrames // Closing
-                    : 1 - (currentFrame - halfFrames) / halfFrames; // Opening
-
-            this.eyeArray.forEach(eye => (eye.eyelidLevel = eyelidLevel));
-
-            // Finishing
-            if (currentFrame > totalFrames) {
-                this.eyeArray.forEach(eye => {
-                    eye.eyelidLevel = 0;
-                    eye.blinking = false;
-                });
-                this.blinkAllTimeoutID.id = null;
-                return GLib.SOURCE_REMOVE;
-            }
-
-            return GLib.SOURCE_CONTINUE;
-        });
-    }
-
-    blinkSingle(eye) {
-        const refreshRate = eye.refreshRate;
-        const blinkInterval = 1000 / refreshRate;
-        const totalFrames = Math.ceil(refreshRate * (BLINK_DURATION / 1000));
-        const halfFrames = totalFrames / 2;
-
-        Timeout.clearInterval(eye.blinkTimeoutID);
-
-        eye.blinking = true;
-
-        let currentFrame = 0;
-        eye.blinkTimeoutID.id = GLib.timeout_add(GLib.PRIORITY_DEFAULT, blinkInterval, () => {
-            // Increment frame
-            currentFrame++;
-
-            // Calculate eyelid level based on if the animation is past the halfway point or not
-            const eyelidLevel =
-                currentFrame <= halfFrames
-                    ? currentFrame / halfFrames // Closing
-                    : 1 - (currentFrame - halfFrames) / halfFrames; // Opening
-
-            eye.eyelidLevel = eyelidLevel;
-
-            // Finishing
-            if (currentFrame > totalFrames) {
-                eye.eyelidLevel = 0;
-                eye.blinking = false;
-                eye.blinkTimeoutID.id = null;
-                return GLib.SOURCE_REMOVE;
-            }
-
-            return GLib.SOURCE_CONTINUE;
-        });
+        if (this.eyeArray.length > 0) // Only trigger if there are eyes
+            this.eyeArray.forEach((eye) => eye.blink());
     }
 
     scheduleNextBlink(eye) {
         // Calculate a random interval to next blink
         const interval =
             this.blinkIntervalRange[0] +
-            (this.blinkIntervalRange[1] - this.blinkIntervalRange[0]) * Math.random();
+            ((this.blinkIntervalRange[1] - this.blinkIntervalRange[0]) * Math.random());
 
-        eye.randomBlinkTimeoutID.id = GLib.timeout_add(
-            GLib.PRIORITY_DEFAULT,
-            1000 * interval,
+        eye.randomBlinkTimeout = setTimeout(
             () => {
-                this.blinkSingle(eye);
+                eye.blink();
                 this.scheduleNextBlink(eye);
-                return GLib.SOURCE_REMOVE;
-            }
+            },
+            1000 * interval
         );
     }
     //#endregion
 
-    //#region Routine functions
-    selectBlinkMode() {
-        this.stopSyncedBlink();
-        this.stopUnsyncedBlink();
+    //#region Routine methods
+    //#region Start
+    startBlinkMode() {
+        this.stopCurrentMode();
 
+        // Update blink mode
+        this.blinkMode = this.settings.get_string('eye-blink-mode');
+
+        if (this.eyeArray.length > 0) {
+            switch (this.blinkMode) {
+                case 'synced':
+                    this.startSyncedBlink();
+                    break;
+                case 'unsynced':
+                    this.startUnsyncedBlink();
+                    break;
+                case 'manual':
+                    this.connectBlinkKeybinding();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    //#endregion
+
+    //#region Stop
+    stopCurrentMode() {
         switch (this.blinkMode) {
             case 'synced':
-                this.startSyncedBlink();
+                this.stopSyncedBlink();
                 break;
             case 'unsynced':
-                this.startUnsyncedBlink();
+                this.stopUnsyncedBlink();
                 break;
             case 'manual':
+                this.disconnectKeybinding();
+                break;
             default:
                 break;
         }
     }
+    //#endregion
 
     //#region Synced
     startSyncedBlink() {
-        Timeout.setInterval(
-            this.syncedRoutineID,
+        this.syncedRoutine = setInterval(
             this.blinkAll.bind(this),
             1000 * this.blinkInterval
         );
     }
 
     stopSyncedBlink() {
-        Timeout.clearInterval(this.syncedRoutineID);
+        this.syncedRoutine = clearInterval(this.syncedRoutine);
     }
     //#endregion
 
     //#region Unsynced
     startUnsyncedBlink() {
-        this.eyeArray.forEach(eye => this.scheduleNextBlink(eye));
+        this.eyeArray.forEach((eye) => this.scheduleNextBlink(eye));
     }
 
     stopUnsyncedBlink() {
-        this.eyeArray.forEach(eye => Timeout.clearTimeout(eye.randomBlinkTimeoutID));
+        this.eyeArray.forEach((eye) => {
+            eye.randomBlinkTimeout = clearTimeout(eye.randomBlinkTimeout);
+        });
+    }
+    //#endregion
+
+    //#region Manual
+    connectBlinkKeybinding() {
+        Main.wm.addKeybinding(
+            'eye-blink-keybinding',
+            this.settings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.ALL,
+            this.blinkAll.bind(this)
+        );
+
+        this.keybindingConnected = true;
+    }
+
+    disconnectKeybinding() {
+        if (this.keybindingConnected) {
+            Main.wm.removeKeybinding('eye-blink-keybinding');
+            this.keybindingConnected = false;
+        }
     }
     //#endregion
     //#endregion
 
-    //#region Destroy function
+    //#region Destroy method
     destroy() {
+        // Stop routines
+        this.stopCurrentMode();
+
         // Clear any remaining timeouts
-        this.stopSyncedBlink();
-        this.stopUnsyncedBlink();
-        Timeout.clearInterval(this.blinkAllTimeoutID);
-        Timeout.clearTimeout(this.unsyncedDebounceID);
+        this.blinkChangeDelay = clearTimeout(this.blinkChangeDelay);
 
         // Disconnect settings signal handlers
-        this.settingsHandlers?.forEach(connection => this.settings.disconnect(connection));
+        this.settingsHandlers.forEach((connection) => this.settings.disconnect(connection));
         this.settingsHandlers = null;
 
-        // Disconnect keybinding
-        Main.wm.removeKeybinding('eye-blink-keybinding');
-
-        // Disconnect settings
+        // Drop settings objects
         this.settings = null;
     }
     //#endregion
 }
-//#endregion

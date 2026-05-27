@@ -8,14 +8,14 @@ import {SocketHandler} from '../socketByProfile.js';
 import {Checksum, MessageType} from './sonyConfig.js';
 
 export const SonySocketBase = GObject.registerClass({
+    GTypeName: 'BluetoothBatteryMeter_SonySocketBase',
     Signals: {'ack-received': {param_types: [GObject.TYPE_STRING]}},
 }, class SonySocketBase extends SocketHandler {
-    _init(devicePath, fd) {
-        super._init(devicePath, fd);
+    _init(devicePath, profileManager, profile) {
+        super._init(devicePath, profileManager, profile);
         const identifier = devicePath.slice(-2);
         const tag = `SonySocketBase-${identifier}`;
         this._log = createLogger(tag);
-        this._log.info(`SonySocketBase init with fd: ${fd}`);
         this._messageQueue = [];
         this._initComplete = false;
         this._processingQueue = false;
@@ -216,7 +216,7 @@ export const SonySocketBase = GObject.registerClass({
 
             const attempt = () => {
                 if (retries >= maxRetries) {
-                    this._log.error(`Failed to receive '${ackType}' after ${maxRetries} retries`);
+                    this._log.error(`Failed to receive ${ackType} after ${maxRetries} retries`);
                     if (this._responseSignalId)
                         this.disconnect(this._responseSignalId);
                     this._responseSignalId = null;
@@ -341,10 +341,6 @@ export const SonySocketBase = GObject.registerClass({
     }
 
     destroy() {
-        if (this._sonyBaseSocketDestroyed)
-            return;
-        this._sonyBaseSocketDestroyed = true;
-
         if (this.ackSignalId)
             this.disconnect(this.ackSignalId);
         this.ackSignalId = null;

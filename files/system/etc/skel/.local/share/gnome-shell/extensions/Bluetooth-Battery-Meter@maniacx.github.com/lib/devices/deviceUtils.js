@@ -1,4 +1,5 @@
 'use strict';
+import Gio from 'gi://Gio';
 
 export function booleanFromByte(val) {
     switch (val) {
@@ -52,7 +53,6 @@ export function validateProperties(settings, settingsKey, devicesList, defaults,
 
     let changed = false;
 
-    // Remove unknown keys
     for (const key of Object.keys(device)) {
         if (!(key in defaults)) {
             delete device[key];
@@ -60,7 +60,6 @@ export function validateProperties(settings, settingsKey, devicesList, defaults,
         }
     }
 
-    // Add missing default keys
     for (const [key, value] of Object.entries(defaults)) {
         if (!(key in device)) {
             device[key] = value;
@@ -68,7 +67,6 @@ export function validateProperties(settings, settingsKey, devicesList, defaults,
         }
     }
 
-    // Save if modified
     if (changed) {
         settings.set_strv(
             settingsKey,
@@ -77,3 +75,21 @@ export function validateProperties(settings, settingsKey, devicesList, defaults,
     }
 }
 
+
+export function launchConfigureWindow(path, type, dir, cancellable) {
+    const argv = ['gjs', '-m', `${dir}/script/moreSettings.js`, '--path', path, '--type', type];
+
+    try {
+        const proc = new Gio.Subprocess({argv, flags: Gio.SubprocessFlags.NONE});
+        proc.init(cancellable);
+        /**
+         * Launches the configuration window GJS script as a separate subprocess.
+         *
+         * The extension does not keep a reference to the subprocess and does not attempt
+         * to terminate it on destroy(). The configuration script manages its own
+         * lifecycle and exits when the extension is disabled.
+         */
+    } catch (e) {
+        console.log(`Failed to launch configure window for path: ${path} Err: ${e}`);
+    }
+}

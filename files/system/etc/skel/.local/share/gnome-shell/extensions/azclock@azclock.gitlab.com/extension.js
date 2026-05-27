@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Graphene from 'gi://Graphene';
@@ -52,7 +53,7 @@ function debugLog(msg) {
         console.log(msg);
 }
 
-var DesktopWidget = GObject.registerClass(
+const DesktopWidget = GObject.registerClass(
 class AzClockDesktopWidget extends St.Widget {
     _init(settings, settingsId) {
         super._init({
@@ -548,6 +549,9 @@ export default class AzClock extends Extension {
         EXTENSION = this;
         this.settings = SETTINGS = this.getSettings();
 
+        this._resource = Gio.Resource.load(`${this.path}/data/resources.gresource`);
+        Gio.resources_register(this._resource);
+
         Utils.createInitialWidget(EXTENSION, SETTINGS);
 
         this.widgets = new Map();
@@ -567,6 +571,9 @@ export default class AzClock extends Extension {
     }
 
     disable() {
+        Gio.resources_unregister(this._resource);
+        this._resource = null;
+
         SETTINGS.disconnectObject(this);
         Main.layoutManager.disconnectObject(this);
 

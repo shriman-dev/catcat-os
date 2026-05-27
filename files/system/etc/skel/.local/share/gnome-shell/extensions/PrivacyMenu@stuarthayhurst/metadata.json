@@ -3,6 +3,7 @@
   "description": "Add privacy settings toggles to the GNOME system menu\nNOTE: This only provides quick access to settings, it doesn't directly access hardware",
   "donations": {
     "github": "stuarthayhurst",
+    "kofi": "stuarthayhurst",
     "paypal": "stuartahayhurst"
   },
   "gettext-domain": "PrivacyMenu@stuarthayhurst",
@@ -13,9 +14,10 @@
     "46",
     "47",
     "48",
-    "49"
+    "49",
+    "50"
   ],
   "url": "https://github.com/stuarthayhurst/privacy-menu-extension",
   "uuid": "PrivacyMenu@stuarthayhurst",
-  "version": 27
+  "version": 28
 }

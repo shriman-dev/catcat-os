@@ -1,11 +1,11 @@
 'use strict';
-import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {createLogger} from '../logger.js';
 import {getBluezDeviceProxy} from '../../bluezDeviceProxy.js';
-import {buds2to1BatteryLevel, validateProperties} from '../deviceUtils.js';
+import {buds2to1BatteryLevel, validateProperties, launchConfigureWindow} from '../deviceUtils.js';
 import {createConfig, createProperties, DataHandler} from '../../dataHandler.js';
 import {MediaController} from '../mediaController.js';
 import {AirpodsSocket} from './airpodsSocket.js';
@@ -56,7 +56,6 @@ export const AirpodsDevice = GObject.registerClass({
         this._devicePath = devicePath;
         this._alias = alias;
         this._extPath = extPath;
-        this._profileManager = profileManager;
         this.updateDeviceMapCb = updateDeviceMapCb;
 
         this._config = createConfig();
@@ -88,83 +87,66 @@ export const AirpodsDevice = GObject.registerClass({
             updateVolSwipeMode: this.updateVolSwipeMode.bind(this),
             updateNotificationToneMode: this.updateNotificationToneMode.bind(this),
         };
-        this._initialize();
+        this._initialize(profileManager);
     }
 
-    _initialize() {
+    _initialize(profileManager) {
         this._bluezDeviceProxy = getBluezDeviceProxy(this._devicePath);
         const modalias = this._bluezDeviceProxy.Modalias;
         const regex = /v004Cp([0-9A-Fa-f]{4})d/;
         const match = modalias.match(regex);
-        if (match) {
-            this._model = match[1].toUpperCase();
-            this._modelData = AirpodsModelList.find(m => m.key === this._model);
-            this._log.info(`Configuration: ${JSON.stringify(this._modelData, null, 2)}`);
+        if (!match)
+            return;
 
-            this._batteryType = this._modelData.batteryType;
-            this._ancSupported = this._modelData.ancSupported ?? false;
-            this._adaptiveSupported = this._modelData.adaptiveSupported ?? false;
-            this._awarenessSupported = this._modelData.awarenessSupported ?? false;
-            this._pressSpeedDurationSupported =
+        this._model = match[1].toUpperCase();
+        this._modelData = AirpodsModelList.find(m => m.key === this._model);
+        this._log.info(`Configuration: ${JSON.stringify(this._modelData, null, 2)}`);
+
+        this._batteryType = this._modelData.batteryType;
+        this._ancSupported = this._modelData.ancSupported ?? false;
+        this._adaptiveSupported = this._modelData.adaptiveSupported ?? false;
+        this._awarenessSupported = this._modelData.awarenessSupported ?? false;
+        this._pressSpeedDurationSupported =
                         this._modelData.pressSpeedDurationSupported ?? false;
-            this._volumeSwipeSupported = this._modelData.volumeSwipeSupported ?? false;
-            this._longPressCycleSupported = this._modelData.longPressCycleSupported ?? false;
-            this._toneVolumeSupported = this._modelData.toneVolumeSupported ?? false;
+        this._volumeSwipeSupported = this._modelData.volumeSwipeSupported ?? false;
+        this._longPressCycleSupported = this._modelData.longPressCycleSupported ?? false;
+        this._toneVolumeSupported = this._modelData.toneVolumeSupported ?? false;
+        this._enableTurnOffListeningMode = this._modelData.enableTurnOffListeningMode ?? false;
 
-            this._commonIcon = this._modelData.budsIcon;
-            this._config.battery1ShowOnDisconnect = true;
-            this._config.showSettingsButton = true;
+        this._commonIcon = this._modelData.budsIcon;
+        this._config.battery1ShowOnDisconnect = true;
+        this._config.showSettingsButton = true;
 
-            if (this._batteryType !== 1)
-                this._caseIcon = `${this._modelData.case}`;
+        if (this._batteryType !== 1)
+            this._caseIcon = `${this._modelData.case}`;
 
-            if (this._ancSupported) {
-                this._config.toggle1Title = _('Noise Control');
-                this._config.toggle1Button1Icon = 'bbm-anc-off-symbolic.svg';
-                this._config.toggle1Button1Name = _('Off');
+        this._createDefaultSettings();
 
-                this._config.toggle1Button2Icon = 'bbm-transperancy-symbolic.svg';
-                this._config.toggle1Button2Name = _('Transparency');
+        const devicesList = this._settings.get_strv('airpods-list').map(JSON.parse);
 
-                if (this._adaptiveSupported) {
-                    this._config.toggle1Button3Icon = 'bbm-adaptive-symbolic.svg';
-                    this._config.toggle1Button3Name = _('Adaptive');
-                    this._config.optionsBox1 = ['slider'];
-                    this._config.box1SliderTitle = _('Ambient Level');
-                    this._config.toggle1Button4Icon = 'bbm-anc-on-symbolic.svg';
-                    this._config.toggle1Button4Name = _('Noise Cancellation');
-                } else {
-                    this._config.toggle1Button3Icon = 'bbm-anc-on-symbolic.svg';
-                    this._config.toggle1Button3Name = _('Noise Cancellation');
-                }
-            }
-
-            if (this._awarenessSupported) {
-                this._config.toggle2Title = _('Conversation Awareness');
-                this._config.toggle2Button1Icon = 'bbm-ca-on-symbolic.svg';
-                this._config.toggle2Button1Name = _('On');
-                this._config.toggle2Button2Icon = 'bbm-ca-off-symbolic.svg';
-                this._config.toggle2Button2Name = _('Off');
-            }
-
-            this._createDefaultSettings();
-
-            const devicesList = this._settings.get_strv('airpods-list').map(JSON.parse);
-
-            if (devicesList.length === 0 ||
+        if (devicesList.length === 0 ||
                 !devicesList.some(device => device.path === this._devicePath)) {
-                this._addPropsToSettings(devicesList);
-            } else {
-                validateProperties(this._settings, 'airpods-list', devicesList,
-                    this._defaultsDeviceSettings, this._devicePath);
-            }
-
-            this._updateInitialValues();
-            this._monitorAirpodsListGsettings(true);
-            this._updateIcons();
-
-            this._initializeProfile();
+            this._addPropsToSettings(devicesList);
+        } else {
+            validateProperties(this._settings, 'airpods-list', devicesList,
+                this._defaultsDeviceSettings, this._devicePath);
         }
+
+        this._updateInitialValues();
+        this._monitorAirpodsListGsettings(true);
+        this._updateIcons();
+        this._updateAncConfig();
+        this._updateAwarnessConfig();
+
+        const profile = {type: DeviceTypeAirpods, uuid: AirpodsUUID};
+
+        this._airpodsSocket = new AirpodsSocket(
+            this._devicePath,
+            profileManager,
+            profile,
+            this._modelData,
+            this._callbacks
+        );
     }
 
     _updateIcons() {
@@ -184,6 +166,83 @@ export const AirpodsDevice = GObject.registerClass({
         this.dataHandler?.setConfig(this._config);
     }
 
+    _updateAncConfig() {
+        if (!this._ancSupported)
+            return;
+
+        this._config.toggle1Title = _('Noise Control');
+
+        const allowOff = !this._enableTurnOffListeningMode ||
+        this._enableTurnOffListeningMode && this._lisMode;
+
+        const modes = [];
+
+        if (allowOff)
+            modes.push('off');
+
+        modes.push('transparency');
+
+        if (this._adaptiveSupported)
+            modes.push('adaptive');
+
+        modes.push('anc');
+
+        this._toggle1Modes = modes;
+
+        const icons = {
+            off: 'bbm-anc-off-symbolic.svg',
+            transparency: 'bbm-transperancy-symbolic.svg',
+            adaptive: 'bbm-adaptive-symbolic.svg',
+            anc: 'bbm-anc-on-symbolic.svg',
+        };
+
+        const labels = {
+            off: _('Off'),
+            transparency: _('Transparency'),
+            adaptive: _('Adaptive'),
+            anc: _('Noise Cancellation'),
+        };
+
+        const ncModes = {
+            off: ANCMode.ANC_OFF,
+            transparency: ANCMode.TRANSPARENCY,
+            adaptive: ANCMode.ADAPTIVE,
+            anc: ANCMode.ANC_ON,
+        };
+
+        this._toggle1ButtonToAncMode = [];
+
+        for (let i = 1; i <= 4; i++) {
+            this._config[`toggle1Button${i}Icon`] = '';
+            this._config[`toggle1Button${i}Name`] = '';
+            this._toggle1ButtonToAncMode[i] = null;
+        }
+
+        modes.forEach((mode, index) => {
+            const button = index + 1;
+
+            this._config[`toggle1Button${button}Icon`] = icons[mode];
+            this._config[`toggle1Button${button}Name`] = labels[mode];
+
+            this._toggle1ButtonToAncMode[button] = ncModes[mode];
+        });
+
+        if (this._adaptiveSupported) {
+            this._config.optionsBox1 = ['slider'];
+            this._config.box1SliderTitle = _('Ambient Level');
+        }
+    }
+
+    _updateAwarnessConfig() {
+        if (this._awarenessSupported) {
+            this._config.toggle2Title = _('Conversation Awareness');
+            this._config.toggle2Button1Icon = 'bbm-ca-on-symbolic.svg';
+            this._config.toggle2Button1Name = _('On');
+            this._config.toggle2Button2Icon = 'bbm-ca-off-symbolic.svg';
+            this._config.toggle2Button2Name = _('Off');
+        }
+    }
+
     _createDefaultSettings() {
         this._defaultsDeviceSettings = {
             path: this._devicePath,
@@ -196,6 +255,10 @@ export const AirpodsDevice = GObject.registerClass({
             },
 
             'wear-detection-mode': 1,
+
+            ...this._enableTurnOffListeningMode && {
+                'listening-mode': true,
+            },
 
             ...this._awarenessSupported && {
                 'ca-volume-enabled': true,
@@ -245,6 +308,9 @@ export const AirpodsDevice = GObject.registerClass({
             this._caVolume = this._settingsItems['ca-volume'];
         }
 
+        if (this._enableTurnOffListeningMode)
+            this._lisMode = this._settingsItems['listening-mode'];
+
         if (this._longPressCycleSupported)
             this._lpValue = this._settingsItems['lp-value'];
 
@@ -293,8 +359,19 @@ export const AirpodsDevice = GObject.registerClass({
         }
 
         if (this._awarenessSupported) {
-            this._caVolEnabled = this._settingsItems['ca-volume-enabled'];
             this._caVolume = this._settingsItems['ca-volume'];
+            if (this._caVolEnabled && !this._settingsItems['ca-volume-enabled'])
+                this._mediaController?.setConversationAwarenessVolume(false, this._caVolume);
+
+            this._caVolEnabled = this._settingsItems['ca-volume-enabled'];
+        }
+
+        if (this._enableTurnOffListeningMode) {
+            const lisMode = this._settingsItems['listening-mode'];
+            if (this._lisMode !== lisMode) {
+                this._lisMode = lisMode;
+                this._setListMode(lisMode);
+            }
         }
 
         if (this._longPressCycleSupported) {
@@ -365,59 +442,6 @@ export const AirpodsDevice = GObject.registerClass({
         this._monitorAirpodsListGsettings(true);
     }
 
-    async _initializeProfile() {
-        let fd = this._profileManager.getFd(this._devicePath);
-        if (fd !== -1) {
-            this._startAirpodsSocket(fd);
-            return;
-        }
-
-        this._profileSignalId = this._profileManager.connect('new-connection', (o, path, newFd) => {
-            if (path !== this._devicePath)
-                return;
-
-            fd = newFd;
-
-            this._profileManager.disconnect(this._profileSignalId);
-            this._profileSignalId = null;
-
-            if (this._connectProfileTimeoutId)
-                GLib.source_remove(this._connectProfileTimeoutId);
-            this._connectProfileTimeoutId = null;
-
-            this._startAirpodsSocket(fd);
-        });
-
-        const ok = await this._profileManager.registerProfile('airpods', AirpodsUUID);
-        if (!ok || fd !== -1)
-            return;
-
-        await this._profileManager.connectProfile('airpods', this._devicePath, AirpodsUUID);
-
-        let i = 0;
-        const interval = 500;
-        const maxTime = 7500;
-
-        this._connectProfileTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval, () => {
-            i++;
-            if (fd !== -1 || !this._bluezDeviceProxy.Connected || i * interval >= maxTime) {
-                this._connectProfileTimeoutId = null;
-                return GLib.SOURCE_REMOVE;
-            }
-
-            this._profileManager.connectProfile('airpods', this._devicePath, AirpodsUUID);
-            return GLib.SOURCE_CONTINUE;
-        });
-    }
-
-    _startAirpodsSocket(fd) {
-        this._airpodsSocket = new AirpodsSocket(
-            this._devicePath,
-            fd,
-            this._modelData,
-            this._callbacks);
-    }
-
     _startConfiguration(battInfo) {
         const bat1level = battInfo.battery1Level  ?? 0;
         const bat2level = battInfo.battery2Level  ?? 0;
@@ -429,6 +453,9 @@ export const AirpodsDevice = GObject.registerClass({
         this._battInfoRecieved = true;
 
         this._configureMediaController();
+
+        if (this._enableTurnOffListeningMode)
+            this._setListMode(this._lisMode, true);
 
         this.dataHandler = new DataHandler(this._config, this._props);
 
@@ -489,20 +516,22 @@ export const AirpodsDevice = GObject.registerClass({
         this.dataHandler?.setProps(this._props);
     }
 
-    updateAncMode(mode) {
-        if (mode === ANCMode.ANC_OFF)
-            this._props.toggle1State = 1;
-        else if (mode === ANCMode.TRANSPARENCY)
-            this._props.toggle1State = 2;
-        else if (this._adaptiveSupported && mode === ANCMode.ADAPTIVE)
-            this._props.toggle1State = 3;
-        else if (this._adaptiveSupported && mode === ANCMode.ANC_ON)
-            this._props.toggle1State = 4;
-        else if (!this._adaptiveSupported && mode === ANCMode.ANC_ON)
-            this._props.toggle1State = 3;
+    updateAncMode(ancMode) {
+        if (!this._ancSupported)
+            return;
 
-        if (this._adaptiveSupported)
-            this._props.optionsBoxVisible = mode === ANCMode.ADAPTIVE ? 1 : 0;
+        if (ancMode !== null)
+            this._ancMode = ancMode;
+
+        let index = this._toggle1ButtonToAncMode?.findIndex(v => v === this._ancMode);
+
+        if (index < 0)
+            index = 0;
+
+        this._props.toggle1State = index;
+
+        this._props.optionsBoxVisible =
+        this._adaptiveSupported && ancMode === ANCMode.ADAPTIVE ? 1 : 0;
 
         this.dataHandler?.setProps(this._props);
     }
@@ -560,7 +589,7 @@ export const AirpodsDevice = GObject.registerClass({
 
     updateAwarenessData(attenuated) {
         if (this._awarenessSupported && this._caVolEnabled)
-            this._mediaController?.lowerAirpodsVolume(attenuated, this._caVolume);
+            this._mediaController?.setConversationAwarenessVolume(attenuated, this._caVolume);
     }
 
     updateNotificationToneMode(level) {
@@ -645,30 +674,41 @@ export const AirpodsDevice = GObject.registerClass({
     }
 
     _toggle1ButtonClicked(index) {
-        if (index === 1)
-            this._airpodsSocket.setAncMode(ANCMode.ANC_OFF);
-        else if (index === 2)
-            this._airpodsSocket.setAncMode(ANCMode.TRANSPARENCY);
-        else if (this._adaptiveSupported && index === 3)
-            this._airpodsSocket.setAncMode(ANCMode.ADAPTIVE);
-        else if (this._adaptiveSupported && index === 4)
-            this._airpodsSocket.setAncMode(ANCMode.ANC_ON);
-        else if (!this._adaptiveSupported && index === 3)
-            this._airpodsSocket.setAncMode(ANCMode.ANC_ON);
+        const ancMode = this._toggle1ButtonToAncMode?.[index];
+        if (ancMode == null)
+            return;
+
+        this._props.toggle1State = index;
+        this.dataHandler?.setProps(this._props);
+        this._airpodsSocket?.setAncMode(ancMode);
     }
 
     _toggle2ButtonClicked(index) {
+        this._props.toggle2State = index;
+        this.dataHandler?.setProps(this._props);
         if (index === 1)
-            this._airpodsSocket.setAwarenessMode(AwarenessMode.ON);
+            this._airpodsSocket?.setAwarenessMode(AwarenessMode.ON);
         else if (index === 2)
-            this._airpodsSocket.setAwarenessMode(AwarenessMode.OFF);
+            this._airpodsSocket?.setAwarenessMode(AwarenessMode.OFF);
     }
 
     _setSliderChanged(level) {
         const inverseLevel = 100 - level;
         if (this._inverseLevel !== inverseLevel) {
             this._inverseLevel = inverseLevel;
-            this._airpodsSocket.setAdaptiveLevel(inverseLevel);
+            this._airpodsSocket?.setAdaptiveLevel(inverseLevel);
+        }
+    }
+
+    _setListMode(lisMode, atInit = false) {
+        if (!this._enableTurnOffListeningMode)
+            return;
+
+        this._airpodsSocket?.setListMode(lisMode);
+        if (!atInit) {
+            this._updateAncConfig();
+            this.dataHandler?.setConfig(this._config);
+            this.updateAncMode(this._ancMode);
         }
     }
 
@@ -676,21 +716,21 @@ export const AirpodsDevice = GObject.registerClass({
         if (!this._longPressCycleSupported)
             return;
 
-        this._airpodsSocket.setLongpressCycle(cyclicValue);
+        this._airpodsSocket?.setLongpressCycle(cyclicValue);
     }
 
     _setNotiVolume(volume) {
         if (!this._toneVolumeSupported)
             return;
 
-        this._airpodsSocket.setNotiVolume(volume);
+        this._airpodsSocket?.setNotiVolume(volume);
     }
 
     _setSwipeMode(state) {
         if (!this._volumeSwipeSupported)
             return;
 
-        this._airpodsSocket.setSwipeMode(state);
+        this._airpodsSocket?.setSwipeMode(state);
     }
 
     _setSwipeLength(index) {
@@ -698,11 +738,11 @@ export const AirpodsDevice = GObject.registerClass({
             return;
 
         if (index === 0)
-            this._airpodsSocket.setSwipeLength(VolSwipeLength.DEFAULT);
+            this._airpodsSocket?.setSwipeLength(VolSwipeLength.DEFAULT);
         else if (index === 1)
-            this._airpodsSocket.setSwipeLength(VolSwipeLength.LONGER);
+            this._airpodsSocket?.setSwipeLength(VolSwipeLength.LONGER);
         else if (index === 2)
-            this._airpodsSocket.setSwipeLength(VolSwipeLength.LONGEST);
+            this._airpodsSocket?.setSwipeLength(VolSwipeLength.LONGEST);
     }
 
     _setPressSpeed(index) {
@@ -710,11 +750,11 @@ export const AirpodsDevice = GObject.registerClass({
             return;
 
         if (index === 0)
-            this._airpodsSocket.setPressSpeed(PressSpeedMode.DEFAULT);
+            this._airpodsSocket?.setPressSpeed(PressSpeedMode.DEFAULT);
         else if (index === 1)
-            this._airpodsSocket.setPressSpeed(PressSpeedMode.SLOWER);
+            this._airpodsSocket?.setPressSpeed(PressSpeedMode.SLOWER);
         else if (index === 2)
-            this._airpodsSocket.setPressSpeed(PressSpeedMode.SLOWEST);
+            this._airpodsSocket?.setPressSpeed(PressSpeedMode.SLOWEST);
     }
 
     _setPressDur(index) {
@@ -722,32 +762,28 @@ export const AirpodsDevice = GObject.registerClass({
             return;
 
         if (index === 0)
-            this._airpodsSocket.setPressDur(PressDurationMode.DEFAULT);
+            this._airpodsSocket?.setPressDur(PressDurationMode.DEFAULT);
         else if (index === 1)
-            this._airpodsSocket.setPressDur(PressDurationMode.SHORTER);
+            this._airpodsSocket?.setPressDur(PressDurationMode.SHORTER);
         else if (index === 2)
-            this._airpodsSocket.setPressDur(PressDurationMode.SHORTEST);
+            this._airpodsSocket?.setPressDur(PressDurationMode.SHORTEST);
     }
 
     _settingsButtonClicked() {
-        const cmd = `gjs -m ${this._extPath}/script/moreSettings.js` +
-            ` --path ${this._devicePath} --type airpods`;
-        GLib.spawn_command_line_async(cmd);
+        this._configureWindowLauncherCancellable = new Gio.Cancellable();
+        launchConfigureWindow(this._devicePath, 'airpods', this._extPath,
+            this._configureWindowLauncherCancellable);
+        this._configureWindowLauncherCancellable = null;
     }
 
     destroy() {
-        if (this._profileManager && this._profileSignalId) {
-            this._profileManager.disconnect(this._profileSignalId);
-            this._profileSignalId = null;
-        }
-
-        if (this._connectProfileTimeoutId)
-            GLib.source_remove(this._connectProfileTimeoutId);
-        this._connectProfileTimeoutId = null;
+        this._configureWindowLauncherCancellable?.cancel();
+        this._configureWindowLauncherCancellable = null;
 
         this._airpodsSocket?.destroy();
         this._airpodsSocket = null;
         this._bluezDeviceProxy = null;
+        this.dataHandler?.disconnectObject(this);
         this.dataHandler = null;
         this._settings?.disconnectObject(this);
         this._mediaController?.disconnectObject(this);

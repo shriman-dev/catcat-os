@@ -135,6 +135,7 @@ export default class AdwPrefs extends ExtensionPreferences {
             valign: Gtk.Align.CENTER,
         });
         buttonUp.set_icon_name("go-up-symbolic");
+        buttonUp.set_tooltip_text(_("Move item up"));
         if (indexItem > 0) {
             buttonUp.connect("clicked", this._changeOrder.bind(this, menuItems, page2, indexItem, -1));
             buttonUp.set_sensitive(true);
@@ -150,6 +151,7 @@ export default class AdwPrefs extends ExtensionPreferences {
             valign: Gtk.Align.CENTER,
         });
         buttonDown.set_icon_name("go-down-symbolic");
+        buttonDown.set_tooltip_text(_("Move item down"));
         if (indexItem < itemslen - 1) {
             buttonDown.connect("clicked", this._changeOrder.bind(this, menuItems, page2, indexItem, 1));
             buttonDown.set_sensitive(true);
@@ -169,6 +171,7 @@ export default class AdwPrefs extends ExtensionPreferences {
                 margin_start: 10,
             });
             buttonDel.set_icon_name("user-trash-symbolic");
+            buttonDel.set_tooltip_text(_("Delete item"));
             buttonDel.connect("clicked", this._delCmd.bind(this, menuItems, page2, indexItem));
         }
         return buttonDel;
@@ -179,8 +182,22 @@ export default class AdwPrefs extends ExtensionPreferences {
             active: item["enable"],
             valign: Gtk.Align.CENTER,
         });
+        valueList.set_tooltip_text(_("Enable/Disable item"));
         valueList.connect("notify::active", this._changeEnable.bind(this, menuItems, indexItem, valueList));
         return valueList;
+    }
+
+    _addAppIcon(adwrow, appname) {
+        const apps = Gio.AppInfo.get_all();
+
+        for (const app of apps) {
+            if (appname.includes(app.get_id())) {
+                adwrow.subtitle = app.get_description();
+                const icon = new Gtk.Image({ gicon: app.get_icon() });
+                adwrow.add_prefix(icon);
+                return;
+            }
+        }
     }
 
     _buildList(menuItems, page2) {
@@ -192,12 +209,17 @@ export default class AdwPrefs extends ExtensionPreferences {
         group3.set_name("settingscenter_menuitems");
         page2.add(group3);
         page2._group3 = group3;
-        let items = menuItems.getItems();
+        const items = menuItems.getItems();
 
-        for (let indexItem in items) {
-            let item = items[indexItem];
-            const adwrow = new Adw.ActionRow({ title: _(item["label"]) });
+        for (const indexItem in items) {
+            const item = items[indexItem];
+            const appInfo = Gio.DesktopAppInfo.new(item["cmd"]);
+            if (appInfo !== null) {
+                item["label"] = appInfo.get_display_name();
+            }
+            const adwrow = new Adw.ActionRow({ title: item["label"] });
             adwrow.set_tooltip_text(item["cmd"]);
+            this._addAppIcon(adwrow, item["cmd"]);
             group3.add(adwrow);
             const buttonUp = this._buttonUp(menuItems, page2, indexItem);
             const buttonDown = this._buttonDown(menuItems, page2, indexItem, items.length);
@@ -214,6 +236,49 @@ export default class AdwPrefs extends ExtensionPreferences {
     _getFilename(fullPath) {
         this.getLogger().log("_getFilename fullPath: " + fullPath);
         return fullPath.replace(/^.*[\\/]/, "");
+    }
+
+    _findWidgetByType(parent, type) {
+        for (const child of parent) {
+            if (child instanceof type) return child;
+
+            const match = this._findWidgetByType(child, type);
+            if (match) return match;
+        }
+        return null;
+    }
+
+    _addResetButton(window, settings) {
+        const button = new Gtk.Button({
+            label: _("Reset Settings"),
+            icon_name: "edit-clear",
+            css_classes: ["destructive-action"],
+            vexpand: true,
+            valign: Gtk.Align.END,
+        });
+        button.set_tooltip_text(_("Reset all settings to default values"));
+        button.connect("clicked", () => {
+            this._resetSettings(settings, "all");
+        });
+
+        const header = this._findWidgetByType(window.get_content(), Adw.HeaderBar);
+        if (header) {
+            header.pack_start(button);
+        }
+    }
+
+    _resetSettings(settings, strKey) {
+        if (strKey === "all") {
+            // List all keys you want to reset
+            const keys = ["label-menu", "items", "show-systemindicator"];
+            for (const key of keys) {
+                if (settings.is_writable(key)) {
+                    settings.reset(key);
+                }
+            }
+        } else if (settings.is_writable(strKey)) {
+            settings.reset(strKey);
+        }
     }
 
     fillPreferencesWindow(window) {
@@ -268,6 +333,7 @@ export default class AdwPrefs extends ExtensionPreferences {
         page2._group3 = null;
         this._buildList(menuItems, page2);
         window.set_default_size(675, 655);
+        this._addResetButton(window, window._settings);
         window.add(page1);
         window.add(page2);
     }

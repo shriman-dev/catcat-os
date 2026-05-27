@@ -3,6 +3,9 @@
 usr_dconf_ext="/usr/etc/dconf/db/distro.d/extensions"
 dash_to_panel_positions="$(dconf read /org/gnome/shell/extensions/dash-to-panel/panel-positions)"
 
+
+sed -i '/.dashtopanelMainPanel .dash-item-container .show-apps .overview-icon {/,/}/ s|color:.*|color: none;|' "${HOME}/.local/share/gnome-shell/extensions/dash-to-panel@jderose9.github.com/stylesheet.css"
+
 if [[ -n "${DISPLAY}" && "${dash_to_panel_positions}" =~ '"":' ]]; then
     primary_monitor="$(gdbus call --session --dest org.gnome.Mutter.DisplayConfig --object-path /org/gnome/Mutter/DisplayConfig --method org.gnome.Mutter.DisplayConfig.GetCurrentState | grep -o "\[((.*), \[(" | tr -cd '[:alnum:],' | cut -d "," -f2,4 | tr "," "-")"
 

@@ -11,7 +11,7 @@ import {
 } from './airpodsConfig.js';
 
 /**
-AppleDevice Class: Airpods / Beats module for Bluetooth battery meter service to provide,
+Airpods / Beats module for Bluetooth battery meter service to provide,
 battery information, ANC and Convesational awareness on device that support it.
 
 Credits:
@@ -25,12 +25,12 @@ kavishdevar for Conversation awarness and AAP Definations
 export const AirpodsSocket = GObject.registerClass({
     GTypeName: 'BluetoothBatteryMeter_AirpodsSocket',
 }, class AirpodsSocket extends SocketHandler {
-    _init(devicePath, fd, modelData, callbacks) {
-        super._init(devicePath, fd);
+    _init(devicePath, profileManager, profile, modelData, callbacks) {
+        super._init(devicePath, profileManager, profile);
         const identifier = devicePath.slice(-2);
-        const tag = `AirpodsDevice-${identifier}`;
+        const tag = `AirpodsSocket-${identifier}`;
         this._log = createLogger(tag);
-        this._log.info('AirpodsDevice init');
+        this._log.info('AirpodsSocket init');
 
         this._ancSupported = modelData.ancSupported ?? false;
         this._adaptiveSupported = modelData.adaptiveSupported ?? false;
@@ -48,7 +48,7 @@ export const AirpodsSocket = GObject.registerClass({
         this._bud1State = EarDetection.IN_CASE;
         this._bud2State = EarDetection.IN_CASE;
 
-        this.startSocket(fd);
+        this.startSocket();
     }
 
     async postConnectInitialization() {
@@ -348,6 +348,16 @@ export const AirpodsSocket = GObject.registerClass({
             this._callbacks.updateAwarenessMode(mode);
     }
 
+    setListMode(lisMode) {
+        const listModeByte = lisMode ? 0x01 : 0x02;
+        const lisModePacket = Uint8Array.from([
+            ...PacketConstants.LISTENING_MODE_HEADER,
+            listModeByte,
+            ...PacketConstants.SUFFIX,
+        ]);
+        this.sendMessage(lisModePacket);
+    }
+
     setLongpressCycle(cyclicValue) {
         const cyclicPacket = Uint8Array.from([
             ...PacketConstants.LONGPRESS_CYCLE_HEADER,
@@ -407,10 +417,6 @@ export const AirpodsSocket = GObject.registerClass({
     }
 
     destroy() {
-        if (this._airpodsSocketDestroyed)
-            return;
-        this._airpodsSocketDestroyed = true;
-
         if (this._delayReadTimeoutId)
             GLib.source_remove(this._delayReadTimeoutId);
         this._delayReadTimeoutId = null;
