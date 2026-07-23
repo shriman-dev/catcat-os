@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+source /usr/lib/catcat-os/funcvar.sh
+
+# Remove useless logs, dirs or files
+#
+
+# System clean up
+one_day=86400
+one_week=$((one_day * 7))
+cleanup_log="/etc/catcat-os/log/last_cleanup.log"
+if is_file_older ${one_week} "${cleanup_log}"; then
+    date "+%a %b %d %H:%M:%S %Y" > "${cleanup_log}"
+    {
+        /usr/bin/podman image prune -f
+        /usr/bin/podman volume prune -f
+        /usr/bin/systemd-tmpfiles --clean
+        /usr/bin/rpm-ostree cleanup -bm
+        /usr/bin/dnf5 clean all
+        /usr/bin/flatpak --system uninstall --unused --assumeyes --noninteractive
+
+        # Delete DNS logs older than 3 months (default}
+        /usr/bin/localdnsctl -v --flush-logs
+    } >> "${cleanup_log}"
+fi
+
+# Run buttercare trim every 20 days
+twenty_days=$((one_day * 20))
+buttercare_log="/etc/catcat-os/log/buttercare.log"
+if is_file_older ${twenty_days} "${buttercare_log}"; then
+    date "+%a %b %d %H:%M:%S %Y" > "${buttercare_log}"
+    /usr/bin/buttercare -v balance trim >> "${buttercare_log}"
+fi

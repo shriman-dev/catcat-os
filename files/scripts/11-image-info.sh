@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+source "${BUILD_SCRIPT_LIB}"
+set -euox pipefail
+log "INFO" "Applying custom image info and labels"
+
+declare -A IMAGE_INFO=(
+    ["NAME"]="${PRETTY_NAME}"
+    ["PRETTY_NAME"]="${PRETTY_NAME} ${MAJOR_VERSION}"
+    ["ID"]="${PROJECT_NAME}"
+    ["ID_LIKE"]="fedora"
+    ["IMAGE_ID"]="${IMAGE_NAME}-${MAJOR_VERSION}.${DATESTAMP}.${TIMESTAMP}"
+    ["VARIANT_ID"]="${IMAGE_NAME}"
+    ["BOOTLOADER_NAME"]="${PRETTY_NAME} ${MAJOR_VERSION} (${DATESTAMP})"
+    ["DEFAULT_HOSTNAME"]="catcat"
+)
+
+OS_RELEASE_FILE="/usr/lib/os-release"
+
+for key in "${!IMAGE_INFO[@]}"; do
+    value="${IMAGE_INFO[${key}]}"
+    log "DEBUG" "${key}=${value}"
+    sed -i "s|^${key}=.*|${key}=\"${value}\"|" "${OS_RELEASE_FILE}"
+    # If the key does not exist, append it to the os-release file
+    grep -q "^${key}=" "${OS_RELEASE_FILE}" || echo "${key}=\"${value}\"" >> "${OS_RELEASE_FILE}"
+done
+log "INFO" "Applied image info"
+
+log "INFO" "Full output of: ${OS_RELEASE_FILE}"
+cat "${OS_RELEASE_FILE}"

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Hidden=false
+Name=CatCat OS User Setup
+Comment=Setup user home with default CatCat OS configurations
+Terminal=false
+Exec=/usr/libexec/catcat-user-setup
+Type=Application

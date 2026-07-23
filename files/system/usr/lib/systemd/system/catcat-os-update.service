@@ -1,0 +1,17 @@
+[Unit]
+Description=CatCat OS Update Oneshot Service
+ConditionPathExists=/run/ostree-booted
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/catcat-updater
+Nice=19
+CPUSchedulingPolicy=batch
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+OOMScoreAdjust=1000
+CPUWeight=30
+CPUQuota=300%
+IOWeight=30

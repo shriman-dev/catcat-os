@@ -1,0 +1,170 @@
+#!/usr/bin/bash
+source /usr/lib/catcat-os/funcvar.sh
+U1000="$(id -un 1000)"
+
+# First boot setup
+firstboot_file="/etc/catcat-os/log/.first-boot-done"
+if [[ ! -f "${firstboot_file}" ]]; then
+    plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
+
+    # Setup grub
+    mkdir -vp /boot/grub_themes && cp -af /usr/share/grub/themes/* /boot/grub_themes/
+    replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
+    replace_add 'GRUB_DEFAULT=' 'GRUB_DEFAULT=saved' /etc/default/grub
+    replace_add 'GRUB_DISABLE_SUBMENU=' 'GRUB_DISABLE_SUBMENU=true' /etc/default/grub
+    replace_add 'GRUB_DISABLE_RECOVERY=' 'GRUB_DISABLE_RECOVERY=true' /etc/default/grub
+    replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
+    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
+    replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
+    replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
+    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=true' /etc/default/grub
+    #GRUB_TERMINAL_OUTPUT=gfxterm
+    #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
+    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha/theme.txt"' /etc/default/grub
+
+    # Update grubup
+    /usr/bin/grubup
+
+    # Set default tty fonts
+    replace_add 'FONT=' 'FONT=sun12x22' /etc/vconsole.conf
+
+    # Show grub screen for desktop devices
+    hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
+
+    # Set default hostname
+    hostnamectl set-hostname --static "catcat"
+
+    # Permit main user
+    #usermod -aG libvirt ${U1000}
+
+    mkdir -pv "$(dirname ${firstboot_file})"
+    echo 'first boot' > "${firstboot_file}"
+fi
+
+/usr/libexec/secatcat
+/usr/libexec/catcat-kargs
+/usr/libexec/catcat-flatpak-manager
+
+# Sync configs on update
+update_info="/usr/etc/catcat-os/build_info"
+lastup_info="/etc/catcat-os/log/.build_info_previous"
+if ! diff -q "${update_info}" "${lastup_info}"; then
+    ru_config_d="/root/.config"
+    ru_local_share="/root/.local/share"
+    ru_catcat_d="${ru_local_share}/catcat-os"
+    [[ ! -d "${ru_catcat_d}/LS_COLORS_DIR" ]] &&
+            mkdir -vp "${ru_catcat_d}/LS_COLORS_DIR"
+    cp -vaf /usr/share/catcat-os/LS_COLORS_DIR/* \
+            "${ru_catcat_d}/LS_COLORS_DIR"/
+
+    [[ ! -e "${ru_config_d}/bat" ]] &&
+            { mkdir -vp "${ru_config_d}" ; ln -Tsvf /etc/bat "${ru_config_d}"/; }
+    /usr/bin/bat cache --build
+
+    [[ -d "/var/lib/waydroid" ]] && restorecon -vR "/var/lib/waydroid"
+
+    # GDM
+    if systemctl is-enabled gdm; then
+        # Update it or fall back to orignal GDM theme
+        gdm_shell="share/gnome-shell"
+        gdm_resource="gnome-shell-theme.gresource"
+        if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
+            [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
+            cp -vaf "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
+        fi
+        /usr/bin/dconf update
+    fi
+
+    cp -vf "${update_info}" "${lastup_info}"
+fi
+
+# Sync main user's monitors.xml with GDM
+monitors_xml=".config/monitors.xml"
+if [[ -f "/home/${U1000}/${monitors_xml}" ]] && systemctl is-enabled gdm; then
+    if ! diff -q "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}" >/dev/null 2>&1; then
+        cp -vf "/home/${U1000}/${monitors_xml}" "/var/lib/gdm/${monitors_xml}"
+        restorecon -vR "/home/${U1000}/.local/share/icc"
+    fi
+fi
+
+# Turn on hhd daemon for user 1000 on deck image
+if [[ "$(grep 'VARIANT_ID' /usr/lib/os-release)" =~ "catcat-os-hh" ]]; then
+    systemctl -f enable hhd@${U1000}
+fi
+
+# Nvidia specific
+if [[ "$(grep 'VARIANT_ID' /usr/lib/os-release)" =~ "catcat-os-nv" ]]; then
+    echo
+    # Enable nvidia optimus if device is laptop and has nvidia dgpu
+#   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
+#       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
+#           echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
+#       fi
+#   fi
+fi
+
+# Enable i2c-dev support to configure monitors via ddcutil
+i2c_dev_conf="/etc/modules-load.d/i2c_dev.conf"
+if [[ ! -f "${i2c_dev_conf}" ]] && command -v ddcutil; then
+    echo "i2c-dev" > "${i2c_dev_conf}"
+    # Enable i2c support for nvidia cards
+    if [[ "$(grep 'VARIANT_ID' /usr/lib/os-release)" =~ "catcat-os-nv" ]]; then
+        echo "options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100" > \
+                "${i2c_dev_conf/.conf/_nvidia.conf}"
+    fi
+fi
+
+# Disable wifi power saving for better wifi performance
+nm_confd="/etc/NetworkManager/conf.d"
+# 0 (use default), 1 (ignore/don't touch), 2 (disable) or 3 (enable).
+if [[ ! -f "${nm_confd}/better-wifi-perf.conf" ]] && hostnamectl | grep -i "Chassis:.*desktop"; then
+    mkdir -vp "${nm_confd}"
+    echo -e "[connection]\nwifi.powersave = 2" > "${nm_confd}/better-wifi-perf.conf"
+    systemctl restart NetworkManager
+fi
+
+# If iwd is disabled but iwd creds exists then enable iwd
+if ! systemctl is-enabled iwd.service; then
+    if find /var/lib/iwd -maxdepth 1 -type f \
+        \( -name '*.psk' -o -name '*.8021x' -o -name '*.open' \) -print -quit | grep -q .; then
+
+        mkdir -vp "${nm_confd}"
+        [[ -f "${nm_confd}/99-valve-wifi-backend.conf" ]] &&
+            rm -vf "${nm_confd}/99-valve-wifi-backend.conf"
+        [[ -f "${nm_confd}/supplicant.conf" ]] &&
+            rm -vf "${nm_confd}/supplicant.conf"
+
+        echo -e "[device]\nwifi.backend=iwd\nwifi.iwd.autoconnect=yes" > "${nm_confd}/iwd.conf"
+        systemctl disable --now wpa_supplicant.service
+        systemctl mask wpa_supplicant.service
+        systemctl unmask iwd.service
+        systemctl enable --now iwd.service
+    fi
+fi
+
+# FIXES
+# Set default target to graphical on base images, fixes rebase
+current_default_target=$(systemctl get-default)
+variant_id="$(grep '^VARIANT_ID' /usr/lib/os-release | cut -d= -f2-)"
+default_target=$([[ ${variant_id} =~ "-sv" ]] && echo "multi-user.target" || echo "graphical.target")
+
+grep "${default_target}" <<< "${current_default_target}" || systemctl set-default "${default_target}"
+
+# Waydroid fix
+if [[ -f "/var/lib/waydroid/lxc/waydroid/config" ]]; then
+    # Remove unneeded apparmor entry from Waydroid LXC
+    sed -i '/lxc\.apparmor\.profile\s*=\s*unconfined/d' "/var/lib/waydroid/lxc/waydroid/config"
+fi
+
+# Distrobox fix
+# If the hostname is too long Distrobox will fail during setup
+# Let's check the length and reset it to something sensible if that happens.
+if (( $(hostname | wc -m) > 20 )); then
+    hostnamectl set-hostname catcat
+fi
+
+# Fix missing hostname file breaking distrobox
+if [[ ! -f /etc/hostname ]]; then
+    touch /etc/hostname
+fi

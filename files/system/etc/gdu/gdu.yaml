@@ -1,0 +1,22 @@
+show-relative-size: true
+style:
+    selected-row:
+        text-color: "#11111b"
+        background-color: "#fab387"
+    progress-modal:
+        current-item-path-max-len: 0
+    use-old-size-bar: false
+    footer:
+        text-color: '#cdd6f4'
+        background-color: '#303049'
+        number-color: '#b6c0ff'
+    header:
+        text-color: '#cdd6f4'
+        background-color: '#303049'
+        hidden: false
+    result-row:
+        number-color: '#c1ffbc'
+        directory-color: '#fab387'
+sorting:
+    by: "size"
+    order: "desc"

@@ -1,0 +1,11 @@
+[Unit]
+Description=Update dns blocklist
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/dns-blocklist-updater
+
+[Install]
+WantedBy=multi-user.target

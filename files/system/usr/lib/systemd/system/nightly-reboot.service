@@ -1,0 +1,6 @@
+[Unit]
+Description=Nightly Reboot for CatCat OS
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/nightly-reboot

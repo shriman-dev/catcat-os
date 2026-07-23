@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="32" height="32" version="1" xmlns="http://www.w3.org/2000/svg">
+  <rect width="28" height="28" x="2" y="3.346" rx="9.087" ry="9.087" style="fill: rgba(0, 0, 0, 0.2);"/>
+  <rect width="28" height="28" x="2" y="2" rx="9.087" ry="9.087" style="fill: rgb(64, 64, 89);"/>
+  <rect width="28" height="28" x="2" y="2" rx="9.087" ry="9.087" style="fill: rgba(255, 255, 255, 0.12);"/>
+  <rect width="28" height="26.654" x="2" y="3.346" rx="9.087" ry="9.087" style="fill: rgb(64, 64, 89);"/>
+  <g style="opacity: 0.2;" transform="matrix(0.882216, 0, 0, 0.882216, 1.951841, 2.901364)">
+    <rect width="4" height="4" x="14" y="14" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="20" y="14" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="8" y="14" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="14" y="8" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="20" y="8" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="8" y="8" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="14" y="20" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="20" y="20" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+    <rect width="4" height="4" x="8" y="20" rx="1.3" ry="1.3" style="fill: rgba(255, 255, 255, 0);"/>
+  </g>
+  <g style="" transform="matrix(0.882216, 0, 0, 0.882216, 1.951841, 1.817233)">
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="14" y="14" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="20" y="14" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="8" y="14" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="14" y="8" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="20" y="8" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="8" y="8" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="14" y="20" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="20" y="20" rx="1.3" ry="1.3"/>
+    <rect style="fill: rgb(250, 179, 135);" width="4" height="4" x="8" y="20" rx="1.3" ry="1.3"/>
+  </g>
+</svg>

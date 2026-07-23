@@ -1,0 +1,1 @@
+../../system/usr/lib/catcat-os/funcvar.sh

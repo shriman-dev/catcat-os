@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Icon=hubstaff-green
+NoDisplay=false
+Exec=cbonsai --live --infinite --wait=3
+Terminal=true
+X-GNOME-UsesNotifications=false
+Name=Cbonsai

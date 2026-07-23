@@ -1,0 +1,34 @@
+services:
+  catcat-os:
+    build:
+      context: ..
+      containerfile: Containerfile
+      secrets:
+        - sbmok_priv
+      args:
+        PRETTY_NAME: "${PRETTY_NAME}"
+        PROJECT_NAME: "${PROJECT_NAME}"
+        MAJOR_VERSION: "${MAJOR_VERSION}"
+        PUSH_REGISTRY: "${PUSH_REGISTRY}"
+        CUSTOM_KERNEL: "${CUSTOM_KERNEL}"
+        DATESTAMP: "${DATESTAMP}"
+        TIMESTAMP: "${TIMESTAMP}"
+        TIMEZONE: "${TIMEZONE}"
+        COMMIT_SHA: "${COMMIT_SHA}"
+        IMAGE_NAME: "${IMAGE_NAME}"
+        BASE_IMAGE: "${BASE_IMAGE}"
+        ALT_TAG: "${ALT_TAG}"
+      tags:
+        - "localhost/${IMAGE_NAME}:${DEFAULT_TAG}"
+        - "localhost/${IMAGE_NAME}:${MAJOR_VERSION}"
+    labels:
+      io.artifacthub.package.readme-url: "https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/README.md"
+      org.opencontainers.image.created: "${AH_DATE}"
+      org.opencontainers.image.description: "${PROJECT_DESC}"
+      org.opencontainers.image.title: "${IMAGE_NAME}"
+      org.opencontainers.image.vendor: "shriman-dev"
+      org.opencontainers.image.version: "${MAJOR_VERSION}.${DATETIMESTAMP}"
+      containers.bootc: "1"
+secrets:
+  sbmok_priv:
+    environment: SBMOK_KEY

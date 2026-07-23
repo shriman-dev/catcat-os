@@ -1,0 +1,184 @@
+{
+    "overrides": [
+        {
+            "wmClass": "org.gnome.Shell.Extensions",
+            "wmTitle": "Forge Settings",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-toolbox",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-goland",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-webstorm",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-phpstorm",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-datagrip",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-rubymine",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "jetbrains-idea",
+            "wmTitle": "splash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Com.github.amezin.ddterm",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Com.github.donadigo.eddy",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Conky",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Gnome-initial-setup",
+            "mode": "float"
+        },
+        {
+            "wmClass": "gnome-calculator",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Calculator",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.bassi.Amberol",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gtkhash.gtkhash",
+            "mode": "float"
+        },
+        {
+            "wmClass": "zenity",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Gnome-terminal",
+            "wmTitle": "Preferences – General",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Guake",
+            "mode": "float"
+        },
+        {
+            "wmClass": "zoom",
+            "mode": "float"
+        },
+        {
+            "wmClass": "com.github.amezin.ddterm",
+            "mode": "float"
+        },
+        {
+            "wmClass": "re.sonny.Junction",
+            "mode": "float"
+        },
+        {
+            "wmClass": "com.github.neithern.g4music",
+            "mode": "float"
+        },
+        {
+            "wmClass": "dev.geopjr.Collision",
+            "mode": "float"
+        },
+        {
+            "wmClass": "it.ublue.Yafti",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Music",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Weather",
+            "mode": "float"
+        },
+        {
+            "wmClass": "net.codelogistics.clicker",
+            "mode": "float"
+        },
+        {
+            "wmClass": "com.vixalien.sticky",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.efogdev.mpris-timer",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Loupe",
+            "mode": "float"
+        },
+        {
+            "wmClass": "eog",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Decibels",
+            "mode": "float"
+        },
+        {
+            "wmClass": "org.gnome.Characters",
+            "mode": "float"
+        },
+        {
+            "wmClass": "com.github.tenderowl.frog",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.giantpinkrobots.varia",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.herve4m.Length",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.jorchube.monitorets",
+            "mode": "float"
+        },
+        {
+            "wmClass": "wlroots",
+            "mode": "float"
+        },
+        {
+            "wmClass": "Waydroid",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.mrvladus.List",
+            "mode": "float"
+        },
+        {
+            "wmClass": "dev.bragefuglseth.Keypunch",
+            "mode": "float"
+        },
+        {
+            "wmClass": "io.github.revisto.drum-machine",
+            "mode": "float"
+        }
+    ]
+}

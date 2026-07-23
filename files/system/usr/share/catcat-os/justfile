@@ -1,0 +1,10 @@
+set allow-duplicate-recipes := true
+set ignore-comments := true
+
+_default:
+    #!/usr/bin/bash
+    source /usr/lib/catcat-os/funcvar.sh
+    /usr/bin/just --list --list-heading $'Available commands:\n'
+
+# Imports
+

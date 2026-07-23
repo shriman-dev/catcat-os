@@ -1,0 +1,7 @@
+[Desktop Entry]
+Hidden=false
+Name=Mute Microphone on Login
+Comment=Mute Microphone on Login
+Terminal=false
+Exec=/usr/bin/amixer set Capture nocap
+Type=Application

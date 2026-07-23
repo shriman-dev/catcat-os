@@ -1,0 +1,96 @@
+#!/bin/bash
+source /usr/lib/catcat-os/funcvar.sh
+source /etc/catcat-os/build_info
+
+REG_FLATPAK_APPS_UPDATE=(
+    "org.mozilla.firefox"
+    "io.gitlab.librewolf-community"
+    "net.mullvad.MullvadBrowser"
+    "org.garudalinux.firedragon"
+    "one.ablaze.floorp"
+    "app.zen_browser.zen"
+    "org.torproject.torbrowser-launcher"
+    "org.chromium.Chromium"
+    "com.brave.Browser"
+    "io.github.ungoogled_software.ungoogled_chromium"
+    "com.vivaldi.Vivaldi"
+    "com.opera.Opera"
+    "com.microsoft.Edge"
+    "com.google.Chrome"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
+    "re.sonny.Tangram"
+)
+
+FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/)"
+
+if check_network_connection; then
+    for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
+        [[ "${FLATPAK_APPS}" =~ "${APP}" ]] &&
+            /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
+    done
+fi
+
+##########################################################################################
+
+notify_all() {
+    notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
+}
+
+on_connection() {
+    local conn_type="${1}"
+
+    if [[ "${conn_type}" =~ 'wifi=' ]]; then
+        local ssid="${conn_type#*=}"
+        local connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
+        [[ "${connected_ssid}" =~ "${ssid}" ]] && return 0
+    elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${conn_type}" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+update_cmd() {
+    local one_day=86400
+    local one_week=$((one_day * 7))
+    local autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
+    local firstboot_file="/etc/catcat-os/log/.first-boot-done"
+
+    # Auto update if system is one week old
+    if is_file_older ${one_week} "${autoupdate_log_file}"; then
+        if check_network_connection; then
+            is_file_older ${one_day} "${firstboot_file}" ||
+                notify_all "Weekly automatic update has started."
+
+            date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
+
+            /usr/bin/update extra >> "${autoupdate_log_file}"
+
+            [[ ${BUILD_EPOCH} -lt $(( $(date +%s) - one_week )) ]] &&
+                 /usr/bin/update >> "${autoupdate_log_file}"
+
+            is_file_older ${one_day} "${firstboot_file}" ||
+                notify_all "Weekly automatic update is done."
+        fi
+    fi
+}
+
+
+allowed_connection_file="/etc/catcat-os/auto_update_on_connection"
+connection_list=($(cat "${allowed_connection_file}"))
+if [[ ${#connection_list[@]} -gt 0 ]]; then
+    for conn in ${connection_list[@]}; do
+        if on_connection "${conn}"; then
+            log "INFO" "Network is active: ${conn}"
+            log "INFO" "Performing updates"
+            update_cmd
+        else
+            log "INFO" "Network is not active: ${conn}"
+            log "INFO" "Skipping updates"
+            continue
+        fi
+    done
+else
+    update_cmd
+fi

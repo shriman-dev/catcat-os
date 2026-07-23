@@ -1,0 +1,17 @@
+#!/bin/bash
+
+boot_was_ro=false
+if grep -q " /boot .* ro," /proc/mounts; then
+     mount -o remount,rw /boot || exit 13
+     boot_was_ro=true
+fi
+
+if [[ -d /sys/firmware/efi ]]; then
+    grub2-mkconfig -o /etc/grub2-efi.cfg
+else
+    grub2-mkconfig -o /etc/grub2.cfg
+fi
+
+if ${boot_was_ro}; then
+    mount -o remount,ro /boot || exit 13
+fi
