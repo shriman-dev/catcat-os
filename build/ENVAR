@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ENVAR=(
+    "PRETTY_NAME=CatCat OS"
+    "PROJECT_NAME=catcat-os"
+    "PROJECT_DESCRP=Meow"
+    "PROJECT_VENDOR=shriman-dev"
+    "PROJECT_SOURCE=https://raw.githubusercontent.com/shriman-dev/catcat-os"
+    "PROJECT_README=https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/README.md"
+    "PUSH_REGISTRY=ghcr.io/shriman-dev"
+    "DEFAULT_TAG=latest"
+    "MAJOR_VERSION=44"
+    "CUSTOM_KERNEL=kernel-cachyos"
+    "TIMEZONE=$(timedatectl show -p Timezone --value)"
+    "DATESTAMP=$(date "+%Y%m%d")"
+    "TIMESTAMP=$(date "+%H%M%S")"
+    "DATETIMESTAMP=$(date "+%Y%m%d.%H%M%S")"
+    "AH_DATE=$(date +%Y\-%m\-%d\T%H\:%M\:%S\Z)"
+    "COMMIT_SHA=$(git rev-parse HEAD)"
+)
+
+# Export variables for later use
+declare -x "${ENVAR[@]}"
+
+store_env="${GITHUB_ENV:-/tmp/BUILD_ENVAR}"
+[[ -z "${GITHUB_ENV:-}" ]] && > "${store_env}"
+printf '%s\n' "${ENVAR[@]}" >> "${store_env}"
+

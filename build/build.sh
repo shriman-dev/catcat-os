@@ -3,28 +3,14 @@ set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source "$(dirname ${SCRIPT_DIR})/files/scripts/script_lib/funcvar.sh"
-
-declare -xr PRETTY_NAME="CatCat OS"
-declare -xr PROJECT_NAME="catcat-os"
-declare -xr PROJECT_DESC="Meow"
-declare -xr DEFAULT_TAG="latest"
-declare -xr MAJOR_VERSION=44
-declare -xr PUSH_REGISTRY="ghcr.io/shriman-dev"
-declare -xr CUSTOM_KERNEL="kernel-cachyos"
-declare -xr DATESTAMP="$(date "+%Y%m%d")"
-declare -xr TIMESTAMP="$(date "+%H%M%S")"
-declare -xr DATETIMESTAMP="${DATESTAMP}.${TIMESTAMP}"
-declare -xr TIMEZONE="$(timedatectl show -p Timezone --value)"
-declare -xr AH_DATE="$(date +%Y\-%m\-%d\T%H\:%M\:%S\Z)"
-declare -xr COMMIT_SHA="$(git rev-parse HEAD)"
-
+source "${SCRIPT_DIR}/ENVAR"
 
 while [[ $# -gt 0 ]]; do
     case ${1} in
-        --image-name)  declare -xr IMAGE_NAME="${2}"; shift ;;
-        --base-image)  declare -xr BASE_IMAGE="${2}"; shift ;;
-        --alt-tag)     declare -xr ALT_TAG="${2}"   ; shift ;;
-        *)             die "Unknown option: ${1}"           ;;
+        --image-name)  declare -x IMAGE_NAME="${2}"; shift  ;;
+        --base-image)  declare -x BASE_IMAGE="${2}"; shift  ;;
+        --alt-tag)     declare -x ALT_TAG="${2}"   ; shift  ;;
+        *)             die "Unknown option: ${1}";;
     esac
     shift
 done

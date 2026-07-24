@@ -88,9 +88,9 @@ for VARIANT in "${BUILD_TARGETS[@]}"; do
 
     IFS='|' read -r ALT_TAG BASE_IMAGE <<< "${BUILDS[${VARIANT}]}"
     if [[ ${BUILD_SKIP:-} -ne 1 ]]; then
-        bash "${SCRIPT_DIR}"/build.sh --image-name "${VARIANT}" \
-                                      --base-image "${BASE_IMAGE}" \
-                                      --alt-tag    "${ALT_TAG}"
+        "${SCRIPT_DIR}"/build.sh --image-name "${VARIANT}" \
+                                 --base-image "${BASE_IMAGE}" \
+                                 --alt-tag    "${ALT_TAG}"
     fi
 
     if [[ ${CHUNK_IMAGE:-} -eq 1 ]]; then
@@ -124,7 +124,8 @@ done
 
 dangling_images=($(podman images -f "dangling=true" -q))
 if [[ ${#dangling_images[@]} -gt 0 ]]; then
-    log "INFO" "Removing dangling images"
+    echo ""
+    log "INFO" "Removing dangling images..."
     podman rmi --force ${dangling_images[@]}
     log "INFO" "Removed ${#dangling_images[@]} dangling images"
 fi

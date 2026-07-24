@@ -1,0 +1,137 @@
+name: build images
+on:
+  workflow_call:
+  schedule:
+    - cron: '05 10 * * *'  # 10:05am UTC everyday
+#  pull_request:
+#    branches:
+#      - main
+  push:
+    branches:
+      - main
+#    paths-ignore:
+#      - '**/README.md'
+#      - '**/build-iso.yml'
+#      - '**/create-release.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: build-image-${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build_push:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - IMAGE_NAME: catcat-os
+            BASE_IMAGE: quay.io/fedora-ostree-desktops/silverblue
+            ALT_TAG: main
+
+          - IMAGE_NAME: catcat-os-nv
+            BASE_IMAGE: quay.io/fedora-ostree-desktops/silverblue
+            ALT_TAG: nvidia
+
+          - IMAGE_NAME: catcat-os-hh
+            BASE_IMAGE: quay.io/fedora-ostree-desktops/silverblue
+            ALT_TAG: deck
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+#      - name: Mount BTRFS for podman storage
+#        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
+#        with:
+#          target-dir: /var/lib/containers
+#          mount-opts: compress-force=zstd:12
+#          loopback-free: "1"
+
+#      - name: Maximize build space
+#        uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
+
+      - name: Prepare environment
+        id: prepare-environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          free -hm
+          nproc --all
+          pwd
+          ls -A1
+          env
+          echo ${GITHUB_ENV}
+
+      - name: Build Image
+        id: build-image
+        env:
+          IMAGE_NAME: ${{ matrix.IMAGE_NAME }}
+          BASE_IMAGE: ${{ matrix.BASE_IMAGE }}
+          ALT_TAG: ${{ matrix.ALT_TAG }}
+          SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ${{ github.workspace }}/build/build.sh \
+                    --image-name "${IMAGE_NAME}" \
+                    --base-image "${BASE_IMAGE}" \
+                    --alt-tag    "${ALT_TAG}"
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: docker/login-action@v4.5.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push To GHCR
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        id: push-image
+        shell: bash
+        run: |
+          set -euox pipefail
+          ALIAS_TAGS=(
+            "$(git rev-parse --short HEAD)"
+            "${{ env.DEFAULT_TAG }}"
+            "${{ env.MAJOR_VERSION }}"
+            "${{ env.MAJOR_VERSION }}.${{ env.DATESTAMP }}"
+            "${{ env.MAJOR_VERSION }}.${{ env.DATETIMESTAMP }}"
+            "${{ matrix.ALT_TAG }}"
+            "${{ matrix.ALT_TAG }}.${{ env.DATETIMESTAMP }}"
+          )
+          for tag in "${ALIAS_TAGS[@]}"; do
+            sudo -E podman push \
+                    --digestfile=/tmp/digestfile \
+                    ${IMAGE_NAME}:${tag} ${IMAGE_REGISTRY}/${IMAGE_NAME}:${tag}
+          done
+          echo "digest=$(< /tmp/digestfile)" >> $GITHUB_OUTPUT
+
+      - name: Install Cosign
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: sigstore/cosign-installer@v4.1.2
+        with:
+          cosign-release: "v2.6.3"
+
+      - name: Sign container image
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        env:
+          IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ matrix.IMAGE_NAME }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+        shell: bash
+        run: |
+          echo "Image Digest: $DIGEST"
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
