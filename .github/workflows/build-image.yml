@@ -111,7 +111,7 @@ jobs:
                      --digestfile=/tmp/digestfile \
                      ${image_tag} ${PUSH_REGISTRY}/${image_tag}
           done
-          echo "digest=$(< /tmp/digestfile)" >> $GITHUB_OUTPUT
+          echo "digest=$(< /tmp/digestfile)" >> ${GITHUB_OUTPUT}
 
       - name: Install Cosign
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -123,10 +123,11 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         env:
           IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ matrix.IMAGE_NAME }}
-          DIGEST: ${{ steps.push.outputs.digest }}
+          DIGEST: ${{ steps.push-image.outputs.digest }}
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
         shell: bash
         run: |
-          echo "Image Digest: $DIGEST"
+          echo ${{ steps.push-image.outputs.digest }}
+          echo "Image Digest: ${DIGEST}"
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
