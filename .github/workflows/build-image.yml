@@ -105,11 +105,11 @@ jobs:
         shell: bash
         run: |
           set -euox pipefail
-          sudo -E podman images
+          podman images
           for image_tag in ${BUILD_TAGS}; do
-            sudo -E podman push \
-                    --digestfile=/tmp/digestfile \
-                    ${image_tag} ${PUSH_REGISTRY}/${image_tag}
+              podman push \
+                     --digestfile=/tmp/digestfile \
+                     ${image_tag} ${PUSH_REGISTRY}/${image_tag}
           done
           echo "digest=$(< /tmp/digestfile)" >> $GITHUB_OUTPUT
 
