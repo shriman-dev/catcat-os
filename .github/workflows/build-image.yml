@@ -105,7 +105,7 @@ jobs:
         shell: bash
         run: |
           set -euox pipefail
-          podman images
+          sudo -E podman images
           for image_tag in ${BUILD_TAGS}; do
             sudo -E podman push \
                     --digestfile=/tmp/digestfile \
