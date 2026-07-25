@@ -82,7 +82,8 @@ RUN --mount=type=cache,dst=/var/cache \
         systemd \
         tweaks-fixes
 
-RUN --mount=type=cache,dst=/var/cache \
+RUN --mount=type=secret,id=sbmok_priv \
+    --mount=type=cache,dst=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
     --mount=type=bind,source=./,target=/ctx,rw \
     ${BUILD_SETUP_DIR}/00-setup.sh \
