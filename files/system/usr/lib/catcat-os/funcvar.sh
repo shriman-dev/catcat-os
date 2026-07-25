@@ -161,7 +161,7 @@ enclosed_heading() {
 
     echo -e "\n${border}"
     symmetric_heading "${text}" "${padding_char}" ${output_width}
-    echo -e "\n${border}"
+    echo -e "${border}\n"
 }
 
 cmd_test_timer() {
