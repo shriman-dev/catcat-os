@@ -128,6 +128,5 @@ jobs:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
         shell: bash
         run: |
-          echo ${{ steps.push-image.outputs.digest }}
           echo "Image Digest: ${DIGEST}"
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
