@@ -15,12 +15,14 @@ cp -vf "${BUILD_ROOT_DIR}/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # Copy the template policy.json if the file is missing or lacks 'reject' default policy
 [[ ! -f "${POLICY_FILE}" ]] && cp -vf "${TEMPLATE_POLICY}" "${POLICY_FILE}"
-[[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]] &&
+if [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything" ]]; then
     cp -vf "${TEMPLATE_POLICY}" "${POLICY_FILE}"
+fi
 
-jq --arg image_url "${PROJECT_REGISTRY}/${IMAGE_NAME}" \
-   --arg cosign_pub_key "${COSIGN_PUB_KEY}" \
-   '.transports.docker |=
+if ! grep "${PROJECT_REGISTRY}/${IMAGE_NAME}" "${POLICY_FILE}"; then
+    jq --arg image_url "${PROJECT_REGISTRY}/${IMAGE_NAME}" \
+       --arg cosign_pub_key "${COSIGN_PUB_KEY}" \
+    '.transports.docker |=
     { $image_url: [
         {
             "type": "sigstoreSigned",
@@ -31,15 +33,16 @@ jq --arg image_url "${PROJECT_REGISTRY}/${IMAGE_NAME}" \
         }
     ] } + .' "${POLICY_FILE}" > "/tmp/POLICY.tmp"
 
-mv -v "/tmp/POLICY.tmp" "${POLICY_FILE}"
+    mv -v "/tmp/POLICY.tmp" "${POLICY_FILE}"
 
-echo "docker:
+    echo "docker:
   ${PROJECT_REGISTRY}/${IMAGE_NAME}:
     use-sigstore-attachments: true" > "/etc/containers/registries.d/${PROJECT_NAME}.yaml"
+fi
 
 log "INFO" "Container signing policy updated"
 
-set +x
+#set +x
 
 # Sign kernel and kernel modules for secureboot
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
