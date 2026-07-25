@@ -23,7 +23,6 @@ ENVAR=(
 # Export variables for later use
 declare -x "${ENVAR[@]}"
 
-store_env="${GITHUB_ENV:-/tmp/BUILD_ENVAR}"
-[[ -z "${GITHUB_ENV:-}" ]] && > "${store_env}"
-printf '%s\n' "${ENVAR[@]}" >> "${store_env}"
-
+if [[ -n "${GITHUB_ENV:-}" ]]; then
+    printf '%s\n' "${ENVAR[@]}" >> "${GITHUB_ENV}"
+fi
