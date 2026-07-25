@@ -19,7 +19,7 @@ if [[ "$(jq -r '.default[0].type' "${POLICY_FILE}")" == "insecureAcceptAnything"
     cp -vf "${TEMPLATE_POLICY}" "${POLICY_FILE}"
 fi
 
-if ! grep "${PROJECT_REGISTRY}/${IMAGE_NAME}" "${POLICY_FILE}"; then
+if ! grep "\"${PROJECT_REGISTRY}/${IMAGE_NAME}\"" "${POLICY_FILE}"; then
     jq --arg image_url "${PROJECT_REGISTRY}/${IMAGE_NAME}" \
        --arg cosign_pub_key "${COSIGN_PUB_KEY}" \
     '.transports.docker |=

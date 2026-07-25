@@ -43,9 +43,6 @@ pkgs_nvidia() {
     log "INFO" "Installing NVIDIA RPM Drivers and Packages"
     local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
 
-    # Fix nvidia kmod error when kernel is not signed
-    "${BUILD_SETUP_DIR}/12-signing.sh"
-
     # Sec limit nofile causes akmod install issue
     bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
     bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
