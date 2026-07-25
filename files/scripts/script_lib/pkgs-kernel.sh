@@ -33,6 +33,7 @@ cachy_kernel() {
     dnf5 -y install "${addons[@]}"
     dnf5 -y versionlock add "${ker_pkgs[@]}"
     depmod -a "$(rpm -q "${CUSTOM_KERNEL}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
+    "${BUILD_SETUP_DIR}/13-initramfs.sh"
 
     # NOTE: Do not disable custom kernel copr/repo to support building down stream images
     # Disable cachy copr

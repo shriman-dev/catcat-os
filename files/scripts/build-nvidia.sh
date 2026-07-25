@@ -43,9 +43,12 @@ pkgs_nvidia() {
     log "INFO" "Installing NVIDIA RPM Drivers and Packages"
     local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
 
+    # Fix when initramfs does not exists
+    #"${BUILD_SETUP_DIR}/13-initramfs.sh"
+
     # Sec limit nofile causes akmod install issue
-#    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
-#    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
+    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
+    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
 
     dnf5 -y install "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
     dnf5 -y mark user "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
@@ -94,8 +97,8 @@ pkgs_nvidia() {
     [[ "${kmod_ver}" != "${negativo_ver}" ]] &&
         die "NVIDIA drivers version mismatch"
 
-#    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
-#    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
+    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
+    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
 
     # SELinux policies for NVIDIA image
     curl_get "${BUILD_CACHE_DIR}/fetched/nvidia-container.pp" \
