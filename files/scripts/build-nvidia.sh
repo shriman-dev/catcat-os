@@ -49,15 +49,16 @@ pkgs_nvidia() {
 
     dnf5 -y install "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
     dnf5 -y mark user "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
-    dnf5 -y install --enable-repo="fedora-nvidia" akmods gcc gcc-c++
+    dnf5 -y install --enable-repo="fedora-nvidia" akmods gcc-c++
 
     # TODO: remove this when fixed upstream
-    cp /usr/sbin/akmodsbuild /usr/sbin/akmodsbuild.backup
-    sed -i '/if \[\[ -w \/var \]\] ; then/,/fi/d' /usr/sbin/akmodsbuild
+    sed -i.bak '/if \[\[ -w \/var \]\] ; then/,/fi/d' /usr/sbin/akmodsbuild
 
     dnf5 -y install --enable-repo="fedora-nvidia" nvidia-kmod-common nvidia-modprobe
     akmods --kernels "${kernel_ver}" --kmod "nvidia" --rebuild --force
     cat /var/cache/akmods/nvidia/*.failed.log || true
+
+    mv /usr/sbin/akmodsbuild.bak /usr/sbin/akmodsbuild
 
     # Verify drivers
     modinfo \

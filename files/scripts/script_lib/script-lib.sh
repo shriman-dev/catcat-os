@@ -52,7 +52,7 @@ enable_rpm_repos() {
 disable_rpm_repos() {
     local repo copr
     for repo in _copr_ublue-os-akmods.repo \
-        negativo17-fedora-multimedia.repo; do
+                negativo17-fedora-multimedia.repo; do
         sed -i 's/enabled=1/enabled=0/g' "/etc/yum.repos.d/${repo}" || true
     done
     for copr in "${copr_list[@]}"; do
