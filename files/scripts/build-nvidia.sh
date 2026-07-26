@@ -49,12 +49,13 @@ pkgs_nvidia() {
 
     dnf5 -y install "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
     dnf5 -y mark user "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
-    dnf5 -y install --enable-repo="fedora-nvidia" akmods gcc-c++
+    dnf5 -y install --enable-repo="fedora-nvidia" akmods gcc gcc-c++
 
     # TODO: remove this when fixed upstream
     sed -i.bak '/if \[\[ -w \/var \]\] ; then/,/fi/d' /usr/sbin/akmodsbuild
+    chmod -v +x /usr/sbin/akmodsbuild
 
-    dnf5 -y install --enable-repo="fedora-nvidia" nvidia-kmod-common nvidia-modprobe
+    dnf5 -y install --enable-repo="fedora-nvidia" akmod-nvidia nvidia-kmod-common nvidia-modprobe
     akmods --kernels "${kernel_ver}" --kmod "nvidia" --rebuild --force
     cat /var/cache/akmods/nvidia/*.failed.log || true
 
@@ -76,7 +77,7 @@ pkgs_nvidia() {
                 --enable-repo="fedora-nvidia" \
                 nvtop nvidia-driver nvidia-persistenced nvidia-settings \
                 nvidia-driver-cuda nvidia-container-toolkit libnvidia-fbc \
-                libva-nvidia-driver
+                libnvidia-cfg libnvidia-ml libnvidia-gpucomp libva-nvidia-driver
 #                libnvidia-ml.i686 nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686
 
     local kmod_ver=$(
@@ -114,9 +115,15 @@ rpm_repos disable
 ################################
 log "INFO" "Enabling system services"
 systemctl -f enable nvctk-cdi.service
-systemctl -v disable akmods-keygen@akmods-keygen.service \
-                     akmods-keygen.target || true
-log "INFO" "Enabled system services"
+
+DISABLE_SERVICES=(
+    "akmods-keygen@akmods-keygen.service"
+    "akmods-keygen.target"
+)
+
+log "INFO" "Disabling and masking system services"
+systemctl -v disable ${DISABLE_SERVICES[@]} || true
+systemctl -v mask ${DISABLE_SERVICES[@]} || true
 
 
 #########################################

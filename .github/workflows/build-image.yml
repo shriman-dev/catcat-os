@@ -36,7 +36,7 @@ jobs:
             ALT_TAG: main
 
           - IMAGE_NAME: catcat-os-nv
-            BASE_IMAGE: quay.io/fedora-ostree-desktops/silverblue
+            BASE_IMAGE: ghcr.io/shriman-dev/catcat-os
             ALT_TAG: nvidia
 
           - IMAGE_NAME: catcat-os-hh

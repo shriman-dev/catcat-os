@@ -105,6 +105,7 @@ GLOBAL_DISABLE_SERVICES=(
     "evolution-calendar-factory.service"
     "evolution-source-registry.service"
     "evolution-user-prompter.service"
+    "flatpak-user-updates.timer"
     "localsearch-3.service"
     "localsearch-control-3.service"
     "localsearch-writeback-3.service"
