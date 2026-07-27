@@ -81,7 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           source ${{ github.workspace }}/build/ENVAR
-          builder() { "${{ github.workspace }}/build/build.sh" "$@"; }
+          builder() { sudo -E "${{ github.workspace }}/build/build.sh" "$@"; }
           builder build \
                   --image-name "${IMAGE_NAME}" \
                   --base-image "${BASE_IMAGE}" \
@@ -105,7 +105,7 @@ jobs:
           set -euo pipefail
           source ${{ github.workspace }}/build/ENVAR
           declare -x BUILD_TAGS="${BUILD_TAGS}"
-          builder() { "${{ github.workspace }}/build/build.sh" "$@"; }
+          builder() { sudo -E "${{ github.workspace }}/build/build.sh" "$@"; }
           builder push \
                   --image-name "${IMAGE_NAME}" \
                   --base-image "${BASE_IMAGE}" \
