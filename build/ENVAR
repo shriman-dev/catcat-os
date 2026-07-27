@@ -24,11 +24,11 @@ ENVAR=(
 declare -x "${ENVAR[@]}"
 
 # Tags
-BUILD_TAGS=(
+_BUILD_TAGS=(
     "${DEFAULT_TAG}"
     "${MAJOR_VERSION}"
 )
-declare -x BUILD_TAGS="${BUILD_TAGS[@]}"
+declare -x BUILD_TAGS="${_BUILD_TAGS[@]}"
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
     if ! grep "${PROJECT_NAME}" <<< "${GITHUB_ENV}"; then
