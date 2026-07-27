@@ -20,6 +20,10 @@ ENVAR=(
     "COMMIT_SHA=$(git rev-parse HEAD)"
 )
 
+# Export variables for later use
+declare -x "${ENVAR[@]}"
+
+# Tags
 BUILD_TAGS=(
     "${DEFAULT_TAG}"
     "${MAJOR_VERSION}"
@@ -32,8 +36,6 @@ EXTRA_TAGS=(
     "${ALT_TAG}.${DATETIMESTAMP}"
 )
 
-# Export variables for later use
-declare -x "${ENVAR[@]}"
 declare -x BUILD_TAGS="${BUILD_TAGS[@]}"
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then

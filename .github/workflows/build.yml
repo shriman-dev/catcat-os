@@ -33,6 +33,7 @@ jobs:
 
   build-variants:
     name: Build Images
+    needs: [build-main]
     uses: ./.github/workflows/build-variants.yml
     strategy:
       fail-fast: false  # Continues with other builds even if one fails
