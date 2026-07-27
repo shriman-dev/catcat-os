@@ -28,19 +28,9 @@ BUILD_TAGS=(
     "${DEFAULT_TAG}"
     "${MAJOR_VERSION}"
 )
-EXTRA_TAGS=(
-    "$(git rev-parse --short HEAD)"
-    "${MAJOR_VERSION}.${DATESTAMP}"
-    "${MAJOR_VERSION}.${DATETIMESTAMP}"
-    "${ALT_TAG}"
-    "${ALT_TAG}.${DATETIMESTAMP}"
-)
-
 declare -x BUILD_TAGS="${BUILD_TAGS[@]}"
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
-    declare -x BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
-
     if ! grep "${PROJECT_NAME}" <<< "${GITHUB_ENV}"; then
         printf '%s\n' "${ENVAR[@]}" >> "${GITHUB_ENV}"
     fi

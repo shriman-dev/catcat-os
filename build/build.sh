@@ -36,6 +36,14 @@ prep_metadata() {
         "--label" "org.opencontainers.image.version=${MAJOR_VERSION}.${DATETIMESTAMP}"
         "--label" "containers.bootc=1"
     )
+
+    EXTRA_TAGS=(
+        "$(git rev-parse --short HEAD)"
+        "${MAJOR_VERSION}.${DATESTAMP}"
+        "${MAJOR_VERSION}.${DATETIMESTAMP}"
+        "${ALT_TAG}"
+        "${ALT_TAG}.${DATETIMESTAMP}"
+    )
 }
 
 sect_border() {
@@ -48,6 +56,7 @@ build_image() {
 
     # Add build tags to GITHUB_OUTPUT for later use
     if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+        BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
         echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
     fi
     BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
