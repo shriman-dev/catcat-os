@@ -3,98 +3,220 @@ set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source "$(dirname ${SCRIPT_DIR})/files/scripts/script_lib/funcvar.sh"
-source "${SCRIPT_DIR}/ENVAR"
 
-while [[ $# -gt 0 ]]; do
-    case ${1} in
-        --image-name)  IMAGE_NAME="${2}"; shift  ;;
-        --base-image)  BASE_IMAGE="${2}"; shift  ;;
-        --alt-tag)     ALT_TAG="${2}"   ; shift  ;;
-        *)             die "Unknown option: ${1}";;
-    esac
-    shift
-done
+prep_metadata() {
+    BUILD_ARGS=(
+        "--build-arg" "PRETTY_NAME=${PRETTY_NAME}"
+        "--build-arg" "PROJECT_NAME=${PROJECT_NAME}"
+        "--build-arg" "PROJECT_VENDOR=${PROJECT_VENDOR}"
+        "--build-arg" "PROJECT_SOURCE=${PROJECT_SOURCE}"
+        "--build-arg" "PROJECT_README=${PROJECT_README}"
+        "--build-arg" "PUSH_REGISTRY=${PUSH_REGISTRY}"
+        "--build-arg" "MAJOR_VERSION=${MAJOR_VERSION}"
+        "--build-arg" "CUSTOM_KERNEL=${CUSTOM_KERNEL}"
+        "--build-arg" "TIMEZONE=${TIMEZONE}"
+        "--build-arg" "DATESTAMP=${DATESTAMP}"
+        "--build-arg" "TIMESTAMP=${TIMESTAMP}"
+        "--build-arg" "COMMIT_SHA=${COMMIT_SHA}"
+        "--build-arg" "IMAGE_NAME=${IMAGE_NAME}"
+        "--build-arg" "BASE_IMAGE=${BASE_IMAGE}"
+        "--build-arg" "ALT_TAG=${ALT_TAG}"
+    )
 
-BUILD_ARGS=(
-    "--build-arg" "PRETTY_NAME=${PRETTY_NAME}"
-    "--build-arg" "PROJECT_NAME=${PROJECT_NAME}"
-    "--build-arg" "PROJECT_VENDOR=${PROJECT_VENDOR}"
-    "--build-arg" "PROJECT_SOURCE=${PROJECT_SOURCE}"
-    "--build-arg" "PROJECT_README=${PROJECT_README}"
-    "--build-arg" "PUSH_REGISTRY=${PUSH_REGISTRY}"
-    "--build-arg" "MAJOR_VERSION=${MAJOR_VERSION}"
-    "--build-arg" "CUSTOM_KERNEL=${CUSTOM_KERNEL}"
-    "--build-arg" "TIMEZONE=${TIMEZONE}"
-    "--build-arg" "DATESTAMP=${DATESTAMP}"
-    "--build-arg" "TIMESTAMP=${TIMESTAMP}"
-    "--build-arg" "COMMIT_SHA=${COMMIT_SHA}"
-    "--build-arg" "IMAGE_NAME=${IMAGE_NAME}"
-    "--build-arg" "BASE_IMAGE=${BASE_IMAGE}"
-    "--build-arg" "ALT_TAG=${ALT_TAG}"
-)
+    BUILD_LABELS=(
+        "--label" "io.artifacthub.package.deprecated=false"
+        "--label" "io.artifacthub.package.prerelease=false"
+        "--label" "io.artifacthub.package.readme-url=${PROJECT_README}"
+        "--label" "org.opencontainers.image.documentation=${PROJECT_README}"
+        "--label" "org.opencontainers.image.source=${PROJECT_SOURCE}"
+        "--label" "org.opencontainers.image.created=${AH_DATE}"
+        "--label" "org.opencontainers.image.description=${PROJECT_DESCRP}"
+        "--label" "org.opencontainers.image.title=${IMAGE_NAME}"
+        "--label" "org.opencontainers.image.vendor=${PROJECT_VENDOR}"
+        "--label" "org.opencontainers.image.version=${MAJOR_VERSION}.${DATETIMESTAMP}"
+        "--label" "containers.bootc=1"
+    )
+}
 
-BUILD_LABELS=(
-    "--label" "io.artifacthub.package.deprecated=false"
-    "--label" "io.artifacthub.package.prerelease=false"
-    "--label" "io.artifacthub.package.readme-url=${PROJECT_README}"
-    "--label" "org.opencontainers.image.documentation=${PROJECT_README}"
-    "--label" "org.opencontainers.image.source=${PROJECT_SOURCE}"
-    "--label" "org.opencontainers.image.created=${AH_DATE}"
-    "--label" "org.opencontainers.image.description=${PROJECT_DESCRP}"
-    "--label" "org.opencontainers.image.title=${IMAGE_NAME}"
-    "--label" "org.opencontainers.image.vendor=${PROJECT_VENDOR}"
-    "--label" "org.opencontainers.image.version=${MAJOR_VERSION}.${DATETIMESTAMP}"
-    "--label" "containers.bootc=1"
-)
+sect_border() {
+    symmetric_heading "#" "#" "100" | tr ' ' '#'
+}
 
-BUILD_TAGS=(
-    "--tag" "${IMAGE_NAME}:${DEFAULT_TAG}"
-    "--tag" "${IMAGE_NAME}:${MAJOR_VERSION}"
-)
+build_image() {
+    local log_file="${SCRIPT_DIR}/.log/${IMAGE_NAME}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
+    mkdir -p "$(dirname ${log_file})"
 
-EXTRA_TAGS=(
-    "--tag" "${IMAGE_NAME}:$(git rev-parse --short HEAD)"
-    "--tag" "${IMAGE_NAME}:${MAJOR_VERSION}.${DATESTAMP}"
-    "--tag" "${IMAGE_NAME}:${MAJOR_VERSION}.${DATETIMESTAMP}"
-    "--tag" "${IMAGE_NAME}:${ALT_TAG}"
-    "--tag" "${IMAGE_NAME}:${ALT_TAG}.${DATETIMESTAMP}"
-)
+    # Add build tags to GITHUB_OUTPUT for later use
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+        echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
+    fi
+    BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
 
-if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-    BUILD_TAGS+=("${EXTRA_TAGS[@]}")
-    echo "build_tags=${BUILD_TAGS[@]/--tag/}" >> "${GITHUB_OUTPUT}"
-fi
-
-LOG_FILE="${SCRIPT_DIR}/.log/${IMAGE_NAME}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
-mkdir -p "$(dirname ${LOG_FILE})"
-{
-    symmetric_heading "#" "#" "100"
-    echo " Building    - ${IMAGE_NAME}:${ALT_TAG}"
-    echo " Base Image  - ${BASE_IMAGE}"
-    echo " Datestamp   - ${DATETIMESTAMP}"
-    echo " Git Commit  - ${COMMIT_SHA}"
-    echo " Working Dir - ${SCRIPT_DIR}"
-    symmetric_heading "#" "#" "100"
-
+    {
+    sect_border
+    echo " Building      - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Base Image    - ${BASE_IMAGE}"
+    echo " Datestamp     - ${DATETIMESTAMP}"
+    echo " Git Commit    - ${COMMIT_SHA}"
+    sect_border
     _cmd_test_timer_start=$(date +%s)
     cd "$(dirname ${SCRIPT_DIR})"
-    ( set -x; podman build \
-                     --pull=newer \
-                     --secret "id=sbmok_priv,env=SBMOK_KEY" \
-                     --file "Containerfile" \
-                     "${BUILD_LABELS[@]}" \
-                     "${BUILD_ARGS[@]}" \
-                     "${BUILD_TAGS[@]}" \
-                     . )
-    symmetric_heading "#" "#" "100"
-    echo " Build Done  - ${IMAGE_NAME}:${ALT_TAG}"
-    echo " Build Time  - $(cmd_test_timer)"
-    symmetric_heading "#" "#" "100"
-} \
-2>&1 | while read -r line ; do echo "$(date +'[%T.%3N]') ${line}"; done \
-2>&1 | tee -a "${LOG_FILE}"
+    { brief_trace; } 2>/dev/null
+    podman build "$@" \
+                 --pull=newer \
+                 --secret "id=sbmok_priv,env=SBMOK_KEY" \
+                 --file "Containerfile" \
+                 "${BUILD_LABELS[@]}" \
+                 "${BUILD_ARGS[@]}" \
+                 "${BUILD_TAGS[@]}" \
+                 .
+    { brief_trace; } 2>/dev/null
+    sect_border
+    echo " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Build Time    - $(cmd_test_timer)"
+    sect_border
+    } \
+    2>&1 | while read -r line; do echo "$(date +'[%T.%3N]') ${line}"; done \
+    2>&1 | tee -a "${log_file}"
+}
 
+chunk_image() {
+    sect_border
+    echo " Chunking      - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    sect_border
+    _cmd_test_timer_start=$(date +%s)
+    { brief_trace; } 2>/dev/null
+    ${RPM_OSTREE} compose \
+                  build-chunked-oci \
+                  --bootc --max-layers 250 \
+                  --format-version=2 \
+                  --from "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
+                  --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
+    { brief_trace; } 2>/dev/null
+    sect_border
+    echo " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Chunk Time    - $(cmd_test_timer)"
+    sect_border
+}
 
+push_image() {
+    local digestfile="/tmp/digestfile" build_tags="${BUILD_TAGS}" tag push_image
 
+    sect_border
+    echo " Pushing       - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Push Registry - ${PUSH_REGISTRY}"
+    sect_border
+    _cmd_test_timer_start=$(date +%s)
+    for tag in ${build_tags}; do
+        # Always push image without chunked suffix
+        push_image="${IMAGE_NAME/-chunked/}"
+        log "INFO" "Pushing: ${image_tag}"
+        { brief_trace; } 2>/dev/null
+        podman tag "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
+        podman push --digestfile="${digestfile}" "$@" \
+                    "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
+        { brief_trace; } 2>/dev/null
+        log "INFO" "Pushed: ${image_tag}"
+    done
+    # Add digestfile to GITHUB_OUTPUT for later use
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+        echo "digest=$(< "${digestfile}")" >> ${GITHUB_OUTPUT}
+    fi
+    sect_border
+    echo " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Push Time    - $(cmd_test_timer)"
+    sect_border
+}
 
+show_help() {
+    cat <<EOF
+Usage: $(basename "${0}") [global_options] command1 [options] [command2 [options] ...
 
+Global Options:
+  -h, --help          Show this help message
+  -i, --image-name    Set default image name of build
+  -b, --base-image    Set base image to build upon
+  -t, --alt-tag       Set an alt tag for image build
+
+Commands:
+  build               Build the container image using podman
+  chunk               Create a chunked OCI image using rpm-ostree
+  push                Push the image with tag(s) to the configured registry
+
+Example:
+  $(basename "${0}") build chunk push -i my-image -t main -b quay.io/fedora-ostree-desktops/silverblue
+EOF
+}
+
+exec_subcommand() {
+    local cmd="${1}"; shift
+    case "${cmd}" in
+        build) build_image "$@" ;;
+        chunk) chunk_image "$@" ;;
+        push)  push_image  "$@" ;;
+        *) die "Unknown command: ${cmd}" show_help ;;
+    esac
+}
+
+main() {
+    local rem_args arg curr_cmd curr_args
+
+    [[ $# -eq 0 ]] && show_help
+    # Iterate through all arguments and capture global flags
+    rem_args=()
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -h|--help)
+                show_help;          exit  0 ;;
+            -i|--image-name)
+                IMAGE_NAME="${2}";  shift 2 ;;
+            -b|--base-image)
+                BASE_IMAGE="${2}";  shift 2 ;;
+            -t|--alt-tag)
+                ALT_TAG="${2}";     shift 2 ;;
+            *)
+                rem_args+=("${1}"); shift   ;;
+        esac
+    done
+
+    RPM_OSTREE="$(command -v rpm-ostree)"
+    if [[ -z "${RPM_OSTREE:-}" ]]; then
+        [[ $(id -u) -ne 0 ]] &&
+            die "Require root privileges, rpm-ostree command does not exists on current system"
+        RPM_OSTREE="podman run --rm --privileged -v /var/lib/containers:/var/lib/containers \
+        --entrypoint /usr/bin/rpm-ostree ${BASE_IMAGE}"
+    fi
+
+    prep_metadata
+
+    # Execute subcommands
+    for arg in "${rem_args[@]}"; do
+        case "${arg}" in
+            build|chunk|push)
+                # Execute a subcommand in progress before starting new one
+                if [[ -n "${curr_cmd:-}" ]]; then
+                    exec_subcommand "${curr_cmd}" "${curr_args[@]}"
+                fi
+                curr_cmd="${arg}"
+                curr_args=()
+                ;;
+            *)
+                # Collect args for active subcommand
+                if [[ -n "${curr_cmd:-}" ]]; then
+                    curr_args+=("${arg}")
+                else
+                    die "Non glabl flag '${arg}' provided before subcommand"
+                fi
+                ;;
+        esac
+    done
+
+    # Execute the final subcommand remaining
+    if [[ -n "${curr_cmd:-}" ]]; then
+        exec_subcommand "${curr_cmd}" "${curr_args[@]}"
+    fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

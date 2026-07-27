@@ -3,6 +3,7 @@ set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source "$(dirname ${SCRIPT_DIR})/files/scripts/script_lib/funcvar.sh"
+source "${SCRIPT_DIR}/ENVAR"
 
 #set -x
 
@@ -13,7 +14,8 @@ while [[ $# -gt 0 ]]; do
             CHUNK_IMAGE=1
             ;;
         --local-reg)
-            INIT_LOCAL_REGISTRY=1
+            LOCAL_REGISTRY=1
+            LOCAL_REGISTRY_URL="127.0.0.1:5000"
             ;;
         --build-skp) # Skip building image and proceed to chunking or pushing
             BUILD_SKIP=1
@@ -42,12 +44,12 @@ fi
 # This is useful for building images completely without root privileges
 # Switch to locally built image with command:
 # sudo bootc switch 127.0.0.1:5000/catcat-os:latest
-if [[ ${INIT_LOCAL_REGISTRY:-} -eq 1 ]]; then
+if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
     registries_confd="/etc/containers/registries.conf.d"
     if [[ ! -f "${registries_confd}/local-registry.conf" ]]; then
-        echo '[[registry]]
-location = "127.0.0.1:5000"
-insecure = true' | sudo tee "${registries_confd}/local-registry.conf"
+        echo "[[registry]]
+location = \"${LOCAL_REGISTRY_URL}\"
+insecure = true" | sudo tee "${registries_confd}/local-registry.conf"
 #        echo '[[registry]]
 #location = "10.0.0.0:5000"
 #insecure = true' | sudo tee "${registries_confd}/localnet-registry.conf"
@@ -81,6 +83,7 @@ if [[ ${#BUILD_TARGETS[@]} -eq 0 ]]; then
     BUILD_TARGETS=("${!BUILDS[@]}")
 fi
 
+builder() { "${SCRIPT_DIR}/build.sh" "$@"; }
 for VARIANT in "${BUILD_TARGETS[@]}"; do
     if [[ -z "${BUILDS[${VARIANT}]:-}" ]]; then
         die "Variant '${VARIANT}' not found in BUILDS array"
@@ -88,37 +91,27 @@ for VARIANT in "${BUILD_TARGETS[@]}"; do
 
     IFS='|' read -r ALT_TAG BASE_IMAGE <<< "${BUILDS[${VARIANT}]}"
     if [[ ${BUILD_SKIP:-} -ne 1 ]]; then
-        "${SCRIPT_DIR}"/build.sh --image-name "${VARIANT}" \
-                                 --base-image "${BASE_IMAGE}" \
-                                 --alt-tag    "${ALT_TAG}"
+        builder build --image-name "${VARIANT}" \
+                      --base-image "${BASE_IMAGE}" \
+                      --alt-tag    "${ALT_TAG}"
     fi
 
     if [[ ${CHUNK_IMAGE:-} -eq 1 ]]; then
-        echo ""; symmetric_heading "Creating Chunked Image" "%" "115"
-        log "INFO" "Running ostree chunker"
-        _cmd_test_timer_start=$(date +%s)
-        { brief_trace; } 2>/dev/null
-        rpm-ostree compose build-chunked-oci \
-                   --bootc --max-layers 250 \
-                   --format-version=2 \
-                   --from "localhost/${VARIANT}:latest" \
-                   --output containers-storage:"localhost/${VARIANT}-chunked:latest"
+        builder chunk --image-name "${VARIANT}" \
+                      --base-image "${BASE_IMAGE}" \
+                      --alt-tag    "${ALT_TAG}"
         VARIANT="${VARIANT}-chunked"
-        { brief_trace; } 2>/dev/null
-        log "INFO" "Created chunked image in: $(cmd_test_timer)"
     fi
-    if [[ ${INIT_LOCAL_REGISTRY:-} -eq 1 ]]; then
-        echo ""; symmetric_heading "Pushing To Local Container Registry" "%" "115"
-        log "INFO" "Pushing image to local container registry"
-        REAL_VARIANT="${VARIANT/-chunked/}"
-        _cmd_test_timer_start=$(date +%s)
-        { brief_trace; } 2>/dev/null
-        podman tag "localhost/${VARIANT}:latest" "localhost:5000/${REAL_VARIANT}:latest"
-        podman push --compression-format "zstd" \
-                    --compression-level 19 \
-                    --tls-verify=false "${VARIANT}:latest" "localhost:5000/${REAL_VARIANT}:latest"
-        { brief_trace; } 2>/dev/null
-        log "INFO" "Pushed in: $(cmd_test_timer)"
+
+    if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
+        declare -x PUSH_REGISTRY="${LOCAL_REGISTRY_URL}"
+        declare -x BUILD_TAGS="${DEFAULT_TAG}"
+        builder push  --image-name "${VARIANT}" \
+                      --base-image "${BASE_IMAGE}" \
+                      --alt-tag    "${ALT_TAG}" \
+                      --compression-format "zstd" \
+                      --compression-level 19 \
+                      --tls-verify=false
     fi
 done
 
