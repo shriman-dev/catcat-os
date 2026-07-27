@@ -75,7 +75,7 @@ jobs:
           SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
         shell: bash
         run: |
-          set -euo pipefail
+          set -euox pipefail
           source ${{ github.workspace }}/build/ENVAR
           builder() { "${{ github.workspace }}/build/build.sh" "$@"; }
           builder build \
