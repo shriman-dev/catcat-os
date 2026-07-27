@@ -188,7 +188,7 @@ main() {
         esac
     done
 
-    RPM_OSTREE="$(command -v rpm-ostree)"
+    RPM_OSTREE="$(command -v rpm-ostree || true)"
     if [[ -z "${RPM_OSTREE:-}" ]]; then
         [[ $(id -u) -ne 0 ]] &&
             die "Require root privileges, rpm-ostree command does not exists on current system"
