@@ -54,9 +54,13 @@ jobs:
           nproc --all
           pwd
           ls -A1
-          echo 'builder() { sudo -E "${{ github.workspace }}/build/builder" "$@"; }' | \
-              sudo tee /etc/profile.d/builder.sh
-          podman images
+
+          mkdir -vp "${GITHUB_WORKSPACE}/bin"
+          cat << 'EOF' > "${GITHUB_WORKSPACE}/bin/builder"
+          #!/bin/bash
+          sudo -E "${{ github.workspace }}/build/builder" "$@"
+          EOF
+          chmod +x "${GITHUB_WORKSPACE}/bin/builder"
 
       - name: Build Image
         id: build-image
