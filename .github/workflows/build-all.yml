@@ -35,7 +35,7 @@ jobs:
     name: Build Variants
     needs: [build-main]
     strategy:
-      fail-fast: true   # Other builds even if one fails
+      fail-fast: false   # Other builds even if one fails
       matrix:
         include:
           - image_name: catcat-os-nv

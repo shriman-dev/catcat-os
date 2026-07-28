@@ -119,13 +119,13 @@ push_image() {
     for tag in ${build_tags}; do
         # Always push image without chunked suffix
         push_image="${IMAGE_NAME/-chunked/}"
-        log "INFO" "Pushing: ${image_tag}"
+        log "INFO" "Pushing: ${push_image}:${tag}"
         { brief_trace; } 2>/dev/null
         podman tag "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
         podman push --digestfile="${digestfile}" "$@" \
                     "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
         { brief_trace; } 2>/dev/null
-        log "INFO" "Pushed: ${image_tag}"
+        log "INFO" "Pushed: ${push_image}:${tag}"
     done
     # Add digestfile to GITHUB_OUTPUT for later use
     if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
