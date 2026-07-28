@@ -47,56 +47,56 @@ RUN --mount=type=cache,dst=/var/cache \
     ${BUILD_SETUP_DIR}/00-setup.sh \
         prep-env \
         cleanup \
-        debloat \
-        copy-sysfiles
+        debloat #\
+#        copy-sysfiles
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        pkgs-kernel
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        pkgs-kernel
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        pkgs-common
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        pkgs-common
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        pkgs-desktop
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        pkgs-desktop
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        theming
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        theming
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        secatcat \
-        systemd \
-        tweaks-fixes
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        secatcat \
+#        systemd \
+#        tweaks-fixes
 
-RUN --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        build-variants
+#RUN --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        build-variants
 
-RUN --mount=type=secret,id=sbmok_priv \
-    --mount=type=cache,dst=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
-    --mount=type=bind,source=./,target=/ctx,rw \
-    ${BUILD_SETUP_DIR}/00-setup.sh \
-        image-info \
-        signing \
-        initramfs \
-        post-setup
+#RUN --mount=type=secret,id=sbmok_priv \
+#    --mount=type=cache,dst=/var/cache \
+#    --mount=type=tmpfs,dst=/tmp \
+#    --mount=type=bind,source=./,target=/ctx,rw \
+#    ${BUILD_SETUP_DIR}/00-setup.sh \
+#        image-info \
+#        signing \
+#        initramfs \
+#        post-setup
 
 ### LINTING
 ## Verify final image and contents are correct.
