@@ -32,8 +32,8 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Maximize Build Space
-        uses: hastd/free-disk-space@v0.1.2
+#      - name: Maximize Build Space
+#        uses: hastd/free-disk-space@v0.1.2
 
       - name: Mount Container Storage BTRFS Loopback
         run: |
