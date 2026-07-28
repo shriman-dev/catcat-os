@@ -2,10 +2,6 @@
 
 Catppucin themed customized image based on [Fedora Silverblue](https://fedoraproject.org/atomic-desktops/silverblue/)
 
-## ISO
-
-Download ISOs from latest release [here](https://github.com/shriman-dev/catcat-os/releases/latest).
-
 ## Rebase
 
 To rebase an existing atomic Fedora installation to the latest build:

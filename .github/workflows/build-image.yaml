@@ -37,14 +37,14 @@ jobs:
         with:
           skip-if-available: "80G"
 
-      - name: Mount Container Storage BTRFS Loopback
-        run: |
-          sudo truncate -s 70G /mnt/podman-storage.img
-          sudo mkfs.btrfs -f /mnt/podman-storage.img
-          sudo podman system reset --force
-          sudo systemctl stop podman.service
-          sudo mount -o compress-force=zstd:3 /mnt/podman-storage.img /var/lib/containers
-          sudo systemctl start podman.service
+#      - name: Mount Container Storage BTRFS Loopback
+#        run: |
+#          sudo truncate -s 70G /mnt/podman-storage.img
+#          sudo mkfs.btrfs -f /mnt/podman-storage.img
+#          sudo podman system reset --force
+#          sudo systemctl stop podman.service
+#          sudo mount -o compress-force=zstd:3 /mnt/podman-storage.img /var/lib/containers
+#          sudo systemctl start podman.service
 
       - name: Prepare Environment
         id: prep-env
