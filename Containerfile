@@ -65,4 +65,4 @@ RUN --mount=type=secret,id=sbmok_priv \
 
 ### LINTING
 ## Verify final image and contents are correct.
-RUN bootc container lint
+RUN rm -rf /run/* && bootc container lint

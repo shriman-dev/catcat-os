@@ -32,8 +32,10 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-#      - name: Maximize Build Space
-#        uses: hastd/free-disk-space@v0.1.2
+      - name: Maximize Build Space
+        uses: hastd/free-disk-space@v0.1.2
+        with:
+          skip-if-available: "80G"
 
       - name: Mount Container Storage BTRFS Loopback
         run: |
@@ -95,12 +97,12 @@ jobs:
       - name: Push To GitHub Container Registry
         id: push-image
         env:
-          BUILD_TAGS: ${{ steps.build-image.outputs.build_tags }}
+          build_tags: ${{ steps.build-image.outputs.build_tags }}
         shell: bash
         run: |
           set -euo pipefail
           source ENVAR
-          declare -x BUILD_TAGS="${BUILD_TAGS}"
+          declare -x BUILD_TAGS="${build_tags}"
           builder push \
                   --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
