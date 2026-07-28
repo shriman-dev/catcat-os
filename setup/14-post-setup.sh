@@ -73,7 +73,7 @@ rm -vf /etc/.pwd.lock \
        /etc/subgid-
 
 #dnf5 clean all
-find /var/* \
+find /run/* /var/* \
     -maxdepth 0 -type d \
     -not -name "cache" \
     -exec rm -rvf {} \;
