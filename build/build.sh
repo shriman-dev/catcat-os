@@ -58,6 +58,8 @@ build_image() {
     if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
         BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
         echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
+        # Add real image_name to GITHUB_ENV for later use
+        echo "image_name=${IMAGE_NAME}" >> ${GITHUB_ENV}
     fi
     BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
 
@@ -102,6 +104,10 @@ chunk_image() {
                   --from "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
                   --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
     { brief_trace; } 2>/dev/null
+    # Add chunked image_name to GITHUB_ENV for later use
+    if [[ -n "${GITHUB_ENV:-}" ]]; then
+        echo "image_name=${IMAGE_NAME}-chunked" >> ${GITHUB_ENV}
+    fi
     sect_border
     echo " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
     echo " Chunk Time    - $(cmd_test_timer)"
@@ -109,16 +115,16 @@ chunk_image() {
 }
 
 push_image() {
-    local digestfile="/tmp/digestfile" build_tags="${BUILD_TAGS}" tag push_image
+    local digestfile="/tmp/digestfile" build_tags="${BUILD_TAGS}" tag
+    local push_image="${IMAGE_NAME/-chunked/}"
 
     sect_border
-    echo " Pushing       - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo " Pushing       - ${push_image}:${DEFAULT_TAG}"
     echo " Push Registry - ${PUSH_REGISTRY}"
     sect_border
     _cmd_test_timer_start=$(date +%s)
     for tag in ${build_tags}; do
         # Always push image without chunked suffix
-        push_image="${IMAGE_NAME/-chunked/}"
         log "INFO" "Pushing: ${push_image}:${tag}"
         { brief_trace; } 2>/dev/null
         podman tag "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"

@@ -17,6 +17,7 @@ on:
 
 jobs:
   build_image:
+    name: ${{ inputs.image_name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,15 +31,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-#      - name: Mount BTRFS For Podman Storage
-#        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
-#        with:
-#          target-dir: /var/lib/containers
-#          mount-opts: compress-force=zstd:12
-#          loopback-free: "1"
+      - name: Maximize Build Space
+        uses: hastd/free-disk-space@v0.1.2
 
-#      - name: Maximize Build Space
-#        uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
+      - name: Mount Container Storage BTRFS Loopback
+        run: |
+          sudo truncate -s 70G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f /mnt/podman-storage.img
+          sudo podman system reset --force
+          sudo systemctl stop podman.service
+          sudo mount -o compress-force=zstd:3 /mnt/podman-storage.img /var/lib/containers
+          sudo systemctl start podman.service
 
       - name: Prepare Environment
         id: prep-env
@@ -68,6 +71,20 @@ jobs:
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
 
+      - name: Chunk Image
+        id: chunk-image
+        env:
+          SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source ${{ github.workspace }}/build/ENVAR
+          builder() { sudo -E "${{ github.workspace }}/build/build.sh" "$@"; }
+          builder chunk \
+                  --image-name "${{ env.image_name }}" \
+                  --base-image "${{ inputs.base_image }}" \
+                  --alt-tag    "${{ inputs.alt_tag }}"
+
       - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         uses: docker/login-action@v4.5.1
@@ -88,7 +105,7 @@ jobs:
           declare -x BUILD_TAGS="${BUILD_TAGS}"
           builder() { sudo -E "${{ github.workspace }}/build/build.sh" "$@"; }
           builder push \
-                  --image-name "${{ inputs.image_name }}" \
+                  --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
 
