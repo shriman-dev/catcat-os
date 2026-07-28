@@ -88,15 +88,15 @@ RUN --mount=type=cache,dst=/var/cache \
 #    ${BUILD_SETUP_DIR}/00-setup.sh \
 #        build-variants
 
-#RUN --mount=type=secret,id=sbmok_priv \
-#    --mount=type=cache,dst=/var/cache \
-#    --mount=type=tmpfs,dst=/tmp \
-#    --mount=type=bind,source=./,target=/ctx,rw \
-#    ${BUILD_SETUP_DIR}/00-setup.sh \
 #        image-info \
 #        signing \
 #        initramfs \
-#        post-setup
+RUN --mount=type=secret,id=sbmok_priv \
+    --mount=type=cache,dst=/var/cache \
+    --mount=type=tmpfs,dst=/tmp \
+    --mount=type=bind,source=./,target=/ctx,rw \
+    ${BUILD_SETUP_DIR}/00-setup.sh \
+        post-setup
 
 ### LINTING
 ## Verify final image and contents are correct.
