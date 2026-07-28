@@ -26,7 +26,7 @@ concurrency:
 jobs:
   build-main:
     name: Build Main
-    uses: ./.github/workflows/reuse/build-image.yaml
+    uses: ./.github/workflows/build-image.yaml
     strategy:
       fail-fast: true   # Other builds even if one fails
     secrets: inherit    # Uses secrets from parent workflow
@@ -44,7 +44,7 @@ jobs:
           - image_name: catcat-os-hh
             base_image: ghcr.io/shriman-dev/catcat-os
             alt_tag: deck
-    uses: ./.github/workflows/reuse/build-image.yaml
+    uses: ./.github/workflows/build-image.yaml
     with:
       image_name: ${{ matrix.image_name }}
       base_image: ${{ matrix.base_image }}
