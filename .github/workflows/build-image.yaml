@@ -68,7 +68,7 @@ jobs:
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
 
-      - uses: ./.github/workflows/reuse/push-image.yaml
+      - uses: ./.github/actions/push
         with:
           tags: ${{ steps.build-image.outputs.build_tags }}
 
