@@ -99,9 +99,9 @@ pkgs_nvidia() {
     bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
 
     # SELinux policies for NVIDIA image
-    curl_get "${BUILD_CACHE_DIR}/fetched/nvidia-container.pp" \
+    curl_get "${BUILD_CACHE_DIR}/nvidia-container.pp" \
          "https://raw.githubusercontent.com/NVIDIA/dgx-selinux/master/bin/RHEL9/nvidia-container.pp"
-    semodule -i "${BUILD_CACHE_DIR}/fetched/nvidia-container.pp"
+    semodule -i "${BUILD_CACHE_DIR}/nvidia-container.pp"
 
     log "INFO" "Packages installed successfully"
 }
