@@ -83,7 +83,7 @@ if [[ ${#BUILD_TARGETS[@]} -eq 0 ]]; then
     BUILD_TARGETS=("${!BUILDS[@]}")
 fi
 
-builder() { "${SCRIPT_DIR}/build.sh" "$@"; }
+builder() { "${SCRIPT_DIR}/builder" "$@"; }
 for VARIANT in "${BUILD_TARGETS[@]}"; do
     if [[ -z "${BUILDS[${VARIANT}]:-}" ]]; then
         die "Variant '${VARIANT}' not found in BUILDS array"
