@@ -25,18 +25,30 @@ concurrency:
 
 jobs:
   build-main:
-    name: Build Images
-    uses: ./.github/workflows/build-main.yml
+    name: Build Main
+    uses: ./.github/workflows/reuse/build-image.yaml
     strategy:
-      fail-fast: false  # Continues with other builds even if one fails
+      fail-fast: true   # Other builds even if one fails
     secrets: inherit    # Uses secrets from parent workflow
 
   build-variants:
-    name: Build Images
+    name: Build Variants
     needs: [build-main]
-    uses: ./.github/workflows/build-variants.yml
     strategy:
-      fail-fast: false  # Continues with other builds even if one fails
+      fail-fast: true   # Other builds even if one fails
+      matrix:
+        include:
+          - image_name: catcat-os-nv
+            base_image: ghcr.io/shriman-dev/catcat-os
+            alt_tag: nvidia
+          - image_name: catcat-os-hh
+            base_image: ghcr.io/shriman-dev/catcat-os
+            alt_tag: deck
+    uses: ./.github/workflows/reuse/build-image.yaml
+    with:
+      image_name: ${{ matrix.image_name }}
+      base_image: ${{ matrix.base_image }}
+      alt_tag: ${{ matrix.alt_tag }}
     secrets: inherit    # Uses secrets from parent workflow
 
 #  build-iso:
