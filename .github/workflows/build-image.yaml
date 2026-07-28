@@ -54,7 +54,10 @@ jobs:
           nproc --all
           pwd
           ls -A1
-          echo "${{ github.workspace }}/build" >> ${GITHUB_PATH}
+          printf '#!/bin/bash\nsudo -E "${GITHUB_WORKSPACE}/build/builder" "$@"\n' | \
+              install -m 755 -D /dev/stdin "${GITHUB_WORKSPACE}/bin/builder"
+          ln -sv "${GITHUB_WORKSPACE}/build/ENVAR" "${GITHUB_WORKSPACE}/bin"/
+          echo "${GITHUB_WORKSPACE}/bin" >> "${GITHUB_PATH}"
 
       - name: Build Image
         id: build-image
@@ -64,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           source ENVAR
-          sudo -E builder build \
+          builder build \
                   --image-name "${{ inputs.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
@@ -77,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           source ENVAR
-          sudo -E builder chunk \
+          builder chunk \
                   --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
@@ -98,7 +101,7 @@ jobs:
           set -euo pipefail
           source ENVAR
           declare -x BUILD_TAGS="${BUILD_TAGS}"
-          sudo -E builder push \
+          builder push \
                   --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
