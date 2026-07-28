@@ -54,14 +54,7 @@ jobs:
           nproc --all
           pwd
           ls -A1
-
-          mkdir -vp "${GITHUB_WORKSPACE}/bin"
-          cat << 'EOF' > "${GITHUB_WORKSPACE}/bin/builder"
-          #!/bin/bash
-          sudo -E "${{ github.workspace }}/build/builder" "$@"
-          EOF
-          chmod +x "${GITHUB_WORKSPACE}/bin/builder"
-          echo "${GITHUB_WORKSPACE}/bin" >> ${GITHUB_PATH}
+          echo "${{ github.workspace }}/build" >> ${GITHUB_PATH}
 
       - name: Build Image
         id: build-image
@@ -70,8 +63,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source ${{ github.workspace }}/build/ENVAR
-          builder build \
+          source ENVAR
+          sudo -E builder build \
                   --image-name "${{ inputs.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
@@ -83,8 +76,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source ${{ github.workspace }}/build/ENVAR
-          builder chunk \
+          source ENVAR
+          sudo -E builder chunk \
                   --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"
@@ -103,9 +96,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source ${{ github.workspace }}/build/ENVAR
+          source ENVAR
           declare -x BUILD_TAGS="${BUILD_TAGS}"
-          builder push \
+          sudo -E builder push \
                   --image-name "${{ env.image_name }}" \
                   --base-image "${{ inputs.base_image }}" \
                   --alt-tag    "${{ inputs.alt_tag }}"

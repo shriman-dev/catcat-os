@@ -1,1 +1,1 @@
-../../system/usr/lib/catcat-os/funcvar.sh
+../../files/system/usr/lib/catcat-os/funcvar.sh
