@@ -355,7 +355,7 @@ COMMON=(
 )
 
 kernel_add() {
-    ( set -x; "${BUILD_SETUP_DIR}"/script_lib/pkgs-kernel.sh add )
+    ( set -x; "${BUILD_SETUP_DIR}"/setup_lib/pkgs-kernel.sh add )
 }
 
 process_installations() {

@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname ${SCRIPT_DIR})/files/scripts/script_lib/funcvar.sh"
+source "$(dirname ${SCRIPT_DIR})/setup/setup_lib/funcvar.sh"
 source "${SCRIPT_DIR}/ENVAR"
 
 #set -x

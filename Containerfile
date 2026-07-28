@@ -37,8 +37,8 @@ ARG ALT_TAG
 
 ARG TZ="${TIMEZONE}"
 ARG BUILD_ROOT_DIR="/ctx"
-ARG BUILD_SETUP_DIR="${BUILD_ROOT_DIR}/files/scripts"
-ARG BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/script_lib/script-lib.sh"
+ARG BUILD_SETUP_DIR="${BUILD_ROOT_DIR}/setup"
+ARG BUILD_SCRIPT_LIB="${BUILD_SETUP_DIR}/setup_lib/setup-lib.sh"
 
 ### MODIFICATIONS
 RUN --mount=type=secret,id=sbmok_priv \

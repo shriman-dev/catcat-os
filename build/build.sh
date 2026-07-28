@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname ${SCRIPT_DIR})/files/scripts/script_lib/funcvar.sh"
+source "$(dirname ${SCRIPT_DIR})/setup/setup_lib/funcvar.sh"
 
 prep_metadata() {
     BUILD_ARGS=(
@@ -199,7 +199,7 @@ main() {
         [[ $(id -u) -ne 0 ]] &&
             die "Require root privileges, rpm-ostree command does not exists on current system"
         RPM_OSTREE="podman run --rm --privileged -v /var/lib/containers:/var/lib/containers \
-        --entrypoint /usr/bin/rpm-ostree ${BASE_IMAGE}"
+        --entrypoint /usr/bin/rpm-ostree ${BASE_IMAGE}:${MAJOR_VERSION}"
     fi
 
     prep_metadata

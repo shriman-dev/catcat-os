@@ -14,7 +14,7 @@ log "INFO" "Kernel checksum verified"
 log "INFO" "Running post setup cleanup"
 # Remove packages no longer needed
 log "INFO" "Running package removal"
-"${BUILD_SETUP_DIR}"/script_lib/pkgs-kernel.sh remove-devel
+"${BUILD_SETUP_DIR}"/setup_lib/pkgs-kernel.sh remove-devel
 "${BUILD_SETUP_DIR}"/03-debloat.sh remove-devel
 log "INFO" "Packages removed"
 
