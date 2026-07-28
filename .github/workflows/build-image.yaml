@@ -72,20 +72,20 @@ jobs:
         with:
           tags: ${{ steps.build-image.outputs.build_tags }}
 
-      - name: Install Cosign
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        uses: sigstore/cosign-installer@v4.1.2
-        with:
-          cosign-release: "v2.6.3"
+#      - name: Install Cosign
+#        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+#        uses: sigstore/cosign-installer@v4.1.2
+#        with:
+#          cosign-release: "v2.6.3"
 
-      - name: Sign container image
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        env:
-          IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ matrix.IMAGE_NAME }}
-          DIGEST: ${{ steps.push-image.outputs.digest }}
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
-        shell: bash
-        run: |
-          echo "Image Digest: ${DIGEST}"
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
+#      - name: Sign container image
+#        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+#        env:
+#          IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ inputs.IMAGE_NAME }}
+#          DIGEST: ${{ steps.push-image.outputs.digest }}
+#          COSIGN_EXPERIMENTAL: false
+#          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+#        shell: bash
+#        run: |
+#          echo "Image Digest: ${DIGEST}"
+#          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
