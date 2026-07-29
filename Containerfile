@@ -61,6 +61,6 @@ RUN --mount=type=secret,id=sbmok_priv \
         image-info \
         signing \
         initramfs \
-        post-setup &&
+        post-setup && \
             bootc container lint ## LINTING # Verify final image and contents are correct.
 
