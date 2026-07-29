@@ -40,22 +40,23 @@ log "INFO" "Debloat Done"
 # Installing Packages #
 #######################
 pkgs_nvidia() {
-    log "INFO" "Installing NVIDIA RPM Drivers and Packages"
     local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
 
     # Sec limit nofile causes akmod install issue
     bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
     bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
 
-    dnf5 -y install "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
-    dnf5 -y mark user "kernel-headers" "${CUSTOM_KERNEL:-kernel}-devel-matched"
-    dnf5 -y install --enable-repo="fedora-nvidia" akmods gcc gcc-c++
+    RPM_REPOS=("fedora-nvidia")
+    pkgs_install "NVIDIA Drivers: kernel devel" \
+                kernel-headers "${CUSTOM_KERNEL:-kernel}"-devel-matched
+
+    pkgs_install "NVIDIA Drivers: akmods" akmods gcc gcc-c++
 
     # TODO: remove this when fixed upstream
     sed -i.bak '/if \[\[ -w \/var \]\] ; then/,/fi/d' /usr/sbin/akmodsbuild
     chmod -v +x /usr/sbin/akmodsbuild
 
-    dnf5 -y install --enable-repo="fedora-nvidia" akmod-nvidia nvidia-kmod-common nvidia-modprobe
+    pkgs_install "NVIDIA Drivers" akmod-nvidia nvidia-kmod-common nvidia-modprobe
     akmods --kernels "${kernel_ver}" --kmod "nvidia" --rebuild --force
     cat /var/cache/akmods/nvidia/*.failed.log || true
 
@@ -63,18 +64,17 @@ pkgs_nvidia() {
 
     # Verify drivers
     modinfo \
-    "/usr/lib/modules/${kernel_ver}/extra/nvidia"/nvidia{,-drm,-modeset,-peermem,-uvm}.ko.xz \
-    >/dev/null ||
-        die "NVIDIA drivers installation failed" "cat /var/cache/akmods/nvidia/*.failed.log"
+      "/usr/lib/modules/${kernel_ver}/extra/nvidia"/nvidia{,-drm,-modeset,-peermem,-uvm}.ko.xz \
+      >/dev/null ||
+          die "NVIDIA Drivers installation failed" "cat /var/cache/akmods/nvidia/*.failed.log"
 
     # Install NVIDIA packages
     [[ ! -f /etc/pki/tls/certs/ca-bundle.crt ]] &&
         ln -svf /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
                 /etc/pki/tls/certs/ca-bundle.crt
 
-    dnf5 -y install \
-                --enable-repo="nvidia-container-toolkit" \
-                --enable-repo="fedora-nvidia" \
+    RPM_REPOS+=("nvidia-container-toolkit")
+    pkgs_install "NVIDIA" \
                 nvtop nvidia-driver nvidia-persistenced nvidia-settings \
                 nvidia-driver-cuda nvidia-container-toolkit libnvidia-fbc \
                 libnvidia-cfg libnvidia-ml libnvidia-gpucomp libva-nvidia-driver
@@ -93,7 +93,7 @@ pkgs_nvidia() {
 
     depmod -a "$(rpm -q "${CUSTOM_KERNEL:-kernel}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
     [[ "${kmod_ver}" != "${negativo_ver}" ]] &&
-        die "NVIDIA drivers version mismatch"
+        die "NVIDIA Drivers version mismatch"
 
     bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
     bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
@@ -103,7 +103,7 @@ pkgs_nvidia() {
          "https://raw.githubusercontent.com/NVIDIA/dgx-selinux/master/bin/RHEL9/nvidia-container.pp"
     semodule -i "${BUILD_CACHE_DIR}/nvidia-container.pp"
 
-    log "INFO" "Packages installed successfully"
+    log "INFO" "NVIDIA Drivers installation successfully"
 }
 
 rpm_repos enable

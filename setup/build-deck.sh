@@ -54,6 +54,11 @@ log "INFO" "Fetching done"
 #######################
 # Installing Packages #
 #######################
+COPR_LIST=(
+    "rhea/acpi_call"
+    "hhd-dev/hhd"
+)
+
 DECK_PACKAGES=(
 #    "jupiter-fan-control"
 #    "galileo-mura" # Utility designed to mitigate uneven brightness or graininess on OLED screens
@@ -73,6 +78,7 @@ DECK_PACKAGES=(
     "adjustor"
     "kernel-headers"
     "${CUSTOM_KERNEL:-kernel}-devel-matched"
+    "acpi_call-dkms"
 )
 
 rpm_repos enable

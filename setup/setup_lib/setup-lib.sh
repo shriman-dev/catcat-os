@@ -82,7 +82,7 @@ rpm_repos() {
 #        "atim/starship"
 #        "zeno/scrcpy"
 #        "atim/lazygit"
-        "hhd-dev/hhd"
+        "${COPR_LIST[@]}"
     )
 
     case "${action}" in
@@ -107,24 +107,31 @@ rpm_repos() {
 
 pkgs_install() {
     local pkgs_type="${1}"
-    log "INFO" "Installing ${pkgs_type^} RPM and External Packages"
     shift
     local dnf_pkgs="$(printf '%s\n' "$@" | grep -v '^++')"
     local external_pkgs="$(printf '%s\n' "$@" | sed -n 's|^++||gp')"
+    local rpm_repos=(
+        "terra"
+        "terra-extras"
+        "${RPM_REPOS[@]}"
+    )
+    rpm_repos=($(printf -- "--enable-repo=%s\n" "${rpm_repos[@]}"))
 
     if [[ -n "${dnf_pkgs}" ]]; then
+        log "INFO" "Installing ${pkgs_type^} RPM Package(s)"
 #        dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
         brief_trace
         dnf5 -y clean dbcache
-        dnf5 -y install --enable-repo=terra --enable-repo=terra-extras ${dnf_pkgs}
+        dnf5 -y install "${rpm_repos[@]}" ${dnf_pkgs}
         brief_trace
     fi
     if [[ -n "${external_pkgs}" ]]; then
+        log "INFO" "Installing ${pkgs_type^} External Package(s)"
         brief_trace
         "${BUILD_SETUP_DIR}"/06-pkgs-external.sh ${external_pkgs}
         brief_trace
     fi
-    log "INFO" "${pkgs_type^} packages installed successfully"
+    log "INFO" "${pkgs_type^} package(s) installed successfully"
 }
 
 
