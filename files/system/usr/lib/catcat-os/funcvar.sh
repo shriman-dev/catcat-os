@@ -362,6 +362,8 @@ curl_fetch() { curl -fsS --retry 5 "${1}"; }
 
 curl_get() { curl -fLsS --retry 5 -o "${1}" "${2}"; }
 
+ensure_repo() { [[ -d "${2}" ]] || git clone --depth 1 "${1}" "${2}"; }
+
 latest_ghpkg_url() {
     local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" sha="${4:-}"
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |

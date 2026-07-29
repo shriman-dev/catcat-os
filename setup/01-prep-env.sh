@@ -14,6 +14,7 @@ env
 log "INFO" "Creating needed directories"
 mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
           "${BUILD_CACHE_DIR}/conf_repos" \
+          "${BUILD_CACHE_DIR}/fetched" \
           "${BUILD_CACHE_DIR}/rpm"
 
 mkdir -vp /etc/dconf/db/distro.d \
@@ -25,12 +26,11 @@ mkdir -vp /etc/dconf/db/distro.d \
 chmod -vR 1777 /var/tmp
 
 log "INFO" "Caching repositories with configurations"
-clone_repo() { [[ -d "${2}" ]] || git clone --depth 1 "${1}" "${2}"; }
-clone_repo "https://github.com/CachyOS/CachyOS-Settings.git" \
-           "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings"
+ensure_repo "https://github.com/CachyOS/CachyOS-Settings.git" \
+            "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings"
 
-clone_repo "https://github.com/ublue-os/packages.git" \
-           "${BUILD_CACHE_DIR}/conf_repos/ublue_packages"
+ensure_repo "https://github.com/ublue-os/packages.git" \
+            "${BUILD_CACHE_DIR}/conf_repos/ublue_packages"
 
 # To make /opt immutable, needed for some rpm? packages (browsers, docker-desktop)
 if [[ -L /opt ]]; then

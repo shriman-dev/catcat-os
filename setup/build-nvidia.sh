@@ -40,7 +40,7 @@ log "INFO" "Debloat Done"
 # Installing Packages #
 #######################
 pkgs_nvidia() {
-    local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
+    local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
 
     # Sec limit nofile causes akmod install issue
     bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
@@ -57,7 +57,7 @@ pkgs_nvidia() {
     chmod -v +x /usr/sbin/akmodsbuild
 
     pkgs_install "NVIDIA Drivers" akmod-nvidia nvidia-kmod-common nvidia-modprobe
-    akmods --kernels "${kernel_ver}" --kmod "nvidia" --rebuild --force
+    akmods --kernels "${kernel_ver}" --kmod "nvidia" --force
     cat /var/cache/akmods/nvidia/*.failed.log || true
 
     mv /usr/sbin/akmodsbuild.bak /usr/sbin/akmodsbuild

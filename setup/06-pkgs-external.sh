@@ -3,6 +3,7 @@ source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
 TMP_DIR="/tmp/pkgs_external"
+FETCHED="${BUILD_CACHE_DIR}/fetched"
 SYS_CACHE="${BUILD_CACHE_DIR}/system-pkgs-external"
 BIN_DIR="${SYS_CACHE}/usr/bin"
 LIBEXEC_DIR="${SYS_CACHE}/usr/libexec"
@@ -96,6 +97,24 @@ waydroid_setup() {
                     "/usr/lib/waydroid/data/scripts/waydroid-net.sh"
     fi
     systemctl disable waydroid-container.service
+}
+
+acpi_call() {
+    export KVER="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
+
+    ensure_repo "https://github.com/nix-community/acpi_call.git" \
+                "${BUILD_CACHE_DIR}/conf_repos/acpi_call"
+
+    cd "${BUILD_CACHE_DIR}/conf_repos/acpi_call"
+    make
+    install -v -D -m 0644 "${BUILD_CACHE_DIR}/conf_repos/acpi_call"/*.ko \
+                  -t "/usr/lib/modules/${KVER}/extra/acpi_call"/
+
+    depmod -a "${KVER}"
+    echo "acpi_call" > "/etc/modules-load.d/acpi_call.conf"
+
+    cd -
+    unset KVER
 }
 
 #wldrivers() {
@@ -251,6 +270,9 @@ process_package() {
         ls-iommu)
             _get_ghpkg --name "${1}" --repo "HikariKnight/ls-iommu" \
                        --regx 'Linux_x86_64\.tar\.gz$'
+            ;;
+        acpi_call)
+            acpi_call
             ;;
         ucat_setup)
             ucat_setup

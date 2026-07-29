@@ -55,7 +55,6 @@ log "INFO" "Fetching done"
 # Installing Packages #
 #######################
 COPR_LIST=(
-    "rhea/acpi_call"
     "hhd-dev/hhd"
 )
 
@@ -73,12 +72,14 @@ DECK_PACKAGES=(
 #    "socat"
 #    "python-vdf"
 #    "python-crcmod"
+    "gcc"
+    "make"
     "hhd"
     "hhd-ui"
     "adjustor"
     "kernel-headers"
     "${CUSTOM_KERNEL:-kernel}-devel-matched"
-    "acpi_call-dkms"
+    "++acpi_call"
 )
 
 rpm_repos enable

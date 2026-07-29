@@ -42,7 +42,7 @@ fi
 
 log "INFO" "Container signing policy updated"
 
-#set +x
+set +x
 
 # Sign kernel and kernel modules for secureboot
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
