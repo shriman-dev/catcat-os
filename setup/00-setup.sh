@@ -55,7 +55,7 @@ steps() {
             run_step "Cleaning Up" \
             "${BUILD_SETUP_DIR}/02-cleanup.sh"
             ;;
-        debloat) # Corrected typo from deblaot
+        debloat)
             run_step "Debloating" \
             "${BUILD_SETUP_DIR}/03-debloat.sh"
             ;;
@@ -77,45 +77,39 @@ steps() {
             ;;
         theming)
             run_step "Applying Various Themes" \
-            "${BUILD_SETUP_DIR}/07-theming.sh"
+            "${BUILD_SETUP_DIR}/06-theming.sh"
             ;;
         secatcat)
             run_step "Enhancing Security" \
-            "${BUILD_SETUP_DIR}/08-secatcat.sh"
+            "${BUILD_SETUP_DIR}/07-secatcat.sh"
             ;;
         systemd)
             run_step "Configuring Systemd Services" \
-            "${BUILD_SETUP_DIR}/09-systemd.sh"
+            "${BUILD_SETUP_DIR}/08-systemd.sh"
             ;;
         tweaks-fixes)
             run_step "Tweaks And Fixes" \
-            "${BUILD_SETUP_DIR}/10-tweaks-fixes.sh"
+            "${BUILD_SETUP_DIR}/09-tweaks-fixes.sh"
             ;;
-        build-variants)
-            if [[ "${IMAGE_NAME}" =~ "-nv" ]]; then
-                run_step "Building NVIDIA Image" \
-                "${BUILD_SETUP_DIR}/build-nvidia.sh"
-            fi
-            if [[ "${IMAGE_NAME}" =~ "-hh" ]]; then
-                run_step "Building Deck Image" \
-                "${BUILD_SETUP_DIR}/build-deck.sh"
-            fi
+        variants)
+            run_step "Building ${ALT_TAG^} Image" \
+                "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
             ;;
         image-info)
             run_step "Applying Image Info" \
-            "${BUILD_SETUP_DIR}/11-image-info.sh"
+            "${BUILD_SETUP_DIR}/10-image-info.sh"
             ;;
         signing)
             run_step "Signing Image Container and Kernel" \
-            "${BUILD_SETUP_DIR}/12-signing.sh"
+            "${BUILD_SETUP_DIR}/11-signing.sh"
             ;;
         initramfs)
             run_step "Regenerating Initramfs" \
-            "${BUILD_SETUP_DIR}/13-initramfs.sh"
+            "${BUILD_SETUP_DIR}/12-initramfs.sh"
             ;;
         post-setup)
             run_step "Post Build Setup" \
-            "${BUILD_SETUP_DIR}/14-post-setup.sh"
+            "${BUILD_SETUP_DIR}/13-post-setup.sh"
             ;;
         *)
             die "Unknown argument: ${arg}"

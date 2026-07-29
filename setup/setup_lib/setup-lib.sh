@@ -128,7 +128,7 @@ pkgs_install() {
     if [[ -n "${external_pkgs}" ]]; then
         log "INFO" "Installing ${pkgs_type^} External Package(s)"
         brief_trace
-        "${BUILD_SETUP_DIR}"/06-pkgs-external.sh ${external_pkgs}
+        "${SCRIPT_DIR}"/pkgs-external.sh ${external_pkgs}
         brief_trace
     fi
     log "INFO" "${pkgs_type^} package(s) installed successfully"
