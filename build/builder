@@ -54,13 +54,6 @@ build_image() {
     local log_file="${SCRIPT_DIR}/.log/${IMAGE_NAME}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
     mkdir -p "$(dirname ${log_file})"
 
-    # Add build tags to GITHUB_OUTPUT for later use
-    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-        BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
-        echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
-        # Add real image_name to GITHUB_ENV for later use
-        echo "image_name=${IMAGE_NAME}" >> ${GITHUB_ENV}
-    fi
     BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
 
     {
@@ -113,10 +106,6 @@ chunk_image() {
                   --from "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
                   --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
     { brief_trace; } 2>/dev/null
-    # Add chunked image_name to GITHUB_ENV for later use
-    if [[ -n "${GITHUB_ENV:-}" ]]; then
-        echo "image_name=${IMAGE_NAME}-chunked" >> ${GITHUB_ENV}
-    fi
     sect_border
     echo " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
     echo " Chunk Time    - $(cmd_test_timer)"
@@ -124,8 +113,9 @@ chunk_image() {
 }
 
 push_image() {
-    local digestfile="/tmp/digestfile" build_tags="${BUILD_TAGS}" tag
-    local push_image="${IMAGE_NAME/-chunked/}"
+    # Always push image without chunked suffix
+    local push_image="${IMAGE_NAME/-chunked/}" build_tags="${BUILD_TAGS}" tag
+    digestfile="/tmp/digestfile"
 
     sect_border
     echo " Pushing       - ${push_image}:${DEFAULT_TAG}"
@@ -133,7 +123,6 @@ push_image() {
     sect_border
     _cmd_test_timer_start=$(date +%s)
     for tag in ${build_tags}; do
-        # Always push image without chunked suffix
         log "INFO" "Pushing: ${push_image}:${tag}"
         { brief_trace; } 2>/dev/null
         podman tag "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
@@ -142,10 +131,6 @@ push_image() {
         { brief_trace; } 2>/dev/null
         log "INFO" "Pushed: ${push_image}:${tag}"
     done
-    # Add digestfile to GITHUB_OUTPUT for later use
-    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-        echo "digest=$(< "${digestfile}")" >> ${GITHUB_OUTPUT}
-    fi
     sect_border
     echo " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
     echo " Push Time    - $(cmd_test_timer)"
@@ -172,14 +157,44 @@ Example:
 EOF
 }
 
+# Add values to GITHUB_VARS for later use
+gh_set() {
+    local cmd="${1}"
+    if [[ -n "${GITHUB_ENV:-}" ]]; then
+        case "${cmd}" in
+            pre-build)
+                # Add build tags
+                BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
+                echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
+                # Add real image_name
+                echo "image_name=${IMAGE_NAME}" >> "${GITHUB_ENV}"
+                ;;
+            post-chunk)
+                # Add chunked image_name
+                echo "image_name=${IMAGE_NAME}-chunked" >> "${GITHUB_ENV}"
+                ;;
+            post-push)
+                # Add digestfile for cosign
+                echo "digest=$(< ${digestfile})" >> "${GITHUB_OUTPUT}"
+                unset digestfile
+                ;;
+            *)
+                return 0
+                ;;
+        esac
+    fi
+}
+
 exec_subcommand() {
     local cmd="${1}"; shift
+    gh_set "pre-${cmd}"
     case "${cmd}" in
         build) build_image "$@" ;;
         chunk) chunk_image "$@" ;;
         push)  push_image  "$@" ;;
         *) die "Unknown command: ${cmd}" show_help ;;
     esac
+    gh_set "post-${cmd}"
 }
 
 main() {
