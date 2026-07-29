@@ -250,7 +250,7 @@ ocopy() {
         shift
     done
 
-    mkdir ${VERBOSE:+-v} -p "${dst}"
+    mkdir ${VERBOSE:+-v} -p "${src}" "${dst}"
     tar -C "${src}" ${excludes} -cf - . | tar ${verbose} -C "${dst}" -xf -
 }
 
