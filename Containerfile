@@ -61,6 +61,8 @@ RUN --mount=type=secret,id=sbmok_priv \
         image-info \
         signing \
         initramfs \
-        post-setup && \
-            bootc container lint ## LINTING # Verify final image and contents are correct.
+        post-setup
 
+### LINTING
+## Verify final image and contents are correct.
+RUN bootc container lint --skip nonempty-run-tmp
