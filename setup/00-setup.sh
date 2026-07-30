@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euox pipefail
+set -euo pipefail
 umask 0022
 source "${BUILD_SCRIPT_LIB}"
 
