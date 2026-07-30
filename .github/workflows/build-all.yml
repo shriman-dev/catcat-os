@@ -33,7 +33,7 @@ jobs:
 
   build-variants:
     name: Build Variants
-    needs: [build-main]
+#    needs: [build-main]
     strategy:
       fail-fast: false   # Other builds even if one fails
       matrix:
