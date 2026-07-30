@@ -15,7 +15,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --local-reg)
             LOCAL_REGISTRY=1
-            LOCAL_REGISTRY_URL="127.0.0.1:5000"
+            LOCAL_REGISTRY_ADR="127.0.0.1:5000"
             ;;
         --build-skp) # Skip building image and proceed to chunking or pushing
             BUILD_SKIP=1
@@ -48,7 +48,7 @@ if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
     registries_confd="/etc/containers/registries.conf.d"
     if [[ ! -f "${registries_confd}/local-registry.conf" ]]; then
         echo "[[registry]]
-location = \"${LOCAL_REGISTRY_URL}\"
+location = \"${LOCAL_REGISTRY_ADR}\"
 insecure = true" | sudo tee "${registries_confd}/local-registry.conf"
 #        echo '[[registry]]
 #location = "10.0.0.0:5000"
@@ -104,7 +104,7 @@ for VARIANT in "${BUILD_TARGETS[@]}"; do
     fi
 
     if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
-        declare -x PUSH_REGISTRY="${LOCAL_REGISTRY_URL}"
+        declare -x PUSH_REGISTRY="${LOCAL_REGISTRY_ADR}"
         declare -x BUILD_TAGS="${DEFAULT_TAG}"
         builder push  --image-name "${VARIANT}" \
                       --base-image "${BASE_IMAGE}" \

@@ -54,10 +54,7 @@ log "INFO" "Fetching done"
 #######################
 # Installing Packages #
 #######################
-COPR_LIST=(
-    "hhd-dev/hhd"
-)
-
+COPR_LIST=("hhd-dev/hhd")
 DECK_PACKAGES=(
 #    "jupiter-fan-control"
 #    "galileo-mura" # Utility designed to mitigate uneven brightness or graininess on OLED screens
