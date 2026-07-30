@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euox pipefail
 umask 0022
 source "${BUILD_SCRIPT_LIB}"
 
@@ -94,7 +94,7 @@ steps() {
         variants)
             if [[ "${ALT_TAG}" != "main" ]]; then
                 run_step "Building ${ALT_TAG^} Image" \
-                    "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
+                "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
             fi
             ;;
         image-info)
