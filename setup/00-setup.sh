@@ -92,8 +92,10 @@ steps() {
             "${BUILD_SETUP_DIR}/09-tweaks-fixes.sh"
             ;;
         variants)
-            run_step "Building ${ALT_TAG^} Image" \
-                "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
+            if [[ "${ALT_TAG}" != "main" ]]; then
+                run_step "Building ${ALT_TAG^} Image" \
+                    "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
+            fi
             ;;
         image-info)
             run_step "Applying Image Info" \
