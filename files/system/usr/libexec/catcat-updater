@@ -78,6 +78,7 @@ update_cmd() {
 
 
 allowed_connection_file="/etc/catcat-os/auto_update_on_connection"
+touch "${allowed_connection_file}"
 connection_list=($(< "${allowed_connection_file}"))
 if [[ ${#connection_list[@]} -gt 0 ]]; then
     for conn in ${connection_list[@]}; do

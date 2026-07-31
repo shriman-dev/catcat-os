@@ -1,22 +1,56 @@
-show-relative-size: true
 style:
-    selected-row:
-        text-color: "#11111b"
-        background-color: "#fab387"
-    progress-modal:
-        current-item-path-max-len: 0
-    use-old-size-bar: false
     footer:
         text-color: '#cdd6f4'
         background-color: '#303049'
         number-color: '#b6c0ff'
+    selected-row:
+        text-color: '#11111b'
+        background-color: '#fab387'
+    result-row:
+        number-color: '#c1ffbc'
+        directory-color: '#fab387'
     header:
         text-color: '#cdd6f4'
         background-color: '#303049'
         hidden: false
-    result-row:
-        number-color: '#c1ffbc'
-        directory-color: '#fab387'
+    progress-modal:
+        current-item-path-max-len: 0
+        show-disk-progress-bar: true
+    use-old-size-bar: false
 sorting:
-    by: "size"
-    order: "desc"
+    by: size
+    order: desc
+log-file: /dev/null
+ignore-dirs:
+    - /proc
+    - /dev
+    - /sys
+    - /run
+ignore-dir-patterns: []
+show-apparent-size: false
+show-relative-size: true
+show-annexed-size: false
+show-item-count: true
+show-mtime: false
+no-color: false
+mouse: true
+non-interactive: false
+interactive: false
+no-progress: false
+no-unicode: false
+no-cross: false
+no-hidden: false
+no-delete: false
+no-view-file: true
+follow-symlinks: false
+profiling: false
+summarize: false
+use-si-prefix: false
+no-prefix: false
+reverse-sort: false
+change-cwd: false
+delete-in-background: false
+delete-in-parallel: false
+archive-browsing: false
+collapse-path: false
+browse-parent-dirs: false

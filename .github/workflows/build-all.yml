@@ -1,6 +1,4 @@
-name: build all
-
-# Build Images, ISOs and make release
+name: build all # Build Images, ISOs and make release
 # Defines when the workflow will run
 on:
   schedule:

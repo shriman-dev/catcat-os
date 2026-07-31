@@ -67,7 +67,6 @@ build_image() {
     cd "$(dirname ${SCRIPT_DIR})"
     { brief_trace; } 2>/dev/null
     podman build "$@" \
-                 --log-level info \
                  --pull=newer \
                  --secret "id=sbmok_priv,env=SBMOK_KEY" \
                  --file "Containerfile" \
