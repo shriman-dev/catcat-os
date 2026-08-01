@@ -2,26 +2,6 @@
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
-#####################################
-# Copying Over System Default Files #
-#####################################
-log "INFO" "Copying and fetching configurations"
-SYS_CACHE="${BUILD_CACHE_DIR}/system-${IMAGE_NAME}"
-cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/bin"/dlss-swapper* \
-       "/usr/bin"/
-cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/lib/modprobe.d/nvidia.conf" \
-       "/usr/lib/modprobe.d/cachy-nvidia.conf"
-cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/lib/udev/rules.d/71-nvidia.rules" \
-       "/usr/lib/udev/rules.d"/
-
-get_ghraw --dstd "${SYS_CACHE}/usr/lib/systemd/system" --repo "blue-build/base-images" \
-          --repod "files/nvidia/usr/lib/systemd/system" -f "nvctk-cdi.service"
-
-log "INFO" "Copying cached files"
-ocopy "${SYS_CACHE}" /
-log "INFO" "Copying done"
-
-
 ##############
 # Debloating #
 ##############
@@ -80,16 +60,8 @@ pkgs_nvidia() {
                 libnvidia-cfg libnvidia-ml libnvidia-gpucomp libva-nvidia-driver
 #                libnvidia-ml.i686 nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686
 
-    local kmod_ver=$(
-            rpm -qa | grep akmod-nvidia | \
-            awk -F':' '{print $(NF)}' | \
-            awk -F'-' '{print $(NF-1)}'
-            )
-    local negativo_ver=$(
-            rpm -qa | grep nvidia-modprobe | \
-            awk -F':' '{print $(NF)}' | \
-            awk -F'-' '{print $(NF-1)}'
-            )
+    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
+    local negativo_ver="$(rpm -q nvidia-modprobe --queryformat '%{VERSION}\n')"
 
     depmod -a "$(rpm -q "${CUSTOM_KERNEL:-kernel}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
     [[ "${kmod_ver}" != "${negativo_ver}" ]] &&
@@ -109,6 +81,27 @@ pkgs_nvidia() {
 rpm_repos enable
 pkgs_nvidia
 rpm_repos disable
+
+
+#####################################
+# Copying Over System Default Files #
+#####################################
+log "INFO" "Copying and fetching configurations"
+SYS_CACHE="${BUILD_CACHE_DIR}/system-${IMAGE_NAME}"
+cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/bin"/dlss-swapper* \
+       "/usr/bin"/
+cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/lib/modprobe.d/nvidia.conf" \
+       "/usr/lib/modprobe.d/cachy-nvidia.conf"
+cp -vf "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings/usr/lib/udev/rules.d/71-nvidia.rules" \
+       "/usr/lib/udev/rules.d"/
+
+get_ghraw --dstd "${SYS_CACHE}/usr/lib/systemd/system" --repo "blue-build/base-images" \
+          --repod "files/nvidia/usr/lib/systemd/system" -f "nvctk-cdi.service"
+
+log "INFO" "Copying cached files"
+ocopy "${SYS_CACHE}" /
+log "INFO" "Copying done"
+
 
 ################################
 # Configuring Systemd Services #

@@ -221,7 +221,6 @@ DESKTOP_COMMON=(
     "dconf-editor"
     "gnome-software"
     "gnome-system-monitor"
-    "gnome-software-rpm-ostree"
 #    "gnome-shell-extension-hanabi" # from ublue-os/bazzite
     "gnome-shell-extension-common"
     "gnome-shell-extension-gsconnect"
