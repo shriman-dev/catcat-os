@@ -89,7 +89,7 @@ jobs:
                   --alt-tag    "${{ inputs.alt_tag }}"
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4.5.2
+        uses: docker/login-action@v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
