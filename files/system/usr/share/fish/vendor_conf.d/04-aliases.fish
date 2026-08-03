@@ -2,7 +2,6 @@ status is-interactive || exit 0
 _check_local_config
 
 ## Useful aliases
-alias cd='z'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'

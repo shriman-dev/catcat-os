@@ -6,6 +6,7 @@ after_cleanup() {
     rm -rvf /var/log/dnf*.log
     rm -rvf /boot/.*
     rm -rvf /boot/*
+    rm -rvf /tmp/.*
     rm -rvf /tmp/*
 }
 

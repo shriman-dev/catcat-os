@@ -13,13 +13,13 @@ if type -q starship
     set pawship_conf "/tmp/catcat-os/pawship.toml"
     set starship_conf "$HOME/.config/starship.toml"
 
+    if not test -f "$starship_conf"
+        set starship_conf "/etc/starship/starship.toml"
+    end
+
     if test -d "/usr/share/catcat-os"
         if not test -f "$pawship_conf"
-            if not test -f "$starship_conf"
-                set starship_conf "/etc/starship/starship.toml"
-            end
-            mkdir -p $(dirname "$pawship_conf")
-            cp "$starship_conf" "$pawship_conf"
+            install -D -m 0644 "$starship_conf" "$pawship_conf"
             sed -i 's|^Fedora =.*|Fedora = ""|' "$pawship_conf"
         end
         set -gx STARSHIP_CONFIG "$pawship_conf"
@@ -39,7 +39,10 @@ if type -q starship
 end
 
 ## Zoxide
-type -q zoxide && zoxide init fish | source
+if type -q zoxide
+    zoxide init fish | source
+    alias cd='z'
+end
 
 # Fzf colors
 set -gx FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS\

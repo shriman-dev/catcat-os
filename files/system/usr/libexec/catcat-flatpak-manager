@@ -185,7 +185,7 @@ app_specific_perms() {
 
   # Allow gedit to edit files all over system
   log "INFO" "\nAllow gedit to edit files all over system"
-  flatpak override "${SCOPE}" --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/flatpak,~/.var,/tmp} org.gnome.gedit
+  flatpak override "${SCOPE}" --unshare=network --filesystem={host,host-{etc,os},home,~/.local/share/{flatpak,libgedit-gtksourceview-300},~/.var,/tmp} org.gnome.gedit
 }
 
 # perms for gaming apps

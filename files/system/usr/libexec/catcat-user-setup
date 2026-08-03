@@ -276,6 +276,7 @@ setup_apps() {
         ["io.freetubeapp.FreeTube"]="/usr/share/icons/crafted/yt2.svg"
         ["io.gitlab.librewolf-community"]="firefox"
         ["com.github.tenderowl.frog"]="com.endlessnetwork.frogsquash"
+        ["com.github.PintaProject.Pinta"]="gnome-paint"
     )
 
     local _app

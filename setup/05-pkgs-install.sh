@@ -80,6 +80,9 @@ DESKTOP_EXTRAS=(
     "awf-gtk2"
     "awf-gtk3"
     "awf-gtk4"
+    "libadwaita"
+    "gtk4-devel-tools"
+    "gtk3-devel"
 
     # Virtualization
     ##virt-manager gnome-boxes

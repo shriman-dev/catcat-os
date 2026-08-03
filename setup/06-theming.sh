@@ -6,30 +6,42 @@ SYS_CACHE="${BUILD_CACHE_DIR}/system-theming"
 desktop_files() {
     log "INFO" "Configuring desktop files"
 
-    local desktopfile_dir="/usr/share/applications"
+    local entries_dir="/usr/share/applications"
     # To use catcat update
-    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" "${desktopfile_dir}"/system-update.desktop || true
+    sed -i "s|^Exec=.*|Exec=/usr/bin/sudo /usr/bin/update all|" "${entries_dir}"/system-update.desktop || true
+    sed -i 's|^Name.*=.*|Name=Software Store|' "${entries_dir}"/io.github.kolunmi.Bazaar.desktop || true
+    sed -i 's|^Name=.*|Name=Nemo File Manager|' "${entries_dir}"/nemo.desktop || true
+    sed -i 's/^Icon=.*/Icon=fish/' "${entries_dir}"/org.gnome.Ptyxis.desktop
+    sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' "${entries_dir}"/org.gnome.Settings.desktop
+    sed -i 's/^Icon=.*/Icon=np2/' "${entries_dir}"/oneko.desktop
+    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' "${entries_dir}"/yazi.desktop || true
 
-    sed -i 's|^Name=.*|Name=Nemo File Manager|' "${desktopfile_dir}"/nemo.desktop || true
-    sed -i 's/^Icon=.*/Icon=user-home/' "${desktopfile_dir}"/org.gnome.Nautilus.desktop
-    sed -i 's/^Exec=.*/Exec=nautilus --new-window Me\//;/DBusActivatable/d' "${desktopfile_dir}"/org.gnome.Nautilus.desktop
-    sed -i 's/^Icon=.*/Icon=fish/' "${desktopfile_dir}"/org.gnome.Ptyxis.desktop
-    sed -i 's/^Icon=.*/Icon=mintsources-maintenance/' "${desktopfile_dir}"/org.gnome.Settings.desktop
-    sed -i 's/^Icon=.*/Icon=np2/' "${desktopfile_dir}"/oneko.desktop
-    sed -i 's|^Icon=.*|Icon=/usr/share/icons/yazi.png|' "${desktopfile_dir}"/yazi.desktop || true
+    sed -i -e 's/^Icon=.*/Icon=user-home/' \
+           -e 's/^Exec=.*/Exec=nautilus --new-window Me\//' \
+           -e '/DBusActivatable/d' "${entries_dir}"/org.gnome.Nautilus.desktop
 
-    sed -i 's|^Name.*=.*|Name=Software Store|' "${desktopfile_dir}"/io.github.kolunmi.Bazaar.desktop || true
+    sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' "${entries_dir}"/Waydroid.desktop
 
-    sed -i 's|^Exec=.*|Exec=/usr/bin/catcat-waydroid-launcher|' "${desktopfile_dir}"/Waydroid.desktop
+    sed -i '/NoDisplay/d' "${entries_dir}"/gtk3-widget-factory.desktop
 
     # Hide desktop entries
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/fish.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/bottom.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/yad-icon-browser.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/nvtop.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/amdgpu_top.desktop || true
-    sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" "${desktopfile_dir}"/amdgpu_top-tui.desktop || true
-
+    local dfiles dfile
+    dfiles=(
+        "fish"
+        "bottom"
+        "yad-icon-browser"
+        "nvtop"
+        "amdgpu_top"
+        "amdgpu_top-tui"
+        "syncthing-start"
+        "org.gtk.Demo4"
+        "org.gtk.gtk4.NodeEditor"
+        "org.gtk.PrintEditor4"
+    )
+    for dfile in "${dfiles[@]}"; do
+        sed -i "/NoDisplay/d;/\[Desktop Entry\]/a NoDisplay=true" \
+               "${entries_dir}/${dfile}.desktop" || true
+    done
     log "INFO" "Done configuring desktop files"
 }
 

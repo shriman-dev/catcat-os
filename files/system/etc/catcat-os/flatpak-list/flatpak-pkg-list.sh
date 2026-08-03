@@ -25,6 +25,7 @@ DESKTOP_EXTRAS=(
 
     # Gaming Apps
     "app/com.usebottles.bottles/x86_64/stable"
+    "app/io.github.Faugus.faugus-launcher/x86_64/stable"
     "app/com.vysp3r.ProtonPlus/x86_64/stable"
     "app/page.kramo.Cartridges/x86_64/stable"
     "app/io.github.radiolamp.mangojuice/x86_64/stable"
@@ -56,7 +57,6 @@ DESKTOP_EXTRAS=(
 
 DESKTOP_COMMON=(
     # # File Viewers
-    #"app/org.gnome.eog/x86_64/stable"
     "app/org.gnome.Loupe/x86_64/stable"
     "app/app.fotema.Fotema/x86_64/stable"
     "app/org.gnome.Papers/x86_64/stable"
@@ -125,10 +125,7 @@ DESKTOP_COMMON=(
 
     # Productivity and Development
     "app/io.github.efogdev.mpris-timer/x86_64/stable"
-    "app/com.toolstack.Folio/x86_64/stable"
     "app/se.sjoerd.Graphs/x86_64/stable"
-    "app/re.sonny.Eloquent/x86_64/stable"
-    "app/dev.bragefuglseth.Keypunch/x86_64/stable"
     "app/me.iepure.devtoolbox/x86_64/stable"
 
     # Gaming Apps
@@ -147,6 +144,7 @@ DESKTOP_COMMON=(
     "runtime/org.kde.KStyle.Kvantum/x86_64/6.6"
     "runtime/org.kde.KStyle.Kvantum/x86_64/6.5"
     "runtime/org.kde.KStyle.Kvantum/x86_64/6.10"
+    "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-25.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-24.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-23.08"
     "runtime/org.kde.KStyle.Kvantum/x86_64/5.15-22.08"
