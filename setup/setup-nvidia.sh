@@ -11,7 +11,8 @@ dnf5 -y remove \
         rocm-hip \
         rocm-opencl \
         rocm-clinfo \
-        rocm-smi
+        rocm-smi \
+        amdsmi
 dnf5 -y autoremove
 log "INFO" "Debloat Done"
 
@@ -22,27 +23,28 @@ log "INFO" "Debloat Done"
 pkgs_nvidia() {
     local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
 
-    # Sec limit nofile causes akmod install issue
-    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
-    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
-
-    RPM_REPOS=("fedora-nvidia")
-    pkgs_install "NVIDIA Drivers: kernel devel" \
-                kernel-headers "${CUSTOM_KERNEL:-kernel}"-devel-matched
-
-    pkgs_install "NVIDIA Drivers: akmods" akmods gcc gcc-c++
+    log "INFO" "Installing NVIDIA Drivers Packages"
+    dnf_action install kernel-headers "${CUSTOM_KERNEL:-kernel}"-devel-matched \
+                       akmods gcc gcc-c++
 
     # TODO: remove this when fixed upstream
     sed -i.bak '/if \[\[ -w \/var \]\] ; then/,/fi/d' /usr/sbin/akmodsbuild
     chmod -v +x /usr/sbin/akmodsbuild
 
-    pkgs_install "NVIDIA Drivers" akmod-nvidia nvidia-kmod-common nvidia-modprobe
+    dnf_action install from-repo "fedora-nvidia" \
+                       akmod-nvidia nvidia-kmod-common nvidia-modprobe
+
     akmods --kernels "${kernel_ver}" --kmod "nvidia" --force
     cat /var/cache/akmods/nvidia/*.failed.log || true
 
     mv /usr/sbin/akmodsbuild.bak /usr/sbin/akmodsbuild
 
     # Verify drivers
+    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
+    local negativo_ver="$(rpm -q nvidia-modprobe --queryformat '%{VERSION}\n')"
+
+    [[ "${kmod_ver}" != "${negativo_ver}" ]] && die "NVIDIA Drivers version mismatch"
+
     modinfo \
       "/usr/lib/modules/${kernel_ver}/extra/nvidia"/nvidia{,-drm,-modeset,-peermem,-uvm}.ko.xz \
       >/dev/null ||
@@ -53,29 +55,22 @@ pkgs_nvidia() {
         ln -svf /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
                 /etc/pki/tls/certs/ca-bundle.crt
 
-    RPM_REPOS+=("nvidia-container-toolkit")
-    pkgs_install "NVIDIA" \
-                nvtop nvidia-driver nvidia-persistenced nvidia-settings \
-                nvidia-driver-cuda nvidia-container-toolkit libnvidia-fbc \
-                libnvidia-cfg libnvidia-ml libnvidia-gpucomp libva-nvidia-driver
-#                libnvidia-ml.i686 nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686
+    dnf_action install nvtop libva-nvidia-driver
+    dnf_action install from-repo "fedora-nvidia" \
+                       libnvidia-cfg libnvidia-fbc libnvidia-gpucomp libnvidia-ml \
+                       nvidia-driver nvidia-driver-common nvidia-driver-cuda \
+                       nvidia-persistenced nvidia-settings
+    dnf_action install from-repo "nvidia-container-toolkit" \
+                       nvidia-container-toolkit
 
-    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
-    local negativo_ver="$(rpm -q nvidia-modprobe --queryformat '%{VERSION}\n')"
-
-    depmod -a "$(rpm -q "${CUSTOM_KERNEL:-kernel}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
-    [[ "${kmod_ver}" != "${negativo_ver}" ]] &&
-        die "NVIDIA Drivers version mismatch"
-
-    bakrestore "/usr/lib/systemd/system.conf.d/10-limits.conf"
-    bakrestore "/usr/lib/systemd/user.conf.d/10-limits.conf"
-
+    # Finalize
     # SELinux policies for NVIDIA image
     curl_get "${BUILD_CACHE_DIR}/nvidia-container.pp" \
          "https://raw.githubusercontent.com/NVIDIA/dgx-selinux/master/bin/RHEL9/nvidia-container.pp"
     semodule -i "${BUILD_CACHE_DIR}/nvidia-container.pp"
 
-    log "INFO" "NVIDIA Drivers installation successfully"
+    depmod -a "${kernel_ver}"
+    log "INFO" "NVIDIA Drivers installation successful"
 }
 
 rpm_repos enable

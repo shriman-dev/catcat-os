@@ -11,7 +11,7 @@ REMOVE_PKGS=(
     "coreos-installer"
     "docker-cli"
     "fastfetch"
-    "f$(rpm -E %fedora)-backgrounds-base"
+    #"f$(rpm -E %fedora)-backgrounds-base"
     "fedora-bookmarks"
     "fedora-chromium-config*"
     "fedora-flathub-remote"
@@ -28,7 +28,7 @@ REMOVE_PKGS=(
     "gnome-tour"
     "google-compute-engine-guest-configs-udev"
     "htop"
-    "httpd"
+    "httpd*"
     "httpd-core"
     "libvirt"
     "libvirt-libs"
@@ -59,7 +59,7 @@ REMOVE_PKGS=(
     "webapp-manager"
     "xdotool"
     "ydotool"
-    "yelp"
+    "yelp*"
     "zincati"
     "zram-generator-defaults"
 )
@@ -80,8 +80,6 @@ KERNEL_PKGS=(
     "kernel-modules"
     "kernel-modules-core"
 #    "kernel-modules-extra"
-#    "kernel-tools"
-#    "kernel-tools-libs"
 )
 
 if [[ $# -eq 0 ]]; then

@@ -71,6 +71,10 @@ steps() {
             run_step "Installing Common Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "common"
             ;;
+        pkgs-hwaccel)
+            run_step "Installing HW Acceleration Packages" \
+            "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "hwaccel"
+            ;;
         pkgs-desktop)
             run_step "Installing Desktop Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "batch-end" "desktop"

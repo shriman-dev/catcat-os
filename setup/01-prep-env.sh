@@ -17,6 +17,12 @@ mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
           "${BUILD_CACHE_DIR}/fetched" \
           "${BUILD_CACHE_DIR}/rpm"
 
+mkdir -vp "/etc/${PROJECT_NAME}" \
+          "/etc/skel/.local/share/${PROJECT_NAME}" \
+          "/usr/lib/${PROJECT_NAME}" \
+          "/usr/share/${PROJECT_NAME}" \
+          "/usr/share/backgrounds/${PROJECT_NAME}"
+
 mkdir -vp /etc/dconf/db/distro.d \
           /var/tmp \
           /var/roothome \

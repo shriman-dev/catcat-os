@@ -33,7 +33,6 @@ DESKTOP_EXTRAS=(
     "stress-ng"
     "wireshark"
     "++bandwhich"
-    #amdgpu_top
     "$(rpm_dl 'amdgpu_top' 'Umio-Yasuno/amdgpu_top' 'x86_64\.rpm$')"
 
     # Backup, Archive, Encryption and Compression
@@ -50,22 +49,12 @@ DESKTOP_EXTRAS=(
     # More Terminal Tools
     ##ydotool
     "yt-dlp"
-    "ffmpeg"
-    "ffmpegthumbnailer"
     "kpcli"
-    #watchexec
-    "$(rpm_dl 'watchexec' 'watchexec/watchexec' 'x86_64-unknown-linux-gnu\.rpm$')"
+#    "$(rpm_dl 'watchexec' 'watchexec/watchexec' 'x86_64-unknown-linux-gnu\.rpm$')"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
-    "buildah"
     #"++llama-cpp"
-
-    # Rocm lib
-    #rocm-hip
-    #rocm-opencl
-    #rocm-clinfo
-    #rocm-smi
 
     # File Manage Stuff
     "nemo"
@@ -97,26 +86,24 @@ DESKTOP_EXTRAS=(
     "spice-gtk-tools"
     "swtpm"
     "swtpm-tools"
+    "podman-machine"
     "++ls-iommu"
 
-    # Gaming Stuff
+    # Gaming packages
     ##coolercontrol mfancontrol liquidctl lsfg-vk
     ##fluidsynth gamemode gamescope goverlay lutris mangohud vkBasalt
     "input-remapper"
     "antimicrox"
+
+    # Gaming Deps
     "openrgb"
     "openrgb-udev-rules"
-    #lsfg-vk
-    #$(rpm_dl 'lsfg-vk' 'PancakeTAS/lsfg-vk' 'x86_64\.rpm$')
-
-    # Performance Tuning
-    ##corectrl
-    "uresourced"
-    #"irqbalance"
-    #lact
+    "libratbag-ratbagd" # DBus daemon to access programmable input devices, mainly gaming mice
     #"$(rpm_dl 'lact' 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
+    #"$(rpm_dl 'lsfg-vk' 'PancakeTAS/lsfg-vk' 'x86_64\.rpm$')"
 
     # Extras deps
+    "++extras"
 #    "rocm"
 #    "rocm-core"
 #    "rocm-hip"
@@ -126,7 +113,6 @@ DESKTOP_EXTRAS=(
 #    "rocm-smi"
 #    "hipblas"
 #    "hipblaslt"
-    "++extras"
 )
 
 DESKTOP_COMMON=(
@@ -134,7 +120,6 @@ DESKTOP_COMMON=(
     #bubblejail
     "firewall-config"
     "usbguard-notifier"
-    #opensnitch
     #$(rpm_dl 'opensnitch' 'evilsocket/opensnitch' 'x86_64.rpm$')
     #$(rpm_dl 'opensnitch-noarch' 'evilsocket/opensnitch' 'noarch\.rpm$')
 
@@ -147,6 +132,7 @@ DESKTOP_COMMON=(
     ##hwinfo
     "inxi"
     "tealdeer"
+    "mediainfo"
 
     # Disk Operations and Analyze
     "gparted"
@@ -199,7 +185,7 @@ DESKTOP_COMMON=(
     "android-tools"
 
     # waydroid stuff
-    "cage" # runs a single, maximized application
+    "cage"         # Runs a single, maximized application
     "waydroid"
     "wlr-randr"
     "++waydroid_setup"
@@ -208,6 +194,7 @@ DESKTOP_COMMON=(
     "distrobox"
     "podman-compose"
     "podman"
+    "buildah"
     "udica"
 
     # File Manage Stuff
@@ -215,7 +202,8 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-#    "rom-properties-gtk4" # from ublue-os/rom-properties
+    "rom-properties-gtk4" # From terra
+    "rom-properties-utils" # From terra
 
     # Gnome Apps and Extensions
     "xed"
@@ -228,7 +216,7 @@ DESKTOP_COMMON=(
     "gnome-shell-extension-common"
     "gnome-shell-extension-gsconnect"
 
-    # Themeing Deps
+    # Theming Deps
     "adwaita-fonts-all"
     #"adwaita-gtk2-theme"
     #"gnome-themes-extra"
@@ -242,8 +230,8 @@ DESKTOP_COMMON=(
     "gnome-menus"
     "glib2-devel"
     "libgtop2"
-    "ffmpegthumbnailer"
     "libappindicator-gtk3"
+    "google-noto-fonts-all"
 
     # Yubikey Deps
     "pam-u2f"
@@ -254,25 +242,28 @@ DESKTOP_COMMON=(
     # Needed Deps
     "yad"
     "zenity"
+    "libmtp"
+    "gvfs-mtp"
+    "gvfs-fuse"
     "espeak-ng"
     "i2c-tools"
-    #"++wldrivers"
-    "alsa-firmware"
-    #"pipewire-libs-extra"
-    "solaar-udev" # udev rules for Logitech wireless receivers
+    "solaar-udev" # Udev rules for Logitech wireless receivers
     "steam-devices"
     "grub2-tools-extra"
-    "google-noto-fonts-all"
+    "libcamera"
+    "libcamera-ipa"
     "libcamera-tools"
     "libcamera-gstreamer"
     "libimobiledevice-utils"
+    "pipewire-plugin-libcamera"
 )
 
 COMMON=(
     # Shell setup
     "zsh"
     "fish"
-    #fastfetch
+    "bash-completion"
+    "bash-color-prompt"
     "$(rpm_dl 'fastfetch' 'fastfetch-cli/fastfetch' 'linux-amd64\.rpm$')"
     "starship" # from terra repo
     "fzf"
@@ -287,6 +278,7 @@ COMMON=(
     # Secure
     "firewalld"
     "usbguard"
+    "sbsigntools" # Tools to add signatures to efi binaries and drivers
     "setools-console"
     "++dnscrypt-proxy"
 
@@ -296,7 +288,6 @@ COMMON=(
     "nethogs"
     "tcpdump"
     "traceroute"
-    #bottom
     "$(rpm_dl 'bottom' 'ClementTsang/bottom' 'x86_64\.rpm$' 'musl')"
 
     # Info Helper
@@ -335,30 +326,32 @@ COMMON=(
     # Performance Tuning
     "tuned"
 
-    # Exrtas
-    "++ucat_setup"
-
-    # Needed Deps
-    #cosign
+    # Networking
     "iwd"
-    "newt" # library for windows and widgets in terminal
-    "bootc"
-    "gettext" # libraries for localized translated messages
     "openssl"
-    "lsb_release" # os-release
-    "dnf5-plugins"
-    "sbsigntools" # tools to add signatures to efi binaries and drivers
     "wireguard-tools"
+
+    # Firmware
     "fwupd"
     "fwupd-efi"
     "fwupd-plugin-flashrom"
     "fwupd-plugin-modem-manager"
     "fwupd-plugin-uefi-capsule-data"
-)
 
-kernel_add() {
-    ( set -x; "${BUILD_SETUP_DIR}"/setup_lib/pkgs-kernel.sh add )
-}
+    # Exrtas
+    "++ucat_setup"
+
+    # Needed Deps
+    #cosign
+    "apr" # Apache Portable Runtime C library
+    "apr-util"
+    #"greenboot" # Automate rollbacks to the last known working state
+    "newt" # Library for windows and widgets in terminal
+    "bootc"
+    "gettext" # Libraries for localized translated messages
+    "lsb_release" # os-release
+    "dnf5-plugins"
+)
 
 process_installations() {
     case "${1}" in
@@ -367,6 +360,9 @@ process_installations() {
             ;;
         common)
             pkgs_install "${1}" "${COMMON[@]}"
+            ;;
+        hwaccel)
+            pkgs_hwaccel
             ;;
         desktop_comm)
             pkgs_install "${1}" "${DESKTOP_COMMON[@]}"
@@ -379,6 +375,7 @@ process_installations() {
             ;;
         all)
             kernel_add
+            pkgs_hwaccel
             pkgs_install "${1}" "${COMMON[@]}" "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
             ;;
         *) die "Unknown argument: ${1}";;

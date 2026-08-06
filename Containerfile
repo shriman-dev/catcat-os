@@ -52,6 +52,7 @@ RUN --mount=type=secret,id=sbmok_priv \
         copy-sysfiles \
         pkgs-kernel \
         pkgs-common \
+        pkgs-hwaccel \
         pkgs-desktop \
         theming \
         secatcat \
@@ -65,4 +66,6 @@ RUN --mount=type=secret,id=sbmok_priv \
 
 ### LINTING
 ## Verify final image and contents are correct.
-RUN bootc container lint --skip nonempty-run-tmp
+RUN --network=none \
+    --mount=type=tmpfs,target=/run \
+    bootc container lint

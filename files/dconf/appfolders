@@ -2,7 +2,7 @@
 folder-children=['FileViewers', 'Creative', 'Docs', 'Net', 'Stores', 'Sysmon', 'DiskBackup', 'SysSecurity', 'DroidCons', 'Utils', 'Tweaks', 'ProdDevel', 'Gaming', 'Tools', 'Optimize', 'Others']
 
 [org/gnome/desktop/app-folders/folders/FileViewers]
-apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'org.gnome.Showtime.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'org.gnome.Decibels.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'io.github.diegopvlk.Cine.desktop', 'io.github.celluloid_player.Celluloid.desktop', 'io.github.tobagin.scramble.desktop', 'org.gnome.FileRoller.desktop', 'app.drey.EarTag.desktop', 'com.github.rafostar.Clapper.desktop', 'de.leopoldluley.Clapgrep.desktop', 'nemo.desktop', 'yazi.desktop', 'org.gnome.Loupe.desktop', 'org.gnome.eog.desktop', 'org.gnome.Evince.desktop']
+apps=['org.gnome.Nautilus.desktop', 'app.fotema.Fotema.desktop', 'org.gnome.Showtime.desktop', 'com.github.neithern.g4music.desktop', 'org.gnome.Papers.desktop', 'org.videolan.VLC.desktop', 'org.gnome.Decibels.desktop', 'dev.geopjr.Collision.desktop', 'org.gnome.meld.desktop', 'io.github.diegopvlk.Cine.desktop', 'io.github.celluloid_player.Celluloid.desktop', 'io.github.tobagin.scramble.desktop', 'org.gnome.FileRoller.desktop', 'app.drey.EarTag.desktop', 'com.github.rafostar.Clapper.desktop', 'de.leopoldluley.Clapgrep.desktop', 'nemo.desktop', 'yazi.desktop', 'com.gerbilsoft.rom-properties.rp-config.desktop', 'org.gnome.Loupe.desktop', 'org.gnome.eog.desktop', 'org.gnome.Evince.desktop']
 name='File Viewers'
 translate=false
 
@@ -37,7 +37,7 @@ name='Disk & Backup'
 translate=false
 
 [org/gnome/desktop/app-folders/folders/SysSecurity]
-apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'io.github.linx_systems.ClamUI.desktop', 'org.openrgb.OpenRGB.desktop', 'io.github.ilya_zlobintsev.LACT.desktop', 'hhd-ui.desktop', 'monitor-control.desktop', 'app.drey.KeyRack.desktop', 'org.freedesktop.MalcontentControl.desktop', 'org.cachyos.scx-manager.desktop', 'mcontrolcenter.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'ddcui.desktop', 'com.mitchellh.ghostty.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
+apps=['org.gnome.Settings.desktop', 'org.gnome.ColorViewer.desktop', 'org.gnome.PowerStats.desktop', 'com.github.tchx84.Flatseal.desktop', 'org.gnome.Firmware.desktop', 'firewall-config.desktop', 'io.github.linx_systems.ClamUI.desktop', 'org.openrgb.OpenRGB.desktop', 'io.github.ilya_zlobintsev.LACT.desktop', 'hhd-ui.desktop', 'monitor-control.desktop', 'app.drey.KeyRack.desktop', 'org.freedesktop.MalcontentControl.desktop', 'org.cachyos.scx-manager.desktop', 'cardwire-gui.desktop', 'mcontrolcenter.desktop', 'nvidia-settings.desktop', 'tuned-gui.desktop', 'cups.desktop', 'ddcui.desktop', 'com.mitchellh.ghostty.desktop', 'org.gnome.Ptyxis.desktop', 'foot.desktop', 'footclient.desktop', 'foot-server.desktop', 'fish.desktop', 'com.github.amezin.ddterm.desktop']
 name='Sys & Security'
 translate=false
 

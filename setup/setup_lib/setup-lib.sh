@@ -44,6 +44,14 @@ enable_rpm_repos() {
         dnf5 -y config-manager setopt nvidia-container-toolkit.gpgcheck=1
     fi
 
+    # Negativo17 Multimedia Repo
+    if [[ ! -f "/etc/yum.repos.d/fedora-multimedia.repo" ]]; then
+        dnf5 -y config-manager addrepo \
+             --from-repofile="https://negativo17.org/repos/fedora-multimedia.repo"
+        dnf5 -y config-manager setopt fedora-multimedia.enabled=0
+        dnf5 -y config-manager setopt fedora-multimedia.priority=90
+    fi
+
     # Rpmfusion Repo
 #    dnf5 -y install \
 #    https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -52,8 +60,7 @@ enable_rpm_repos() {
 
 disable_rpm_repos() {
     local repo copr
-    for repo in _copr_ublue-os-akmods.repo \
-                negativo17-fedora-multimedia.repo; do
+    for repo in _copr_ublue-os-akmods.repo; do
         sed -i 's/enabled=1/enabled=0/g' "/etc/yum.repos.d/${repo}" || true
     done
     for copr in "${copr_list[@]}"; do
@@ -75,7 +82,7 @@ rpm_repos() {
     local action="${1}"
     local copr_list=(
         "bieszczaders/kernel-cachyos-addons"
-        "ublue-os/bazzite"
+#        "ublue-os/bazzite"
 #        "ublue-os/bazzite-multilib"
 #        "ublue-os/staging"
 #        "ublue-os/packages"
@@ -106,9 +113,39 @@ rpm_repos() {
     esac
 }
 
+dnf_action() {
+    local operation="${1}" from_repo="" repo="" weak_deps="False"; shift
+
+    while [[ $# -gt 0 ]]; do
+        case ${1} in
+            from-repo)
+                repo="--enable-repo=${2}"
+                from_repo="--from-repo=${2}"
+                shift 2
+                ;;
+            enable-repo)
+                repo="--enable-repo=${2}"
+                shift 2
+                ;;
+            weak-deps)
+                weak_deps="True"
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    brief_trace
+    dnf5 -y clean dbcache
+    dnf5 -y --setopt=install_weak_deps="${weak_deps}" \
+            ${repo} ${operation} ${from_repo} "$@"
+    brief_trace
+}
+
 pkgs_install() {
-    local pkgs_type="${1}"
-    shift
+    local pkgs_type="${1}"; shift
     local dnf_pkgs="$(printf '%s\n' "$@" | grep -v '^++')"
     local external_pkgs="$(printf '%s\n' "$@" | sed -n 's|^++||gp')"
     local rpm_repos=(
@@ -116,15 +153,11 @@ pkgs_install() {
         "terra-extras"
         "${RPM_REPOS[@]}"
     )
-    rpm_repos=($(printf -- "--enable-repo=%s\n" "${rpm_repos[@]}"))
+    rpm_repos="$(tr ' ' ',' <<< "${rpm_repos[@]}")"
 
     if [[ -n "${dnf_pkgs}" ]]; then
         log "INFO" "Installing ${pkgs_type^} RPM Package(s)"
-#        dnf5 -y --setopt=disable_excludes=* install mesa-demos # dep of quickemu
-        brief_trace
-        dnf5 -y clean dbcache
-        dnf5 -y install "${rpm_repos[@]}" ${dnf_pkgs}
-        brief_trace
+        dnf_action install enable-repo "${rpm_repos}" ${dnf_pkgs}
     fi
     if [[ -n "${external_pkgs}" ]]; then
         log "INFO" "Installing ${pkgs_type^} External Package(s)"
@@ -135,6 +168,12 @@ pkgs_install() {
     log "INFO" "${pkgs_type^} package(s) installed successfully"
 }
 
+kernel_add() {
+    ( set -x; "${SCRIPT_DIR}"/pkgs-kernel.sh add )
+}
 
+pkgs_hwaccel() {
+    ( set -x; "${SCRIPT_DIR}"/pkgs-hwaccel.sh )
+}
 
 

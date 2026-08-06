@@ -2,7 +2,6 @@
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
-#sddm.service#gdm.service
 services_enable() {
 #libvirtd.service
     log "INFO" "Enabling system services"
@@ -11,13 +10,17 @@ services_enable() {
         podman.socket \
         catcat-system-setup.service \
         catcat-os-update.timer \
-        catcat-maintenance.timer
+        catcat-maintenance.timer \
+        input-remapper.service \
+        dmemcg-booster-system.service \
+        cardwired.service
 
 #dualsense-catppuccin-rainbow.service
     log "INFO" "Enabling global services"
     systemctl --global -f enable \
         libadwaita-theme-sync.service \
-        catcat-user-setup.service
+        catcat-user-setup.service \
+        dmemcg-booster-user.service
     log "INFO" "Enabled system services"
 }
 
@@ -51,7 +54,7 @@ DISABLE_SERVICES=(
     "iscsid.socket"
     "iscsiuio.service"
     "iscsiuio.socket"
-    "iwd.service" # Mask iwd by default to provide wider hardware support with wpa_supplicant
+    "iwd.service" # Mask iwd by default to provide wider hardware support via wpa_supplicant
     "localsearch-3.service"
     "localsearch-control-3.service"
     "localsearch-writeback-3.service"
