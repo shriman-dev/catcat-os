@@ -3,7 +3,7 @@ source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
 services_enable() {
-#libvirtd.service
+#libvirtd.service cardwired.service
     log "INFO" "Enabling system services"
     systemctl -f enable \
         nix.mount \
@@ -12,8 +12,7 @@ services_enable() {
         catcat-os-update.timer \
         catcat-maintenance.timer \
         input-remapper.service \
-        dmemcg-booster-system.service \
-        cardwired.service
+        dmemcg-booster-system.service
 
 #dualsense-catppuccin-rainbow.service
     log "INFO" "Enabling global services"
