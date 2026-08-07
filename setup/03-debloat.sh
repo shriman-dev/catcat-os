@@ -18,6 +18,7 @@ REMOVE_PKGS=(
     "fedora-third-party"
     "fedora-workstation-backgrounds"
     "firefox*"
+    "flatpak-spawn"
     "gnome-browser-connector"
     "gnome-extensions-app"
     "gnome-initial-setup"

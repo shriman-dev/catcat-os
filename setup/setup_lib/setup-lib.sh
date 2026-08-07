@@ -20,6 +20,11 @@ enable_rpm_repos() {
         dnf5 -y copr enable "${copr}"
     done
 
+    # Always remove cisco repo
+    if [[ -f "/etc/yum.repos.d/fedora-cisco-openh264.repo" ]]; then
+        rm -vf "/etc/yum.repos.d/fedora-cisco-openh264.repo"
+    fi
+
     # Terra Repo
     if [[ ! -f "/etc/yum.repos.d/terra.repo" ]]; then
         dnf5 -y install --nogpgcheck --repofrompath \
@@ -67,16 +72,6 @@ disable_rpm_repos() {
         dnf5 -y copr disable "${copr}"
     done
 }
-
-#rpm_repo_conf() {
-#    dnf5 -y config-manager setopt "*rpmfusion*".priority=5 "*rpmfusion*".exclude="mesa-*"
-#    dnf5 -y config-manager setopt "*cachyos*".priority=1
-#    dnf5 -y config-manager setopt "*terra*".priority=2
-#    dnf5 -y config-manager setopt \
-#            "*terra*".exclude="nerd-fonts topgrade scx-* python3-protobuf zlib-devel"
-#    dnf5 -y config-manager setopt \
-#            "*fedora*".exclude="kernel-core* kernel-modules* kernel-uki-virt-*" mesa-* 
-#}
 
 rpm_repos() {
     local action="${1}"

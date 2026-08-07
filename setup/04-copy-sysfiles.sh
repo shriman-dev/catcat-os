@@ -8,12 +8,16 @@ FETCHED="${BUILD_CACHE_DIR}/fetched"
 
 log "INFO" "Copying default configurations and files"
 # CachyOS settings
-ocopy "${BUILD_CACHE_DIR}/conf_repos/cachyos_settings" / \
+cachy="${BUILD_CACHE_DIR}/conf_repos/cachyos_settings"
+mv -v "${cachy}/usr/lib/modprobe.d"/*amdgpu.conf \
+      "${cachy}/usr/lib/modprobe.d/cachy-amdgpu.conf" || true
+mv -v "${cachy}/usr/lib/modprobe.d"/*blacklist.conf \
+      "${cachy}/usr/lib/modprobe.d/cachy-blacklist.conf" || true
+ocopy "${cachy}" / \
       'usr/bin/dlss-swapper*' \
       'usr/lib/modprobe.d/nvidia.conf' \
       'usr/lib/udev/rules.d/71-nvidia.rules'
-mv -v /usr/lib/modprobe.d/amdgpu.conf /usr/lib/modprobe.d/cachy-amdgpu.conf
-mv -v /usr/lib/modprobe.d/blacklist.conf /usr/lib/modprobe.d/cachy-blacklist.conf
+unset cachy
 
 # Default settings
 ocopy    "${BUILD_FILES_DIR}/system" /

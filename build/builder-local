@@ -104,8 +104,8 @@ for VARIANT in "${BUILD_TARGETS[@]}"; do
     fi
 
     if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
-        declare -x PUSH_REGISTRY="${LOCAL_REGISTRY_ADR}"
-        declare -x BUILD_TAGS="${DEFAULT_TAG}"
+        PUSH_REGISTRY="${LOCAL_REGISTRY_ADR}" \
+        BUILD_TAGS="${DEFAULT_TAG}" \
         builder push  --image-name "${VARIANT}" \
                       --base-image "${BASE_IMAGE}" \
                       --alt-tag    "${ALT_TAG}" \

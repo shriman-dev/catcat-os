@@ -17,7 +17,7 @@ HWACCEL_PKGS=(
 
     # Performance Tuning
     #"corectrl"
-    #"lact"                      # From terra
+    #"lact"                       # From terra
     #"irqbalance"
     #"cardwire-gui"               # From terra # A GPU Manager and switcher for linux
     "dmemcg-booster"             # From terra
@@ -78,6 +78,7 @@ pkgs_hwaccel() {
                        "${HWACCEL_PKGS[@]}"
 
     # Exclude Mesa from all Fedora and Terra repos except Negativo17's fedora-multimedia
+    #dnf5 -y config-manager setopt "*rpmfusion*".exclude="mesa-*"
     dnf5 -y config-manager setopt "*fedora*".exclude="mesa-*"
     dnf5 -y config-manager setopt "*terra*".exclude="mesa-*"
     dnf5 -y config-manager setopt "fedora-multimedia".exclude=

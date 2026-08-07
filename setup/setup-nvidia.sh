@@ -39,17 +39,6 @@ pkgs_nvidia() {
 
     mv /usr/sbin/akmodsbuild.bak /usr/sbin/akmodsbuild
 
-    # Verify drivers
-    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
-    local negativo_ver="$(rpm -q nvidia-modprobe --queryformat '%{VERSION}\n')"
-
-    [[ "${kmod_ver}" != "${negativo_ver}" ]] && die "NVIDIA Drivers version mismatch"
-
-    modinfo \
-      "/usr/lib/modules/${kernel_ver}/extra/nvidia"/nvidia{,-drm,-modeset,-peermem,-uvm}.ko.xz \
-      >/dev/null ||
-          die "NVIDIA Drivers installation failed" "cat /var/cache/akmods/nvidia/*.failed.log"
-
     # Install NVIDIA packages
     [[ ! -f /etc/pki/tls/certs/ca-bundle.crt ]] &&
         ln -svf /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
@@ -62,6 +51,17 @@ pkgs_nvidia() {
                        nvidia-persistenced nvidia-settings
     dnf_action install from-repo "nvidia-container-toolkit" \
                        nvidia-container-toolkit
+
+    # Verify drivers
+    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
+    local driver_ver="$(rpm -q nvidia-driver --queryformat '%{VERSION}\n')"
+
+    [[ "${kmod_ver}" != "${driver_ver}" ]] && die "NVIDIA Drivers version mismatch"
+
+    modinfo \
+      "/usr/lib/modules/${kernel_ver}/extra/nvidia"/nvidia{,-drm,-modeset,-peermem,-uvm}.ko.xz \
+      >/dev/null ||
+          die "NVIDIA Drivers installation failed" "cat /var/cache/akmods/nvidia/*.failed.log"
 
     # Finalize
     # SELinux policies for NVIDIA image
@@ -103,6 +103,7 @@ log "INFO" "Copying done"
 ################################
 log "INFO" "Enabling system services"
 systemctl -f enable nvctk-cdi.service
+#systemctl -f enable nvidia-powerd.service
 
 DISABLE_SERVICES=(
     "akmods-keygen@akmods-keygen.service"

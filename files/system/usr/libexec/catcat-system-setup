@@ -146,10 +146,12 @@ fi
 # FIXES
 # Set default target to graphical on base images, fixes rebase
 current_default_target=$(systemctl get-default)
-variant_id="$(grep '^VARIANT_ID' /usr/lib/os-release | cut -d= -f2-)"
-default_target=$([[ ${variant_id} =~ "-sv" ]] && echo "multi-user.target" || echo "graphical.target")
+default_target="graphical.target"
 
-grep "${default_target}" <<< "${current_default_target}" || systemctl set-default "${default_target}"
+systemctl is-enabled display-manager.service || default_target="multi-user.target"
+if [[ "${current_default_target}" != "${default_target}" ]]; then
+    systemctl set-default "${default_target}"
+fi
 
 # Waydroid fix
 if [[ -f "/var/lib/waydroid/lxc/waydroid/config" ]]; then

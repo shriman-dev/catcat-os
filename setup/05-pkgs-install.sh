@@ -217,7 +217,6 @@ DESKTOP_COMMON=(
     "gnome-shell-extension-gsconnect"
 
     # Theming Deps
-    "adwaita-fonts-all"
     #"adwaita-gtk2-theme"
     #"gnome-themes-extra"
     "gtk-murrine-engine"
@@ -231,7 +230,9 @@ DESKTOP_COMMON=(
     "glib2-devel"
     "libgtop2"
     "libappindicator-gtk3"
+    "adwaita-fonts-all"
     "google-noto-fonts-all"
+    "fontawesome-fonts-all"
 
     # Yubikey Deps
     "pam-u2f"
