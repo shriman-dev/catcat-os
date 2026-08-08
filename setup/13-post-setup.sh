@@ -23,19 +23,19 @@ log "INFO" "Packages removed"
 # Disable gnome software running in background
 if rpm -q gnome-software; then
     log "INFO" "Disabling gnome software from running in background"
-    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop
-    rm -vf /usr/etc/xdg/autostart/org.gnome.Software.desktop
-    rm -vf /usr/lib/systemd/user/gnome-software.service
-    rm -vf /usr/share/dbus-1/services/org.gnome.Software.service
-    rm -vf /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
+    rm -vf /etc/xdg/autostart/org.gnome.Software.desktop \
+           /usr/etc/xdg/autostart/org.gnome.Software.desktop \
+           /usr/lib/systemd/user/gnome-software.service \
+           /usr/share/dbus-1/services/org.gnome.Software.service \
+           /usr/share/dbus-1/services/org.freedesktop.PackageKit.service
 fi
 
 # Remove more stuffs in skel
 #/etc/skel/.config/autostart
-rm -rvf /etc/skel/.mozilla
-rm -rvf /etc/skel/.config/user-tmpfiles.d
-rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vapor.palette
-rm -rvf /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
+#/etc/skel/.config/user-tmpfiles.d \
+rm -rvf /etc/skel/.mozilla \
+        /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vapor.palette \
+        /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
 
 # Remove symlink resolv conf and create empty one
 if [[ -L "/etc/resolv.conf" ]]; then
@@ -44,22 +44,17 @@ if [[ -L "/etc/resolv.conf" ]]; then
 fi
 
 # Copy entries into /usr/lib/passwd and /usr/lib/group
-if [[ -f /etc/passwd ]]; then
-    out=$(grep -v "root" /etc/passwd) || true
-    if [[ -n "${out}" ]]; then
-        log "INFO" "Moving the following passwd users to /usr/lib/passwd"
-        echo "${out}" >> /usr/lib/passwd
-        echo "root:x:0:0:root:/root:/bin/bash" > /etc/passwd
-    fi
+if out=$(grep -v root /etc/passwd); then
+    log "INFO" "Moving passwd users to /usr/lib/passwd"
+    echo "${out}" >> /usr/lib/passwd
+    echo "root:x:0:0:root:/root:/bin/bash" > /etc/passwd
 fi
-if [[ -f /etc/group ]]; then
-    out=$(grep -v "root\|wheel" /etc/group) || true
-    if [[ -n "${out}" ]]; then
-        log "INFO" "Moving the following group entries to /usr/lib/group"
-        echo "${out}" >> /usr/lib/group
-        echo "root:x:0:" > /etc/group
-        echo "wheel:x:10:" >> /etc/group
-    fi
+
+if out=$(grep -v "root\|wheel" /etc/group); then
+    log "INFO" "Moving group entries to /usr/lib/group"
+    echo "${out}" >> /usr/lib/group
+    echo "root:x:0:" > /etc/group
+    echo "wheel:x:10:" >> /etc/group
 fi
 unset out
 

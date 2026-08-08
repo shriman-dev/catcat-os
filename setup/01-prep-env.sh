@@ -3,14 +3,6 @@ source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
 log "INFO" "Preparing build environment"
-# To use cached sbmok.der
-mkdir -vp "/usr/share/${PROJECT_NAME}/certs" "/etc/pki/akmods/certs"
-SBMOK_DER="${BUILD_CACHE_DIR}/sbmok.der"
-[[ ! -f "${SBMOK_DER}" ]] && SBMOK_DER="${BUILD_ROOT_DIR}/sbmok.der"
-cp -vf "${SBMOK_DER}" "/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
-cp -vf "${SBMOK_DER}" "/etc/pki/akmods/certs/${PROJECT_NAME}-mok.der"
-env
-
 log "INFO" "Creating needed directories"
 mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
           "${BUILD_CACHE_DIR}/conf_repos" \
@@ -18,9 +10,10 @@ mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
           "${BUILD_CACHE_DIR}/rpm"
 
 mkdir -vp "/etc/${PROJECT_NAME}" \
+          "/etc/pki/akmods/certs" \
           "/etc/skel/.local/share/${PROJECT_NAME}" \
           "/usr/lib/${PROJECT_NAME}" \
-          "/usr/share/${PROJECT_NAME}" \
+          "/usr/share/${PROJECT_NAME}/certs" \
           "/usr/share/backgrounds/${PROJECT_NAME}"
 
 mkdir -vp /etc/dconf/db/distro.d \
@@ -30,6 +23,14 @@ mkdir -vp /etc/dconf/db/distro.d \
           /nix
 
 chmod -vR 1777 /var/tmp
+
+
+# To use cached sbmok.der
+SBMOK_DER="${BUILD_CACHE_DIR}/sbmok.der"
+[[ ! -f "${SBMOK_DER}" ]] && SBMOK_DER="${BUILD_ROOT_DIR}/sbmok.der"
+cp -vf "${SBMOK_DER}" "/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
+cp -vf "${SBMOK_DER}" "/etc/pki/akmods/certs/akmods-${PROJECT_NAME}-mok.der"
+env
 
 log "INFO" "Caching repositories with configurations"
 ensure_repo "https://github.com/CachyOS/CachyOS-Settings.git" \
