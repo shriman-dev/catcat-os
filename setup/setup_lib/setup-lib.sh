@@ -109,7 +109,7 @@ rpm_repos() {
 }
 
 dnf_action() {
-    local operation="${1}" repo="" weak_deps="False"; shift
+    local operation="${1}" from_repo="" repo="" weak_deps="False"; shift
 
     while [[ $# -gt 0 ]]; do
         case ${1} in
@@ -118,7 +118,8 @@ dnf_action() {
                 shift 2
                 ;;
             from-repo)
-                repo="--repo=${2}"
+                repo="--enable-repo=${2}"
+                from_repo="--from-repo=${2}"
                 shift 2
                 ;;
             weak-deps)
@@ -134,7 +135,7 @@ dnf_action() {
     brief_trace
     dnf5 -y clean dbcache
     dnf5 -y --setopt=install_weak_deps="${weak_deps}" \
-            ${repo} ${operation} "$@"
+            ${repo} ${operation} ${from_repo} "$@"
     brief_trace
 }
 
