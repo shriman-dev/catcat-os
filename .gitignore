@@ -8,6 +8,8 @@ cosign.private
 /syncro.d/
 /build/.cache/
 /build/.log/
+/build/.test/
 /build/test/
+/build/output/
 /build/build0
 /build/build0.sh
