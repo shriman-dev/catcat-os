@@ -74,7 +74,7 @@ pkgs_hwaccel() {
 #                    switcheroo-control cardwire
     dnf_action swap from-repo "terra-extras" \
                     uresourced uresourced-dmemcg
-    dnf_action install enable-repo "terra,terra-extras" \
+    dnf_action install repo "terra,terra-extras" \
                        "${HWACCEL_PKGS[@]}"
 
     # Exclude Mesa from all Fedora and Terra repos except Negativo17's fedora-multimedia

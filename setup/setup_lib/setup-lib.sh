@@ -109,17 +109,16 @@ rpm_repos() {
 }
 
 dnf_action() {
-    local operation="${1}" from_repo="" repo="" weak_deps="False"; shift
+    local operation="${1}" repo="" weak_deps="False"; shift
 
     while [[ $# -gt 0 ]]; do
         case ${1} in
-            from-repo)
+            repo)
                 repo="--enable-repo=${2}"
-                from_repo="--from-repo=${2}"
                 shift 2
                 ;;
-            enable-repo)
-                repo="--enable-repo=${2}"
+            from-repo)
+                repo="--repo=${2}"
                 shift 2
                 ;;
             weak-deps)
@@ -135,7 +134,7 @@ dnf_action() {
     brief_trace
     dnf5 -y clean dbcache
     dnf5 -y --setopt=install_weak_deps="${weak_deps}" \
-            ${repo} ${operation} ${from_repo} "$@"
+            ${repo} ${operation} "$@"
     brief_trace
 }
 
@@ -152,7 +151,7 @@ pkgs_install() {
 
     if [[ -n "${dnf_pkgs}" ]]; then
         log "INFO" "Installing ${pkgs_type^} RPM Package(s)"
-        dnf_action install enable-repo "${rpm_repos}" ${dnf_pkgs}
+        dnf_action install repo "${rpm_repos}" ${dnf_pkgs}
     fi
     if [[ -n "${external_pkgs}" ]]; then
         log "INFO" "Installing ${pkgs_type^} External Package(s)"
