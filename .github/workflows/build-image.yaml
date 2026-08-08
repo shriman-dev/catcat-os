@@ -52,6 +52,7 @@ jobs:
         shell: bash
         run: |
           set -euox pipefail
+          id
           lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
           free -hm
           nproc --all
