@@ -251,7 +251,12 @@ ocopy() {
     done
 
     mkdir ${VERBOSE:+-v} -p "${src}" "${dst}"
-    tar -C "${src}" ${excludes} -cf - . | tar ${verbose} -C "${dst}" -xf -
+    tar -C "${src}" ${excludes} -cf - . | \
+    tar ${verbose} \
+        --touch \
+        --no-same-owner \
+        --no-same-permissions \
+        -C "${dst}" -xf -
 }
 
 check_file_inplace() {
