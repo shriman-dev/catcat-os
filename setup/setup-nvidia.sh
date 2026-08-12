@@ -119,10 +119,12 @@ systemctl -v mask ${DISABLE_SERVICES[@]} || true
 # Refining System With Tweaks And Fixes #
 #########################################
 log "INFO" "Applying NVIDIA specific tweaks"
-# Blacklist nouveau and add Nvidia modesetting support
-echo '
-# Modesetting must be disabled in case of SLI Mosaic
+echo '# I2C support on NVIDIA
+options nvidia NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100
+' > /etc/modprobe.d/nvidia_i2c.conf
 
+# Blacklist nouveau and add Nvidia modesetting support
+echo '# Modesetting must be disabled in case of SLI Mosaic
 options nvidia-drm modeset=1 fbdev=1
 
 blacklist nouveau

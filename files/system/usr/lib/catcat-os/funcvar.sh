@@ -44,7 +44,7 @@ declare -r uninvert=$'\033[27m'
 declare -r unhide=$'\033[28m'
 
 QUIET=false
-VERBOSE=2
+VERBOSE=1
 
 # Logging with optional verbose output
 log() {
@@ -54,7 +54,7 @@ log() {
     local datetime="$([[ ${VERBOSE} -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
 
     case "${level^^}" in
-        "DEBUG") color=${cyan};   [[ ${QUIET} == false && ${VERBOSE} -eq 2 ]] || return ;;
+        "DEBUG") color=${cyan};   [[ ${QUIET} == false ]] || return ;;
         "INFO")  color=${green};  [[ ${QUIET} == false ]] || return ;;
         "NOTE")  color=${blue};   [[ ${QUIET} == false ]] || return ;;
         "WARN")  color=${yellow}; [[ ${QUIET} == false ]] || return ;;
@@ -141,6 +141,7 @@ symmetric_heading() {
     local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
     local left_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
     local right_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
+    local -n color_ref="${4:-noc}"
 
     if (( ${#text} >= output_width - 3 )); then
         err "Text is too long for the given output width. Increase value of output width."
@@ -151,17 +152,18 @@ symmetric_heading() {
         right_padding+="${padding_char}"
     fi
 
-    printf "%s %s %s\n" "${left_padding}" "${text}" "${right_padding}"
+    printf "%s %s %s\n" "${color_ref}${left_padding}" "${text}" "${right_padding}${noc}"
 }
 
 # Same as above but with upper and lower borders using given character
 enclosed_heading() {
     local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
     local border="$(printf "%*s" ${output_width} | tr ' ' ${padding_char})"
+    local -n color_ref="${4:-noc}"
 
-    echo -e "\n${border}"
-    symmetric_heading "${text}" "${padding_char}" ${output_width}
-    echo -e "${border}\n"
+    echo -e "\n${color_ref}${border}${noc}"
+    symmetric_heading "${text}" "${padding_char}" ${output_width} "${4:-noc}"
+    echo -e "${color_ref}${border}${noc}\n"
 }
 
 cmd_test_timer() {

@@ -318,9 +318,11 @@ COMMON=(
 
     # More Terminal Tools
     "jq"
+    "yq"
     "pv" # tool for monitoring the progress of data through a pipeline
     "gum"
     "just"
+    "tree"
     "kmscon"
     "kmscon-gl"
 

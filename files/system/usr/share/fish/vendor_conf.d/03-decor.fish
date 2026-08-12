@@ -10,7 +10,7 @@ end
 
 ## Starship prompt
 if type -q starship
-    set pawship_conf "/tmp/catcat-os/pawship.toml"
+    set pawship_conf "$HOME/.config/pawship.toml"
     set starship_conf "$HOME/.config/starship.toml"
 
     if not test -f "$starship_conf"
@@ -18,7 +18,7 @@ if type -q starship
     end
 
     if test -d "/usr/share/catcat-os"
-        if not test -f "$pawship_conf"
+        if not diff -q "$starship_conf" "$pawship_conf" >/dev/null 2>&1
             install -D -m 0644 "$starship_conf" "$pawship_conf"
             sed -i 's|^Fedora =.*|Fedora = ""|' "$pawship_conf"
         end

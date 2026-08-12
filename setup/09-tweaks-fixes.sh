@@ -35,7 +35,7 @@ cp -vf /usr/lib/systemd/sleep.conf /etc/systemd/sleep.conf.d/sleep.conf.example
 log "INFO" "Applying performance tweaks"
 # Configure zram and reduce ram consumption by disabling unneeded process
 check_file_inplace /usr/lib/systemd/zram-generator.conf
-check_file_inplace /usr/lib/sysctl.d/65-memory.conf
+check_file_inplace /usr/lib/sysctl.d/99-catcat-perf.conf
 
 # Disable ibus (causes input lag when selected)
 #chmod -v 000 /usr/bin/ibus

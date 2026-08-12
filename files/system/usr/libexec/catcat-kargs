@@ -3,27 +3,10 @@ source /usr/lib/catcat-os/funcvar.sh
 KARGS=$(rpm-ostree kargs)
 NEEDED_KARGS=()
 
-COMMON_KARGS=(
-    "vconsole.font=sun12x22"
-    # catppuccin mocha colors for tty
-    "vt.default_red=30,243,166,249,137,245,148,186,88,243,166,249,137,245,148,166"
-    "vt.default_grn=30,139,227,226,180,194,226,194,91,139,227,226,180,194,226,173"
-    "vt.default_blu=46,168,161,175,250,231,213,222,112,168,161,175,250,231,213,200"
-    "module.sig_enforce=1"
-    "loglevel=3"
-    "rd.udev.log_priority=3"
-    "rd.shell=0"
-    "rd.emergency=halt"
-    "rd.luks.options=discard"
-    "luks.options=discard"
-    "bluetooth.disable_ertm=1"
-    "split_lock_detect=off"
-    "processor.ignore_ppc=1"
-)
+COMMON_KARGS=($(yq '.kargs[]' /usr/lib/bootc/kargs.d/catcat.toml))
 
 for karg in "${COMMON_KARGS[@]}"; do
     if [[ ! ${KARGS} =~ ${karg} ]]; then
-        log "INFO" "Adding needed kargs: ${karg}"
         NEEDED_KARGS+=("--append-if-missing=${karg}")
     fi
 done

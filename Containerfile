@@ -65,7 +65,7 @@ RUN --mount=type=secret,id=sbmok_priv \
         post-setup
 
 ### LINTING
-## Verify final image and contents are correct.
+## Verify final image and contents are correct
 RUN --network=none \
     --mount=type=tmpfs,target=/run \
     bootc container lint
