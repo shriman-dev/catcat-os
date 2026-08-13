@@ -58,7 +58,7 @@ RUN --mount=type=secret,id=sbmok_priv \
         secatcat \
         systemd \
         tweaks-fixes \
-        variants \
+        variant \
         image-info \
         signing \
         initramfs \

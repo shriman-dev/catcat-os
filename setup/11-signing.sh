@@ -98,8 +98,8 @@ sbsign_modules() {
 
 if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
     log "INFO" "Signing kernel and kernel modules with secureboot keys"
-    ker_sigsha_dir="/usr/share/${PROJECT_NAME}/kernel_sigsha"
-    mkdir -vp "${ker_sigsha_dir}"
+    ker_checksum_dir="/usr/share/${PROJECT_NAME}/kernel_checksum"
+    mkdir -vp "${ker_checksum_dir}"
 
     openssl x509 -inform DER -in "${SBMOK_DER}" -outform PEM -out "${SBMOK_CRT}"
     [[ ! -f "${SBMOK_CRT}" ]] && die "Failed to create PEM certificate"
@@ -123,7 +123,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
                    --cert "${SBMOK_CRT}" \
                    --output "${vmlinuz_image}" \
                             "${vmlinuz_image}" || die "Failed to sign: ${vmlinuz_image}"
-            sha256sum "${vmlinuz_image}" > "${ker_sigsha_dir}/kernel-ver-${kernel_ver}.sha"
+            sha256sum "${vmlinuz_image}" > "${ker_checksum_dir}/kernel-ver-${kernel_ver}.sha"
         fi
         sbsign_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"

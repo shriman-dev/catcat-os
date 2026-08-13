@@ -7,6 +7,9 @@ source "${BUILD_SCRIPT_LIB}"
 declare -x BUILD_CACHE_DIR="/var/cache/${PROJECT_NAME}"
 build_markd="/var/build_markd"
 
+# Check first setup run; if yes
+# Track image is being rebuilt with file REBUILDING_IMAGE
+# Track image is being re/built on base image of current project with file CURRENT_PROJECT
 mkdir -p "${BUILD_CACHE_DIR}" "${build_markd}"
 if [[ ! -f "${build_markd}/marked" ]]; then
     mkdir -p "${build_markd}"
@@ -33,15 +36,16 @@ run_step() {
 
 steps() {
     local arg="${1}"
+    local skip_list="cleanup|debloat|copy-sysfiles|pkgs-|theming|secatcat|systemd|tweaks-fixes"
 
-    # Skip below steps when building on base image of current project
-    if [[ -f "${build_markd}/CURRENT_PROJECT" ]]; then
+    if [[ "${ALT_TAG}" == "main" && "${arg}" == "variant" ]]; then
+        # Skip "variant" step when it's main image
         STEP_SKIPPED=true
-        case "${arg}" in
-            cleanup|debloat|copy-sysfiles|pkgs-*|theming|secatcat|systemd|tweaks-fixes)
-                return 0
-                ;;
-        esac
+        return 0
+    elif [[ -f "${build_markd}/CURRENT_PROJECT" && "${arg}" =~ ^(${skip_list}) ]]; then
+        # Skip the steps when building on base image of current project
+        STEP_SKIPPED=true
+        return 0
     fi
 
     case "${arg}" in
@@ -93,11 +97,9 @@ steps() {
             run_step "purple" "Tweaks And Fixes" \
             "${BUILD_SETUP_DIR}/09-tweaks-fixes.sh"
             ;;
-        variants)
-            if [[ "${ALT_TAG}" != "main" ]]; then
-                run_step "red" "Building ${ALT_TAG^} Image" \
-                "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
-            fi
+        variant)
+            run_step "red" "Building ${ALT_TAG^} Image" \
+            "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
             ;;
         image-info)
             run_step "green" "Applying Image Info" \

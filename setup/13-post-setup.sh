@@ -4,8 +4,8 @@ set -euox pipefail
 
 # Kernel sign checks
 log "INFO" "Verifying kernel checksum generated during secureboot signing"
-ker_sigsha_dir="/usr/share/${PROJECT_NAME}/kernel_sigsha"
-for kver_sha in "${ker_sigsha_dir}"/*.sha; do
+ker_checksum_dir="/usr/share/${PROJECT_NAME}/kernel_checksum"
+for kver_sha in "${ker_checksum_dir}"/*.sha; do
     sha256sum -c "${kver_sha}" ||
         die "Kernel was modified, checksum mismatch for kernel version: ${kver_sha}"
 done
