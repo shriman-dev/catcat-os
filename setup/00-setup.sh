@@ -46,35 +46,35 @@ steps() {
 
     case "${arg}" in
         prep-env)
-            run_step "yellow" "Preparing System Environment" \
+            run_step "red" "Preparing System Environment" \
             "${BUILD_SETUP_DIR}/01-prep-env.sh"
             ;;
         cleanup)
-            run_step "blue" "Cleaning Up" \
+            run_step "green" "Cleaning Up" \
             "${BUILD_SETUP_DIR}/02-cleanup.sh"
             ;;
         debloat)
-            run_step "red" "Debloating" \
+            run_step "blue" "Debloating" \
             "${BUILD_SETUP_DIR}/03-debloat.sh"
             ;;
         copy-sysfiles)
-            run_step "green" "Copying System Default Files" \
+            run_step "yellow" "Copying System Default Files" \
             "${BUILD_SETUP_DIR}/04-copy-sysfiles.sh"
             ;;
         pkgs-kernel)
-            run_step "yellow" "Adding Kernel Packages" \
+            run_step "cyan" "Adding Kernel Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "batch-start" "kernel"
             ;;
         pkgs-common)
-            run_step "yellow" "Installing Common Packages" \
+            run_step "purple" "Installing Common Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "common"
             ;;
         pkgs-hwaccel)
-            run_step "yellow" "Installing HW Acceleration Packages" \
+            run_step "red" "Installing HW Acceleration Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "hwaccel"
             ;;
         pkgs-desktop)
-            run_step "yellow" "Installing Desktop Packages" \
+            run_step "green" "Installing Desktop Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "batch-end" "desktop"
             ;;
         theming)
@@ -82,33 +82,33 @@ steps() {
             "${BUILD_SETUP_DIR}/06-theming.sh"
             ;;
         secatcat)
-            run_step "red" "Enhancing Security" \
+            run_step "yellow" "Enhancing Security" \
             "${BUILD_SETUP_DIR}/07-secatcat.sh"
             ;;
         systemd)
-            run_step "green" "Configuring Systemd Services" \
+            run_step "cyan" "Configuring Systemd Services" \
             "${BUILD_SETUP_DIR}/08-systemd.sh"
             ;;
         tweaks-fixes)
-            run_step "cyan" "Tweaks And Fixes" \
+            run_step "purple" "Tweaks And Fixes" \
             "${BUILD_SETUP_DIR}/09-tweaks-fixes.sh"
             ;;
         variants)
             if [[ "${ALT_TAG}" != "main" ]]; then
-                run_step "yellow" "Building ${ALT_TAG^} Image" \
+                run_step "red" "Building ${ALT_TAG^} Image" \
                 "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
             fi
             ;;
         image-info)
-            run_step "blue" "Applying Image Info" \
+            run_step "green" "Applying Image Info" \
             "${BUILD_SETUP_DIR}/10-image-info.sh"
             ;;
         signing)
-            run_step "red" "Signing Image Container and Kernel" \
+            run_step "blue" "Signing Image Container and Kernel" \
             "${BUILD_SETUP_DIR}/11-signing.sh"
             ;;
         initramfs)
-            run_step "green" "Regenerating Initramfs" \
+            run_step "yellow" "Regenerating Initramfs" \
             "${BUILD_SETUP_DIR}/12-initramfs.sh"
             ;;
         post-setup)

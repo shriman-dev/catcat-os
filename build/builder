@@ -47,21 +47,23 @@ prep_metadata() {
 }
 
 sect_border() {
-    symmetric_heading "#" "#" "100" | tr ' ' '#'
+    symmetric_heading "#" "#" "100" "blue" | tr ' ' '#'
 }
 
 build_image() {
-    local log_file="${SCRIPT_DIR}/.log/${IMAGE_NAME}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
-    mkdir -p "$(dirname ${log_file})"
+    local log_dir="${SCRIPT_DIR}/.log/${IMAGE_NAME}"
+    local log_file="${log_dir}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
+
+    [[ ! -d "${log_dir}" ]] && mkdir -p "${log_dir}"
 
     BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
 
     {
     sect_border
-    echo " Building      - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo " Base Image    - ${BASE_IMAGE}"
-    echo " Datestamp     - ${DATETIMESTAMP}"
-    echo " Git Commit    - ${COMMIT_SHA}"
+    echo "${green}"  " Building      - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Base Image    - ${BASE_IMAGE}${noc}"
+    echo "${yellow}" " Datestamp     - ${DATETIMESTAMP}${noc}"
+    echo "${cyan}"   " Git Commit    - ${COMMIT_SHA}${noc}"
     sect_border
     _cmd_test_timer_start=$(date +%s)
     cd "$(dirname ${SCRIPT_DIR})"
@@ -76,12 +78,14 @@ build_image() {
                  .
     { brief_trace; } 2>/dev/null
     sect_border
-    echo " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo " Build Time    - $(cmd_test_timer)"
+    echo "${green}"  " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Build Time    - $(cmd_test_timer)${noc}"
     sect_border
     } \
     2>&1 | while read -r line; do echo "$(date +'[%T.%3N]') ${line}"; done \
     2>&1 | tee -a "${log_file}"
+
+    ln -sf "${log_file}" "${log_dir}/${IMAGE_NAME}.last.log"
 }
 
 containerized_rpm_ostree() {
@@ -94,7 +98,7 @@ containerized_rpm_ostree() {
 
 chunk_image() {
     sect_border
-    echo " Chunking      - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo "${green}" " Chunking      - ${IMAGE_NAME}:${DEFAULT_TAG}"
     sect_border
     _cmd_test_timer_start=$(date +%s)
     { brief_trace; } 2>/dev/null
@@ -106,8 +110,8 @@ chunk_image() {
                   --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
     { brief_trace; } 2>/dev/null
     sect_border
-    echo " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo " Chunk Time    - $(cmd_test_timer)"
+    echo "${green}"  " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo "${purple}" " Chunk Time    - $(cmd_test_timer)"
     sect_border
 }
 
@@ -117,8 +121,8 @@ push_image() {
     digestfile="/tmp/digestfile"
 
     sect_border
-    echo " Pushing       - ${push_image}:${DEFAULT_TAG}"
-    echo " Push Registry - ${PUSH_REGISTRY}"
+    echo "${green}"  " Pushing       - ${push_image}:${DEFAULT_TAG}"
+    echo "${purple}" " Push Registry - ${PUSH_REGISTRY}"
     sect_border
     _cmd_test_timer_start=$(date +%s)
     for tag in ${build_tags}; do
@@ -131,8 +135,8 @@ push_image() {
         log "INFO" "Pushed: ${push_image}:${tag}"
     done
     sect_border
-    echo " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo " Push Time    - $(cmd_test_timer)"
+    echo "${green}"  " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo "${purple}" " Push Time    - $(cmd_test_timer)"
     sect_border
 }
 
