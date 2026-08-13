@@ -25,6 +25,7 @@ REMOVE_PKGS=(
     "gnome-remote-desktop"
     "gnome-shell-extension-*"
     "gnome-software-rpm-ostree"
+    "gnome-user-share"
     "gnome-terminal-nautilus"
     "gnome-tour"
     "google-compute-engine-guest-configs-udev"
