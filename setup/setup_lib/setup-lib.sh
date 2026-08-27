@@ -136,6 +136,7 @@ dnf_action() {
                 shift
                 ;;
             *)
+                dnf_cmd+=("${operation}")
                 break
                 ;;
         esac
