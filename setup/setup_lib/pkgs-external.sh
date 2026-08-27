@@ -30,7 +30,7 @@ _get_ghpkg() {
                       --negx "${pkg_negx:-musl}"
         fi
     else
-        if [[ -d "${LIBEXEC_DIR}/${pkg_name}" && "$(ls -A "${LIBEXEC_DIR}/${pkg_name}")" ]]; then
+        if [[ -d "${LIBEXEC_DIR}/${pkg_name}" && -n "$(ls -A "${LIBEXEC_DIR}/${pkg_name}")" ]]; then
             log "NOTE" "Lib-package skipped - Non-empty directory exists: ${LIBEXEC_DIR}/${pkg_name}"
         else
             get_ghpkg --name "${pkg_name}" --repo "${pkg_repo}" --regx "${pkg_regx}" \
@@ -43,38 +43,38 @@ ucat_setup() {
     local import_dir="/usr/share/${PROJECT_NAME}/just"
     local import_file="${import_dir}file"
     local justfile_dir="${BUILD_ROOT_DIR}/files/justfiles"
+    local fetched_justd="${FETCHED}/justfiles"
 
     mkdir -vp "${import_dir}"
 
     log "INFO" "Installing ucat and ugum"
     check_file_inplace "/usr/bin/ucat"
     place_executable "${BUILD_CACHE_DIR}/conf_repos/ublue_packages" 'ugum'
-    log "INFO" "Done."
 
     # Modify fetched just recipes
-    local fetched_justfiles="${BUILD_CACHE_DIR}/fetched/justfiles"
-    sed -i '/waydroid-container-restart.desktop/d' "${fetched_justfiles}/82-bazzite-waydroid.just"
+    sed -i '/waydroid-container-restart.desktop/d' "${fetched_justd}/82-bazzite-waydroid.just"
     sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat-os/funcvar.sh|' \
-           "${fetched_justfiles}/82-bazzite-waydroid.just"
+           "${fetched_justd}/82-bazzite-waydroid.just"
 
     # Import justfiles to ucat
     log "INFO" "Importing justfiles to ucat"
     check_file_inplace "${import_file}"
 
-    if [[ -f "${import_file}" ]]; then
-        local justfile import_line
-        for justfile in $(ls -A1 "${fetched_justfiles}"/*.just | tac) \
-                        $(ls -A1 "${justfile_dir}"/*.just | tac); do
-            # Copy justfiles to ucat default directory
-            cp -vf "${justfile}" "${import_dir}"/
-            # Add import line if it does not exists already
-            import_line="import \"${import_dir}/$(basename ${justfile})\""
-            grep -w "${import_line}" "${import_file}" || {
-                sed -i "/# Imports/a\\${import_line}" "${import_file}"
-                log "INFO" "Added: '${import_line}' to ${import_file}"
-            }
-        done
-    fi
+    shopt -s nullglob
+    local just_arr justf import_line
+    just_arr=("${justfile_dir}"/*.just)
+    just_arr+=("${fetched_justd}"/*.just)
+    for justf in "${just_arr[@]}"; do
+        # Copy justfiles to ucat default directory
+        cp -vf "${justf}" "${import_dir}"/
+        # Add import line if it does not exists already
+        import_line="import \"${import_dir}/$(basename "${justf}")\""
+        grep -w "${import_line}" "${import_file}" || {
+            sed -i "/# Imports/a\\${import_line}" "${import_file}"
+            log "INFO" "Added: '${import_line}' to ${import_file}"
+        }
+    done
+    shopt -u nullglob
     log "INFO" "Justfile(s) imported"
 
     log "INFO" "Full output of: ${import_file}"
@@ -100,7 +100,8 @@ waydroid_setup() {
 }
 
 acpi_call() {
-    export KVER="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
+    KVER="$(rpm -q "${CUSTOM_KERNEL:-kernel}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
+    export KVER
 
     ensure_repo "https://github.com/nix-community/acpi_call.git" \
                 "${BUILD_CACHE_DIR}/conf_repos/acpi_call"
@@ -190,7 +191,7 @@ process_package() {
         yazi)
             local bash_complt="${SYS_CACHE}/usr/share/bash-completion/completions"
             local fish_complt="${SYS_CACHE}/usr/share/fish/completions"
-            mkdir -vp "${bash_complt}" "${fish_complt}"
+            ensure_dir "${bash_complt}" "${fish_complt}"
             _get_ghpkg --name "${1}" --repo "sxyazi/yazi" \
                        --regx 'x86_64-unknown-linux-gnu\.zip$'
             if [[ -n "${auto_fold_dir:-}" ]]; then

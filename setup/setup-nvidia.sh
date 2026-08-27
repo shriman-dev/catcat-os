@@ -21,7 +21,8 @@ log "INFO" "Debloat Done"
 # Installing Packages #
 #######################
 pkgs_nvidia() {
-    local kernel_ver="$(rpm -q ${CUSTOM_KERNEL:-kernel} --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
+    local kernel_ver kmod_ver driver_ver
+    kernel_ver="$(rpm -q "${CUSTOM_KERNEL:-kernel}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
 
     log "INFO" "Installing NVIDIA Drivers Packages"
     dnf_action install kernel-headers "${CUSTOM_KERNEL:-kernel}"-devel-matched \
@@ -53,8 +54,8 @@ pkgs_nvidia() {
                        nvidia-container-toolkit
 
     # Verify drivers
-    local kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
-    local driver_ver="$(rpm -q nvidia-driver --queryformat '%{VERSION}\n')"
+    kmod_ver="$(rpm -q akmod-nvidia --queryformat '%{VERSION}\n')"
+    driver_ver="$(rpm -q nvidia-driver --queryformat '%{VERSION}\n')"
 
     [[ "${kmod_ver}" != "${driver_ver}" ]] && die "NVIDIA Drivers version mismatch"
 
@@ -65,9 +66,9 @@ pkgs_nvidia() {
 
     # Finalize
     # SELinux policies for NVIDIA image
-    curl_get "${BUILD_CACHE_DIR}/nvidia-container.pp" \
+    curl_get "${BUILD_CACHE_DIR}/fetched/nvidia-container.pp" \
          "https://raw.githubusercontent.com/NVIDIA/dgx-selinux/master/bin/RHEL9/nvidia-container.pp"
-    semodule -i "${BUILD_CACHE_DIR}/nvidia-container.pp"
+    semodule -i "${BUILD_CACHE_DIR}/fetched/nvidia-container.pp"
 
     depmod -a "${kernel_ver}"
     log "INFO" "NVIDIA Drivers installation successful"
@@ -111,8 +112,8 @@ DISABLE_SERVICES=(
 )
 
 log "INFO" "Disabling and masking system services"
-systemctl -v disable ${DISABLE_SERVICES[@]} || true
-systemctl -v mask ${DISABLE_SERVICES[@]} || true
+systemctl -v disable "${DISABLE_SERVICES[@]}" || true
+systemctl -v mask "${DISABLE_SERVICES[@]}" || true
 
 
 #########################################

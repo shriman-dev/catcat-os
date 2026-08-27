@@ -17,7 +17,7 @@ if ! grep "${nix_user_path}" "${sudoersd_file}"; then
     chmod -v 640 "${sudoersd_file}"
     sed -i "/secure_path = /s|$|:${nix_user_path}|" "${sudoersd_file}"
     # Proper sudoers.d perms
-    chmod -v --recursive 440 "$(dirname ${sudoersd_file})"
+    chmod -v --recursive 440 "$(dirname "${sudoersd_file}")"
 fi
 
 # Mount tmpfs on /var/tmp
@@ -30,33 +30,7 @@ if ! grep -E "^tmpfs.*/var/tmp.*tmpfs" "${fstab_file}"; then
 fi
 
 # Set ad-malware blocking localdns
-tmp_localdns="/tmp/localdns.d"
-localdns_confd="/etc/catcat-os/localdns.d"
-dnscrypt_confd="/etc/dnscrypt-proxy"
-dnsmasq_confd="/etc/dnsmasq.d"
-ushare_localdns="/usr/share/localdns.d"
-
-# Extract blocklist
-if [[ -f "${dnsmasq_confd}/domains-blocklist.conf" || -f "${dnscrypt_confd}/domains-blocklist.txt" ]]; then
-    mkdir -pv "${tmp_localdns}" "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
-    chmod -v 700 "/var/log/dnscrypt-proxy" "/var/cache/dnscrypt-proxy"
-    [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
-        cat "${ushare_localdns}/dnscrypt"/domains-filtered-subdomains.tar.zst* | \
-            tar -C "${tmp_localdns}"/ --zstd -xvf -
-        cp -vf "${tmp_localdns}/domains-filtered-subdomains" "${dnscrypt_confd}/domains-blocklist.txt"
-    }
-
-    [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]] && {
-        cat "${ushare_localdns}/dnsmasq"/blocklist.conf.tar.zst* | \
-            tar -C "${tmp_localdns}"/ --zstd -xvf -
-        cp -vf "${tmp_localdns}/blocklist.conf" "${dnsmasq_confd}/domains-blocklist.conf"
-        restorecon -vR "${dnsmasq_confd}"/
-    }
-    rm -fv /etc/resolv.conf
-    systemctl restart NetworkManager.service
-    localdnsctl --restart
-    rm -rvf "${tmp_localdns}"
-fi
+/usr/bin/localdnsctl -v --setup
 
 # TODO: Log unsuccessful login attempts
 # Enabling needed authselect features

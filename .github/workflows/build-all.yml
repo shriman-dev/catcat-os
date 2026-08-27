@@ -2,19 +2,20 @@ name: Build All # Build Images, ISOs and make release
 # Defines when the workflow will run
 on:
   schedule:
-    - cron: "0 0 1 * *" # Runs at 00:00 UTC on the 1st of every month
+    - cron: "00 6 * * *"    # build at 6:00 UTC every day
+#    - cron: "0 0 1 * *"    # Runs at 00:00 UTC on the 1st of every month
   push:
     branches:
-      - main            # Only runs on pushes to main branch
+      - main                # Only runs on pushes to main branch
     paths-ignore:
       - '**/README.md'
-  workflow_dispatch:    # Allows manual trigger of workflow
+  workflow_dispatch:        # Allows manual trigger of workflow
 
 # Sets permissions for the workflow
 permissions:
-  contents: write      # Can modify repository contents
-  packages: write      # Can publish packages
-  id-token: write      # Can use OIDC tokens
+  contents: write           # Can modify repository contents
+  packages: write           # Can publish packages
+  id-token: write           # Can use OIDC tokens
 
 # Prevents concurrent workflow runs
 concurrency:
@@ -26,14 +27,14 @@ jobs:
     name: Build Main
     uses: ./.github/workflows/build-image.yaml
     strategy:
-      fail-fast: true   # Other builds even if one fails
-    secrets: inherit    # Uses secrets from parent workflow
+      fail-fast: true       # Other builds even if one fails
+    secrets: inherit        # Uses secrets from parent workflow
 
   build-variants:
     name: Build Variants
     needs: [build-main]
     strategy:
-      fail-fast: false   # Other builds even if one fails
+      fail-fast: false      # Other builds even if one fails
       matrix:
         include:
           - image_name: catcat-os-nv
@@ -47,7 +48,7 @@ jobs:
       image_name: ${{ matrix.image_name }}
       base_image: ${{ matrix.base_image }}
       alt_tag: ${{ matrix.alt_tag }}
-    secrets: inherit    # Uses secrets from parent workflow
+    secrets: inherit        # Uses secrets from parent workflow
 
 #  build-iso:
 #    name: Build ISOs

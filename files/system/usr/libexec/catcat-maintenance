@@ -7,8 +7,13 @@ source /usr/lib/catcat-os/funcvar.sh
 # System clean up
 one_day=86400
 one_week=$((one_day * 7))
+twenty_days=$((one_day * 20))
 cleanup_log="/etc/catcat-os/log/last_cleanup.log"
-if is_file_older ${one_week} "${cleanup_log}"; then
+buttercare_log="/etc/catcat-os/log/buttercare.log"
+
+ensure_file "${cleanup_log}" "${buttercare_log}"
+
+if is_older_than "${cleanup_log}" "${one_week}"; then
     date "+%a %b %d %H:%M:%S %Y" > "${cleanup_log}"
     {
         /usr/bin/podman image prune -f
@@ -24,9 +29,7 @@ if is_file_older ${one_week} "${cleanup_log}"; then
 fi
 
 # Run buttercare trim every 20 days
-twenty_days=$((one_day * 20))
-buttercare_log="/etc/catcat-os/log/buttercare.log"
-if is_file_older ${twenty_days} "${buttercare_log}"; then
+if is_older_than "${buttercare_log}" "${twenty_days}"; then
     date "+%a %b %d %H:%M:%S %Y" > "${buttercare_log}"
     /usr/bin/buttercare -v balance trim >> "${buttercare_log}"
 fi

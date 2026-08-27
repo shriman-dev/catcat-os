@@ -4,13 +4,12 @@ set -euox pipefail
 
 # Container image policy
 log "INFO" "Configuring container signing policy"
-PROJECT_NAME="${PROJECT_NAME}"
 PROJECT_REGISTRY="${PUSH_REGISTRY}"
 TEMPLATE_POLICY="${BUILD_SETUP_DIR}/setup_files/policy.json"
 COSIGN_PUB_KEY="/etc/pki/containers/${PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
-mkdir -vp /etc/pki/containers /etc/containers/registries.d
+ensure_dir /etc/pki/containers /etc/containers/registries.d
 cp -vf "${BUILD_ROOT_DIR}/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # Copy the template policy.json if the file is missing or lacks 'reject' default policy
@@ -48,23 +47,25 @@ set +x
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
 SBMOK_CRT="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.pem"
 SBMOK_KEY="/run/secrets/sbmok_priv" # Placed via podman build --secret or build yaml
-KERNEL_PATH=(
-    $(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d -exec test -e "{}/vmlinuz" \; -print)
-)
+readarray -t KERNEL_PATH < \
+    <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname {} \;)
 
 sbsign_modules() {
-    local kpath="${1}" kver="$(basename ${1})" modules_dir="${1}/extra" _kmodules _kmod
-    local sign_file="$(find /usr/src/kernels/${kver} -type f -name 'sign-file' -print -quit)"
+    local kpath="${1}" kver modules_dir sign_file _kmodules _kmod
+    kver="$(basename "${kpath}")"
+    modules_dir="${kpath}/extra"
+    sign_file="$(find "/usr/src/kernels/${kver}" -type f -name 'sign-file' -print -quit)"
 
-    [[ ! -x "${sign_file}" ]] && sign_file="$(find ${kpath} -type f -name 'sign-file' -print -quit)"
+    [[ ! -x "${sign_file}" ]] && sign_file="$(find "${kpath}" -type f -name 'sign-file' -print -quit)"
     [[ ! -x "${sign_file}" ]] && sign_file="$(rpm -qal 'kernel*' | grep -E "${kver}.*sign-file$")"
     [[ ! -x "${sign_file}" ]] && die "Could not find 'sign-file'"
 
     sign_module() {
         ${sign_file} sha512 "${SBMOK_KEY}" "${SBMOK_CRT}" "${1}" || die "Failed to sign: ${1}"
     }
-    if [[ -d "${modules_dir}" && $(ls -A1 "${modules_dir}" | wc -l) -gt 0 ]]; then
-        mapfile -t _kmodules < <(find "${modules_dir}" -type f -name '*\.ko*')
+    
+    if [[ -d "${modules_dir}" && -n "$(ls -A "${modules_dir}")" ]]; then
+        readarray -t _kmodules < <(find "${modules_dir}" -type f -name '*\.ko*')
         log "DEBUG" "Signing kernel modules... Total count: ${#_kmodules[@]}"
         for _kmod in "${_kmodules[@]}"; do
             case "${_kmod}" in
@@ -91,6 +92,8 @@ sbsign_modules() {
                     sign_module "${_kmod%.zst}"
                     zstd --quiet --force --rm "${_kmod%.zst}"
                     ;;
+                *)  return 1
+                    ;;
             esac
         done
     fi
@@ -112,7 +115,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
     fi
 
     for kernel_path in "${KERNEL_PATH[@]}"; do
-        kernel_ver="$(basename ${kernel_path})"
+        kernel_ver="$(basename "${kernel_path}")"
         vmlinuz_image="${kernel_path}/vmlinuz"
         if sbverify --list "${vmlinuz_image}" | grep -q "CN=${PROJECT_NAME/-/ }"; then
             log "NOTE" "Signing skipped"

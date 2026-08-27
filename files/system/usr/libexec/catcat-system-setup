@@ -7,6 +7,8 @@ firstboot_file="/etc/catcat-os/log/.first-boot-done"
 if [[ ! -f "${firstboot_file}" ]]; then
     plymouth display-message --text="Preparing CatCat OS - Please wait, this may take a while" || true
 
+    /usr/libexec/catcat-kargs
+
     # Setup grub
     mkdir -vp /boot/grub_themes && cp -af /usr/share/grub/themes/* /boot/grub_themes/
     replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
@@ -37,12 +39,11 @@ if [[ ! -f "${firstboot_file}" ]]; then
     # Permit main user
     #usermod -aG libvirt ${U1000}
 
-    mkdir -pv "$(dirname ${firstboot_file})"
+    mkdir -pv "$(dirname "${firstboot_file}")"
     echo 'first boot' > "${firstboot_file}"
 fi
 
 /usr/libexec/secatcat
-/usr/libexec/catcat-kargs
 /usr/libexec/catcat-flatpak-manager
 
 # Sync configs on update
@@ -52,8 +53,7 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
     ru_config_d="/root/.config"
     ru_local_share="/root/.local/share"
     ru_catcat_d="${ru_local_share}/catcat-os"
-    [[ ! -d "${ru_catcat_d}/LS_COLORS_DIR" ]] &&
-            mkdir -vp "${ru_catcat_d}/LS_COLORS_DIR"
+    ensure_dir "${ru_catcat_d}/LS_COLORS_DIR"
     cp -vaf /usr/share/catcat-os/LS_COLORS_DIR/* \
             "${ru_catcat_d}/LS_COLORS_DIR"/
 
@@ -64,12 +64,12 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
     [[ -d "/var/lib/waydroid" ]] && restorecon -vR "/var/lib/waydroid"
 
     # GDM
-    if systemctl is-enabled gdm; then
+    gdm_shell="share/gnome-shell"
+    gdm_resource="gnome-shell-theme.gresource"
+    if [[ -f "/usr/${gdm_shell}/${gdm_resource}.og" ]] && systemctl is-enabled gdm; then
         # Update it or fall back to orignal GDM theme
-        gdm_shell="share/gnome-shell"
-        gdm_resource="gnome-shell-theme.gresource"
+        ensure_dir "/usr/local/${gdm_shell}"
         if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
-            [[ ! -d "/usr/local/${gdm_shell}" ]] && mkdir -vp "/usr/local/${gdm_shell}"
             cp -vaf "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
         fi
         /usr/bin/dconf update
@@ -87,38 +87,21 @@ if [[ -f "/home/${U1000}/${monitors_xml}" ]] && systemctl is-enabled gdm; then
     fi
 fi
 
-# Turn on hhd daemon for user 1000 on deck image
-if [[ "$(grep 'VARIANT_ID' /usr/lib/os-release)" =~ "catcat-os-hh" ]]; then
-    systemctl -f enable hhd@${U1000}
-fi
-
-# Nvidia specific
-if [[ "$(grep 'VARIANT_ID' /usr/lib/os-release)" =~ "catcat-os-nv" ]]; then
-    echo
-    # Enable nvidia optimus if device is laptop and has nvidia dgpu
-#   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
-#       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
-#           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
-#           echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
-#       fi
-#   fi
-fi
-
-# Disable wifi power saving for better wifi performance
 nm_confd="/etc/NetworkManager/conf.d"
+ensure_dir "${nm_confd}"
+# Disable wifi power saving for better wifi performance
 # 0 (use default), 1 (ignore/don't touch), 2 (disable) or 3 (enable).
 if [[ ! -f "${nm_confd}/better-wifi-perf.conf" ]] && hostnamectl | grep -i "Chassis:.*desktop"; then
-    mkdir -vp "${nm_confd}"
+    ensure_dir "${nm_confd}"
     echo -e "[connection]\nwifi.powersave = 2" > "${nm_confd}/better-wifi-perf.conf"
     systemctl restart NetworkManager
 fi
 
 # If iwd is disabled but iwd creds exists then enable iwd
 if ! systemctl is-enabled iwd.service; then
-    if find /var/lib/iwd -maxdepth 1 -type f \
-        \( -name '*.psk' -o -name '*.8021x' -o -name '*.open' \) -print -quit | grep -q .; then
-
-        mkdir -vp "${nm_confd}"
+    found_iwd_conn="$(find /var/lib/iwd -maxdepth 1 -type f \
+                      \( -name '*.psk' -o -name '*.8021x' -o -name '*.open' \) -print -quit)"
+    if [[ -n "${found_iwd_conn}" ]]; then
         [[ -f "${nm_confd}/99-valve-wifi-backend.conf" ]] &&
             rm -vf "${nm_confd}/99-valve-wifi-backend.conf"
         [[ -f "${nm_confd}/supplicant.conf" ]] &&
@@ -132,9 +115,30 @@ if ! systemctl is-enabled iwd.service; then
     fi
 fi
 
+
+# Variant specific tweaks
+variant_image="$(grep 'VARIANT_ID' /usr/lib/os-release)"
+
+# Turn on hhd daemon for user 1000 on deck image
+if [[ "${variant_image}" =~ "catcat-os-hh" ]]; then
+    systemctl -f enable "hhd@${U1000}"
+fi
+
+# Nvidia specific
+if [[ "${variant_image}" =~ "catcat-os-nv" ]]; then
+    echo
+    # Enable nvidia optimus if device is laptop and has nvidia dgpu
+#   if [[ -d /sys/module/battery && -d /proc/acpi/button/lid ]]; then
+#       if [[ ! -f /etc/modprobe.d/nvidia.conf ]] || ! grep -qF "NVreg_DynamicPowerManagement" /etc/modprobe.d/nvidia-optimus.conf; then
+#           echo "# https://download.nvidia.com/XFree86/Linux-x86_64/545.29.06/README/dynamicpowermanagement.html" >> /etc/modprobe.d/nvidia-optimus.conf
+#           echo "options nvidia NVreg_DynamicPowerManagement=0x02" >> /etc/modprobe.d/nvidia-optimus.conf
+#       fi
+#   fi
+fi
+
 # FIXES
 # Set default target to graphical on base images, fixes rebase
-current_default_target=$(systemctl get-default)
+current_default_target="$(systemctl get-default)"
 default_target="graphical.target"
 
 systemctl is-enabled display-manager.service || default_target="multi-user.target"
@@ -156,6 +160,4 @@ if (( $(hostname | wc -m) > 20 )); then
 fi
 
 # Fix missing hostname file breaking distrobox
-if [[ ! -f /etc/hostname ]]; then
-    touch /etc/hostname
-fi
+ensure_file /etc/hostname

@@ -4,31 +4,32 @@ source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
 update_flatpak() {
     source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
     local scope="--user"
-    [[ $(id -u) -eq 0 ]] && scope="--system"
+    [[ ${EUID} -eq 0 ]] && scope="--system"
 
     enclosed_heading "Flatpak ${scope:2} update" "="
 
     # Add repo if does not exists
-    /usr/bin/flatpak remotes | grep -i "flathub.*${scope:2}" || {
+    flatpak remotes | grep -i "flathub.*${scope:2}" || {
         log "INFO" "Adding flathub repo for current ${scope:2}"
         # First remove fedora flatpak repo
-        /usr/bin/flatpak remote-delete --system --force fedora
-        /usr/bin/flatpak remote-delete --user --force fedora
+        flatpak remote-delete --system --force fedora
+        flatpak remote-delete --user --force fedora
 
         # Add flathub repo
-        /usr/bin/flatpak "${scope}" remote-add \
-                    --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        flatpak remote-add "${scope}" --if-not-exists \
+                flathub "https://dl.flathub.org/repo/flathub.flatpakrepo"
+        flatpak remote-modify "${scope}" --prio=10 flathub
     }
 
     # Update flatpaks
-    /usr/bin/flatpak update "${scope}" --assumeyes --noninteractive --appstream
-    /usr/bin/flatpak update "${scope}" --assumeyes --noninteractive
+    flatpak update "${scope}" --assumeyes --noninteractive --appstream
+    flatpak update "${scope}" --assumeyes --noninteractive
 
     # Clean unneeded runtimes silently
-    /usr/bin/flatpak uninstall "${scope}" --unused --assumeyes --noninteractive >/dev/null 2>&1
+    flatpak uninstall "${scope}" --unused --assumeyes --noninteractive >/dev/null 2>&1
 
     log "INFO" "Running flatpak repair"
-    /usr/bin/flatpak repair "${scope}"
+    flatpak repair "${scope}"
 }
 
 update_nixpkg() {
@@ -36,7 +37,7 @@ update_nixpkg() {
     local scope="user"
     local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
-    if [[ $(id -u) -eq 0 ]]; then
+    if [[ ${EUID} -eq 0 ]]; then
         scope="global"
         cmdpath="/nix/var/nix/profiles/default/bin"
     fi
@@ -72,7 +73,8 @@ update_system() {
     enclosed_heading "System update" "="
 
     # Always update to signed image if current image is not signed
-    local booted_image="$(rpm-ostree status --booted | grep -w 'ostree-unverified-registry')"
+    local booted_image
+    booted_image="$(rpm-ostree status --booted | grep -w 'ostree-unverified-registry')"
     if [[ -n "${booted_image}" ]]; then
 #        local image_ref="${booted_image#*ostree-unverified-registry:}"
         log "WARN" "Current image is not signed"
@@ -81,7 +83,7 @@ update_system() {
 #                err "Could not rebase to signed image"
     fi
 
-    if [[ $(id -u) -eq 0 ]]; then
+    if [[ ${EUID} -eq 0 ]]; then
         rpm-ostree upgrade
         # Show change logs
         rpm-ostree db diff --changelogs
@@ -145,9 +147,9 @@ exec_subcommand() {
         extra)
             update_flatpak
             update_nixpkg
-            [[ $(id -u) -eq 0 ]] && run_as_users update_flatpak
-            [[ $(id -u) -eq 0 ]] && run_as_users update_nixpkg
-            [[ $(id -u) -eq 0 ]] && { update_firmware; update_dns_blocklist; }
+            [[ ${EUID} -eq 0 ]] && run_as_users update_flatpak
+            [[ ${EUID} -eq 0 ]] && run_as_users update_nixpkg
+            [[ ${EUID} -eq 0 ]] && { update_firmware; update_dns_blocklist; }
             ;;
         flat-nix)
             update_flatpak

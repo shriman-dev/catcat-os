@@ -3,11 +3,9 @@ export HISTCONTROL=ignoreboth
 export HISTSIZE=-1
 export HISTFILESIZE="${HISTSIZE}"
 
-export LS_COLORS="$(cat ${HOME}/.local/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach)"
 export MICRO_TRUECOLOR=1
 #export EDITOR="micro"
 
-export XCURSOR_SIZE="$(gsettings get org.gnome.desktop.interface cursor-size)"
 export QT_QPA_PLATFORM=xcb #wayland
 #export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export QT_QPA_PLATFORMTHEME=qt5ct
@@ -17,9 +15,14 @@ export JavaScriptCoreUseJIT=0
 export GJS_DISABLE_JIT=1
 export SYSTEMD_PAGER=
 
-[[ ! -d ${HOME}/.config/bat ]] && export BAT_CONFIG_DIR="/etc/bat"
-[[ ! -d ${HOME}/.config/eza ]] && export EZA_CONFIG_DIR="/etc/eza"
-[[ ! -d ${HOME}/.config/yazi ]] && export YAZI_CONFIG_HOME="/etc/yazi"
+XCURSOR_SIZE="$(gsettings get org.gnome.desktop.interface cursor-size)"
+LS_COLORS="$(< "${HOME}/.local/share/catcat-os/LS_COLORS_DIR/catppuccin-mocha-peach")"
+
+export LS_COLORS XCURSOR_SIZE
+
+[[ ! -d "${HOME}/.config/bat" ]] && export BAT_CONFIG_DIR="/etc/bat"
+[[ ! -d "${HOME}/.config/eza" ]] && export EZA_CONFIG_DIR="/etc/eza"
+[[ ! -d "${HOME}/.config/yazi" ]] && export YAZI_CONFIG_HOME="/etc/yazi"
 
 export PROCS_CONFIG_FILE="${HOME}/.config/procs/config.toml"
 [[ ! -f "${PROCS_CONFIG_FILE}" ]] && export PROCS_CONFIG_FILE="/etc/procs/config.toml"

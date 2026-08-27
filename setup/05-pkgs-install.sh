@@ -6,10 +6,10 @@ log "INFO" "Defining packages..."
 
 # Download remote RPMs to cache
 rpm_dl() {
-    local rpm_archive="${BUILD_CACHE_DIR}/rpm/${1}.rpm"
+    local rpm_archive="${BUILD_CACHE_DIR}/rpm/${1}.rpm" rpm_url
     { brief_trace; } 2>/dev/null
     if [[ ! -f "${rpm_archive}" ]]; then
-        local rpm_url="$(latest_ghpkg_url "${2}" "${3}" "${4:-}")"
+        rpm_url="$(latest_ghpkg_url "${2}" "${3}" "${4:-}")"
         curl_get "${rpm_archive}" "${rpm_url}"
         echo "${rpm_archive}"
     else
@@ -22,26 +22,37 @@ DESKTOP_EXTRAS=(
     # Shell setup
     ##lsd zellij
     "nu"
+    "zsh"
     "++grex"
+    "++yazi"
 
     # Secure
+    #bubblejail
     "++hblock"
+    #$(rpm_dl 'opensnitch' 'evilsocket/opensnitch' 'x86_64.rpm$')
+    #$(rpm_dl 'opensnitch-noarch' 'evilsocket/opensnitch' 'noarch\.rpm$')
 
     # Monitoring Tools
-    #"htop"
-    "s-tui"
-    "stress-ng"
+    #"htop" "btop"
     "wireshark"
     "++bandwhich"
     "$(rpm_dl 'amdgpu_top' 'Umio-Yasuno/amdgpu_top' 'x86_64\.rpm$')"
 
+    # Disk Operations and Analyze
+    #ncdu dua-cli duf
+    "fio"
+
     # Backup, Archive, Encryption and Compression
-    ##borgbackup zsync
+    ##borgbackup zsync fscrypt
+    "rclone"
+    "syncthing"
     "archivemount"
     "cryfs"
     "++gocryptfs"
 
     # Parallelization and Testing
+    "s-tui"
+    "stress-ng"
     "hyperfine"
     "parallel"
     "memtester"
@@ -52,9 +63,41 @@ DESKTOP_EXTRAS=(
     "kpcli"
 #    "$(rpm_dl 'watchexec' 'watchexec/watchexec' 'x86_64-unknown-linux-gnu\.rpm$')"
 
+    # Fun Terminal Tools
+    "sl"
+    "neo"
+    "cava"
+    "oneko"
+    "cowsay"
+    "cbonsai"
+    "cmatrix"
+    "asciinema"
+    "fortune-mod"
+    "asciiquarium"
+    "++pipes-sh"
+    "++chess-tui"
+    "++ascii-image-converter"
+
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
+    "pv" # tool for monitoring the progress of data through a pipeline
+    "glow"
+    "++uv"
+    "neovim"
     #"++llama-cpp"
+    "moreutils"
+    "ShellCheck"
+    "$(rpm_dl 'vscodium' 'VSCodium/vscodium' 'x86_64\.rpm$')"
+
+    # Android Tools
+    "++scrcpy"
+    "android-tools"
+
+    # waydroid stuff
+    "cage"         # Runs a single, maximized application
+    "waydroid"
+    "wlr-randr"
+    "++waydroid_setup"
 
     # File Manage Stuff
     "nemo"
@@ -64,6 +107,8 @@ DESKTOP_EXTRAS=(
     "nemo-extensions"
     "nemo-search-helpers"
     "folder-color-switcher-nemo"
+    "rom-properties-gtk4" # From terra
+    "rom-properties-utils" # From terra
 
     # Extra Gnome Apps
     "awf-gtk2"
@@ -104,6 +149,8 @@ DESKTOP_EXTRAS=(
 
     # Extras deps
     "++extras"
+    "espeak-ng"
+    "solaar-udev" # Udev rules for Logitech wireless receivers
 #    "rocm"
 #    "rocm-core"
 #    "rocm-hip"
@@ -117,11 +164,8 @@ DESKTOP_EXTRAS=(
 
 DESKTOP_COMMON=(
     # Secure
-    #bubblejail
     "firewall-config"
     "usbguard-notifier"
-    #$(rpm_dl 'opensnitch' 'evilsocket/opensnitch' 'x86_64.rpm$')
-    #$(rpm_dl 'opensnitch-noarch' 'evilsocket/opensnitch' 'noarch\.rpm$')
 
     # Monitoring Tools
     "powertop"
@@ -139,12 +183,7 @@ DESKTOP_COMMON=(
     "exfatprogs"
     "gnome-disk-utility"
 
-    # Backup, Archive, Encryption and Compression
-    "rclone"
-    "syncthing"
-
     # WM tools
-    #wlr-randr
     "wmctrl"
     "wl-clipboard"
 
@@ -155,40 +194,14 @@ DESKTOP_COMMON=(
     "ddcutil"
     "brightnessctl"
 
-    # Fun Terminal Tools
-    "sl"
-    "neo"
-    "cava"
-    "oneko"
-    "cowsay"
-    "cbonsai"
-    "cmatrix"
-    "asciinema"
-    "fortune-mod"
-    "asciiquarium"
-    "++pipes-sh"
-    "++chess-tui"
-    "++ascii-image-converter"
-
     # Dev Tools
     "git"
-    "glow"
-    "++uv"
+    "curl"
     "micro"
-    "neovim"
     "inotify-tools"
-    #vscodium
-    "$(rpm_dl 'vscodium' 'VSCodium/vscodium' 'x86_64\.rpm$')"
 
     # Android Tools
-    "++scrcpy"
     "android-tools"
-
-    # waydroid stuff
-    "cage"         # Runs a single, maximized application
-    "waydroid"
-    "wlr-randr"
-    "++waydroid_setup"
 
     # Containers
     "distrobox"
@@ -202,12 +215,10 @@ DESKTOP_COMMON=(
     "nautilus-python"
     "nautilus-gsconnect"
     "nautilus-extensions"
-    "rom-properties-gtk4" # From terra
-    "rom-properties-utils" # From terra
 
     # Gnome Apps and Extensions
     "xed"
-    #"menulibre"
+#    "menulibre"
     "gnome-tweaks"
     "dconf-editor"
     "gnome-software"
@@ -246,9 +257,7 @@ DESKTOP_COMMON=(
     "libmtp"
     "gvfs-mtp"
     "gvfs-fuse"
-    "espeak-ng"
     "i2c-tools"
-    "solaar-udev" # Udev rules for Logitech wireless receivers
     "steam-devices"
     "grub2-tools-extra"
     "libcamera"
@@ -261,7 +270,6 @@ DESKTOP_COMMON=(
 
 COMMON=(
     # Shell setup
-    "zsh"
     "fish"
     "bash-completion"
     "bash-color-prompt"
@@ -271,7 +279,6 @@ COMMON=(
     "bat"
     "++eza"
     "zoxide"
-    "++yazi"
     "ripgrep"
     "fd-find"
     "tmux"
@@ -284,7 +291,6 @@ COMMON=(
     "++dnscrypt-proxy"
 
     # Monitoring Tools
-    #"btop"
     "procs"
     "nethogs"
     "tcpdump"
@@ -297,11 +303,10 @@ COMMON=(
     "smartmontools"
 
     # Disk Operations and Analyze
-    #dmraid ncdu dua-cli
+    #dmraid
     "parted"
     "hdparm"
     "nvme-cli"
-    "fio"
     "gdu"
     "++btdu"
     "compsize"
@@ -313,13 +318,11 @@ COMMON=(
     "unzip"
     "7zip"
     "7zip-standalone-all"
-    "fscrypt"
     "zstd"
 
     # More Terminal Tools
     "jq"
     "yq"
-    "pv" # tool for monitoring the progress of data through a pipeline
     "gum"
     "just"
     "tree"
@@ -387,6 +390,8 @@ process_installations() {
 
 case "${1}" in
     batch-start)
+        # Perform cleanup before any operation
+        dnf5 clean dbcache
         rpm_repos enable
         shift
         ;;
@@ -399,6 +404,7 @@ case "${1}" in
         trap "rpm_repos disable" EXIT
         shift
         ;;
+    *) true ;;
 esac
 
 # Process all provided arguments

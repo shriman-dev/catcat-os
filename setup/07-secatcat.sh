@@ -73,59 +73,18 @@ check_file_inplace "/etc/ssh/sshd_config.d/catcat-ssh.conf"
 
 # Ad/Malware blocking
 log "INFO" "Adding support for Ad/Malware blocking"
-cached_localdns="${BUILD_CACHE_DIR}/fetched/localdns.d"
-localdns_confd="/etc/${PROJECT_NAME}/localdns.d"
-ushare_localdns="/usr/share/localdns.d"
-dns_blocklist_repo="https://raw.githubusercontent.com/shriman-dev/dns-blocklist/refs/heads/main"
-
 # Install dnscrypt-proxy if not installed
 #####
 
-check_file_inplace "/etc/${PROJECT_NAME}/localdns.d/localdns-server.conf" \
-                   "/etc/dnscrypt-proxy/dnscrypt-proxy.toml" \
-                   "/etc/dnsmasq.d/defaults.conf" \
-                   "/etc/dnsmasq.d/dns-defaults.conf"
-
 # Enable localdns
 log "INFO" "Enabling localdns"
-/usr/bin/localdnsctl -v --switch-backend dnscrypt
-systemctl -f enable dnscrypt-proxy.service
+check_file_inplace "/etc/${PROJECT_NAME}/localdns.d/config.json"
 
-# Enable blocklist updater
-systemctl -f enable dns-blocklist-updater.timer
+TMP_DIR="${BUILD_CACHE_DIR}/fetched" \
+bash -x /usr/bin/localdnsctl -v --switch-backend dnscrypt --setup
 
-# Set localdns as default dns server for blocking ads/malwares
-cp -vf "${localdns_confd}/localdns-server.conf" /etc/NetworkManager/conf.d/
 # Remove symlinked resolv conf in post setup
 [[ -L /etc/resolv.conf ]] && log "WARN" "/etc/resolv.conf is a symlink, remove it in post setup"
-
-# Disable and mask systemd-resolved.service
-systemctl disable systemd-resolved.service
-systemctl mask systemd-resolved.service
-
-# Get DNS blocklist archive
-log "INFO" "Get DNS Ad and Malware blocklist"
-mkdir -vp "${cached_localdns}" "${ushare_localdns}"/{dnscrypt,dnsmasq}
-
-if [[ -f "${localdns_confd}/only-dnscrypt-blocklist" ]]; then
-    # Dnscrypt blocklist
-    blocklist_archive="domains-filtered-subdomains.tar.zst"
-
-    get_ghraw --dstd "${cached_localdns}" --repo "shriman-dev/dns-blocklist" \
-              --repod "domains.d" -f "${blocklist_archive}"
-    split -dC 5M "${cached_localdns}/${blocklist_archive}" \
-                "${ushare_localdns}/dnscrypt/${blocklist_archive}"
-elif [[ ! -f "${localdns_confd}/only-dnscrypt-blocklist" ]]; then
-    # Dnsmasq blocklist
-    blocklist_archive="blocklist.conf.tar.zst"
-    log "INFO" "Make DNSMasq to read conf files from: /etc/dnsmasq.d"
-    echo 'conf-dir=/etc/dnsmasq.d/,*.conf' >> /etc/dnsmasq.conf
-
-    get_ghraw --dstd "${cached_localdns}" --repo "shriman-dev/dns-blocklist" \
-              --repod "dnsmasq.d" -f "${blocklist_archive}"
-    split -dC 5M "${cached_localdns}/${blocklist_archive}" \
-                "${ushare_localdns}/dnsmasq/${blocklist_archive}"
-fi
 log "INFO" "Network setup done."
 
 ######################################################

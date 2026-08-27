@@ -44,13 +44,13 @@ if [[ -L "/etc/resolv.conf" ]]; then
 fi
 
 # Copy entries into /usr/lib/passwd and /usr/lib/group
-if out=$(grep -v root /etc/passwd); then
+if out=$(grep -Ev '^root' /etc/passwd); then
     log "INFO" "Moving passwd users to /usr/lib/passwd"
     echo "${out}" >> /usr/lib/passwd
     echo "root:x:0:0:root:/root:/bin/bash" > /etc/passwd
 fi
 
-if out=$(grep -v "root\|wheel" /etc/group); then
+if out=$(grep -Ev '^(root|wheel)' /etc/group); then
     log "INFO" "Moving group entries to /usr/lib/group"
     echo "${out}" >> /usr/lib/group
     echo "root:x:0:" > /etc/group
@@ -68,15 +68,14 @@ rm -vf /etc/.pwd.lock \
        /etc/subgid-
 
 #dnf5 clean all
-find /var/* \
-    -maxdepth 0 -type d \
+find /var/ -mindepth 1 -maxdepth 1 -type d \
     -not -name "cache" \
-    -exec rm -rvf {} \;
-find /var/cache/* -maxdepth 0 -type d \
+    -exec rm -rvf {} +
+find /var/cache/ -mindepth 1 -maxdepth 1 -type d \
     -not -name "libdnf*" \
     -not -name "rpm-ostree" \
     -not -name "${PROJECT_NAME}" \
-    -exec rm -fr {} \;
+    -exec rm -rf {} +
 
 
 log "INFO" "Post setup configuration"

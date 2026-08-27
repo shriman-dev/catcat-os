@@ -53,7 +53,7 @@ check-idle-power-draw:
 [group("utilities")]
 clean-system:
     #!/usr/bin/bash
-    [[ $(id -u) -eq 0 ]] && systemd-tmpfiles --clean
+    [[ ${EUID} -eq 0 ]] && systemd-tmpfiles --clean
     podman image prune -af
     podman volume prune -f
     flatpak uninstall --unused --assumeyes --noninteractive

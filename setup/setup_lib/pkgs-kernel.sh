@@ -49,7 +49,7 @@ case "${1}" in
             log "INFO" "Installing custom kernel: ${CUSTOM_KERNEL}"
             # Exclude standard kernel pkgs to prevent conflicts
             dnf5 -y config-manager setopt \
-                "*fedora*".exclude="kernel-core* kernel-modules* kernel-uki-virt-*"
+                "*fedora*.exclude=kernel-core* kernel-modules* kernel-uki-virt-*"
             if [[ "${CUSTOM_KERNEL}" == "kernel-cachyos" ]]; then
                 cachy_kernel
             fi

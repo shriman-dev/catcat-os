@@ -2,7 +2,7 @@
 source /usr/lib/catcat-os/funcvar.sh
 source /etc/catcat-os/build_info
 
-REG_FLATPAK_APPS_UPDATE=(
+FREQ_UPDATE_FLATPAK_APPS=(
     "org.mozilla.firefox"
     "io.gitlab.librewolf-community"
     "net.mullvad.MullvadBrowser"
@@ -22,14 +22,18 @@ REG_FLATPAK_APPS_UPDATE=(
     "re.sonny.Tangram"
 )
 
-FLATPAK_APPS="$(ls -A1 /var/lib/flatpak/app/)"
+FLATPAK_PATHS=("/var/lib/flatpak/app")
+readarray -t FLATPAK_APPS < \
+            <(find "${FLATPAK_PATHS[@]}" -maxdepth 1 -mindepth 1 -type d -printf "%f\n")
 
 if check_network_connection; then
-    for APP in "${REG_FLATPAK_APPS_UPDATE[@]}"; do
-        [[ "${FLATPAK_APPS}" =~ "${APP}" ]] &&
-            /usr/bin/flatpak update --assumeyes --noninteractive "${APP}"
+    for app in "${FREQ_UPDATE_FLATPAK_APPS[@]}"; do
+        if [[ " ${FLATPAK_APPS[*]} " =~ " ${app} " ]]; then
+            /usr/bin/flatpak update --assumeyes --noninteractive "${app}"
+        fi
     done
 fi
+unset app
 
 ##########################################################################################
 
@@ -38,11 +42,11 @@ notify_all() {
 }
 
 on_connection() {
-    local conn_type="${1}"
+    local conn_type="${1}" ssid connected_ssid
 
     if [[ "${conn_type}" =~ 'wifi=' ]]; then
-        local ssid="${conn_type#*=}"
-        local connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
+        ssid="${conn_type#*=}"
+        connected_ssid="$(nmcli -f IN-USE,ACTIVE,SSID dev wifi | grep "^\*.*yes")"
         [[ "${connected_ssid}" =~ "${ssid}" ]] && return 0
     elif [[ "$(nmcli -f TYPE connection show --active)" =~ "${conn_type}" ]]; then
         return 0
@@ -52,25 +56,27 @@ on_connection() {
 }
 
 update_cmd() {
-    local one_day=86400
-    local one_week=$((one_day * 7))
-    local autoupdate_log_file="/etc/catcat-os/log/last-auto-update.log"
-    local firstboot_file="/etc/catcat-os/log/.first-boot-done"
+    local one_day=86400 one_week logfile firstboot_file
+    one_week=$((one_day * 7))
+    logfile="/etc/catcat-os/log/last-auto-update.log"
+    firstboot_file="/etc/catcat-os/log/.first-boot-done"
+
+    ensure_file "${logfile}" "${firstboot_file}"
 
     # Auto update if system is one week old
-    if is_file_older ${one_week} "${autoupdate_log_file}"; then
+    if is_older_than "${logfile}" "${one_week}"; then
         if check_network_connection; then
-            is_file_older ${one_day} "${firstboot_file}" ||
+            is_older_than "${firstboot_file}" "${one_week}" &&
                 notify_all "Weekly automatic update has started."
 
-            date "+%a %b %d %H:%M:%S %Y" > "${autoupdate_log_file}"
+            date "+%a %b %d %H:%M:%S %Y" > "${logfile}"
 
-            /usr/bin/update extra >> "${autoupdate_log_file}"
+            /usr/bin/update extra >> "${logfile}"
 
             [[ ${BUILD_EPOCH} -lt $(( $(date +%s) - one_week )) ]] &&
-                 /usr/bin/update >> "${autoupdate_log_file}"
+                 /usr/bin/update >> "${logfile}"
 
-            is_file_older ${one_day} "${firstboot_file}" ||
+            is_older_than "${firstboot_file}" "${one_week}" &&
                 notify_all "Weekly automatic update is done."
         fi
     fi
@@ -78,10 +84,13 @@ update_cmd() {
 
 
 allowed_connection_file="/etc/catcat-os/auto_update_on_connection"
-touch "${allowed_connection_file}"
-connection_list=($(< "${allowed_connection_file}"))
+
+ensure_file "${allowed_connection_file}"
+
+readarray -t connection_list < "${allowed_connection_file}"
+
 if [[ ${#connection_list[@]} -gt 0 ]]; then
-    for conn in ${connection_list[@]}; do
+    for conn in "${connection_list[@]}"; do
         if on_connection "${conn}"; then
             log "INFO" "Network is active: ${conn}"
             log "INFO" "Performing updates"

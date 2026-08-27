@@ -43,31 +43,38 @@ declare -r unblink=$'\033[25m'
 declare -r uninvert=$'\033[27m'
 declare -r unhide=$'\033[28m'
 
-QUIET=false
-VERBOSE=1
+QUIET=${QUIET:-false}
+VERBOSE=${VERBOSE:-2}
 
 # Logging with optional verbose output
 log() {
     # Disable log message tracing by running in subshell
     ( { set +x; } 2>/dev/null
-    local color level="${1}" msg="${@:2}"
-    local datetime="$([[ ${VERBOSE} -ge 2 ]] && date '+[%Y-%m-%d %H:%M:%S] ')"
+    local level="${1^^}" color; shift
+    local msg="$*" datetime=""
 
-    case "${level^^}" in
-        "DEBUG") color=${cyan};   [[ ${QUIET} == false ]] || return ;;
-        "INFO")  color=${green};  [[ ${QUIET} == false ]] || return ;;
-        "NOTE")  color=${blue};   [[ ${QUIET} == false ]] || return ;;
-        "WARN")  color=${yellow}; [[ ${QUIET} == false ]] || return ;;
-        "ERROR") color=${red} ;;
+    [[ ${QUIET} == true ]] && return 0
+    [[ "${level}" == "DEBUG" && ${VERBOSE:-0} -le 1 ]] && return 0
+    [[ ${VERBOSE:-0} -ge 3 ]] && datetime="$(date '+[%Y-%m-%d %H:%M:%S] ')"
+
+    case "${level}" in
+        DEBUG) color="${cyan}"   ;;
+        INFO)  color="${green}"  ;;
+        NOTE)  color="${blue}"   ;;
+        WARN)  color="${yellow}" ;;
+        ERROR) color="${red}"    ;;
+        *)     return 1 ;;
     esac
 
-    echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}" )
+    echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
+    )
 }
 
 # Error handling with optional pre-exit function call
 die() {
     local pre_exit_hook="${2:-}"
-    log "ERROR" "${1}" >&2; [[ -n "${pre_exit_hook}" ]] && ${pre_exit_hook}; exit 1
+    [[ -n "${pre_exit_hook}" ]] && { ${pre_exit_hook} || true; }
+    log "ERROR" "${1}" >&2; exit 1
 }
 
 err() { log "ERROR" "${1}" >&2; }
@@ -76,11 +83,9 @@ brief_trace() {
     if [[ $- != *x* ]]; then
         brief_trace=true
         set -x
-    else
-        if [[ ${brief_trace:-} == true ]]; then
-            set +x
-            unset brief_trace
-        fi
+    elif [[ ${brief_trace:-} == true ]]; then
+        set +x
+        unset brief_trace
     fi
 }
 
@@ -88,11 +93,9 @@ brief_untrace() {
     if [[ $- == *x* ]]; then
         brief_untrace=true
         set +x
-    else
-        if [[ ${brief_untrace:-} == true ]]; then
-            set -x
-            unset brief_untrace
-        fi
+    elif [[ ${brief_untrace:-} == true ]]; then
+        set -x
+        unset brief_untrace
     fi
 }
 
@@ -101,7 +104,8 @@ brief_untrace() {
 # *user selects "option 3"*
 # echo "$CHOICE" will return "option 3"
 function Choose() {
-    local CHOICE=$(ugum choose "$@")
+    local CHOICE
+    CHOICE=$(ugum choose "$@")
     echo "${CHOICE}"
 }
 
@@ -131,17 +135,18 @@ function Bg() {
 function Urllink() {
     local URL="${1}" TEXT="${2}"
     # Generate a clickable hyperlink
-    printf "\033]8;;%s\033\\%s\033]8;;\033\\" "${URL}" "${TEXT}${n}"
+    printf "\033]8;;%s\033\\%s\033]8;;\033\\\n" "${URL}" "${TEXT}${noc}"
 }
 
 # Function to generates a centered text header
 # With customizable padding character, width, and symmetrical padding
 symmetric_heading() {
     local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
-    local padding_length=$(( (output_width - ${#text} - 2) / 2 ))
-    local left_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
-    local right_padding="$(printf "%*s" ${padding_length} | tr ' ' ${padding_char})"
+    local padding_length left_padding right_padding
     local -n color_ref="${4:-noc}"
+    padding_length=$(( (output_width - ${#text} - 2) / 2 ))
+    left_padding="$(printf "%*s" "${padding_length}" "" | tr ' ' "${padding_char}")"
+    right_padding="$(printf "%*s" "${padding_length}" "" | tr ' ' "${padding_char}")"
 
     if (( ${#text} >= output_width - 3 )); then
         err "Text is too long for the given output width. Increase value of output width."
@@ -157,36 +162,37 @@ symmetric_heading() {
 
 # Same as above but with upper and lower borders using given character
 enclosed_heading() {
-    local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
-    local border="$(printf "%*s" ${output_width} | tr ' ' ${padding_char})"
+    local text="${1}" padding_char="${2:-#}" output_width=${3:-75} border
     local -n color_ref="${4:-noc}"
+    border="$(printf "%*s" "${output_width}" "" | tr ' ' "${padding_char}")"
 
     echo -e "\n${color_ref}${border}${noc}"
-    symmetric_heading "${text}" "${padding_char}" ${output_width} "${4:-noc}"
+    symmetric_heading "${text}" "${padding_char}" "${output_width}" "${4:-noc}"
     echo -e "${color_ref}${border}${noc}\n"
 }
 
 cmd_test_timer() {
+    local endt totaltime
     if [[ -n "${_cmd_test_timer_start}" ]]; then
-        local endt=$(($(date +%s) - ${_cmd_test_timer_start}))
-        local totaltime="$(printf "%02d:%02d:%02d\n" $((endt/3600)) $((endt%3600/60)) $((endt%60)))"
-        echo ${totaltime}
+        endt=$(( $(date +%s) - _cmd_test_timer_start ))
+        totaltime="$(printf "%02d:%02d:%02d\n" $((endt/3600)) $((endt%3600/60)) $((endt%60)))"
+        echo "${totaltime}"
     fi
 }
 
 need_root() {
-    [[ $(id -u) -eq 0 ]] || die "This operation requires root privileges"
+    [[ ${EUID} -eq 0 ]] || die "This operation requires root privileges"
 }
 
 exit_if_root() {
-    [[ $(id -u) -eq 0 ]] && die "Cannot run as root"
-    [[ $(id -un) == "gdm" ]] && die "Cannot run as gdm user"
+    [[ ${EUID} -eq 0 ]] && die "Cannot run as root"
+    [[ "${USER}" == "gdm" ]] && die "Cannot run as gdm user"
     [[ "${HOME}" =~ (/run/gdm|/var/lib/gdm) ]] && die "Cannot run as gdm user"
 }
 
 # Quiet mode handling function
 _quiet_exec() {
-    local cmd="$@"
+    local cmd="$*"
     if [[ ${QUIET} == true ]]; then
         ${cmd} >/dev/null
     else
@@ -195,23 +201,36 @@ _quiet_exec() {
 }
 
 run_as_users() {
-    local running_user
+    set -x
+    local cmd="${1}"; shift
+    local args run_cmd running_user some_user_id some_user
+    args=("$@")
+
+    if declare -F "${cmd}" >/dev/null; then
+        run_cmd="$(declare -f "${cmd}"); ${cmd}"
+    elif type -f "${cmd}" >/dev/null; then
+        run_cmd="${cmd}"
+    else
+        die "Not an executable or a shell function: ${cmd}"
+    fi
+
     for running_user in /run/user/*; do
-        local some_user_id="$(basename ${running_user})"
-        local some_user="$(id -un ${some_user_id})"
+        some_user_id="$(basename "${running_user}")"
+        some_user="$(id -un "${some_user_id}")"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "DEBUG" "Running given command as user: ${some_user}"
-            sudo -u "${some_user}" bash -c "$(declare -f $@); $@"
+            sudo -u "${some_user}" bash -c 'exec "$@"' _ "${run_cmd}" "${args[@]}"
         fi
     done
+    set +x
 }
 
 notify_users() {
-    local running_user
+    local running_user some_user_id some_user
     if systemctl is-active display-manager; then
         for running_user in /run/user/*; do
-            local some_user_id="$(basename ${running_user})"
-            local some_user="$(id -un ${some_user_id})"
+            some_user_id="$(basename "${running_user}")"
+            some_user="$(id -un "${some_user_id}")"
             log "DEBUG" "Sending notification to user: ${some_user}"
             sudo -u "${some_user}" \
                     DBUS_SESSION_BUS_ADDRESS=unix:path="/run/user/${some_user_id}/bus" \
@@ -222,43 +241,22 @@ notify_users() {
     fi
 }
 
-bak_before() {
-    if [[ ! -e "${1}.og.bak" ]]; then
-        cp ${VERBOSE:+-v} -drf "${1}" "${1}.og.bak" || err "Backup failed for orignal ${1}"
-    fi
-    cp ${VERBOSE:+-v} -drf "${1}" "${1}.bak" || err "Backup failed for ${1}"
-}
-
-bakrestore() {
-    if [[ -e "${1}.bak" ]]; then
-        mv ${VERBOSE:+-v} "${1}.bak" "${1}"
-    else
-        mv ${VERBOSE:+-v} "${1}" "${1}.bak"
-    fi
-}
-
-ocopy() {
-    local src="" dst="" excludes="" verbose=""
-
-    while [[ $# -gt 0 ]]; do
-        case "${1}" in
-            -v) verbose="-v" ;;
-             *) if [[ -z "${src}" ]]; then src="${1}"
-                elif [[ -z "${dst}" ]]; then dst="${1}"
-                else excludes+=" --exclude=${1}"
-                fi
-                ;;
-        esac
-        shift
+ensure_file() {
+    local _file
+    for _file in "$@"; do
+        if [[ ! -f "${_file}" ]]; then
+            touch "${_file}" || die "Failed touch file: ${_file}"
+        fi
     done
+}
 
-    mkdir ${VERBOSE:+-v} -p "${src}" "${dst}"
-    tar -C "${src}" ${excludes} -cf - . | \
-    tar ${verbose} \
-        --touch \
-        --no-same-owner \
-        --no-same-permissions \
-        -C "${dst}" -xf -
+ensure_dir() {
+    local _dir
+    for _dir in "$@"; do
+        if [[ ! -d "${_dir}" ]]; then
+            mkdir ${VERBOSE:+-v} -p "${_dir}" || die "Failed create directory: ${_dir}"
+        fi
+    done
 }
 
 check_file_inplace() {
@@ -272,27 +270,116 @@ check_file_inplace() {
     done
 }
 
-# Check if a file is older than a specified number of seconds
-is_file_older() {
-    local max_age_seconds="${1}" path="${2}"
-    [[ $(stat -c "%Y" "${path}") -lt $(( $(date +%s) - max_age_seconds )) ]]
+bak_before() {
+    if [[ -e "${1}" ]]; then
+        if [[ ! -e "${1}.og.bak" ]]; then
+            cp ${VERBOSE:+-v} -drf "${1}" "${1}.og.bak" || err "Backup failed for orignal ${1}"
+        fi
+        cp ${VERBOSE:+-v} -drf "${1}" "${1}.bak" || err "Backup failed for ${1}"
+    fi
+}
+
+bakrestore() {
+    if [[ -e "${1}.bak" ]]; then
+        mv ${VERBOSE:+-v} "${1}.bak" "${1}"
+    else
+        mv ${VERBOSE:+-v} "${1}" "${1}.bak"
+    fi
+}
+
+ocopy() {
+    local verbose="" src="" dst="" excludes=()
+
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -v) verbose="-v" ;;
+             *)
+                if [[ -z "${src}" ]]; then
+                    src="${1}"
+                elif [[ -z "${dst}" ]]; then
+                    dst="${1}"
+                else
+                    excludes+=("--exclude=${1}")
+                fi
+                ;;
+        esac
+        shift
+    done
+
+    ensure_dir "${dst}"
+    tar -C "${src}" "${excludes[@]}" -cf - . | \
+    tar "${verbose}" \
+        --touch \
+        --no-same-owner \
+        --no-same-permissions \
+        -C "${dst}" -xf -
+}
+
+# Checks if last modification time of file/directory is older than a specified seconds
+is_older_than() {
+    local target_path threshold_sec target_mtime_sec current_time_sec targett_aged_sec
+    target_path="${1%/}"
+    threshold_sec=${2}
+
+    [[ -e "${target_path}" ]] || die "Does not exist: ${target_path}"
+    [[ "${threshold_sec}" =~ ^[0-9]+$ ]] || die "Not an integer: ${threshold_sec}"
+
+    target_mtime_sec=$(stat -c "%Y" "${target_path}")
+    current_time_sec=$(date +%s)
+    targett_aged_sec=$(( current_time_sec - target_mtime_sec ))
+
+    if [[ ${targett_aged_sec} -gt ${threshold_sec} ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 replace_add() {
-    grep -qi "${1}" "${3}" && sed -i -e "s|.*${1}.*|${2}|" "${3}" || sh -c "echo '${2}' >> ${3}"
+    if grep -qi "${1}" "${3}"; then
+        sed -i -e "s|.*${1}.*|${2}|" "${3}"
+    else
+        echo "${2}" >> "${3}"
+    fi
 }
 
-one_filesystem() {
-    [[ $# -eq 2 ]] || die "Specify two paths to check filesystem"
-    [[ $(stat -L -c %d ${1}) -eq $(stat -L -c %d ${2}) ]]
+check_filesystem() {
+    local mode="${1}"; shift
+    local path_a="${1}" path_b="${2}" fs_a fs_b
+
+    [[ -e "${path_a}" ]] || die "Does not exist: ${path_a}"
+    [[ -e "${path_b}" ]] || die "Does not exist: ${path_b}"
+
+    fs_a="$(findmnt -n -o SOURCE --target "${path_a}" | cut -d'[' -f1)"
+    fs_b="$(findmnt -n -o SOURCE --target "${path_b}" | cut -d'[' -f1)"
+
+    case "${mode}" in
+        same)
+            log "DEBUG" "Validating paths are on same filesystem:\n\t${path_a}\n\t${path_b}"
+            if [[ "${fs_a}" != "${fs_b}" ]]; then
+                die "Paths are not on same filesystem\n\t${path_a} (${fs_a})\n\t${path_b} (${fs_b})"
+            fi
+            ;;
+        diff)
+            log "DEBUG" \
+                "Validating that paths are on different filesystems:\n\t${path_a}\n\t${path_b}"
+            if [[ "${fs_a}" == "${fs_b}" ]]; then
+                die "Paths are on same filesystem\n\t${path_a} (${fs_a})\n\t${path_b} (${fs_b})"
+            fi
+            ;;
+        *)
+            die "Usage: check_filesystem <same|diff> <path_a> <path_b>"
+            ;;
+    esac
 }
 
 validate_path() {
-    local path fs_check
+    local path fs_check="" path_fs=""
     [[ $# -eq 0 ]] && die "No path provided to validate"
 
+    # Identify if first arg is a filesystem type instead of a path
     if [[ ! "${1}" =~ "/" ]]; then
-        local fs_check="${1}"
+        fs_check="${1}"
         shift
     fi
 
@@ -300,7 +387,7 @@ validate_path() {
         [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
         if [[ -n "${fs_check}" ]]; then
             log "DEBUG" "Validating path exists on ${fs_check} filesystem: ${path}"
-            local path_fs="$(stat -f -c '%T' ${path})"
+            path_fs="$(stat -f -c '%T' "${path}")"
             [[ "${path_fs,,}" == "${fs_check,,}" ]] ||
                 die "Path is not on ${fs_check} filesystem: ${path}"
         fi
@@ -308,9 +395,20 @@ validate_path() {
 }
 
 populated_or_afile_dirs() {
-    find "${1}" -type d -exec bash -c \
-    '[[ $(ls -A "{}" | wc -l) -gt 1 || $(ls -Ap "{}" | grep -Ev '/$' | wc -l) -eq 1 ]] &&
-            echo "{}"' \;
+    local _dir dir_items items_count
+    shopt -s dotglob nullglob
+    find "${1}" -type d | while read -r _dir; do
+        dir_items=("${_dir}"/*)
+        items_count=${#dir_items[@]}
+        if [[ ${items_count} -gt 1 ]]; then
+            # Print when it's a populated directory
+            echo "${_dir}"
+        elif [[ ${items_count} -eq 1 && -f "${dir_items[0]}" ]]; then
+            # Print when it's a directory with a file
+            echo "${_dir}"
+        fi
+    done
+    shopt -u dotglob nullglob
 }
 
 unarchive() {
@@ -318,7 +416,7 @@ unarchive() {
 
     [[ -z "${archive}" || -z "${dest}" ]] && die "No archive or destination path was provided"
 
-    [[ ! -d "${dest}" ]] && mkdir ${VERBOSE:+-v} -p "${dest}"
+    ensure_dir "${dest}"
     case "${archive}" in
         *.zip|*.ZIP)
             log "DEBUG" "Extracting ZIP archive in: ${dest}"
@@ -330,9 +428,9 @@ unarchive() {
             ;;
         *.rar)
             log "DEBUG" "Extracting RAR archive in: ${dest}"
-            cd "${dest}"
+            cd "${dest}" || return 1
             unrar x "${archive}"
-            cd -
+            cd -         || return 1
             ;;
         *.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
             log "DEBUG" "Extracting TAR archive in: ${dest}"
@@ -373,15 +471,21 @@ ensure_repo() { [[ -d "${2}" ]] || git clone --depth 1 "${1}" "${2}"; }
 
 latest_ghpkg_url() {
     local repo="${1}" include_pattern="${2:-}" exclude_pattern="${3:-}" sha="${4:-}"
+    local gh_release="https://api.github.com/repos/${repo}/releases/latest"
     local jq_filter='.assets[] | select(.name | test($inc) and (if $exc != "" then test($exc) |
                         not else true end)).browser_download_url'
 
     [[ -n "${JQ_FILTER:-}" ]] && jq_filter="${JQ_FILTER}"
+    [[ -n "${GHPKG_VERSION:-}" ]] && gh_release="${gh_release/latest/tags}/${GHPKG_VERSION}"
+    [[ ${GHPKG_PRERELEASE:-0} -eq 1 ]] && {
+        gh_release="${gh_release/\/latest/}"
+        jq_filter='map(select(.prerelease == true)) | first | '"${jq_filter}"
+    }
 
     local ii response url vals=()
     for ii in {1..5}; do
         { brief_untrace; } 2>/dev/null
-        response="$(curl_fetch https://api.github.com/repos/${repo}/releases/latest)"
+        response="$(curl_fetch "${gh_release}")"
         { brief_untrace; } 2>/dev/null
         url=$(jq -r --arg inc "${include_pattern}" \
                     --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
@@ -393,26 +497,29 @@ latest_ghpkg_url() {
                         --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
             vals+=("${sha}")
         fi
-        [[ -n "${url[@]}" ]] && printf '%s\n' "${vals[@]}" && return 0
+        [[ -n "${url}" ]] && printf '%s\n' "${vals[@]}" && return 0
         sleep 0.4
     done
+
     err "Max attempts reached..."
     die "Unable to retrieve latest package URL from repo: ${repo}"
 }
 
 place_executable() {
     local find_exec_dir="${1}" exec_name="${2}" bin_dir="${BIN_DIR:-/usr/bin}"
-    local exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
-    local found_execs=($(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
-                            grep -E "${exec_types}" | cut -d: -f1 | grep -E "/${exec_name}\$"))
+    local found_execs exec_types="(application|text)/x-(.*executable|elf|.*script|.*python|perl|ruby)"
+    readarray -t found_execs < <(find "${find_exec_dir}" -type f -exec file --mime '{}' \; | \
+                                    grep -E "${exec_types}" | \
+                                    cut -d: -f1 | \
+                                    grep -E "/${exec_name}\$")
 
     if [[ ${#found_execs[@]} -eq 1 ]]; then
-        log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime ${found_execs[0]})"
-        mkdir ${VERBOSE:+-v} -p "${bin_dir}"
+        log "DEBUG" "Executable: ${exec_name} | Mimetype: $(file -b --mime "${found_execs[0]}")"
+        ensure_dir "${bin_dir}"
         cp ${VERBOSE:+-v} -f "${found_execs[0]}" "${bin_dir}"/
         chmod ${VERBOSE:+-v} +x "${bin_dir}/${exec_name}"
     elif [[ ${#found_execs[@]} -gt 1 ]]; then
-        die "More than 1 executable with same name\n$(printf '%s\n' ${found_execs[@]})"
+        die "More than 1 executable with same name\n$(printf '%s\n' "${found_execs[@]}")"
     else
         die "No executable found: ${exec_name}"
     fi
@@ -431,12 +538,13 @@ get_ghpkg() {
         esac
         shift
     done
-    local pkg_vals=($(latest_ghpkg_url "${pkg_repo}" "${pkg_regx}" "${pkg_negx:-musl}" "sha"))
-    local pkg_url="${pkg_vals[0]}"
-    local pkg_sha="${pkg_vals[1]#*:}"
-    local pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/$(basename ${pkg_url})"
+    local pkg_vals pkg_url pkg_sha pkg_archive ii
+    readarray -t pkg_vals < <(latest_ghpkg_url "${pkg_repo}" "${pkg_regx}" "${pkg_negx:-musl}" "sha")
+    pkg_url="${pkg_vals[0]}"
+    pkg_sha="${pkg_vals[1]#*:}"
+    pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/$(basename "${pkg_url}")"
 
-    mkdir ${VERBOSE:+-v} -p "$(dirname ${pkg_archive})"
+    mkdir ${VERBOSE:+-v} -p "$(dirname "${pkg_archive}")"
     curl_get "${pkg_archive}" "${pkg_url}"
     if [[ -n "${pkg_sha}" && "${pkg_sha}" != "null" ]]; then
         sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" ||
@@ -446,19 +554,19 @@ get_ghpkg() {
                 log "INFO" "Retrying ${ii}..."
                 rm "${pkg_archive}"
                 curl_get "${pkg_archive}" "${pkg_url}"
-                sha256sum -c <<< "${pkg_sha}  ${pkg_archive}" && break || continue
+                if sha256sum -c <<< "${pkg_sha}  ${pkg_archive}"; then break
+                else continue; fi
             else
                 die "Max attempts reached, package checksum verification failed: ${pkg_name}"
             fi
         done
-        unset ii
     else
         log "WARN" "Checksum skipped, package digest unavailable in repo: ${pkg_repo}"
     fi
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     # Detect top populated directories
-    auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
+    readarray -t auto_fold_dir < <(populated_or_afile_dirs "${pkg_archive}.extract")
 
     if [[ ${islibexec} -ne 1 ]]; then
         place_executable "${auto_fold_dir[0]}" "${pkg_name}"
@@ -466,7 +574,7 @@ get_ghpkg() {
         local libexec_dir="${LIBEXEC_DIR:-/usr/libexec}"
         log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
         mkdir ${VERBOSE:+-v} -p "${libexec_dir}/${pkg_name}"
-        cp -drvf "${auto_fold_dir[0]}"/* "${libexec_dir}/${pkg_name}"/
+        ocopy "${auto_fold_dir[0]}" "${libexec_dir}/${pkg_name}"
     fi
 }
 
@@ -483,18 +591,18 @@ get_ghraw() {
             *)       die "Unknown option: ${1}" ;;
         esac
     done
-    local gh_api="https://api.github.com/repos/${repo_raw}" branch="" raw_url=""
+    local gh_api="https://api.github.com/repos/${repo_raw}" branch="" raw_url="" dest_path=""
 
     for ffile in "$@"; do
-        local dest_path="${destfile:-"${dest_dir}/${ffile}"}"
+        dest_path="${destfile:-"${dest_dir}/${ffile}"}"
         if [[ -f "${dest_path}" && ${overwrite} -ne 1 ]]; then
             log "NOTE" "Fetch skipped - Overwrite is disabled, file exists: ${dest_path}"
             continue
         fi
         [[ -z "${branch}" ]] &&
-        branch="${GITBRANCH:-"$(curl_fetch ${gh_api} | jq -r '.default_branch')"}"
+        branch="${GIT_BRANCH:-"$(curl_fetch "${gh_api}" | jq -r '.default_branch')"}"
         raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
-        [[ ! -d "$(dirname ${dest_path})" ]] && mkdir -vp "$(dirname ${dest_path})"
+        ensure_dir "$(dirname "${dest_path}")"
         curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
     done
 }
@@ -503,11 +611,12 @@ get_fonts() {
     local font_name="${1}" font_url="${2}"
     local fonts_dir="${FONTS_DIR:-/usr/share/fonts}" tmpdir="${TMP_DIR:-/tmp/get_fonts}"
     local font_dest="${fonts_dir}/${font_name}" font_tmpd="${tmpdir}/${font_name}"
+    local url_file fontfile
 
     [[ -z "${font_url}" ]] &&
     font_dest="${fonts_dir}/nerd-fonts/${font_name}"
     mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
-    if [[ -d "${font_dest}" && "$(ls -A "${font_dest}")" ]]; then
+    if [[ -d "${font_dest}" && -n "$(ls -A "${font_dest}")" ]]; then
         log "NOTE" "Font skipped - Non-empty directory exists: ${font_dest}"
     else
         if [[ -z "${font_url}" ]]; then
@@ -518,7 +627,7 @@ get_fonts() {
                 die "No URL provided to get the font"
             fi
         fi
-        local url_file="$(basename ${font_url})" fontfile
+        url_file="$(basename "${font_url}")"
         log "INFO" "Adding font(s): ${font_name}"
         log "INFO" "From URL: ${font_url}"
 

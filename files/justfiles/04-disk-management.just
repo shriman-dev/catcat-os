@@ -55,7 +55,7 @@ dump-info-luks DEVICE_PATH:
 enable-luks-discard LUKS_UUID:
     #!/usr/bin/env -S sudo -- /bin/bash
     echo 'Note: Add "discard" option for the device entry in /etc/crypttab'
-    if [[ $(rpm-ostree kargs) =~ "luks.options=discard" ]]; then
+    if [[ ! "$(rpm-ostree kargs)" =~ "luks.options=discard" ]]; then
         rpm-ostree kargs --append-if-missing=rd.luks.options=discard \
                          --append-if-missing=luks.options=discard
     fi

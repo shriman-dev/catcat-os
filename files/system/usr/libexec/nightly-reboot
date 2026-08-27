@@ -22,17 +22,16 @@ reboot_sys() {
 }
 
 monitor_cancel_file() {
-    local cancel_file="/run/NIGHTLY_REBOOT/user"
-    local attempts=0
+    local cancel_file="/run/NIGHTLY_REBOOT/user" cancel_user attempts=0
     local max_attempts=${REBOOT_DELAY}
 
     log "INFO" "Monitoring for cancellation"
-    mkdir -p "$(dirname ${cancel_file})"
-    chmod -R 1777 "$(dirname ${cancel_file})"
+    mkdir -p "$(dirname "${cancel_file}")"
+    chmod -R 1777 "$(dirname "${cancel_file}")"
     while [[ ${attempts} -lt ${max_attempts} ]]; do
         if [[ -f "${cancel_file}" ]]; then
             log "INFO" "Cancel file detected: ${cancel_file}"
-            local cancel_user="$(cat ${cancel_file})"
+            cancel_user="$(< "${cancel_file}")"
             log "INFO" "Reboot cancelled by user: ${cancel_user}"
             wall "Nightly Reboot was cancelled by user: ${cancel_user}"
             notify_all "Nightly Reboot was cancelled by user: ${cancel_user}"

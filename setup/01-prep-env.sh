@@ -2,6 +2,9 @@
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
+log "INFO" "Build environment info"
+cat /etc/resolv.conf
+
 log "INFO" "Preparing build environment"
 log "INFO" "Creating needed directories"
 mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
@@ -30,7 +33,6 @@ SBMOK_DER="${BUILD_CACHE_DIR}/sbmok.der"
 [[ ! -f "${SBMOK_DER}" ]] && SBMOK_DER="${BUILD_ROOT_DIR}/sbmok.der"
 cp -vf "${SBMOK_DER}" "/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
 cp -vf "${SBMOK_DER}" "/etc/pki/akmods/certs/akmods-${PROJECT_NAME}-mok.der"
-env
 
 log "INFO" "Caching repositories with configurations"
 ensure_repo "https://github.com/CachyOS/CachyOS-Settings.git" \
@@ -46,7 +48,6 @@ if [[ -L /opt ]]; then
 fi
 
 log "INFO" "Adding build info"
-mkdir -vp "/etc/${PROJECT_NAME}"
 cat <<EOF > "/etc/${PROJECT_NAME}/build_info"
 BUILD_EPOCH=$(date +%s)
 COMMIT_SHA='${COMMIT_SHA}'

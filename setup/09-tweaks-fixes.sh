@@ -64,7 +64,7 @@ log "INFO" "Applying system fixes"
 # Fix if dconf user profile does not exists or is not configured for distro db
 dconf_profile="/etc/dconf/profile/user"
 if [[ ! -f "${dconf_profile}" ]]; then
-    mkdir -vp "$(direname "${dconf_profile}")"
+    ensure_dir "$(dirname "${dconf_profile}")"
     echo "user-db:user
 system-db:local
 system-db:site
@@ -82,7 +82,7 @@ log "INFO" "Fixing librewolf/firefox delayed launch issue"
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'
 sed -i '/^hosts:/ s/myhostname//; /^hosts:.*files\s\+myhostname/! s/mdns4_minimal/myhostname &/' /etc/nsswitch.conf
 
-# Fix iso installation failing for the reason just having CN readme
+# Fix iso installation failing for the reason just package having CN readme
 rpm -q just &&
     rm -v /usr/share/doc/just/README.*.md
 

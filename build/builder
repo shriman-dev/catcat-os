@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname ${SCRIPT_DIR})/setup/setup_lib/funcvar.sh"
+source "$(dirname "${SCRIPT_DIR}")/setup/setup_lib/funcvar.sh"
 
 prep_metadata() {
     BUILD_ARGS=(
@@ -24,12 +24,9 @@ prep_metadata() {
     )
 
     BUILD_LABELS=(
-        "--label" "io.artifacthub.package.deprecated=false"
-        "--label" "io.artifacthub.package.prerelease=false"
-        "--label" "io.artifacthub.package.readme-url=${PROJECT_README}"
         "--label" "org.opencontainers.image.documentation=${PROJECT_README}"
         "--label" "org.opencontainers.image.source=${PROJECT_SOURCE}"
-        "--label" "org.opencontainers.image.created=${AH_DATE}"
+        "--label" "org.opencontainers.image.created=${DATETIMESTAMP}"
         "--label" "org.opencontainers.image.description=${PROJECT_DESCRP}"
         "--label" "org.opencontainers.image.title=${IMAGE_NAME}"
         "--label" "org.opencontainers.image.vendor=${PROJECT_VENDOR}"
@@ -50,13 +47,18 @@ sect_border() {
     symmetric_heading "#" "#" "100" "blue" | tr ' ' '#'
 }
 
+# SC2154 - variable is referenced but not assigned.
+# shellcheck disable=SC2154
 build_image() {
     local log_dir="${SCRIPT_DIR}/.log/${IMAGE_NAME}"
     local log_file="${log_dir}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
+    local tag build_tags=()
 
-    [[ ! -d "${log_dir}" ]] && mkdir -p "${log_dir}"
+    for tag in ${BUILD_TAGS}; do
+        build_tags+=("--tag" "${IMAGE_NAME}:${tag}")
+    done
 
-    BUILD_TAGS=($(printf -- "--tag ${IMAGE_NAME}:%s\n" ${BUILD_TAGS}))
+    ensure_dir "${log_dir}"
 
     {
     sect_border
@@ -65,24 +67,33 @@ build_image() {
     echo "${yellow}" " Datestamp     - ${DATETIMESTAMP}${noc}"
     echo "${cyan}"   " Git Commit    - ${COMMIT_SHA}${noc}"
     sect_border
+
     _cmd_test_timer_start=$(date +%s)
-    cd "$(dirname ${SCRIPT_DIR})"
+    cd "$(dirname "${SCRIPT_DIR}")"
     { brief_trace; } 2>/dev/null
     podman build "$@" \
                  --pull=newer \
-                 --secret "id=sbmok_priv,env=SBMOK_KEY" \
+                 --dns 9.9.9.9 \
+                 --secret "id=sbmok_priv,src=${SBMOK_KEY},type=file" \
                  --file "Containerfile" \
                  "${BUILD_LABELS[@]}" \
                  "${BUILD_ARGS[@]}" \
-                 "${BUILD_TAGS[@]}" \
+                 "${build_tags[@]}" \
                  .
     { brief_trace; } 2>/dev/null
+    _cmd_test_timer_end=$(cmd_test_timer)
+
     sect_border
     echo "${green}"  " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
-    echo "${purple}" " Build Time    - $(cmd_test_timer)${noc}"
+    echo "${purple}" " Build Time    - ${_cmd_test_timer_end}${noc}"
     sect_border
     } \
-    2>&1 | while read -r line; do echo "$(date +'[%T.%3N]') ${line}"; done \
+    2>&1 | \
+    perl -MTime::HiRes=gettimeofday -ne '
+        $|=1;
+        ($s, $usec) = gettimeofday();
+        ($sec,$min,$hour,$mday,$mon,$year) = localtime($s);
+        printf("[%02d:%02d:%02d.%03d] %s", $hour, $min, $sec, $usec/1000, $_);' \
     2>&1 | tee -a "${log_file}"
 
     ln -sf "${log_file}" "${log_dir}/${IMAGE_NAME}.last.log"
@@ -92,14 +103,15 @@ containerized_rpm_ostree() {
     podman run --rm --privileged \
                -v /var/lib/containers:/var/lib/containers \
                --entrypoint /usr/bin/rpm-ostree \
-               ${BASE_IMAGE}:${MAJOR_VERSION} \
+               "${BASE_IMAGE}:${MAJOR_VERSION}" \
                "$@"
 }
 
 chunk_image() {
     sect_border
-    echo "${green}" " Chunking      - ${IMAGE_NAME}:${DEFAULT_TAG}"
+    echo "${green}" " Chunking       - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     sect_border
+
     _cmd_test_timer_start=$(date +%s)
     { brief_trace; } 2>/dev/null
     ${RPM_OSTREE} compose \
@@ -109,23 +121,26 @@ chunk_image() {
                   --from "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
                   --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
     { brief_trace; } 2>/dev/null
+    _cmd_test_timer_end=$(cmd_test_timer)
+
     sect_border
-    echo "${green}"  " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo "${purple}" " Chunk Time    - $(cmd_test_timer)"
+    echo "${green}"  " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Chunk Time    - ${_cmd_test_timer_end}${noc}"
     sect_border
 }
 
 push_image() {
     # Always push image without chunked suffix
-    local push_image="${IMAGE_NAME/-chunked/}" build_tags="${BUILD_TAGS}" tag
+    local push_image="${IMAGE_NAME/-chunked/}" push_tags="${BUILD_TAGS}" tag
     digestfile="/tmp/digestfile"
 
     sect_border
-    echo "${green}"  " Pushing       - ${push_image}:${DEFAULT_TAG}"
-    echo "${purple}" " Push Registry - ${PUSH_REGISTRY}"
+    echo "${green}"  " Pushing       - ${push_image}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Push Registry - ${PUSH_REGISTRY}${noc}"
     sect_border
+
     _cmd_test_timer_start=$(date +%s)
-    for tag in ${build_tags}; do
+    for tag in ${push_tags}; do
         log "INFO" "Pushing: ${push_image}:${tag}"
         { brief_trace; } 2>/dev/null
         podman tag "${IMAGE_NAME}:${DEFAULT_TAG}" "${PUSH_REGISTRY}/${push_image}:${tag}"
@@ -134,9 +149,11 @@ push_image() {
         { brief_trace; } 2>/dev/null
         log "INFO" "Pushed: ${push_image}:${tag}"
     done
+    _cmd_test_timer_end=$(cmd_test_timer)
+
     sect_border
-    echo "${green}"  " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}"
-    echo "${purple}" " Push Time    - $(cmd_test_timer)"
+    echo "${green}"  " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Push Time    - ${_cmd_test_timer_end}${noc}"
     sect_border
 }
 
@@ -167,7 +184,7 @@ gh_hook() {
         case "${cmd}" in
             pre-build)
                 # Add build tags
-                BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[@]}"
+                BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[*]}"
                 echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
                 # Add real image_name
                 echo "image_name=${IMAGE_NAME}" >> "${GITHUB_ENV}"
@@ -178,7 +195,7 @@ gh_hook() {
                 ;;
             post-push)
                 # Add digestfile for cosign
-                echo "digest=$(< ${digestfile})" >> "${GITHUB_OUTPUT}"
+                echo "digest=$(< "${digestfile}")" >> "${GITHUB_OUTPUT}"
                 unset digestfile
                 ;;
             *)
@@ -211,10 +228,13 @@ main() {
             -h|--help)
                 show_help;          exit  0 ;;
             -i|--image-name)
+                [[ -n "${2:-}" ]] || die "Provide image name"
                 IMAGE_NAME="${2}";  shift 2 ;;
             -b|--base-image)
+                [[ -n "${2:-}" ]] || die "Provide base image"
                 BASE_IMAGE="${2}";  shift 2 ;;
             -t|--alt-tag)
+                [[ -n "${2:-}" ]] || die "Provide alt tag"
                 ALT_TAG="${2}";     shift 2 ;;
             *)
                 rem_args+=("${1}"); shift   ;;
@@ -222,9 +242,9 @@ main() {
     done
 
     RPM_OSTREE="$(command -v rpm-ostree)" || true
-    if [[ -z "${RPM_OSTREE:-}" ]]; then
-        [[ $(id -u) -ne 0 ]] &&
-            die "Require root privileges, rpm-ostree command does not exists on current system"
+    if [[ ! -x "${RPM_OSTREE:-}" ]]; then
+        [[ ${EUID} -ne 0 ]] &&
+            die "Requires root privileges, rpm-ostree command not found on current system"
         RPM_OSTREE="containerized_rpm_ostree"
     fi
 
@@ -243,11 +263,8 @@ main() {
                 ;;
             *)
                 # Collect args for active subcommand
-                if [[ -n "${curr_cmd:-}" ]]; then
-                    curr_args+=("${arg}")
-                else
-                    die "Non glabl flag '${arg}' provided before subcommand"
-                fi
+                { [[ -n "${curr_cmd:-}" ]] && curr_args+=("${arg}"); } ||
+                die "Non glabl flag '${arg}' provided before subcommand"
                 ;;
         esac
     done

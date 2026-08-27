@@ -87,9 +87,7 @@ rpm_repos disable
 ###########
 # Network #
 ###########
-systemctl disable dnscrypt-proxy.service
-/usr/bin/localdnsctl -v --switch-backend dnsmasq
-systemctl -f enable dnsmasq.service
+/usr/bin/localdnsctl -v --switch-backend dnsmasq --setup
 
 
 ################################

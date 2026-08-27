@@ -1,13 +1,15 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname ${SCRIPT_DIR})/setup/setup_lib/funcvar.sh"
+source "$(dirname "${SCRIPT_DIR}")/setup/setup_lib/funcvar.sh"
 source "${SCRIPT_DIR}/ENVAR"
 
 #set -x
 
 BUILD_TARGETS=()
+
+[[ $# -eq 0 ]] && die "No option provided"
 while [[ $# -gt 0 ]]; do
     case "${1}" in
         --chunk-img)
@@ -23,6 +25,7 @@ while [[ $# -gt 0 ]]; do
         --build-img) # Build specified image(s) (defaults to all builds)
             shift
             BUILD_TARGETS=("$@")
+            [[ ${#BUILD_TARGETS[@]} -eq 0 ]] && die "No image specified"
             break
             ;;
         *)
@@ -36,7 +39,7 @@ done
 declare -x TMPDIR="/tmp/local-build-cache"
 mkdir -p "${TMPDIR}"
 if [[ -n "${PERSISTENT_CACHE_DIR:-}" ]]; then
-    ln -Tvsf "${PERSISTENT_CACHE_DIR}" "${TMPDIR}/buildah-cache-$(id -u)"
+    ln -Tvsf "${PERSISTENT_CACHE_DIR}" "${TMPDIR}/buildah-cache-${UID}"
 fi
 
 
@@ -115,11 +118,11 @@ for VARIANT in "${BUILD_TARGETS[@]}"; do
     fi
 done
 
-dangling_images=($(podman images -f "dangling=true" -q))
+readarray -t dangling_images < <(podman images -f "dangling=true" -q)
 if [[ ${#dangling_images[@]} -gt 0 ]]; then
     echo ""
     log "INFO" "Removing dangling images..."
-    podman rmi --force ${dangling_images[@]}
+    podman rmi --force "${dangling_images[@]}"
     log "INFO" "Removed ${#dangling_images[@]} dangling images"
 fi
 

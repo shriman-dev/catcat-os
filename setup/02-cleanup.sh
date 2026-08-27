@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
+shopt -s dotglob
 
 # Cleanup is not required when rebuilding image of current project
 log "INFO" "Cleaning up system"
@@ -65,10 +66,8 @@ unset cachy
 
 log "INFO" "Removing dconf and skel defaults"
 rm -rvf /etc/skel/* \
-        /etc/skel/.* \
         /etc/dconf/db/distro.d/* \
         /usr/etc/skel/* \
-        /usr/etc/skel/.* \
         /usr/etc/dconf/db/distro.d/*
 
 log "INFO" "Removing unneeded profile.d scripts, localsearchdb miner, xdg autostart files and rpm repos"

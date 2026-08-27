@@ -120,12 +120,12 @@ GLOBAL_DISABLE_SERVICES=(
 
 services_disable() {
     log "INFO" "Disabling and masking system services"
-    systemctl -v disable ${DISABLE_SERVICES[@]} || true
-    systemctl -v mask ${DISABLE_SERVICES[@]} || true
+    systemctl -v disable "${DISABLE_SERVICES[@]}" || true
+    systemctl -v mask "${DISABLE_SERVICES[@]}" || true
 
     log "INFO" "Disabling and masking global services"
-    systemctl -v --global disable ${GLOBAL_DISABLE_SERVICES[@]} || true
-    systemctl -v --global mask ${GLOBAL_DISABLE_SERVICES[@]} || true
+    systemctl -v --global disable "${GLOBAL_DISABLE_SERVICES[@]}" || true
+    systemctl -v --global mask "${GLOBAL_DISABLE_SERVICES[@]}" || true
     log "INFO" "Disabled system services"
 }
 
@@ -139,6 +139,6 @@ if [[ $# -gt 0 ]]; then
     case "${1}" in
         enable) services_enable;;
         disable) services_disable;;
-        *) die "Usage: $(basename ${0}) [enable|disable]";;
+        *) die "Usage: $(basename "${0}") [enable|disable]";;
     esac
 fi

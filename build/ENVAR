@@ -12,11 +12,10 @@ ENVAR=(
     "DEFAULT_TAG=latest"
     "MAJOR_VERSION=44"
     "CUSTOM_KERNEL=kernel-cachyos"
-    "TIMEZONE=$(ls -l /etc/localtime | sed 's|.*/zoneinfo/||')"
-    "DATESTAMP=$(date "+%Y%m%d")"
-    "TIMESTAMP=$(date "+%H%M%S")"
-    "DATETIMESTAMP=$(date "+%Y%m%d.%H%M%S")"
-    "AH_DATE=$(date +%Y\-%m\-%d\T%H\:%M\:%S\Z)"
+    "TIMEZONE=$(readlink '/etc/localtime' | sed 's|.*/zoneinfo/||')"
+    "DATESTAMP=$(date '+%Y%m%d')"
+    "TIMESTAMP=$(date '+%H%M%S')"
+    "DATETIMESTAMP=$(date '+%Y%m%d.%H%M%S')"
     "COMMIT_SHA=$(git rev-parse HEAD)"
 )
 
@@ -24,11 +23,8 @@ ENVAR=(
 declare -x "${ENVAR[@]}"
 
 # Tags
-_BUILD_TAGS=(
-    "${DEFAULT_TAG}"
-    "${MAJOR_VERSION}"
-)
-declare -x BUILD_TAGS="${_BUILD_TAGS[@]}"
+_build_tags=("${DEFAULT_TAG}" "${MAJOR_VERSION}")
+declare -x BUILD_TAGS="${_build_tags[*]}"
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
     if ! grep "${PROJECT_NAME}" <<< "${GITHUB_ENV}"; then

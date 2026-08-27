@@ -68,32 +68,26 @@ declare -A NTIVO_SWAP=(
 )
 
 pkgs_hwaccel() {
+    local pkg
     log "INFO" "Installing Hardware Acceleration Packages"
     # From Terra Repo
-#    dnf_action swap from-repo "terra" \
-#                    switcheroo-control cardwire
-    dnf_action swap from-repo "terra-extras" \
-                    uresourced uresourced-dmemcg
-    dnf_action install repo "terra,terra-extras" \
-                       "${HWACCEL_PKGS[@]}"
+#    dnf_action swap from-repo "terra" switcheroo-control cardwire
+    dnf_action swap from-repo "terra-extras" uresourced uresourced-dmemcg
+    dnf_action install repo "terra,terra-extras" "${HWACCEL_PKGS[@]}"
 
     # Exclude Mesa from all Fedora and Terra repos except Negativo17's fedora-multimedia
     #dnf5 -y config-manager setopt "*rpmfusion*".exclude="mesa-*"
-    dnf5 -y config-manager setopt "*fedora*".exclude="mesa-*"
-    dnf5 -y config-manager setopt "*terra*".exclude="mesa-*"
+    dnf5 -y config-manager setopt "*fedora*.exclude=mesa-*"
+    dnf5 -y config-manager setopt "*terra*.exclude=mesa-*"
     dnf5 -y config-manager setopt "fedora-multimedia".exclude=
 
     # From Negativo17 Multimedia Repo
-    dnf_action distro-sync from-repo "fedora-multimedia" weak-deps \
-                           "${NTIVO_SYNC[@]}"
-    local pkg
+    dnf_action distro-sync from-repo "fedora-multimedia" weak-deps "${NTIVO_SYNC[@]}"
     for pkg in "${!NTIVO_SWAP[@]}"; do
-        dnf_action swap from-repo "fedora-multimedia" weak-deps \
-                        "${pkg}" "${NTIVO_SWAP["${pkg}"]}"
+        dnf_action swap from-repo "fedora-multimedia" weak-deps "${pkg}" "${NTIVO_SWAP["${pkg}"]}"
     done
     # More packages
-    dnf_action install from-repo "fedora-multimedia" weak-deps \
-                       "${NTIVO_PKGS[@]}"
+    dnf_action install from-repo "fedora-multimedia" weak-deps "${NTIVO_PKGS[@]}"
 
     log "INFO" "Hardware Acceleration packages installed successfully"
 }

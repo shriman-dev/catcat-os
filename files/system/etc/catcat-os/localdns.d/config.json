@@ -1,0 +1,4 @@
+{
+  "backend_type": "dnscrypt",
+  "log_retention": "3 months"
+}

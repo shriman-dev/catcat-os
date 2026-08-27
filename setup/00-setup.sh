@@ -27,7 +27,7 @@ run_step() {
     local args=("$@")
 
     enclosed_heading "${heading}" "=" "100" "${color}"
-    if [[ -n "${args[@]}" ]]; then
+    if [[ -n "${args[*]}" ]]; then
         ( set -x; "${script}" "${args[@]}" )
     else
         ( set -x; "${script}" )
@@ -40,81 +40,81 @@ steps() {
 
     if [[ "${ALT_TAG}" == "main" && "${arg}" == "variant" ]]; then
         # Skip "variant" step when it's main image
-        STEP_SKIPPED=true
+        STEP_SKIPPED=1
         return 0
     elif [[ -f "${build_markd}/CURRENT_PROJECT" && "${arg}" =~ ^(${skip_list}) ]]; then
         # Skip the steps when building on base image of current project
-        STEP_SKIPPED=true
+        STEP_SKIPPED=1
         return 0
     fi
 
     case "${arg}" in
         prep-env)
-            run_step "red" "Preparing System Environment" \
+            run_step "green" "Preparing System Environment" \
             "${BUILD_SETUP_DIR}/01-prep-env.sh"
             ;;
         cleanup)
-            run_step "green" "Cleaning Up" \
+            run_step "blue" "Cleaning Up" \
             "${BUILD_SETUP_DIR}/02-cleanup.sh"
             ;;
         debloat)
-            run_step "blue" "Debloating" \
+            run_step "yellow" "Debloating" \
             "${BUILD_SETUP_DIR}/03-debloat.sh"
             ;;
         copy-sysfiles)
-            run_step "yellow" "Copying System Default Files" \
+            run_step "cyan" "Copying System Default Files" \
             "${BUILD_SETUP_DIR}/04-copy-sysfiles.sh"
             ;;
         pkgs-kernel)
-            run_step "cyan" "Adding Kernel Packages" \
+            run_step "purple" "Adding Kernel Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "batch-start" "kernel"
             ;;
         pkgs-common)
-            run_step "purple" "Installing Common Packages" \
+            run_step "green" "Installing Common Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "common"
             ;;
         pkgs-hwaccel)
-            run_step "red" "Installing HW Acceleration Packages" \
+            run_step "blue" "Installing HW Acceleration Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "hwaccel"
             ;;
         pkgs-desktop)
-            run_step "green" "Installing Desktop Packages" \
+            run_step "yellow" "Installing Desktop Packages" \
             "${BUILD_SETUP_DIR}/05-pkgs-install.sh" "batch-end" "desktop"
             ;;
         theming)
-            run_step "blue" "Applying Various Themes" \
+            run_step "cyan" "Applying Various Themes" \
             "${BUILD_SETUP_DIR}/06-theming.sh"
             ;;
         secatcat)
-            run_step "yellow" "Enhancing Security" \
+            run_step "purple" "Enhancing Security" \
             "${BUILD_SETUP_DIR}/07-secatcat.sh"
             ;;
         systemd)
-            run_step "cyan" "Configuring Systemd Services" \
+            run_step "green" "Configuring Systemd Services" \
             "${BUILD_SETUP_DIR}/08-systemd.sh"
             ;;
         tweaks-fixes)
-            run_step "purple" "Tweaks And Fixes" \
+            run_step "blue" "Tweaks And Fixes" \
             "${BUILD_SETUP_DIR}/09-tweaks-fixes.sh"
             ;;
         variant)
-            run_step "red" "Building ${ALT_TAG^} Image" \
+            run_step "yellow" "Building ${ALT_TAG^} Image" \
             "${BUILD_SETUP_DIR}/setup-${ALT_TAG}.sh"
             ;;
         image-info)
-            run_step "green" "Applying Image Info" \
+            run_step "cyan" "Applying Image Info" \
             "${BUILD_SETUP_DIR}/10-image-info.sh"
             ;;
         signing)
-            run_step "blue" "Signing Image Container and Kernel" \
+            run_step "purple" "Signing Image Container and Kernel" \
             "${BUILD_SETUP_DIR}/11-signing.sh"
             ;;
         initramfs)
-            run_step "yellow" "Regenerating Initramfs" \
+            run_step "green" "Regenerating Initramfs" \
             "${BUILD_SETUP_DIR}/12-initramfs.sh"
             ;;
         post-setup)
-            run_step "cyan" "Post Build Setup" \
+            run_step "blue" "Post Build Setup" \
             "${BUILD_SETUP_DIR}/13-post-setup.sh"
             ;;
         *)
@@ -131,7 +131,7 @@ for arg in "$@"; do
     steps "${arg}"
 done
 
-if [[ ${STEP_SKIPPED:-} != true ]]; then
+if [[ ${STEP_SKIPPED:-0} -ne 1 ]]; then
     after_cleanup
     set -x; ostree container commit
 fi

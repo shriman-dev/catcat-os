@@ -4,7 +4,7 @@ install-catcat-flatpaks:
     #!/usr/bin/bash
     sudo /usr/libexec/catcat-flatpak-manager --install-all
 
-# Install app for controlling fans on msi laptops
+# App for controlling fans on msi laptops
 [group("apps")]
 install-mcontrolcenter:
     #!/usr/bin/env -S sudo -- /bin/bash
@@ -31,4 +31,25 @@ install-mcontrolcenter:
     cd -
     rm -rf "${TMP_DIR}"
     log "INFO" "All Done."
+
+# Install llama.cpp vulkan. Running this again will update llama.cpp
+[group("apps")]
+llama-cpp:
+    #!/usr/bin/env -S sudo -- /bin/bash
+    set -euox pipefail
+    source /usr/lib/catcat-os/funcvar.sh
+    umask 0022
+
+    TMP_DIR="/tmp/extra_pkgs"
+    BIN_DIR="/usr/local/bin"
+    LIBEXEC_DIR="/usr/local/libexec"
+    GHPKG_PRERELEASE=1
+
+    rm -rf "${LIBEXEC_DIR}/llama-cpp-vk"
+
+    log "INFO" "Installing and setting up: llama-cpp-vk"
+    get_ghpkg --name "llama-cpp-vk" --repo "ggml-org/llama.cpp" \
+              --regx 'ubuntu-vulkan-x64\.tar\.gz$' --libexec
+    log "INFO" "Operation done for: llama-cpp-vk"
+    rm -rf "${TMP_DIR}"
 

@@ -3,11 +3,8 @@ SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 source "${SCRIPT_DIR}/funcvar.sh"
 
 after_cleanup() {
-    rm -rvf /var/log/dnf*.log
-    rm -rvf /boot/.*
-    rm -rvf /boot/*
-    rm -rvf /tmp/.*
-    rm -rvf /tmp/*
+    rm -vf /var/log/dnf*.log
+    find /boot /tmp -mindepth 1 -delete
 }
 
 enable_rpm_repos() {
@@ -33,9 +30,9 @@ enable_rpm_repos() {
 #        dnf5 -y install --nogpgcheck --repofrompath \
 #                'terra-multimedia,https://repos.fyralabs.com/terra$releasever' \
 #                terra-release-multimedia
-        dnf5 -y config-manager setopt "terra*".enabled=0
+        dnf5 -y config-manager setopt "terra*.enabled=0"
         dnf5 -y config-manager setopt \
-                "*terra*".exclude="nerd-fonts topgrade scx-* python3-protobuf zlib-devel"
+                "*terra*.exclude=nerd-fonts topgrade scx-* python3-protobuf zlib-devel"
     fi
 
     # NVIDIA Repos
@@ -64,15 +61,16 @@ enable_rpm_repos() {
 }
 
 disable_rpm_repos() {
-    local repo copr
-    for repo in _copr_ublue-os-akmods.repo; do
-        sed -i 's/enabled=1/enabled=0/g' "/etc/yum.repos.d/${repo}" || true
-    done
+    rm -vf /etc/yum.repos.d/_copr_ublue-os-akmods.repo
+
+    local copr
     for copr in "${copr_list[@]}"; do
         dnf5 -y copr disable "${copr}"
     done
 }
 
+# SC2153 - Possible Misspelling: MYVARIABLE may not be assigned
+# shellcheck disable=SC2153
 rpm_repos() {
     local action="${1}"
     local copr_list=(
@@ -85,8 +83,8 @@ rpm_repos() {
 #        "atim/starship"
 #        "zeno/scrcpy"
 #        "atim/lazygit"
-        "${COPR_LIST[@]}"
     )
+    [[ -n "${COPR_LIST[*]}" ]] && copr_list+=("${COPR_LIST[@]}")
 
     case "${action}" in
         enable)
@@ -109,21 +107,32 @@ rpm_repos() {
 }
 
 dnf_action() {
-    local operation="${1}" from_repo="" repo="" weak_deps="False"; shift
+    local operation="${1}" dnf_cmd; shift
 
+    dnf_cmd=("dnf5" "-y")
+
+    [[ $# -eq 0 ]] && die "No argument provided"
     while [[ $# -gt 0 ]]; do
         case ${1} in
             repo)
-                repo="--enable-repo=${2}"
+                dnf_cmd+=(
+                    "--enable-repo=${2}"
+                    "${operation}"
+                )
                 shift 2
                 ;;
             from-repo)
-                repo="--enable-repo=${2}"
-                from_repo="--from-repo=${2}"
+                dnf_cmd+=(
+                    "--enable-repo=${2}"
+                    "${operation}"
+                    "--from-repo=${2}"
+                )
                 shift 2
                 ;;
             weak-deps)
-                weak_deps="True"
+                dnf_cmd+=(
+                    "--setopt=install_weak_deps=True"
+                )
                 shift
                 ;;
             *)
@@ -133,31 +142,33 @@ dnf_action() {
     done
 
     brief_trace
-    dnf5 -y clean dbcache
-    dnf5 -y --setopt=install_weak_deps="${weak_deps}" \
-            ${repo} ${operation} ${from_repo} "$@"
+    "${dnf_cmd[@]}" "$@"
     brief_trace
 }
 
+# shellcheck disable=SC2153
 pkgs_install() {
-    local pkgs_type="${1}"; shift
-    local dnf_pkgs="$(printf '%s\n' "$@" | grep -v '^++')"
-    local external_pkgs="$(printf '%s\n' "$@" | sed -n 's|^++||gp')"
-    local rpm_repos=(
+    local pkgs_type="${1}" pkg dnf_pkgs=() external_pkgs=() rpm_repos _rpm_repos; shift
+    rpm_repos=(
         "terra"
         "terra-extras"
         "${RPM_REPOS[@]}"
     )
-    rpm_repos="$(tr ' ' ',' <<< "${rpm_repos[@]}")"
+    [[ -n "${RPM_REPOS[*]}" ]] && rpm_repos+=("${RPM_REPOS[@]}")
+    _rpm_repos="$(tr ' ' ',' <<< "${rpm_repos[@]}")"
 
-    if [[ -n "${dnf_pkgs}" ]]; then
+    for pkg in "$@"; do
+        { [[ "${pkg}" == ++* ]] && external_pkgs+=("${pkg#++}"); } || dnf_pkgs+=("${pkg}")
+    done
+
+    if [[ -n "${dnf_pkgs[*]}" ]]; then
         log "INFO" "Installing ${pkgs_type^} RPM Package(s)"
-        dnf_action install repo "${rpm_repos}" ${dnf_pkgs}
+        dnf_action install repo "${_rpm_repos}" "${dnf_pkgs[@]}"
     fi
-    if [[ -n "${external_pkgs}" ]]; then
+    if [[ -n "${external_pkgs[*]}" ]]; then
         log "INFO" "Installing ${pkgs_type^} External Package(s)"
         brief_trace
-        "${SCRIPT_DIR}"/pkgs-external.sh ${external_pkgs}
+        "${SCRIPT_DIR}"/pkgs-external.sh "${external_pkgs[@]}"
         brief_trace
     fi
     log "INFO" "${pkgs_type^} package(s) installed successfully"

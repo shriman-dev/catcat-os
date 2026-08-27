@@ -17,7 +17,7 @@ if [[ "$(dconf read /org/gnome/mutter/dynamic-workspaces)" == "false" ]]; then
         # Exit if it is already middle workspace
         /usr/bin/wmctrl -d | grep -w "${middle_workspace}  \*" && exit 0
         # Decrease speed of attempts after 4th attempt
-        [[ ${attempts} -lt 4 ]] && sleep 0.2 || sleep 1
+        { [[ ${attempts} -lt 4 ]] && sleep 0.2; } || sleep 1
         ((attempts++))
     done
 fi

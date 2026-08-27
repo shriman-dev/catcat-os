@@ -59,10 +59,10 @@ install_fonts() {
     local -A EXTRA_FONTS=(
         # Nerd Fonts
         # When Nerd Font name is correct, URL is not required
-        ['AdwaitaMono']=
-        ['FiraCode']=
-        ['Hack']=
-        ['NerdFontsSymbolsOnly']=
+        ['AdwaitaMono']=""
+        ['FiraCode']=""
+        ['Hack']=""
+        ['NerdFontsSymbolsOnly']=""
 
         # From URL
         ['SFMonoNF']="\
@@ -90,24 +90,24 @@ https://github.com/shaunsingh/SFMono-Nerd-Font-Ligaturized.git"
 install_icon_themes() {
     log "INFO" "Installing icons"
     local ICONS_DIR="${SYS_CACHE}/usr/share/icons"
+    local JQ_FILTER latest_icons_url icons_archive papirus_subd papirus_dir
 
     mkdir -vp "${ICONS_DIR}"
     if [[ -d "${ICONS_DIR}/Papirus" ]]; then
         log "NOTE" "Icons skipped - Non-empty directory(s) exists: ${ICONS_DIR}/Papirus"
     else
         log "INFO" "Papirus icons"
-        local JQ_FILTER='.tarball_url'
-        local latest_icons_url="$(latest_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
-        local icons_archive="/tmp/icons/$(basename ${latest_icons_url}).tar"
+        JQ_FILTER='.tarball_url'
+        latest_icons_url="$(latest_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
+        icons_archive="/tmp/icons/$(basename "${latest_icons_url}").tar"
 
-        mkdir -vp "$(dirname ${icons_archive})"
+        mkdir -vp "$(dirname "${icons_archive}")"
         curl_get "${icons_archive}" "${latest_icons_url}"
         unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
 
-        local papirus_subd papirus_dir
         find "${icons_archive}.extract" -type d -name "24x24" | while read -r papirus_subd; do
-            papirus_dir="$(dirname ${papirus_subd})"
-            ocopy "${papirus_dir}" "${ICONS_DIR}/$(basename ${papirus_dir})"
+            papirus_dir="$(dirname "${papirus_subd}")"
+            ocopy "${papirus_dir}" "${ICONS_DIR}/$(basename "${papirus_dir}")"
         done
     fi
 
@@ -118,6 +118,7 @@ install_icon_themes() {
 install_gtk_themes() {
     log "INFO" "Installing GTK theme(s)"
     local THEMES_DIR="${SYS_CACHE}/usr/share/themes"
+    local JQ_FILTER theme_url theme_archive theme_repo install_exec
 
     mkdir -vp "${THEMES_DIR}"
     # Lavanda-gtk-theme
@@ -125,16 +126,17 @@ install_gtk_themes() {
         log "NOTE" "Theme skipped - Non-empty directory(s) exists: ${THEMES_DIR}/Lavanda-Dark"
     else
         log "INFO" "Lavanda-gtk-theme"
-        local JQ_FILTER='.tarball_url'
-        local latest_lavanda_url="$(latest_ghpkg_url 'vinceliuice/Lavanda-gtk-theme')"
-        local lavanda_tar="/tmp/themes/$(basename ${latest_lavanda_url}).tar"
+        JQ_FILTER='.tarball_url'
+        theme_url="$(latest_ghpkg_url 'vinceliuice/Lavanda-gtk-theme')"
+        theme_archive="/tmp/themes/$(basename "${theme_url}").tar"
 
-        mkdir -vp "$(dirname ${lavanda_tar})"
-        curl_get "${lavanda_tar}" "${latest_lavanda_url}"
-        unarchive "${lavanda_tar}" "${lavanda_tar}.extract" >/dev/null
+        mkdir -vp "$(dirname "${theme_archive}")"
+        curl_get "${theme_archive}" "${theme_url}"
+        unarchive "${theme_archive}" "${theme_archive}.extract" >/dev/null
 
-        chmod -v +x "${lavanda_tar}.extract"/*/install.sh
-        "${lavanda_tar}.extract"/*/install.sh --dest "${THEMES_DIR}" --color light dark
+        install_exec="$(find "${theme_archive}.extract" -type f -name 'install.sh' -print -quit)"
+        chmod -v +x "${install_exec}"
+        "${install_exec}" --dest "${THEMES_DIR}" --color light dark
     fi
 
     # Catppuccin-Gtk-Theme
@@ -142,13 +144,14 @@ install_gtk_themes() {
         log "NOTE" "Theme skipped - Non-empty directory(s) exists: ${THEMES_DIR}/Catppuccin-Dark"
     else
         log "INFO" "Catppuccin-Gtk-Theme"
-        local catppuccin_theme_repo="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
-        local catppuccin_theme_tmp="/tmp/themes/Catppuccin-Gtk-Theme"
+        theme_url="https://github.com/shriman-dev/Catppuccin-Gtk-Theme.git"
+        theme_repo="/tmp/themes/Catppuccin-Gtk-Theme"
 
-        git clone --depth 1 "${catppuccin_theme_repo}" "${catppuccin_theme_tmp}"
-        chmod -v +x "${catppuccin_theme_tmp}"/install.sh
-        "${catppuccin_theme_tmp}"/install.sh --dest "${THEMES_DIR}" --name 'Catppuccin' --theme all \
-                                             --color dark --tweaks catppuccin rimless
+        git clone --depth 1 "${theme_url}" "${theme_repo}"
+        install_exec="$(find "${theme_repo}" -type f -name 'install.sh' -print -quit)"
+        chmod -v +x "${install_exec}"
+        "${install_exec}" --dest "${THEMES_DIR}" --name 'Catppuccin' --theme all \
+                          --color dark --tweaks catppuccin rimless
     fi
     rm -rf /tmp/themes
     log "INFO" "GTK theme(s) installed"
@@ -157,17 +160,19 @@ install_gtk_themes() {
 build_gdm_theme() {
     log "INFO" "Building GDM theme"
 
-    local gdm_resource="/usr/share/gnome-shell/gnome-shell-theme.gresource"
-    local gmd_theme_tmp="/tmp/gnome-shell"
-    local gmd_theme_path="${SYS_CACHE}/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
-    local background_wall="/usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg"
-    local gdm_xml="$(basename ${gdm_resource}).xml"
-    local resource resource_path
+    local gdm_resource gdm_resource_list gmd_theme_tmp gmd_theme_path 
+    local background_wall gdm_xml resource resource_path
+    gdm_resource="/usr/share/gnome-shell/gnome-shell-theme.gresource"
+    gmd_theme_tmp="/tmp/gnome-shell"
+    gmd_theme_path="${SYS_CACHE}/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
+    background_wall="/usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg"
+    gdm_xml="$(basename "${gdm_resource}").xml"
 
-    log "INFO" "Using GTK theme: $(basename $(dirname ${gmd_theme_path}))"
+    log "INFO" "Using GTK theme: $(basename "$(dirname "${gmd_theme_path}")")"
     # Create directories and extract resources from gresource file
     log "INFO" "Creating directories and extracting resources from gresource file"
-    for resource in $(gresource list "${gdm_resource}"); do
+    readarray -t gdm_resource_list < <(gresource list "${gdm_resource}")
+    for resource in "${gdm_resource_list[@]}"; do
         resource_path="${resource#\/org\/gnome\/shell\/}"
         mkdir -vp "${gmd_theme_tmp}/${resource_path%/*}"
         gresource extract "${gdm_resource}" "${resource}" > "${gmd_theme_tmp}/${resource_path}"
@@ -205,7 +210,7 @@ $(find "${gmd_theme_tmp}/theme"/ -type f -not -wholename '*.gresource*' -printf 
     # Compile all resources and apply them to the gdm theme
     log "INFO" "Compiling all resources and apply them to the gdm theme"
     glib-compile-resources --sourcedir="${gmd_theme_tmp}/theme"/ "${gmd_theme_tmp}/theme/${gdm_xml}"
-    mv -v "${gmd_theme_tmp}/theme/$(basename ${gdm_resource})" "${gdm_resource}"
+    mv -v "${gmd_theme_tmp}/theme/$(basename "${gdm_resource}")" "${gdm_resource}"
 
     rm -rf "${gmd_theme_tmp}"
 

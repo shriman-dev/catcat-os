@@ -3,7 +3,7 @@ source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
 log "INFO" "Applying custom image info and labels"
-MAJOR_VERSION_WORD="$(grep '(.*)' /usr/lib/fedora-release)"
+MAJOR_VERSION_WORD="$(grep -o '(.*)' /usr/lib/fedora-release)"
 PROJECT_SUBNAME="${PROJECT_NAME/-os/}"
 declare -A IMAGE_INFO=(
     ["NAME"]="${PRETTY_NAME}"
@@ -33,7 +33,7 @@ for key in "${!IMAGE_INFO[@]}"; do
 done
 sed -i "/^REDHAT_.*=/d" "${OS_RELEASE_FILE}"
 
-echo "${PRETTY_NAME} ${MAJOR_VERSION} ${MAJOR_VERSION_WORD}" > "/etc/system-release"
+echo "${PRETTY_NAME} ${MAJOR_VERSION} ${MAJOR_VERSION_WORD}" > "/usr/lib/fedora-release"
 log "INFO" "Applied image info"
 
 log "INFO" "Full output of: ${OS_RELEASE_FILE}"

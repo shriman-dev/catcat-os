@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+format="${1}"; shift
+# Disabled checks
+# SC1090 - Can't follow non-constant source. Use a directive to specify location
+# SC1091 - Not following sourced script
+# SC2016 - Expressions don't expand in single quotes, use double quotes for that
+# SC2034 - foo appears unused. Verify it or export it.
+# SC2076 - Remove quotes from right-hand side of =~ to match as a regex rather than literally.
+# check-extra-masked-returns,check-unassigned-uppercase
+shellcheck --color=always \
+           --format="${format}" \
+           --severity=style \
+           --exclude=SC1090,SC1091,SC2016,SC2034,SC2076 \
+           --enable=add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,quote-safe-variables,require-double-brackets,require-variable-braces,useless-use-of-cat \
+           "$@"

@@ -13,10 +13,10 @@ show_btrfs_usage() {
     local path="${1}"
     validate_path "btrfs" "${path}"
     log "INFO" "Showing BTRFS detailed usage for ${path}"
-    ${BTRFS} filesystem usage "${path}"
+    "${BTRFS[@]}" filesystem usage "${path}"
     echo
     log "INFO" "Showing BTRFS disk space for ${path}"
-    ${BTRFS} filesystem df "${path}"
+    "${BTRFS[@]}" filesystem df "${path}"
 }
 
 # Perform balance operation
@@ -35,22 +35,23 @@ balance() {
     local mounts=("${path}")
     if [[ "${path}" == "all" ]]; then
         log "INFO" "Auto detecting BTRFS mount points"
-        mounts=($(get_btrfs_mounts))
-        log "INFO" "Mount points detected: ${mounts[@]}"
+        mounts=()
+        readarray -t mounts < <(get_btrfs_mounts)
+        log "INFO" "Mount points detected: ${mounts[*]}"
     fi
 
     btrfs_df() {
         log "INFO" "${1} disk space usage (btrfs filesystem df):"
-        ${BTRFS} filesystem df "${_mount}"
+        "${BTRFS[@]}" filesystem df "${_mount}"
     }
 
     local _mount
-    for _mount in ${mounts[@]}; do
+    for _mount in "${mounts[@]}"; do
         validate_path "btrfs" "${_mount}"
         log "INFO" "Starting balance on ${_mount}"
         [[ -n ${VERBOSE} ]] && btrfs_df "Pre-balance"
         echo ""
-        ${BTRFS} balance start -musage="${musage}" -dusage="${dusage}" --enqueue "${_mount}"
+        "${BTRFS[@]}" balance start -musage="${musage}" -dusage="${dusage}" --enqueue "${_mount}"
         echo ""
         [[ -n ${VERBOSE} ]] && btrfs_df "Post-balance"
         log "INFO" "Balance completed for ${_mount}"
@@ -74,7 +75,7 @@ defrag() {
     validate_path "btrfs" "${path}"
 
     log "INFO" "Starting defragmentation on ${path} (compression: ${comp}${level:+, level: ${level}})"
-    ${BTRFS} filesystem defragment -r -c"${comp}" ${level:+-L ${level}} "${path}"
+    "${BTRFS[@]}" filesystem defragment -r -c"${comp}" ${level:+-L ${level}} "${path}"
     log "INFO" "Defragmentation completed for ${path}"
 }
 
@@ -83,7 +84,7 @@ scrub() {
     local path="${1}"
     validate_path "btrfs" "${path}"
     log "INFO" "Starting scrub on ${path}"
-    ${BTRFS} scrub start -B "${path}"
+    "${BTRFS[@]}" scrub start -B "${path}"
     log "INFO" "Scrub completed for ${path}"
 }
 
@@ -92,62 +93,76 @@ scrub() {
 trim() {
     local path="${1:-}"
     if [[ -z "${path}" ]]; then
-        log "INFO" "Running TRIM on fstab entries"
-        ${FSTRIM} --fstab
-        log "INFO" "TRIM completed on fstab entries"
+        log "INFO" "Running TRIM on: fstab entries"
+        "${FSTRIM[@]}" --fstab
+        log "INFO" "TRIM completed on: fstab entries"
     else
-        log "INFO" "Running TRIM on ${path}"
-        ${FSTRIM} "${path}"
-        log "INFO" "TRIM completed on ${path}"
+        log "INFO" "Running TRIM on: ${path}"
+        "${FSTRIM[@]}" "${path}"
+        log "INFO" "TRIM completed on: ${path}"
     fi
 }
 
 show_help() {
     cat <<EOF
-Usage: $(basename "${0}") [global_options] command1 [options] [command2 [options] ..."
+Usage: $(basename "${0}") [global_options] command1 [options] [command2] [options] ..."
 
 Global Options:
   -h, --help              Show this help message
-  -v, --verbose           Enable verbose output (use -vv for debug verbosity)
+  -v, --verbose           Enable verbose output (use -vv for debug mode)
 
 Commands:
-  usage  <path>           Show BTRFS filesystem usage and disk space information
+  usage <path>            Show BTRFS filesystem usage and disk space information
 
-  balance                 Start balance operation on BTRFS filesystem
-                          Note: Balance operation auto detects all BTRFS mount points if no path specified
-                          Options: -m [musage] -d [dusage] -p [path|all] (Defaults: musage=50, dusage=80, path=all)
+  balance [path]          Start balance operation on BTRFS filesystem
+                          Options: -m [musage] -d [dusage] -p [path|all]
+                          (Defaults: musage=50, dusage=80, path=all)
 
   defrag                  Defragment the BTRFS filesystem using a specified compression algorithm
                           Options: -c <algorithm> -l [level] -p <path>
 
-  scrub  <path>           Start a scrub operation on BTRFS filesystem
+  scrub <path>            Start a scrub operation on BTRFS filesystem
 
-  trim   [path]           Perform TRIM operation on the path
-                          Note: TRIM operation uses fstab entries if no path specified
+  trim [path]             Perform TRIM operation on the path
+
+Notes:
+  * Balance operation auto detects all BTRFS mount points if no path specified.
+
+  * TRIM operation uses fstab entries if no path specified.
+
 EOF
 }
 
 exec_subcommand() {
-    need_root
-    BTRFS="$(echo 'btrfs' ${VERBOSE:+-v})"
-    FSTRIM="$(echo 'fstrim' ${VERBOSE:+-v})"
     local cmd="${1}"; shift
+    BTRFS=("btrfs")
+    FSTRIM=("fstrim")
+    [[ -n "${VERBOSE:-}" ]] && {
+        BTRFS+=("-v")
+        FSTRIM+=("-v")
+    }
+
+    need_root
     case "${cmd}" in
-        usage) [[ $# -eq 1 ]] && show_btrfs_usage "${1}" ||
-                   die "BTRFS mount path required to show usage"
+        usage)
+            [[ -n "${1:-}" ]] || die "BTRFS mount path required to show usage"
+            show_btrfs_usage "${1}"
             ;;
-        defrag) defrag "$@"
+        defrag)
+            [[ -n "${*:-}" ]] || die "Provide defrag options"
+            defrag "$@"
             ;;
-        balance) balance "$@"
+        balance)
+            balance "$@"
             ;;
-        scrub) [[ $# -eq 1 ]] && scrub "${1}" ||
-                   die "BTRFS mount path required for scrub"
+        scrub)
+            [[ -n "${1:-}" ]] || die "BTRFS mount path required for scrub"
+            scrub "${1}"
             ;;
-        trim) [[ $# -le 1 ]] && trim  "$@" ||
-                  die "Usage: $(basename ${0}) trim [PATH]"
+        trim)
+            trim  "$@"
             ;;
-        *) die "Unknown command: ${cmd}" show_help
-            ;;
+        *) die "Unknown command: ${cmd}" show_help ;;
     esac
 }
 
@@ -164,7 +179,7 @@ main() {
             -v|--verbose)
                 VERBOSE=1;          shift ;;
             -vv)
-                VERBOSE=2;          shift ;;
+                VERBOSE=3;          shift ;;
             *)
                 rem_args+=("${1}"); shift ;;
         esac
@@ -183,11 +198,8 @@ main() {
                 ;;
             *)
                 # Collect args for active subcommand
-                if [[ -n "${curr_cmd:-}" ]]; then
-                    curr_args+=("${arg}")
-                else
-                    die "Non glabl flag '${arg}' provided before subcommand"
-                fi
+                { [[ -n "${curr_cmd:-}" ]] && curr_args+=("${arg}"); } ||
+                die "Non glabl flag '${arg}' provided before subcommand"
                 ;;
         esac
     done
