@@ -52,6 +52,7 @@ sect_border() {
 build_image() {
     local log_dir="${SCRIPT_DIR}/.log/${IMAGE_NAME}"
     local log_file="${log_dir}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
+    local sec_type="${SEC_TYPE:-"id=sbmok_priv,src=${SBMOK_KEY},type=file"}"
     local tag build_tags=()
 
     for tag in ${BUILD_TAGS}; do
@@ -74,7 +75,7 @@ build_image() {
     podman build "$@" \
                  --pull=newer \
                  --dns 9.9.9.9 \
-                 --secret "id=sbmok_priv,src=${SBMOK_KEY},type=file" \
+                 --secret "${sec_type}" \
                  --file "Containerfile" \
                  "${BUILD_LABELS[@]}" \
                  "${BUILD_ARGS[@]}" \
@@ -183,6 +184,7 @@ gh_hook() {
     if [[ -n "${GITHUB_ENV:-}" ]]; then
         case "${cmd}" in
             pre-build)
+                SEC_TYPE="id=sbmok_priv,env=SBMOK_KEY"
                 # Add build tags
                 BUILD_TAGS="${BUILD_TAGS} ${EXTRA_TAGS[*]}"
                 echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
