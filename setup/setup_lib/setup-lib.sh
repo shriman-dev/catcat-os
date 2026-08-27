@@ -136,11 +136,12 @@ dnf_action() {
                 shift
                 ;;
             *)
-                dnf_cmd+=("${operation}")
                 break
                 ;;
         esac
     done
+
+    [[ ! " ${dnf_cmd[*]} " =~ " ${operation} " ]] && dnf_cmd+=("${operation}")
 
     brief_trace
     "${dnf_cmd[@]}" "$@"
