@@ -390,8 +390,6 @@ process_installations() {
 
 case "${1}" in
     batch-start)
-        # Perform cleanup before any operation
-        dnf5 clean dbcache
         rpm_repos enable
         shift
         ;;
