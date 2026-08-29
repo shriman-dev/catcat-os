@@ -47,15 +47,15 @@ QUIET=${QUIET:-false}
 VERBOSE=${VERBOSE:-2}
 
 # Logging with optional verbose output
-log() {
-    # Disable log message tracing by running in subshell
-    ( { set +x; } 2>/dev/null
+# Disable log message tracing by running in subshell
+log() (
+    { set +x; } 2>/dev/null
     local level="${1^^}" color; shift
     local msg="$*" datetime=""
 
     [[ ${QUIET} == true ]] && return 0
     [[ "${level}" == "DEBUG" && ${VERBOSE:-0} -le 1 ]] && return 0
-    [[ ${VERBOSE:-0} -ge 3 ]] && datetime="$(date '+[%Y-%m-%d %H:%M:%S] ')"
+    [[ ${VERBOSE:-0} -ge 3 ]] && datetime="$(printf '%([%Y-%m-%d %H:%M:%S])T \n')"
 
     case "${level}" in
         DEBUG) color="${cyan}"   ;;
@@ -66,9 +66,8 @@ log() {
         *)     return 1 ;;
     esac
 
-    echo -e "${bold}${datetime}${color}[${level^^}]${noc} ${msg}"
-    )
-}
+    printf "%s\n"  "${bold}${datetime}${color}[${level}]${noc} ${msg}"
+)
 
 # Error handling with optional pre-exit function call
 die() {
@@ -141,40 +140,40 @@ function Urllink() {
 # Function to generates a centered text header
 # With customizable padding character, width, and symmetrical padding
 symmetric_heading() {
-    local text="${1}" padding_char="${2:-#}" output_width=${3:-75}
-    local padding_length left_padding right_padding
-    local -n color_ref="${4:-noc}"
-    padding_length=$(( (output_width - ${#text} - 2) / 2 ))
-    left_padding="$(printf "%*s" "${padding_length}" "" | tr ' ' "${padding_char}")"
-    right_padding="$(printf "%*s" "${padding_length}" "" | tr ' ' "${padding_char}")"
+    local text="$1" padding_char="${2:-#}" output_width=${3:-75} color_var="${4:-noc}"
+    local -n color="${color_var}"
+    local total=$(( output_width - ${#text} - 2 ))
 
-    if (( ${#text} >= output_width - 3 )); then
-        err "Text is too long for the given output width. Increase value of output width."
+    if (( total < 0 )); then
+        err "Text too long for width ${output_width}"
         return 1
     fi
-    # Adjust for odd-length texts
-    if (( (output_width - ${#text} - 2) % 2 != 0 )); then
-        right_padding+="${padding_char}"
-    fi
 
-    printf "%s %s %s\n" "${color_ref}${left_padding}" "${text}" "${right_padding}${noc}"
+    # Calculate padding: left gets half, right gets the remainder (handles odd numbers)
+    local left right left_pad right_pad
+    left=$(( total / 2 ))
+    right=$(( total - left ))
+    printf -v left_pad "%${left}s"; left_pad=${left_pad// /"${padding_char}"}
+    printf -v right_pad "%${right}s"; right_pad=${right_pad// /"${padding_char}"}
+
+    printf "%s %s %s\n" "${color}${left_pad}" "${text}" "${right_pad}${noc}"
 }
 
 # Same as above but with upper and lower borders using given character
 enclosed_heading() {
     local text="${1}" padding_char="${2:-#}" output_width=${3:-75} border
     local -n color_ref="${4:-noc}"
-    border="$(printf "%*s" "${output_width}" "" | tr ' ' "${padding_char}")"
+    printf -v border "%${output_width}s"; border=${border// /"${padding_char}"}
 
-    echo -e "\n${color_ref}${border}${noc}"
+    printf "\n%s\n" "${color_ref}${border}${noc}"
     symmetric_heading "${text}" "${padding_char}" "${output_width}" "${4:-noc}"
-    echo -e "${color_ref}${border}${noc}\n"
+    printf "%s\n\n" "${color_ref}${border}${noc}"
 }
 
 cmd_test_timer() {
     local endt totaltime
     if [[ -n "${_cmd_test_timer_start}" ]]; then
-        endt=$(( $(date +%s) - _cmd_test_timer_start ))
+        endt=$(( EPOCHSECONDS - _cmd_test_timer_start ))
         totaltime="$(printf "%02d:%02d:%02d\n" $((endt/3600)) $((endt%3600/60)) $((endt%60)))"
         echo "${totaltime}"
     fi
@@ -325,7 +324,7 @@ is_older_than() {
     [[ "${threshold_sec}" =~ ^[0-9]+$ ]] || die "Not an integer: ${threshold_sec}"
 
     target_mtime_sec=$(stat -c "%Y" "${target_path}")
-    current_time_sec=$(date +%s)
+    current_time_sec=${EPOCHSECONDS}
     targett_aged_sec=$(( current_time_sec - target_mtime_sec ))
 
     if [[ ${targett_aged_sec} -gt ${threshold_sec} ]]; then
@@ -492,7 +491,7 @@ latest_ghpkg_url() {
         vals+=("${url}")
 
         if [[ "${sha:-}" == "sha" ]]; then
-            jq_filter="${jq_filter%.br*_*}.digest"
+            jq_filter="${jq_filter%.browser_*}.digest"
             sha=$(jq -r --arg inc "${include_pattern}" \
                         --arg exc "${exclude_pattern}" "${jq_filter}" <<< "${response}")
             vals+=("${sha}")

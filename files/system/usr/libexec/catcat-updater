@@ -73,7 +73,7 @@ update_cmd() {
 
             /usr/bin/update extra >> "${logfile}"
 
-            [[ ${BUILD_EPOCH} -lt $(( $(date +%s) - one_week )) ]] &&
+            [[ ${BUILD_EPOCH} -lt $(( EPOCHSECONDS - one_week )) ]] &&
                  /usr/bin/update >> "${logfile}"
 
             is_older_than "${firstboot_file}" "${one_week}" &&

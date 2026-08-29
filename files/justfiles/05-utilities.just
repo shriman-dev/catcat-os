@@ -15,6 +15,12 @@ enroll-secure-boot-key:
     #!/usr/bin/bash
     /usr/bin/enroll-sbmok
 
+# Apply CatCat OS default kargs
+[group("utilities")]
+kargs-default:
+    #!/usr/bin/bash
+    /usr/libexec/catcat-kargs
+
 
 # Automatically manage power profiles
 [group("utilities")]

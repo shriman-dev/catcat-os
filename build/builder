@@ -69,7 +69,7 @@ build_image() {
     echo "${cyan}"   " Git Commit    - ${COMMIT_SHA}${noc}"
     sect_border
 
-    _cmd_test_timer_start=$(date +%s)
+    _cmd_test_timer_start=${EPOCHSECONDS}
     cd "$(dirname "${SCRIPT_DIR}")"
     { brief_trace; } 2>/dev/null
     podman build "$@" \
@@ -89,8 +89,7 @@ build_image() {
     echo "${purple}" " Build Time    - ${_cmd_test_timer_end}${noc}"
     sect_border
     } \
-    2>&1 | \
-    perl -MTime::HiRes=gettimeofday -ne '
+    2>&1 | perl -MTime::HiRes=gettimeofday -ne '
         $|=1;
         ($s, $usec) = gettimeofday();
         ($sec,$min,$hour,$mday,$mon,$year) = localtime($s);
@@ -113,7 +112,7 @@ chunk_image() {
     echo "${green}" " Chunking       - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     sect_border
 
-    _cmd_test_timer_start=$(date +%s)
+    _cmd_test_timer_start=${EPOCHSECONDS}
     { brief_trace; } 2>/dev/null
     ${RPM_OSTREE} compose \
                   build-chunked-oci \
@@ -140,7 +139,7 @@ push_image() {
     echo "${purple}" " Push Registry - ${PUSH_REGISTRY}${noc}"
     sect_border
 
-    _cmd_test_timer_start=$(date +%s)
+    _cmd_test_timer_start=${EPOCHSECONDS}
     for tag in ${push_tags}; do
         log "INFO" "Pushing: ${push_image}:${tag}"
         { brief_trace; } 2>/dev/null

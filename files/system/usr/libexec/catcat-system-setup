@@ -53,15 +53,19 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
     ru_config_d="/root/.config"
     ru_local_share="/root/.local/share"
     ru_catcat_d="${ru_local_share}/catcat-os"
-    ensure_dir "${ru_catcat_d}/LS_COLORS_DIR"
+
+    ensure_dir "${ru_catcat_d}/LS_COLORS_DIR" "/var/log/usbguard" "/var/lib/waydroid"
+
     cp -vaf /usr/share/catcat-os/LS_COLORS_DIR/* \
             "${ru_catcat_d}/LS_COLORS_DIR"/
 
     [[ ! -e "${ru_config_d}/bat" ]] &&
-            { mkdir -vp "${ru_config_d}" ; ln -Tsvf /etc/bat "${ru_config_d}"/; }
+            { mkdir -vp "${ru_config_d}"; ln -Tsvf /etc/bat "${ru_config_d}"/; }
     /usr/bin/bat cache --build
 
-    [[ -d "/var/lib/waydroid" ]] && restorecon -vR "/var/lib/waydroid"
+    restorecon -vR "/boot"
+    restorecon -vR "/var/log/usbguard"
+    restorecon -vR "/var/lib/waydroid"
 
     # GDM
     gdm_shell="share/gnome-shell"
@@ -74,6 +78,9 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
         fi
         /usr/bin/dconf update
     fi
+
+    # Restore /boot perms to 755, often reset by system update
+    chmod -v 755 /boot
 
     cp -vf "${update_info}" "${lastup_info}"
 fi

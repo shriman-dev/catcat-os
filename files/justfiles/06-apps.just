@@ -36,7 +36,7 @@ install-mcontrolcenter:
 [group("apps")]
 llama-cpp:
     #!/usr/bin/env -S sudo -- /bin/bash
-    set -euox pipefail
+    set -euo pipefail
     source /usr/lib/catcat-os/funcvar.sh
     umask 0022
 
