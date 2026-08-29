@@ -4,6 +4,11 @@ set -euox pipefail
 
 tree -a /var/
 
+mkdir -vp /var/lib/rpm
+touch /var/lib/rpm/.rpm.lock
+rpm --rebuilddb
+
+
 log "INFO" "Build environment info"
 cat /etc/resolv.conf
 
