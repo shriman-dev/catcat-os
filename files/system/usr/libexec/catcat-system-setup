@@ -63,7 +63,6 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
             { mkdir -vp "${ru_config_d}"; ln -Tsvf /etc/bat "${ru_config_d}"/; }
     /usr/bin/bat cache --build
 
-    restorecon -vR "/boot"
     restorecon -vR "/var/log/usbguard"
     restorecon -vR "/var/lib/waydroid"
 
@@ -80,6 +79,7 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
     fi
 
     # Restore /boot perms to 755, often reset by system update
+    restorecon -vR "/boot"
     chmod -v 755 /boot
 
     cp -vf "${update_info}" "${lastup_info}"

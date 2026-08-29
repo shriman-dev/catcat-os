@@ -2,14 +2,8 @@
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
-tree -a /var/
-
-mkdir -vp /var/lib/rpm
-touch /var/lib/rpm/.rpm.lock
-rpm --rebuilddb
-
-
 log "INFO" "Build environment info"
+tree -a /var/
 cat /etc/resolv.conf
 
 log "INFO" "Preparing build environment"
