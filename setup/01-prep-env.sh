@@ -2,6 +2,8 @@
 source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
+tree -a /var/
+
 log "INFO" "Build environment info"
 cat /etc/resolv.conf
 
