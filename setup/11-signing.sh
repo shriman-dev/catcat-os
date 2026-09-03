@@ -6,10 +6,9 @@ set -euox pipefail
 log "INFO" "Configuring container signing policy"
 PROJECT_REGISTRY="${PUSH_REGISTRY}"
 TEMPLATE_POLICY="${BUILD_SETUP_DIR}/setup_files/policy.json"
-COSIGN_PUB_KEY="/etc/pki/containers/${PROJECT_NAME}.pub"
+COSIGN_PUB_KEY="/usr/share/pki/containers/${PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"
 
-ensure_dir /etc/pki/containers /etc/containers/registries.d
 cp -vf "${BUILD_ROOT_DIR}/cosign.pub" "${COSIGN_PUB_KEY}"
 
 # Copy the template policy.json if the file is missing or lacks 'reject' default policy
@@ -41,7 +40,7 @@ fi
 
 log "INFO" "Container signing policy updated"
 
-set +x
+#set +x
 
 # Sign kernel and kernel modules for secureboot
 SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
@@ -118,7 +117,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
         kernel_ver="$(basename "${kernel_path}")"
         vmlinuz_image="${kernel_path}/vmlinuz"
         # Remove any existing kernel signature before signing
-        sbattach --remove "${vmlinuz_image}"
+        sbattach --remove "${vmlinuz_image}" || true
         sbsign --key  "${SBMOK_KEY}" \
                --cert "${SBMOK_CRT}" \
                --output "${vmlinuz_image}" \

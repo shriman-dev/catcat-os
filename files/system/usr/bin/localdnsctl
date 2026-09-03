@@ -37,7 +37,7 @@ write_config() {
 }
 
 load_config() {
-    [[ -f "${LOCALDNS_CONF}" ]] || return
+    [[ -f "${LOCALDNS_CONF}" ]] || return 0
     local key value
 
     jq -r 'to_entries[] | "\(.key)=\(.value)"' "${LOCALDNS_CONF}" | \
@@ -194,6 +194,9 @@ clean_old_logs() {
     local dnscrypt_date_format dnsmasq_date_format date_format log_file line
     dnscrypt_date_format="$(date -d "-${LOG_RETENTION}" '+%Y-%m-%d')"
     dnsmasq_date_format="$(date -d "-${LOG_RETENTION}" '+%b %d')"
+
+    [[ -z "${dnscrypt_date_format}" || -z "${dnsmasq_date_format}" ]] &&
+        die "Could not parse date with LOG_RETENTION='${LOG_RETENTION}'"
 
     # Clean logs
     for log_file in "${DNSMASQ_LOGD}/dnsmasq.log" "${DNSCRYPT_LOGD}"/*.log; do

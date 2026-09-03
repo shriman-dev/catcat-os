@@ -132,6 +132,7 @@ for arg in "$@"; do
 done
 
 if [[ ${STEP_SKIPPED:-0} -ne 1 ]]; then
+    set -x
     after_cleanup
-    set -x; ostree container commit
+    ostree container commit
 fi

@@ -3,7 +3,6 @@ source "${BUILD_SCRIPT_LIB}"
 set -euox pipefail
 
 log "INFO" "Build environment info"
-tree -a /var/
 cat /etc/resolv.conf
 
 log "INFO" "Preparing build environment"
@@ -14,11 +13,15 @@ mkdir -vp "${BUILD_CACHE_DIR}/system"/{etc,usr} \
           "${BUILD_CACHE_DIR}/rpm"
 
 mkdir -vp "/etc/${PROJECT_NAME}" \
-          "/etc/pki/akmods/certs" \
           "/etc/skel/.local/share/${PROJECT_NAME}" \
           "/usr/lib/${PROJECT_NAME}" \
           "/usr/share/${PROJECT_NAME}/certs" \
           "/usr/share/backgrounds/${PROJECT_NAME}"
+
+mkdir -vp /etc/pki/akmods/certs \
+          /etc/containers/registries.d \
+          /etc/pki/containers \
+          /usr/share/pki/containers
 
 mkdir -vp /etc/dconf/db/distro.d \
           /var/tmp \
