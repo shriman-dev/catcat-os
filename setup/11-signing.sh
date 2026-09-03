@@ -117,17 +117,13 @@ if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
     for kernel_path in "${KERNEL_PATH[@]}"; do
         kernel_ver="$(basename "${kernel_path}")"
         vmlinuz_image="${kernel_path}/vmlinuz"
-        if sbverify --list "${vmlinuz_image}" | grep -q "CN=${PROJECT_NAME/-/ }"; then
-            log "NOTE" "Signing skipped"
-            log "NOTE" \
-                "Kernel image was signed with secureboot keys of current project: ${PROJECT_NAME}"
-        else
-            sbsign --key  "${SBMOK_KEY}" \
-                   --cert "${SBMOK_CRT}" \
-                   --output "${vmlinuz_image}" \
-                            "${vmlinuz_image}" || die "Failed to sign: ${vmlinuz_image}"
-            sha256sum "${vmlinuz_image}" > "${ker_checksum_dir}/kernel-ver-${kernel_ver}.sha"
-        fi
+        # Remove any existing kernel signature before signing
+        sbattach --remove "${vmlinuz_image}"
+        sbsign --key  "${SBMOK_KEY}" \
+               --cert "${SBMOK_CRT}" \
+               --output "${vmlinuz_image}" \
+               "${vmlinuz_image}" || die "Failed to sign: ${vmlinuz_image}"
+        sha256sum "${vmlinuz_image}" > "${ker_checksum_dir}/kernel-ver-${kernel_ver}.sha"
         sbsign_modules "${kernel_path}"
         log "DEBUG" "Verifying signature for kernel version: ${kernel_ver}"
         sbverify --list "${vmlinuz_image}"

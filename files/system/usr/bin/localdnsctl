@@ -54,6 +54,9 @@ toggle_localdns() {
 
     die_msg() { die "Failed to ${action} LocalDNS services"; }
     nm_restart() {
+        # Always remove resolv.conf to prevent DNS leaks
+        # (NM recreates it when restarted with override dns server)
+        rm ${VERBOSE:+-v} -f /etc/resolv.conf 2>/dev/null || true
         systemctl daemon-reload && systemctl restart NetworkManager.service
     }
 
@@ -78,13 +81,10 @@ toggle_localdns() {
         nm_restart() { true; }
     else
         # Normal behavior
-        # Always remove resolv.conf to prevent DNS leaks
-        # (NM recreates it when restarted with override dns server)
-        rm ${VERBOSE:+-v} -f /etc/resolv.conf 2>/dev/null || true
         # Ensure NM dns server override conf
         ensure_dir "$(dirname "${NM_OVERRIDE_CONF}")"
-        { [[ ! -f "${NM_OVERRIDE_CONF}" ]] &&
-            printf "%s\n" "${NM_LOCALDNS_OVERRIDE}" | tee "${NM_OVERRIDE_CONF}"; } || die_msg
+        [[ ! -f "${NM_OVERRIDE_CONF}" ]] && {
+            printf "%s\n" "${NM_LOCALDNS_OVERRIDE}" | tee "${NM_OVERRIDE_CONF}" || die_msg; }
         # Ensure blocklists so backend service does not fail to start
         ensure_file "${DNSCRYPT_CONFD}/domains-blocklist.txt" \
                     "${DNSMASQ_CONFD}/domains-blocklist.conf"

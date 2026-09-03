@@ -200,13 +200,15 @@ _quiet_exec() {
 }
 
 run_as_users() {
-    set -x
     local cmd="${1}"; shift
-    local args run_cmd running_user some_user_id some_user
+    local args tmp_cmd run_cmd running_user some_user_id some_user
+    tmp_cmd="$(mktemp)"
     args=("$@")
 
     if declare -F "${cmd}" >/dev/null; then
-        run_cmd="$(declare -f "${cmd}"); ${cmd}"
+        run_cmd="${tmp_cmd}"
+        echo -e "$(declare -f "${cmd}"); ${cmd} \"\$@\"" > "${run_cmd}"
+        chmod ${VERBOSE:+-v} 755 "${run_cmd}"
     elif type -f "${cmd}" >/dev/null; then
         run_cmd="${cmd}"
     else
@@ -217,11 +219,11 @@ run_as_users() {
         some_user_id="$(basename "${running_user}")"
         some_user="$(id -un "${some_user_id}")"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
-            log "DEBUG" "Running given command as user: ${some_user}"
+            log "DEBUG" "Running given commancatd as user: ${some_user}"
             sudo -u "${some_user}" bash -c 'exec "$@"' _ "${run_cmd}" "${args[@]}"
         fi
     done
-    set +x
+    rm -f "${tmp_cmd}"
 }
 
 notify_users() {
@@ -373,21 +375,18 @@ check_filesystem() {
 }
 
 validate_path() {
-    local path fs_check="" path_fs=""
+    local path fs_check="" actual_fs=""
     [[ $# -eq 0 ]] && die "No path provided to validate"
 
     # Identify if first arg is a filesystem type instead of a path
-    if [[ ! "${1}" =~ "/" ]]; then
-        fs_check="${1}"
-        shift
-    fi
+    [[ "$1" != */* ]] && fs_check="${1}" && shift
 
     for path in "$@"; do
         [[ ! -d "${path}" ]] && die "Path does not exist: ${path}"
         if [[ -n "${fs_check}" ]]; then
             log "DEBUG" "Validating path exists on ${fs_check} filesystem: ${path}"
-            path_fs="$(stat -f -c '%T' "${path}")"
-            [[ "${path_fs,,}" == "${fs_check,,}" ]] ||
+            actual_fs="$(stat -f -c '%T' "${path}")"
+            [[ "${actual_fs,,}" == "${fs_check,,}" ]] ||
                 die "Path is not on ${fs_check} filesystem: ${path}"
         fi
     done
