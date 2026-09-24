@@ -10,7 +10,7 @@ run_step() {
     local color="${1}" heading="${2}" run_script=("${3}"); shift 3
     local args=("$@")
 
-    enclosed_heading "${heading}" "=" "100" "${color}"
+    enclosed_heading "${STAGE:-}${heading}" "=" "100" "${color}"
 
     [[ ${#args[@]} -eq 0 ]] || run_script+=("$@")
 

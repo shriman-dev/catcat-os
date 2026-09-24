@@ -86,12 +86,14 @@ jobs:
         id: chunk-image
         env:
           IMAGE_NAME: ${{ matrix.image_name }}
+          BASE_IMAGE: ${{ matrix.base_image }}
         shell: bash
         run: |
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
           sudo -E "${GITHUB_WORKSPACE}/build/builder" \
-                chunk --image-name "${IMAGE_NAME}"
+                chunk --image-name "${IMAGE_NAME}" \
+                      --base-image "${BASE_IMAGE}"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4.6.0

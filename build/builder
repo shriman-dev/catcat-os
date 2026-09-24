@@ -113,6 +113,8 @@ chunk_image() {
     echo "${green}" " Chunking       - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     sect_border
 
+    [[ -n "${BASE_IMAGE:-}" ]] || die "Missing BASE_IMAGE"
+
     _cmd_test_timer_start=${EPOCHSECONDS}
     { brief_trace; } 2>/dev/null
     ${RPM_OSTREE} compose \

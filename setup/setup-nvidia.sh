@@ -3,11 +3,9 @@ set -euo pipefail
 umask 0022
 source "${BUILD_SCRIPT_LIB}"
 
-setup_heading "Build Image - ${IMAGE_NAME}:${IMG_FLAVOR}"
+"${BUILD_SETUP_DIR}/shared/00-setup-base.sh"
 
-run_step "green" "Preparing System Environment" \
-         "${BUILD_SETUP_DIR}/shared/01-prep-env.sh"
-
+STAGE="${IMG_FLAVOR^^}: "
 #run_step "blue" "Cleaning Up" \
 #         "${BUILD_SETUP_DIR}/nvidia/01-cleanup.sh"
 
