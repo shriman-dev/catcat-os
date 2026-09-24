@@ -25,9 +25,7 @@ ocopy -v "${BUILD_FILES_DIR}/dconf" /etc/dconf/db/distro.d
 
 log "INFO" "Fetching remote configurations"
 # Justfiles
-get_ghraw --dstd "${FETCHED}/justfiles" --repo "ublue-os/bazzite" \
-          --repod "system_files/desktop/shared/usr/share/ublue-os/just" \
-          -f "82-bazzite-waydroid.just"
+#
 
 # Udev rules
 get_ghraw --dstd "${SYS_CACHE}/usr/lib/udev/rules.d" --repo "M0Rf30/android-udev-rules" \

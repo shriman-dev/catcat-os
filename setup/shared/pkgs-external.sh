@@ -21,9 +21,6 @@ ucat_setup() {
     place_executable "${BUILD_CACHE_DIR}/conf_repos/ublue_packages" 'ugum'
 
     # Modify fetched just recipes
-    sed -i '/waydroid-container-restart.desktop/d' "${fetched_justd}/82-bazzite-waydroid.just"
-    sed -i 's|source /usr/lib/ujust/ujust.sh|source /usr/lib/catcat-os/bash-lib.sh|' \
-           "${fetched_justd}/82-bazzite-waydroid.just"
 
     # Import justfiles to ucat
     log "INFO" "Importing justfiles to ucat"
