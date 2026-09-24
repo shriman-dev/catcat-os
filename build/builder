@@ -78,7 +78,6 @@ build_image() {
                  --dns 9.9.9.9 \
                  --secret "${sec_type}" \
                  --file "Containerfile" \
-                 --target "${IMAGE_NAME}" \
                  "${BUILD_LABELS[@]}" \
                  "${BUILD_ARGS[@]}" \
                  "${build_tags[@]}" \
