@@ -1,32 +1,32 @@
 name: Build Images
 on:
   workflow_call:
-  schedule:
-    - cron: "00 6 * * *"    # build at 6:00 UTC every day
+    inputs:
+      image_name:
+        required: false
+        type: string
+        default: catcat-os
+      base_image:
+        required: false
+        type: string
+        default: quay.io/fedora-ostree-desktops/silverblue
+      img_flavor:
+        required: false
+        type: string
+        default: main
+#  schedule:
+#    - cron: "00 6 * * *"    # build at 6:00 UTC every day
   workflow_dispatch:        # Allows manual trigger of workflow
 
 jobs:
   build_image:
-    name: Build
+    name: ${{ inputs.image_name }}
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
       id-token: write
-    strategy:
-      fail-fast: false      # Other builds even if one fails
-      matrix:
-        include:
-          - image_name: catcat-os
-            base_image: quay.io/fedora-ostree-desktops/silverblue
-            img_flavor: main
-          - image_name: catcat-os-nv
-            base_image: quay.io/fedora-ostree-desktops/silverblue
-            img_flavor: nvidia
-          - image_name: catcat-os-hh
-            base_image: quay.io/fedora-ostree-desktops/silverblue
-            img_flavor: deck
 
     steps:
       - name: Checkout Repo
@@ -43,7 +43,7 @@ jobs:
       - name: Mount Container Storage BTRFS Loopback
         shell: bash
         run: |
-          sudo truncate -s 70G /mnt/podman-storage.img
+          sudo truncate -s 75G /mnt/podman-storage.img
           sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
@@ -70,9 +70,9 @@ jobs:
         id: build-image
         env:
           SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
-          IMAGE_NAME: ${{ matrix.image_name }}
-          BASE_IMAGE: ${{ matrix.base_image }}
-          IMG_FLAVOR: ${{ matrix.img_flavor }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          BASE_IMAGE: ${{ inputs.base_image }}
+          IMG_FLAVOR: ${{ inputs.img_flavor }}
         shell: bash
         run: |
           set -euo pipefail
@@ -85,8 +85,8 @@ jobs:
       - name: Chunk Image
         id: chunk-image
         env:
-          IMAGE_NAME: ${{ matrix.image_name }}
-          BASE_IMAGE: ${{ matrix.base_image }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          BASE_IMAGE: ${{ inputs.base_image }}
         shell: bash
         run: |
           set -euo pipefail
@@ -106,8 +106,8 @@ jobs:
         id: push-image
         env:
           build_tags: ${{ steps.build-image.outputs.build_tags }}
-          IMAGE_NAME: ${{ matrix.image_name }}
-          IMG_FLAVOR: ${{ matrix.img_flavor }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          IMG_FLAVOR: ${{ inputs.img_flavor }}
         shell: bash
         run: |
           set -euo pipefail
@@ -120,12 +120,14 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.2
         with:
+          use-sudo: true
+          install-dir: /usr/bin
           cosign-release: "v2.6.3"
 
       - name: Sign Container Image
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
-          IMAGE_NAME: ${{ matrix.image_name }}
+          IMAGE_NAME: ${{ inputs.image_name }}
         shell: bash
         run: |
           set -euo pipefail

@@ -1,6 +1,9 @@
 name: Build All # Build Images, ISOs and make release
 # Defines when the workflow will run
 on:
+  schedule:
+    - cron: "00 6 * * *"    # build at 6:00 UTC every day
+#    - cron: "0 0 1 * *"    # Runs at 00:00 UTC on the 1st of every month
   push:
     branches:
       - main                # Only runs on pushes to main branch
@@ -24,6 +27,25 @@ jobs:
     name: Build Main
     uses: ./.github/workflows/build-image.yaml
     secrets: inherit        # Uses secrets from parent workflow
+
+  build-variants:
+    name: Build Variants
+    needs: [build-main]
+    strategy:
+      fail-fast: false      # Other builds even if one fails
+      matrix:
+        include:
+          - image_name: catcat-os-nv
+            base_image: ghcr.io/shriman-dev/catcat-os
+            img_flavor: nvidia
+          - image_name: catcat-os-hh
+            base_image: ghcr.io/shriman-dev/catcat-os
+            img_flavor: deck
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      image_name: ${{ matrix.image_name }}
+      base_image: ${{ matrix.base_image }}
+      img_flavor: ${{ matrix.img_flavor }}
 
 #  build-iso:
 #    name: Build ISOs
