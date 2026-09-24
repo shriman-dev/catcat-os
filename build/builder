@@ -163,7 +163,7 @@ push_image() {
 
 cosign_image() {
     local digest="$(< "/tmp/${IMAGE_NAME}-digestfile")"
-    [[ -n "$(command -v cosign") ]] || die "Failed, cosign command not found on current system"
+    [[ -n "$(command -v cosign)" ]] || die "Failed, cosign command not found on current system"
 
     sect_border
     echo "${green}"  " Signing OCI   - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
