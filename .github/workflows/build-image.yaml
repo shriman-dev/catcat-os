@@ -77,7 +77,7 @@ jobs:
         run: |
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
-          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+          sudo -E "${GITHUB_WORKSPACE}/build/builder" \
                 build --image-name "${IMAGE_NAME}" \
                       --base-image "${BASE_IMAGE}" \
                       --img-flavor "${IMG_FLAVOR}"
@@ -90,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
-          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+          sudo -E "${GITHUB_WORKSPACE}/build/builder" \
                 chunk --image-name "${IMAGE_NAME}"
 
       - name: Login to GitHub Container Registry
@@ -111,7 +111,7 @@ jobs:
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
           declare -x BUILD_TAGS="${build_tags}"
-          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+          sudo -E "${GITHUB_WORKSPACE}/build/builder" \
                 push --image-name "${IMAGE_NAME}" \
                      --img-flavor "${IMG_FLAVOR}"
 
@@ -128,5 +128,5 @@ jobs:
         run: |
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
-          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+          sudo -E "${GITHUB_WORKSPACE}/build/builder" \
                 cosign --image-name "${IMAGE_NAME}"
