@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 source /etc/catcat-os/build_info
 
 FREQ_UPDATE_FLATPAK_APPS=(

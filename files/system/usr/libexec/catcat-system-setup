@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 U1000="$(id -un 1000)"
 
 # First boot setup
@@ -11,24 +11,30 @@ if [[ ! -f "${firstboot_file}" ]]; then
 
     # Setup grub
     mkdir -vp /boot/grub_themes && cp -af /usr/share/grub/themes/* /boot/grub_themes/
-    replace_add 'GRUB_TIMEOUT=' 'GRUB_TIMEOUT=2' /etc/default/grub
-    replace_add 'GRUB_DEFAULT=' 'GRUB_DEFAULT=saved' /etc/default/grub
-    replace_add 'GRUB_DISABLE_SUBMENU=' 'GRUB_DISABLE_SUBMENU=true' /etc/default/grub
-    replace_add 'GRUB_DISABLE_RECOVERY=' 'GRUB_DISABLE_RECOVERY=true' /etc/default/grub
-    replace_add 'GRUB_TIMEOUT_STYLE=' 'GRUB_TIMEOUT_STYLE=menu' /etc/default/grub
-    replace_add 'GRUB_TERMINAL_OUTPUT=' 'GRUB_TERMINAL_OUTPUT=gfxterm' /etc/default/grub
-    replace_add 'GRUB_GFXPAYLOAD_LINUX=' 'GRUB_GFXPAYLOAD_LINUX=keep' /etc/default/grub
-    replace_add 'GRUB_GFXMODE=' 'GRUB_GFXMODE=auto' /etc/default/grub
-    #replace_add 'GRUB_ENABLE_BLSCFG=' 'GRUB_ENABLE_BLSCFG=true' /etc/default/grub
-    #GRUB_TERMINAL_OUTPUT=gfxterm
-    #"GRUB_GFXMODE=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')"
-    replace_add 'GRUB_THEME=' 'GRUB_THEME="/boot/grub_themes/catppuccin-mocha/theme.txt"' /etc/default/grub
+    declare -A grub_vars=(
+        ["GRUB_TIMEOUT"]="2"
+        ["GRUB_DEFAULT"]="saved"
+        ["GRUB_DISABLE_SUBMENU"]="true"
+        ["GRUB_DISABLE_RECOVERY"]="true"
+        ["GRUB_TIMEOUT_STYLE"]="menu"
+        ["GRUB_TERMINAL_OUTPUT"]="gfxterm"
+        ["GRUB_GFXPAYLOAD_LINUX"]="keep"
+        ["GRUB_GFXMODE"]="auto" #$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')
+        ["GRUB_THEME"]="\"/boot/grub_themes/catppuccin-mocha/theme.txt\""
+#        ["GRUB_ENABLE_BLSCFG"]="true"
+    )
+
+    for _var in "${!grub_vars[@]}"; do
+        sed -i -Ee "s|^[#[:space:]]*${_var}=.*|${_var}=${grub_vars[${_var}]}|" /etc/default/grub
+        grep -q "^${_var}=" /etc/default/grub ||
+        echo "${_var}=${grub_vars[${_var}]}" >> /etc/default/grub
+    done
 
     # Update grubup
     /usr/bin/grubup
 
     # Set default tty fonts
-    replace_add 'FONT=' 'FONT=sun12x22' /etc/vconsole.conf
+    sed -i -Ee "s|^[#[:space:]]*FONT=.*|FONT=sun12x22|" /etc/vconsole.conf
 
     # Show grub screen for desktop devices
     hostnamectl | grep -i "Chassis:.*desktop" && grub2-editenv - unset menu_auto_hide
@@ -156,7 +162,8 @@ fi
 # Waydroid fix
 if [[ -f "/var/lib/waydroid/lxc/waydroid/config" ]]; then
     # Remove unneeded apparmor entry from Waydroid LXC
-    sed -i '/lxc\.apparmor\.profile\s*=\s*unconfined/d' "/var/lib/waydroid/lxc/waydroid/config"
+    sed -i '/lxc\.apparmor\.profile[[:space:]]*=[[:space:]]*unconfined/d' \
+           "/var/lib/waydroid/lxc/waydroid/config"
 fi
 
 # Distrobox fix

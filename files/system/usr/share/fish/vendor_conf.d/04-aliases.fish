@@ -106,7 +106,7 @@ if command -q flatpak
     alias flls="flatpak list --columns=installation,name,size,application,version,runtime"
     alias fldg="echo -e 'Get commits hashes to downgrade to using alias fdgl (flatpak remote-info --log flathub) then put commit hash (without space) and app id right after this alias \nand then mask the app \n \n' && flatpak update --commit="
     alias fldgl="flatpak remote-info --log flathub"
-    alias flcln="flatpak uninstall --unused && find $HOME/.var/app -path '*/cache/*' | sed -e '/banners\|coverart\|lutris\s*\$/d' | xargs rm -rvf"
+    alias flcln="flatpak uninstall --unused"
     alias flhst="flatpak history"
     alias flinf="flatpak info"
     alias flmsk="flatpak mask"

@@ -69,7 +69,7 @@ device-info:
 [group("system info")]
 debug-info:
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     sudo fastfetch
     symmetric_heading "Detailed Sys+Hardware Information" "="
     sudo inxi --basic --expanded -xxxa --verbosity 8

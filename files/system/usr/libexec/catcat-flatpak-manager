@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 
 runtimes() {
     local runtimes runtime runtime_vers ver

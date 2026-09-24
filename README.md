@@ -36,6 +36,6 @@ cosign verify --key "https://raw.githubusercontent.com/shriman-dev/catcat-os/ref
 
 ## Fix pub key issue
 ```
-sudo sh -c "curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub > /etc/pki/containers/catcat-os.pub" &&
-sudo sed -i.bak "s#/usr/etc/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
+curl https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/cosign.pub | sudo tee /etc/pki/containers/catcat-os.pub
+sudo sed -i.bak "s#/usr/share/pki/containers/catcat-os.pub#/etc/pki/containers/catcat-os.pub#" /etc/containers/policy.json
 ```

@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname "${SCRIPT_DIR}")/setup/setup_lib/funcvar.sh"
+source "$(dirname "${SCRIPT_DIR}")/setup/lib/bash-lib.sh"
 source "${SCRIPT_DIR}/ENVAR"
 
 #set -x
@@ -75,6 +75,7 @@ insecure = true" | sudo tee "${registries_confd}/local-registry.conf"
     unset registries_confd reg_status
 fi
 
+# Define builds
 declare -A BUILDS=(
     [catcat-os]="main|quay.io/fedora-ostree-desktops/silverblue"
     [catcat-os-nv]="nvidia|localhost/catcat-os"
@@ -87,31 +88,31 @@ if [[ ${#BUILD_TARGETS[@]} -eq 0 ]]; then
 fi
 
 builder() { "${SCRIPT_DIR}/builder" "$@"; }
-for VARIANT in "${BUILD_TARGETS[@]}"; do
-    if [[ -z "${BUILDS[${VARIANT}]:-}" ]]; then
-        die "Variant '${VARIANT}' not found in BUILDS array"
+for IMAGE_NAME in "${BUILD_TARGETS[@]}"; do
+    if [[ -z "${BUILDS["${IMAGE_NAME}"]:-}" ]]; then
+        die "Variant '${IMAGE_NAME}' not found in BUILDS array"
     fi
 
-    IFS='|' read -r ALT_TAG BASE_IMAGE <<< "${BUILDS[${VARIANT}]}"
+    IFS='|' read -r IMG_FLAVOR BASE_IMAGE <<< "${BUILDS["${IMAGE_NAME}"]}"
     if [[ ${BUILD_SKIP:-} -ne 1 ]]; then
-        builder build --image-name "${VARIANT}" \
+        builder build --image-name "${IMAGE_NAME}" \
                       --base-image "${BASE_IMAGE}" \
-                      --alt-tag    "${ALT_TAG}"
+                      --img-flavor "${IMG_FLAVOR}"
     fi
 
     if [[ ${CHUNK_IMAGE:-} -eq 1 ]]; then
-        builder chunk --image-name "${VARIANT}" \
+        builder chunk --image-name "${IMAGE_NAME}" \
                       --base-image "${BASE_IMAGE}" \
-                      --alt-tag    "${ALT_TAG}"
-        VARIANT="${VARIANT}-chunked"
+                      --img-flavor "${IMG_FLAVOR}"
+        IMAGE_NAME="${IMAGE_NAME}-chunked"
     fi
 
     if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
         PUSH_REGISTRY="${LOCAL_REGISTRY_ADR}" \
         BUILD_TAGS="${DEFAULT_TAG}" \
-        builder push  --image-name "${VARIANT}" \
+        builder push  --image-name "${IMAGE_NAME}" \
                       --base-image "${BASE_IMAGE}" \
-                      --alt-tag    "${ALT_TAG}" \
+                      --img-flavor "${IMG_FLAVOR}" \
                       --compression-format "zstd" \
                       --compression-level 19 \
                       --tls-verify=false

@@ -19,13 +19,14 @@ ENVAR=(
     "COMMIT_SHA=$(git rev-parse HEAD)"
 )
 
-# Export variables for later use
+# Export variables
 declare -x "${ENVAR[@]}"
 
-# Tags
+# Define tags
 _build_tags=("${DEFAULT_TAG}" "${MAJOR_VERSION}")
 declare -x BUILD_TAGS="${_build_tags[*]}"
 
+# Export variables to GITHUB_ENV
 if [[ -n "${GITHUB_ENV:-}" ]]; then
     if ! grep "${PROJECT_NAME}" <<< "${GITHUB_ENV}"; then
         printf '%s\n' "${ENVAR[@]}" >> "${GITHUB_ENV}"

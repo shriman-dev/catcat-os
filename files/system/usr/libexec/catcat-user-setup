@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 exit_if_root
 HOME_DIR="${HOME}"
 CONFIG="${HOME_DIR}/.config"
@@ -245,9 +245,9 @@ setup_apps() {
     for _app in "${!app_icons[@]}"; do
         if [[ ! -f "${apps_dir}/${_app}.desktop" || ! -s "${apps_dir}/${_app}.desktop" ]]; then
             [[ " ${FLATPAK_APPS[*]} " =~ " ${_app} " ]] &&
-                sed "s|^Icon=.*|Icon=${app_icons[${_app}]}|" \
-                    "/var/lib/flatpak/exports/share/applications/${_app}.desktop" > \
-                        "${apps_dir}/${_app}.desktop"
+                cp -vf "/var/lib/flatpak/exports/share/applications/${_app}.desktop" \
+                       "${apps_dir}/${_app}.desktop"
+                desktop-file-edit --set-icon="${app_icons[${_app}]}" "${apps_dir}/${_app}.desktop"
         fi
     done
 

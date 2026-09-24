@@ -1,36 +1,39 @@
 name: Build Images
 on:
   workflow_call:
-    inputs:
-      image_name:
-        required: false
-        type: string
-        default: catcat-os
-      base_image:
-        required: false
-        type: string
-        default: quay.io/fedora-ostree-desktops/silverblue
-      alt_tag:
-        required: false
-        type: string
-        default: main
+  schedule:
+    - cron: "00 6 * * *"    # build at 6:00 UTC every day
+  workflow_dispatch:        # Allows manual trigger of workflow
 
 jobs:
   build_image:
-    name: ${{ inputs.image_name }}
+    name: Build
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
       id-token: write
+    strategy:
+      fail-fast: false      # Other builds even if one fails
+      matrix:
+        include:
+          - image_name: catcat-os
+            base_image: quay.io/fedora-ostree-desktops/silverblue
+            img_flavor: main
+          - image_name: catcat-os-nv
+            base_image: quay.io/fedora-ostree-desktops/silverblue
+            img_flavor: nvidia
+          - image_name: catcat-os-hh
+            base_image: quay.io/fedora-ostree-desktops/silverblue
+            img_flavor: deck
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
         with:
           persist-credentials: false
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Maximize Build Space
         uses: hastd/free-disk-space@v0.1.2
@@ -41,10 +44,14 @@ jobs:
         shell: bash
         run: |
           sudo truncate -s 70G /mnt/podman-storage.img
-          sudo mkfs.btrfs -f /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
-          sudo mount -o compress-force=zstd:2 /mnt/podman-storage.img /var/lib/containers
+          LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
+          sudo mkdir -p /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "${LOOP}" /mnt/podman-storage
+          sudo mkdir -p /mnt/podman-storage/{storage,tmp}
+          sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
           sudo systemctl start podman.service
 
       - name: Prepare Environment
@@ -58,36 +65,33 @@ jobs:
           nproc --all
           pwd
           ls -A1
-          printf '#!/bin/bash\nsudo -E "${GITHUB_WORKSPACE}/build/builder" "$@"\n' | \
-              install -m 755 -D /dev/stdin "${GITHUB_WORKSPACE}/bin/builder"
-          ln -sv "${GITHUB_WORKSPACE}/build/ENVAR" "${GITHUB_WORKSPACE}/bin"/
-          echo "${GITHUB_WORKSPACE}/bin" >> "${GITHUB_PATH}"
 
       - name: Build Image
         id: build-image
         env:
           SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
+          IMAGE_NAME: ${{ matrix.image_name }}
+          BASE_IMAGE: ${{ matrix.base_image }}
+          IMG_FLAVOR: ${{ matrix.img_flavor }}
         shell: bash
         run: |
           set -euo pipefail
-          source ENVAR
-          builder build \
-                  --image-name "${{ inputs.image_name }}" \
-                  --base-image "${{ inputs.base_image }}" \
-                  --alt-tag    "${{ inputs.alt_tag }}"
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
+          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+                build --image-name "${IMAGE_NAME}" \
+                      --base-image "${BASE_IMAGE}" \
+                      --img-flavor "${IMG_FLAVOR}"
 
       - name: Chunk Image
         id: chunk-image
         env:
-          SBMOK_KEY: ${{ secrets.SBMOK_KEY }}
+          IMAGE_NAME: ${{ matrix.image_name }}
         shell: bash
         run: |
           set -euo pipefail
-          source ENVAR
-          builder chunk \
-                  --image-name "${{ env.image_name }}" \
-                  --base-image "${{ inputs.base_image }}" \
-                  --alt-tag    "${{ inputs.alt_tag }}"
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
+          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+                chunk --image-name "${IMAGE_NAME}"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4.6.0
@@ -100,15 +104,16 @@ jobs:
         id: push-image
         env:
           build_tags: ${{ steps.build-image.outputs.build_tags }}
+          IMAGE_NAME: ${{ matrix.image_name }}
+          IMG_FLAVOR: ${{ matrix.img_flavor }}
         shell: bash
         run: |
           set -euo pipefail
-          source ENVAR
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
           declare -x BUILD_TAGS="${build_tags}"
-          builder push \
-                  --image-name "${{ env.image_name }}" \
-                  --base-image "${{ inputs.base_image }}" \
-                  --alt-tag    "${{ inputs.alt_tag }}"
+          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+                push --image-name "${IMAGE_NAME}" \
+                     --img-flavor "${IMG_FLAVOR}"
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.2
@@ -117,11 +122,11 @@ jobs:
 
       - name: Sign Container Image
         env:
-          IMAGE_FULL: ${{ env.PUSH_REGISTRY }}/${{ inputs.image_name }}
-          DIGEST: ${{ steps.push-image.outputs.digest }}
-          COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+          IMAGE_NAME: ${{ matrix.image_name }}
         shell: bash
         run: |
-          echo "Image Digest: ${DIGEST}"
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${IMAGE_FULL}@${DIGEST}
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
+          sudo -E "${GITHUB_WORKSPACE}/build/builder \
+                cosign --image-name "${IMAGE_NAME}"

@@ -2,7 +2,7 @@
 [group("nightly reboot")]
 toggle-nightly-reboot ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled --quiet nightly-reboot.timer; then
       CURRENT_STATE="Enabled"

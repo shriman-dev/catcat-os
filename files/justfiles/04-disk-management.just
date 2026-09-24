@@ -42,7 +42,7 @@ create-luks-part DEVICE_PATH:
 [group("disk management")]
 dump-info-luks DEVICE_PATH:
     #!/usr/bin/env -S sudo -- /bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     LUKS_UUID="luks-$(lsblk -lo UUID,FSTYPE {{ DEVICE_PATH }} | awk '/crypto_LUKS/ {print $1; exit}')"
     symmetric_heading "Luks Device Status"
     cryptsetup status "${LUKS_UUID}"
@@ -54,15 +54,17 @@ dump-info-luks DEVICE_PATH:
 [group("disk management")]
 enable-luks-discard LUKS_UUID:
     #!/usr/bin/env -S sudo -- /bin/bash
-    echo 'Note: Add "discard" option for the device entry in /etc/crypttab'
+    source /usr/lib/catcat-os/bash-lib.sh
+    log "NOTE" "Add 'discard' option for the device entry in /etc/crypttab"
     if [[ ! "$(rpm-ostree kargs)" =~ "luks.options=discard" ]]; then
         rpm-ostree kargs --append-if-missing=rd.luks.options=discard \
                          --append-if-missing=luks.options=discard
     fi
     cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue \
                --persistent refresh {{ LUKS_UUID }}
-    if ! grep -q "^issue_discards = 1" /etc/lvm/lvm.conf; then
-        sed -i "s|.*issue_discards =.*|issue_discards = 1|" /etc/lvm/lvm.conf
+    if ! grep -q "issue_discards = 1" /etc/lvm/lvm.conf; then
+         sed -i -E 's|^([[:space:]]*)[#[:space:]]*issue_discards =.*|\1issue_discards = 1|' \
+                    /etc/lvm/lvm.conf
         echo -e 'To enable discard regenerate initramfs using:\nsudo rpm-ostree initramfs --enable'
     fi
 

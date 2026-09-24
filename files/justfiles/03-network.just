@@ -10,13 +10,13 @@ auto-update-on-connection CONNECTION:
 [group("network")]
 toggle-ssh ACTION="":
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     OPTION="{{ ACTION }}"
     # Get hostname and IP address
     HOSTNAME="$(hostname)"
     IP_ADDRESS="$(hostname -I | awk '{print $1}')" # First IP address
     # Get current SSH status
-    SSH_STATUS_RUNNING="$(systemctl is-active sshd)"
+    SSH_STATUS_RUNNING="$(systemctl is-active sshd || echo "unknown")"
     SSH_STATUS="${yellow}Disabled And ${SSH_STATUS_RUNNING^}${normal}"
     if systemctl is-enabled --quiet sshd; then
         SSH_STATUS="${green}Enabled And ${SSH_STATUS_RUNNING^}${normal}"
@@ -75,11 +75,11 @@ toggle-ssh ACTION="":
 [group("network")]
 toggle-iwd ACTION="":
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     OPTION="{{ ACTION }}"
     IWD_CONF="/etc/NetworkManager/conf.d/iwd.conf"
     # Get current IWD status
-    IWD_STATUS_RUNNING="$(systemctl is-active iwd.service)"
+    IWD_STATUS_RUNNING="$(systemctl is-active iwd.service || echo "unknown")"
     IWD_STATUS="${yellow}Disabled And ${IWD_STATUS_RUNNING^}${normal}"
     if systemctl is-enabled --quiet iwd.service; then
         IWD_STATUS="${green}Enabled And ${IWD_STATUS_RUNNING^}${normal}"

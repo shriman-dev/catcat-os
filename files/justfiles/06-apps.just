@@ -8,11 +8,11 @@ install-catcat-flatpaks:
 [group("apps")]
 install-mcontrolcenter:
     #!/usr/bin/env -S sudo -- /bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     log "INFO" "Installing mcontrolcenter"
     TMP_DIR="/tmp/extra_pkgs"
     pkg_name="mcontrolcenter"
-    latest_pkg_url="$(latest_ghpkg_url 'dmitry-s93/MControlCenter' 'bin\.tar\.gz$')"
+    latest_pkg_url="$(get_ghpkg_url 'dmitry-s93/MControlCenter' 'bin\.tar\.gz$')"
     pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
 
     umask 0022
@@ -37,7 +37,7 @@ install-mcontrolcenter:
 llama-cpp:
     #!/usr/bin/env -S sudo -- /bin/bash
     set -euo pipefail
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     umask 0022
 
     TMP_DIR="/tmp/extra_pkgs"
@@ -49,7 +49,8 @@ llama-cpp:
 
     log "INFO" "Installing and setting up: llama-cpp-vk"
     get_ghpkg --name "llama-cpp-vk" --repo "ggml-org/llama.cpp" \
-              --regx 'ubuntu-vulkan-x64\.tar\.gz$' --libexec
+              --regx 'ubuntu-vulkan-x64\.tar\.gz$' \
+              --libexec --force
     log "INFO" "Operation done for: llama-cpp-vk"
     rm -rf "${TMP_DIR}"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 
 BOOTC_KARGS="/usr/lib/bootc/kargs.d/catcat.toml"
 EXISTING_KARGS="$(rpm-ostree kargs)"

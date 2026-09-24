@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 0022
 SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname "${SCRIPT_DIR}")/setup/setup_lib/funcvar.sh"
+source "$(dirname "${SCRIPT_DIR}")/setup/lib/bash-lib.sh"
 
 prep_metadata() {
     BUILD_ARGS=(
@@ -19,8 +19,8 @@ prep_metadata() {
         "--build-arg" "TIMESTAMP=${TIMESTAMP}"
         "--build-arg" "COMMIT_SHA=${COMMIT_SHA}"
         "--build-arg" "IMAGE_NAME=${IMAGE_NAME}"
-        "--build-arg" "BASE_IMAGE=${BASE_IMAGE}"
-        "--build-arg" "ALT_TAG=${ALT_TAG}"
+        "--build-arg" "BASE_IMAGE=${BASE_IMAGE:-}"
+        "--build-arg" "IMG_FLAVOR=${IMG_FLAVOR:-}"
     )
 
     BUILD_LABELS=(
@@ -38,8 +38,8 @@ prep_metadata() {
         "${COMMIT_SHA:0:7}"
         "${MAJOR_VERSION}.${DATESTAMP}"
         "${MAJOR_VERSION}.${DATETIMESTAMP}"
-        "${ALT_TAG}"
-        "${ALT_TAG}.${DATETIMESTAMP}"
+        "${IMG_FLAVOR:-}"
+        "${IMG_FLAVOR:-}.${DATETIMESTAMP}"
     )
 }
 
@@ -47,13 +47,14 @@ sect_border() {
     symmetric_heading "#" "#" "100" "blue" | tr ' ' '#'
 }
 
-# SC2154 - variable is referenced but not assigned.
-# shellcheck disable=SC2154
 build_image() {
     local log_dir="${SCRIPT_DIR}/.log/${IMAGE_NAME}"
     local log_file="${log_dir}/${IMAGE_NAME}.${DATETIMESTAMP}.log"
     local sec_type="${SEC_TYPE:-"id=sbmok_priv,src=${SBMOK_KEY},type=file"}"
     local tag build_tags=()
+
+    [[ -n "${BASE_IMAGE:-}" ]] || die "Missing BASE_IMAGE"
+    [[ -n "${IMG_FLAVOR:-}" ]] || die "Missing IMG_FLAVOR"
 
     for tag in ${BUILD_TAGS}; do
         build_tags+=("--tag" "${IMAGE_NAME}:${tag}")
@@ -77,6 +78,7 @@ build_image() {
                  --dns 9.9.9.9 \
                  --secret "${sec_type}" \
                  --file "Containerfile" \
+                 --target "${IMAGE_NAME}" \
                  "${BUILD_LABELS[@]}" \
                  "${BUILD_ARGS[@]}" \
                  "${build_tags[@]}" \
@@ -132,7 +134,9 @@ chunk_image() {
 push_image() {
     # Always push image without chunked suffix
     local push_image="${IMAGE_NAME/-chunked/}" push_tags="${BUILD_TAGS}" tag
-    digestfile="/tmp/digestfile"
+    digestfile="/tmp/${push_image}-digestfile"
+
+    [[ -n "${IMG_FLAVOR:-}" ]] || die "Missing IMG_FLAVOR"
 
     sect_border
     echo "${green}"  " Pushing       - ${push_image}:${DEFAULT_TAG}${noc}"
@@ -152,8 +156,25 @@ push_image() {
     _cmd_test_timer_end=$(cmd_test_timer)
 
     sect_border
-    echo "${green}"  " Push Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
-    echo "${purple}" " Push Time    - ${_cmd_test_timer_end}${noc}"
+    echo "${green}"  " Push Done     - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Push Time     - ${_cmd_test_timer_end}${noc}"
+    sect_border
+}
+
+cosign_image() {
+    local digest="$(< "/tmp/${IMAGE_NAME}-digestfile")"
+    [[ -n "$(command -v cosign") ]] || die "Failed, cosign command not found on current system"
+
+    sect_border
+    echo "${green}"  " Signing OCI   - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Push Registry - ${PUSH_REGISTRY}${noc}"
+    sect_border
+
+    COSIGN_EXPERIMENTAL=false \
+    cosign sign -y --key env://COSIGN_PRIVATE_KEY "${PUSH_REGISTRY}/${IMAGE_NAME}@${digest}"
+
+    sect_border
+    echo "${green}"  " Signing Done  - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     sect_border
 }
 
@@ -165,15 +186,16 @@ Global Options:
   -h, --help          Show this help message
   -i, --image-name    Set default image name of build
   -b, --base-image    Set base image to build upon
-  -t, --alt-tag       Set an alt tag for image build
+  -f, --img-flavor    Set an alt tag for image build
 
 Commands:
   build               Build the container image using podman
   chunk               Create a chunked OCI image using rpm-ostree
   push                Push the image with tag(s) to the configured registry
+  cosign              Signing container image using Sigstore
 
 Example:
-  $(basename "${0}") build chunk push -i my-image -t main -b quay.io/fedora-ostree-desktops/silverblue
+  $(basename "${0}") build chunk push cosign -i my-image -t main -b quay.io/fedora-ostree-desktops/silverblue
 EOF
 }
 
@@ -232,11 +254,9 @@ main() {
                 [[ -n "${2:-}" ]] || die "Provide image name"
                 IMAGE_NAME="${2}";  shift 2 ;;
             -b|--base-image)
-                [[ -n "${2:-}" ]] || die "Provide base image"
                 BASE_IMAGE="${2}";  shift 2 ;;
-            -t|--alt-tag)
-                [[ -n "${2:-}" ]] || die "Provide alt tag"
-                ALT_TAG="${2}";     shift 2 ;;
+            -f|--img-flavor)
+                IMG_FLAVOR="${2}";     shift 2 ;;
             *)
                 rem_args+=("${1}"); shift   ;;
         esac

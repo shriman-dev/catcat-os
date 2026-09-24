@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 
 # Selinux fix
 #restorecon  -vR /home/${U1000}/.local/share/icc
@@ -16,13 +16,13 @@ if ! grep "${nix_user_path}" "${sudoersd_file}"; then
     log "INFO" "Adding support to run nix commands with sudo for user 1000"
     chmod -v 640 "${sudoersd_file}"
     sed -i "/secure_path = /s|$|:${nix_user_path}|" "${sudoersd_file}"
-    # Proper sudoers.d perms
+    # Correct sudoers.d perms
     chmod -v --recursive 440 "$(dirname "${sudoersd_file}")"
 fi
 
 # Mount tmpfs on /var/tmp
 fstab_file="/etc/fstab"
-if ! grep -E "^tmpfs.*/var/tmp.*tmpfs" "${fstab_file}"; then
+if ! grep -E "^tmpfs .*/var/tmp .*tmpfs .*0 0$" "${fstab_file}"; then
     log "INFO" "Adding fstab entry to mount tmpfs on /var/tmp"
     printf "%-10s %-10s %-10s %-20s %s\n" "tmpfs" "/var/tmp" "tmpfs" \
         "defaults,noatime,mode=1777" "0 0" >> "${fstab_file}"
@@ -44,18 +44,3 @@ if ! { grep "without-nullok" <<< "${authsel_curr}" &&
 fi
 
 # Usbguard setup
-#if [[ ! -d /var/log/usbguard ]]; then
-#   usbguard_conf="/etc/usbguard/usbguard-daemon.conf"
-#   mkdir -p /var/log/usbguard
-#   mkdir -p /etc/usbguard
-#   chmod -v 755 /etc/usbguard
-#   restorecon -vR /var/log/usbguard
-#   sh -c 'usbguard generate-policy > /etc/usbguard/rules.conf'
-
-#   sed -i "s/^PresentControllerPolicy=.*/PresentControllerPolicy=apply-policy/" "$usbguard_conf"
-#   sed -i "s/^HidePII=.*/HidePII=true/" "$usbguard_conf"
-#   sed -i "/IPCAllowedGroups=wheel/s/$/ usbguard/" "$usbguard_conf"
-#   usbguard add-user $U1000
-
-#   systemctl enable --force --now usbguard.service
-#fi

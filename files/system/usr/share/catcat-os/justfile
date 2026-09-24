@@ -3,7 +3,7 @@ set ignore-comments
 
 _default:
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     /usr/bin/just --list --list-heading $'Available commands:\n'
 
 # Imports

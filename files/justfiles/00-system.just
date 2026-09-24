@@ -13,7 +13,7 @@ update-firmware:
 [group("system")]
 toggle-updates ACTION="prompt":
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     CURRENT_STATE="Disabled"
     if systemctl is-enabled --quiet catcat-os-update.timer; then
       CURRENT_STATE="Enabled"

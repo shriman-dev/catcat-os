@@ -1,8 +1,8 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
+source /usr/lib/catcat-os/bash-lib.sh >/dev/null 2>&1
 
 update_flatpak() {
-    source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
+    source /usr/lib/catcat-os/bash-lib.sh >/dev/null 2>&1
     local scope="--user"
     [[ ${EUID} -eq 0 ]] && scope="--system"
 
@@ -33,7 +33,7 @@ update_flatpak() {
 }
 
 update_nixpkg() {
-    source /usr/lib/catcat-os/funcvar.sh >/dev/null 2>&1
+    source /usr/lib/catcat-os/bash-lib.sh >/dev/null 2>&1
     local scope="user"
     local cmdpath="${HOME}/.local/state/nix/profile/bin"
 
@@ -147,9 +147,11 @@ exec_subcommand() {
         extra)
             update_flatpak
             update_nixpkg
-            [[ ${EUID} -eq 0 ]] && run_as_users update_flatpak
-            [[ ${EUID} -eq 0 ]] && run_as_users update_nixpkg
-            [[ ${EUID} -eq 0 ]] && { update_firmware; update_dns_blocklist; }
+            [[ ${EUID} -eq 0 ]] && {
+                run_as_users update_flatpak
+                run_as_users update_nixpkg
+                update_dns_blocklist
+            }
             ;;
         flat-nix)
             update_flatpak

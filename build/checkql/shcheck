@@ -1,15 +1,29 @@
 #!/usr/bin/bash
+SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 format="${1}"; shift
+
+cd "$(dirname "$(dirname "${SCRIPT_DIR}")")" || exit 1
+readarray -t found_scripts < <(fd -HI -t f \
+                                  -E 'syncro\.d/**' \
+                                  -E '**/bin/pipes\.sh' \
+                                  -E '**/raw/catcat-papirus-folders-build\.sh' \
+                                  -E '**/etc/grub.d/**' \
+                                  -x file --mime {} | sort | \
+                                     rg --color=always '(application|text)/x-.*shellscript' | \
+                                     cut -d: -f1)
+
+
 # Disabled checks
 # SC1090 - Can't follow non-constant source. Use a directive to specify location
 # SC1091 - Not following sourced script
 # SC2016 - Expressions don't expand in single quotes, use double quotes for that
 # SC2034 - foo appears unused. Verify it or export it.
 # SC2076 - Remove quotes from right-hand side of =~ to match as a regex rather than literally.
+# SC2154 - variable is referenced but not assigned.
 # check-extra-masked-returns,check-unassigned-uppercase
 shellcheck --color=always \
            --format="${format}" \
            --severity=style \
-           --exclude=SC1090,SC1091,SC2016,SC2034,SC2076 \
+           --exclude=SC1090,SC1091,SC2016,SC2034,SC2076,SC2154 \
            --enable=add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,quote-safe-variables,require-double-brackets,require-variable-braces,useless-use-of-cat \
-           "$@"
+           "${found_scripts[@]}"

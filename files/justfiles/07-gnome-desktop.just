@@ -9,7 +9,7 @@ toggle-gnome-extension EXTENSION_ID:
 [group("gnome desktop")]
 restore-gnome-de-settings:
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome settings..."
@@ -22,7 +22,7 @@ restore-gnome-de-settings:
 [group("gnome desktop")]
 restore-gnome-folders:
     #!/usr/bin/bash
-    source /usr/lib/catcat-os/funcvar.sh
+    source /usr/lib/catcat-os/bash-lib.sh
     VERBOSE=
     bak_before "${HOME}/.config/dconf"
     echo "Restoring gnome folders..."

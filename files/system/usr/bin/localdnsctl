@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 # Default values
 VERBOSE=
 TMP_DIR="${TMP_DIR:-"/tmp/localdns-blocklist"}"
@@ -242,7 +242,7 @@ setup_localdns() {
     esac
 
     ensure_dir "${LOCALDNS_CONFD}" "${TMP_DIR}"
-    check_file_inplace "${DNSCRYPT_CONFD}/dnscrypt-proxy.toml" \
+    check_file_presence "${DNSCRYPT_CONFD}/dnscrypt-proxy.toml" \
                        "${DNSMASQ_CONFD}/defaults.conf" \
                        "${DNSMASQ_CONFD}/dns-defaults.conf"
 
@@ -450,7 +450,7 @@ load_config
 while [[ $# -gt 0 ]]; do
     case ${1} in
         -v|--verbose)
-            VERBOSE=3
+            VERBOSE=1
             shift
             ;;
         --setup)

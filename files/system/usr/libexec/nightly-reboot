@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source /usr/lib/catcat-os/funcvar.sh
+source /usr/lib/catcat-os/bash-lib.sh
 REBOOT_DELAY=300  # 5 minutes
 
 notify_all() {
@@ -8,9 +8,9 @@ notify_all() {
 
 # Broadcast warning to all users and send warning notification
 send_warning() {
-    wall "$(echo -e 'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nUse following command to cancel reboot:\nucat cancel-nightly-reboot')"
-    notify_all "System will reboot in 5 minutes" \
-            "To cancel run command: \"ucat cancel-nightly-reboot\""
+    wall $'Starting nightly reboot sequence...\nSystem will reboot in 5 minutes. Please save your work.\n\nTo cancel run command:\nucat cancel-nightly-reboot'
+    notify_all "System will reboot in 5 minutes..." \
+            "Please save your work. To cancel run command: \"ucat cancel-nightly-reboot\""
 }
 
 reboot_sys() {
@@ -21,14 +21,14 @@ reboot_sys() {
     /usr/bin/systemctl reboot -i || /usr/bin/reboot --force --reboot
 }
 
-monitor_cancel_file() {
-    local cancel_file="/run/NIGHTLY_REBOOT/user" cancel_user attempts=0
+watch_cancel_file() {
+    local cancel_file="/run/NIGHTLY_REBOOT/user" cancel_user attempt=0
     local max_attempts=${REBOOT_DELAY}
 
-    log "INFO" "Monitoring for cancellation"
+    log "INFO" "Watching for cancellation"
     mkdir -p "$(dirname "${cancel_file}")"
     chmod -R 1777 "$(dirname "${cancel_file}")"
-    while [[ ${attempts} -lt ${max_attempts} ]]; do
+    while [[ ${attempt} -lt ${max_attempts} ]]; do
         if [[ -f "${cancel_file}" ]]; then
             log "INFO" "Cancel file detected: ${cancel_file}"
             cancel_user="$(< "${cancel_file}")"
@@ -38,10 +38,10 @@ monitor_cancel_file() {
             rm -v "${cancel_file}"
             exit 0
         fi
-        ((attempts++))
+        attempt=$(( attempt + 1 ))
         sleep 1
     done
-    log "INFO" "Monitoring timeout reached"
+    log "INFO" "Watch timeout reached"
 }
 
 # Main reboot sequence
@@ -50,7 +50,7 @@ main() {
     send_warning
     log "INFO" "Reboot warning sent."
 
-    monitor_cancel_file
+    watch_cancel_file
     reboot_sys
 }
 
