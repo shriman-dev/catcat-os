@@ -233,9 +233,10 @@ exec_subcommand() {
     local cmd="${1}"; shift
     gh_hook "pre-${cmd}"
     case "${cmd}" in
-        build) build_image "$@" ;;
-        chunk) chunk_image "$@" ;;
-        push)  push_image  "$@" ;;
+        build)  build_image  "$@" ;;
+        chunk)  chunk_image  "$@" ;;
+        push)   push_image   "$@" ;;
+        cosign) cosign_image "$@" ;;
         *) die "Unknown command: ${cmd}" show_help ;;
     esac
     gh_hook "post-${cmd}"
@@ -275,7 +276,7 @@ main() {
     # Execute subcommands
     for arg in "${rem_args[@]}"; do
         case "${arg}" in
-            build|chunk|push)
+            build|chunk|push|cosign)
                 # Execute a subcommand in progress before starting new one
                 if [[ -n "${curr_cmd:-}" ]]; then
                     exec_subcommand "${curr_cmd}" "${curr_args[@]}"
