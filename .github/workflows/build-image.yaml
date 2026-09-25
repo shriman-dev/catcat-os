@@ -115,7 +115,9 @@ jobs:
           declare -x BUILD_TAGS="${build_tags}"
           sudo -E "${GITHUB_WORKSPACE}/build/builder" \
                 push --image-name "${IMAGE_NAME}" \
-                     --img-flavor "${IMG_FLAVOR}"
+                     --img-flavor "${IMG_FLAVOR}" \
+                     --compression-format "zstd" \
+                     --compression-level 19 \
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.2
