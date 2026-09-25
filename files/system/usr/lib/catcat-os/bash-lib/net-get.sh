@@ -131,7 +131,6 @@ get_ghpkg() {
     readarray -t auto_fold_dir < <(populated_or_afile_dirs "${pkg_archive}.extract")
 
     if [[ ${islibexec} -eq 1 ]]; then
-        local libexec_dir="${LIBEXEC_DIR:-/usr/libexec}"
         log "DEBUG" "Copying contents of ${auto_fold_dir[0]} in ${libexec_dir}/${pkg_name}"
         ensure_dir "${libexec_dir}/${pkg_name}"
         ocopy "${auto_fold_dir[0]}" "${libexec_dir}/${pkg_name}"

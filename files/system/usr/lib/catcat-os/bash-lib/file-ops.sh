@@ -8,13 +8,8 @@ bak_before() {
     fi
 }
 
-bakrestore() {
-    if [[ -e "${1}.bak" ]]; then
-        mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"
-    else
-        mv ${VERBOSE:+-v} -- "${1}" "${1}.bak"
-    fi
-}
+bakitup() { mv ${VERBOSE:+-v} -- "${1}" "${1}.bak"; }
+bakrestore() { mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"; }
 
 ocopy() {
     local verbose="" src="" dst="" excludes=()

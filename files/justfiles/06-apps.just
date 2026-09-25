@@ -41,16 +41,22 @@ llama-cpp-vk:
     umask 0022
 
     TMP_DIR="/tmp/extra_pkgs"
-    BIN_DIR="/usr/local/bin"
     LIBEXEC_DIR="/usr/local/libexec"
     GHPKG_PRERELEASE=1
 
-    rm -rf "${LIBEXEC_DIR}/llama-cpp-vk"
+    bakitup "${LIBEXEC_DIR}/llama-cpp-vk"
 
     log "INFO" "Installing and setting up: llama-cpp-vk"
-    get_ghpkg --name "llama-cpp-vk" --repo "ggml-org/llama.cpp" \
-              --regx 'ubuntu-vulkan-x64\.tar\.gz$' \
-              --libexec --force
+    (
+        get_ghpkg --name "llama-cpp-vk" --repo "ggml-org/llama.cpp" \
+                  --regx 'ubuntu-vulkan-x64\.tar\.gz$' \
+                  --libexec --force
+    ) || {
+        err "Installation failed: llama-cpp-vk"
+        log "NOTE" "Restoring previous version of llama-cpp-vk"
+        bakrestore "${LIBEXEC_DIR}/llama-cpp-vk"
+    }
+    rm -rf "${LIBEXEC_DIR}/llama-cpp-vk.bak"
     log "INFO" "Operation done for: llama-cpp-vk"
     rm -rf "${TMP_DIR}"
 
