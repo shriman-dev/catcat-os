@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 source /usr/lib/catcat-os/bash-lib.sh
 source /etc/catcat-os/build_info
 

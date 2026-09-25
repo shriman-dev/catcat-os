@@ -35,6 +35,11 @@ ocopy() {
         shift
     done
 
+    if [[ ! -d "${src}" ]]; then
+        log "WARN" "Source does not exists: ${src}"
+        return 0
+    fi
+
     ensure_dir "${dst}"
     tar -C "${src}" "${excludes[@]}" -cf - . | \
     tar "${verbose}" \

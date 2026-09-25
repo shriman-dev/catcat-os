@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 [[ -f /tmp/papirus-folders.sh ]] || curl -Lo /tmp/papirus-folders.sh https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/refs/heads/master/papirus-folders
 chmod -v +x /tmp/papirus-folders.sh

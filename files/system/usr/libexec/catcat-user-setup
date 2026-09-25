@@ -65,7 +65,7 @@ gnome_shell_setup() {
         log "INFO" "Extensions update directory octal permission set to ${octalmode}"
 
     # Gnome for Handheld
-    if command -v hhdctl; then
+    if has_cmd hhdctl; then
         [[ "${ENABLED_GNOME_EXTENSIONS}" =~ "gjsosk@vishram1123.com" ]] ||
             gnome-extensions enable gjsosk@vishram1123.com
         [[ -n ${FIRSTBOOT:-} ]] &&

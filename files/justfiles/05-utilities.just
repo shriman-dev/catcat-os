@@ -2,10 +2,11 @@
 [group("utilities")]
 bios:
     #!/usr/bin/bash
+    source /usr/lib/catcat-os/bash-lib.sh
     if [[ -d /sys/firmware/efi ]]; then
       systemctl reboot --firmware-setup
     else
-      echo "Rebooting to legacy BIOS from OS is not supported."
+      err "Rebooting to legacy BIOS from OS is not supported."
     fi
 
 
@@ -59,12 +60,13 @@ check-idle-power-draw:
 [group("utilities")]
 clean-system:
     #!/usr/bin/bash
+    source /usr/lib/catcat-os/bash-lib.sh
     [[ ${EUID} -eq 0 ]] && systemd-tmpfiles --clean
     podman image prune -af
     podman volume prune -f
     flatpak uninstall --unused --assumeyes --noninteractive
     rpm-ostree cleanup -bm
-    if command -v nix-store >/dev/null 2>&1; then
+    if has_cmd nix-store; then
         nix-store --optimise
         nix-collect-garbage
     fi
@@ -78,7 +80,7 @@ clean-system:
 add-user-to-input-group:
     #!/usr/bin/bash
     if ! grep -q "input" /etc/group; then
-      sudo bash -c 'grep "input" /lib/group >> /etc/group'
+      sudo bash -c 'grep "^input" /usr/lib/group >> /etc/group'
     fi
     sudo usermod -a -G input ${USER}
 

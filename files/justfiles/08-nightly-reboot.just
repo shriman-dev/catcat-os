@@ -29,8 +29,9 @@ toggle-nightly-reboot ACTION="prompt":
 [group("nightly reboot")]
 cancel-nightly-reboot:
     #!/usr/bin/bash
+    source /usr/lib/catcat-os/bash-lib.sh
     if [[ ! -d /run/NIGHTLY_REBOOT ]]; then
-        echo "Nightly reboot was not sequenced correctly"
+        err "Nightly reboot was not sequenced correctly"
         exit 1
     fi
     echo "${USER}" | tee /run/NIGHTLY_REBOOT/user

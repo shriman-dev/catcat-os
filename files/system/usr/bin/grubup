@@ -1,6 +1,6 @@
-#!/bin/bash
-
+#!/usr/bin/bash
 boot_was_ro=false
+
 if [[ "$(findmnt -n -o OPTIONS /boot)" =~ (^|,| )ro($|,| ) ]]; then
      mount -o remount,rw /boot || exit 13
      boot_was_ro=true

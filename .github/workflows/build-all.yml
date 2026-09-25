@@ -46,6 +46,7 @@ jobs:
       image_name: ${{ matrix.image_name }}
       base_image: ${{ matrix.base_image }}
       img_flavor: ${{ matrix.img_flavor }}
+    secrets: inherit        # Uses secrets from parent workflow
 
 #  build-iso:
 #    name: Build ISOs

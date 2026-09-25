@@ -34,7 +34,7 @@ install-mcontrolcenter:
 
 # Install llama.cpp vulkan. Running this again will update llama.cpp
 [group("apps")]
-llama-cpp:
+llama-cpp-vk:
     #!/usr/bin/env -S sudo -- /bin/bash
     set -euo pipefail
     source /usr/lib/catcat-os/bash-lib.sh

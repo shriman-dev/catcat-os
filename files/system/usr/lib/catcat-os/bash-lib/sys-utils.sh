@@ -9,6 +9,9 @@ exit_if_root() {
     [[ "${HOME}" =~ (/run/gdm|/var/lib/gdm) ]] && die "Cannot run as gdm user"
 }
 
+has_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
 
 check_container() {
     if [[ -f /.dockerenv || -f /run/.containerenv ]]; then

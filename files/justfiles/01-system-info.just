@@ -2,16 +2,17 @@
 [group("system info")]
 bios-info:
     #!/usr/bin/bash
-    echo "Manufacturer: $(sudo dmidecode -s baseboard-manufacturer)"
-    echo "Product Name: $(sudo dmidecode -s baseboard-product-name)"
-    echo "Version: $(sudo dmidecode -s bios-version)"
+    source /usr/lib/catcat-os/bash-lib.sh
+    echo "${bold}Manufacturer:${noc} $(sudo dmidecode -s baseboard-manufacturer)"
+    echo "${bold}Product Name:${noc} $(sudo dmidecode -s baseboard-product-name)"
+    echo "${bold}Version:${noc} $(sudo dmidecode -s bios-version)"
 
 # Analyze system boot time
 [group("system info")]
 boot-time-analyze:
     #!/usr/bin/bash
     systemd-analyze critical-chain
-    echo " "
+    echo ""
     systemd-analyze time
 
 # Show the changelog
@@ -61,7 +62,7 @@ check-local-overrides:
 [group("system info")]
 device-info:
     #!/usr/bin/bash
-    sudo fastfetch
+    source /usr/lib/catcat-os/bash-lib.sh
     symmetric_heading "Detailed Sys+Hardware Information" "="
     sudo inxi --basic --expanded -xxxa --verbosity 8
 

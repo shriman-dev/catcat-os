@@ -2,7 +2,7 @@
 [group("network")]
 auto-update-on-connection CONNECTION:
     #!/usr/bin/env -S sudo -- /bin/bash
-    CONNECTION={{ CONNECTION }}
+    CONNECTION="{{ CONNECTION }}"
     mkdir -p /etc/catcat-os
     echo "${CONNECTION}" > /etc/catcat-os/auto_update_on_connection
 

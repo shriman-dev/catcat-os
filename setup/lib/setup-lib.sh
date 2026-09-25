@@ -3,7 +3,7 @@ source "${BUILD_SETUP_DIR}/lib/bash-lib.sh"
 
 setup_heading() {
     local heading="${1}"
-    enclosed_heading "${heading}" "=" "100" "bold"
+    symmetric_heading "${heading}" "=" "100" "bold"
 }
 
 run_step() {

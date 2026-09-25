@@ -163,8 +163,9 @@ push_image() {
 }
 
 cosign_image() {
-    local digest="$(< "/tmp/${IMAGE_NAME}-digestfile")"
-    [[ -n "$(command -v cosign)" ]] || die "Failed, cosign command not found on current system"
+    local digest
+    digest="$(< "/tmp/${IMAGE_NAME}-digestfile")"
+    has_cmd cosign || die "Command not found on current system: cosign"
 
     sect_border
     echo "${green}"  " Signing OCI   - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
@@ -267,7 +268,7 @@ main() {
     RPM_OSTREE="$(command -v rpm-ostree)" || true
     if [[ ! -x "${RPM_OSTREE:-}" ]]; then
         [[ ${EUID} -ne 0 ]] &&
-            die "Requires root privileges, rpm-ostree command not found on current system"
+            die "Requires root privileges. Reason: rpm-ostree command not found on current system"
         RPM_OSTREE="containerized_rpm_ostree"
     fi
 
