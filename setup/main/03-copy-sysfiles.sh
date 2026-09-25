@@ -30,9 +30,6 @@ log "INFO" "Fetching remote configurations"
 # Udev rules
 get_ghraw --dstd "${SYS_CACHE}/usr/lib/udev/rules.d" --repo "M0Rf30/android-udev-rules" \
           -f "51-android.rules"
-get_ghraw --dstd "${SYS_CACHE}/usr/lib/udev/rules.d" --repo "ublue-os/bazzite" \
-          --repod "system_files/desktop/silverblue/usr/lib/udev/rules.d" \
-          -f "80-gpu-reset.rules"
 
 if [[ ! -d "${FETCHED}/gamedev_udev" ]]; then
     curl_get "/tmp/game-devices-udev.zip" \

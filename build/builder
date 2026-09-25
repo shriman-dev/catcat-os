@@ -75,7 +75,6 @@ build_image() {
     { brief_trace; } 2>/dev/null
     podman build "$@" \
                  --pull=newer \
-                 --dns 9.9.9.9 \
                  --secret "${sec_type}" \
                  --file "Containerfile" \
                  "${BUILD_LABELS[@]}" \
