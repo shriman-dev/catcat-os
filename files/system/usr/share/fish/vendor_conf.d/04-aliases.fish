@@ -47,20 +47,6 @@ alias pscpu="procs --sortd cpu"
 alias psmem="procs --sortd rss"
 alias proctree="procs --tree"
 
-
-#function grubup
-#  if command -v update-grub
-#    sudo update-grub
-#  else if command -v zypper
-#    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-#  else if command -v dnf || command -v ostree
-#    sudo grub2-editenv - unset menu_auto_hide
-#    sudo grub2-switch-to-blscfg
-#    sudo grub2-mkconfig -o /etc/grub2.cfg
-#    sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
-#  end
-#end
-
 if command -q yazi
     function y
         set tmp (mktemp -t "yazi-cwd.XXXXXX")
