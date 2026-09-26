@@ -55,6 +55,8 @@ llama-cpp-vk:
         err "Installation failed: llama-cpp-vk"
         log "NOTE" "Restoring previous version of llama-cpp-vk"
         bakrestore "${LIBEXEC_DIR}/llama-cpp-vk"
+        rm -rf "${TMP_DIR}"
+        exit 0
     }
     rm -rf "${LIBEXEC_DIR}/llama-cpp-vk.bak"
     log "INFO" "Operation done for: llama-cpp-vk"
