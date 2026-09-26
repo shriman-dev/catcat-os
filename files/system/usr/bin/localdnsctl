@@ -83,8 +83,9 @@ toggle_localdns() {
         # Normal behavior
         # Ensure NM dns server override conf
         ensure_dir "$(dirname "${NM_OVERRIDE_CONF}")"
-        [[ ! -f "${NM_OVERRIDE_CONF}" ]] && {
-            printf "%s\n" "${NM_LOCALDNS_OVERRIDE}" | tee "${NM_OVERRIDE_CONF}" || die_msg; }
+        if [[ ! -f "${NM_OVERRIDE_CONF}" ]]; then
+            printf "%s\n" "${NM_LOCALDNS_OVERRIDE}" > "${NM_OVERRIDE_CONF}" || die_msg
+        fi
         # Ensure blocklists so backend service does not fail to start
         ensure_file "${DNSCRYPT_CONFD}/domains-blocklist.txt" \
                     "${DNSMASQ_CONFD}/domains-blocklist.conf"
@@ -296,7 +297,8 @@ setup_localdns() {
             systemctl restart NetworkManager.service
         } || err "Failed to initiate localdns"
     fi
-    rm ${VERBOSE:+-v} -rf "${TMP_DIR}"
+    # Do not remove TMP_DIR when its exported
+    [[ "${TMP_DIR}" == "/tmp/localdns-blocklist" ]] && rm ${VERBOSE:+-v} -rf "${TMP_DIR}"
     log "INFO" "LocalDNS setup done"
 }
 

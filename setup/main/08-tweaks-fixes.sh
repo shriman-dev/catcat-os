@@ -79,6 +79,11 @@ fi
 log "INFO" "Fixing issues caused by ID no longer being fedora"
 sed -i -E 's|^[#[:space:]]*EFIDIR=.*|EFIDIR="fedora"|' /usr/sbin/grub2-switch-to-blscfg
 
+# Fix grub2-mkconfig failing on root(/) composefs
+sed -i -E 's|^GRUB_DEVICE=.*|GRUB_DEVICE="`${grub_probe} --target=device /sysroot`"|' \
+          /usr/bin/grub2-mkconfig
+
+
 # Fix librewolf/firefox delayed launch issue
 #log "INFO" "Fixing librewolf/firefox delayed launch issue"
 #'/^hosts:/ s/mdns4_minimal/myhostname &/'

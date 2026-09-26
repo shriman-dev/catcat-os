@@ -60,7 +60,7 @@ build_image() {
         build_tags+=("--tag" "${IMAGE_NAME}:${tag}")
     done
 
-    ensure_dir "${log_dir}"
+    ensure_dir "${log_dir}" >/dev/null
 
     {
     sect_border
