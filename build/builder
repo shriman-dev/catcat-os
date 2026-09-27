@@ -172,7 +172,9 @@ cosign_image() {
     sect_border
 
     COSIGN_EXPERIMENTAL=false \
+    { brief_trace; } 2>/dev/null
     cosign sign -y --key env://COSIGN_PRIVATE_KEY "${PUSH_REGISTRY}/${IMAGE_NAME}@${digest}"
+    { brief_trace; } 2>/dev/null
 
     sect_border
     echo "${green}"  " Signing Done  - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
