@@ -129,7 +129,4 @@ check_file_presence "${mute_mic_file}"
 ######################
 # Package Management #
 ######################
-#log "INFO" "Setting all RPM repos to use HTTPS protocol"
-#for dnf_repo in /etc/yum.repos.d/*.repo; do
-#    sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
-#done
+

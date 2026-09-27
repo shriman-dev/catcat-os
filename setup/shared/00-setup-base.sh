@@ -2,14 +2,14 @@
 set -euo pipefail
 umask 0022
 source "${BUILD_SCRIPT_LIB}"
+STAGE="BASE: "
 
 # Set build status
 [[ -d "/etc/${PROJECT_NAME}" ]] && echo "1" > "/run/CURRENT_PROJECT"
 [[ -d "${BUILD_CACHE_DIR}" ]] && echo "1" > "/run/REBUILDING_IMAGE"
 
-setup_heading "Build Image - ${IMAGE_NAME}:${IMG_FLAVOR}"
+setup_heading "Build Stage - ${STAGE%:*} | Image - ${IMAGE_NAME}:${IMG_FLAVOR}"
 
-STAGE="BASE: "
 run_step "green" "Preparing System Environment" \
          "${BUILD_SETUP_DIR}/shared/01-prep-env.sh"
 
@@ -28,25 +28,16 @@ run_step "cyan" "Copying System Default Files" \
          "${BUILD_SETUP_DIR}/main/03-copy-sysfiles.sh"
 
 run_step "purple" "Adding Kernel Packages" \
-         "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh" "batch-start" "kernel"
+         "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh"
 
-run_step "green" "Installing Common Packages" \
-         "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh" "common"
-
-run_step "blue" "Installing HW Acceleration Packages" \
-         "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh" "hwaccel"
-
-run_step "yellow" "Installing Desktop Packages" \
-         "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh" "batch-end" "desktop"
-
-run_step "cyan" "Applying Various Themes" \
+run_step "green" "Applying Various Themes" \
          "${BUILD_SETUP_DIR}/main/05-theming.sh"
 
-run_step "purple" "Enhancing Security" \
+run_step "blue" "Enhancing Security" \
          "${BUILD_SETUP_DIR}/main/06-secatcat.sh"
 
-run_step "green" "Configuring Systemd Services" \
+run_step "yellow" "Configuring Systemd Services" \
          "${BUILD_SETUP_DIR}/main/07-systemd.sh"
 
-run_step "blue" "Tweaks And Fixes" \
+run_step "cyan" "Tweaks And Fixes" \
          "${BUILD_SETUP_DIR}/main/08-tweaks-fixes.sh"

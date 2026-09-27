@@ -33,10 +33,6 @@ chmod -vR 1777 /var/tmp
 
 
 # Secure build environment
-log "INFO" "Setting all RPM repos to use HTTPS protocol"
-for dnf_repo in /etc/yum.repos.d/*.repo; do
-    sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
-done
 
 # To use cached sbmok.der
 SBMOK_DER="${BUILD_CACHE_DIR}/sbmok.der"

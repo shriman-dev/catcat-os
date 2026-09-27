@@ -70,6 +70,11 @@ enable_rpm_repos() {
 #    dnf5 -y install \
 #    https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
 #    https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+    log "INFO" "Setting metalinks in RPM repos to use HTTPS protocol"
+    for dnf_repo in /etc/yum.repos.d/*.repo; do
+        sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
+    done
 }
 
 disable_rpm_repos() {
@@ -157,6 +162,20 @@ dnf_action() {
 
     { brief_trace; } 2>/dev/null
     "${dnf_cmd[@]}" "$@"
+    { brief_trace; } 2>/dev/null
+}
+
+# Download remote RPMs to cache
+rpm_dl() {
+    local rpm_archive="${BUILD_CACHE_DIR}/rpm/${1}.rpm" rpm_url
+    { brief_trace; } 2>/dev/null
+    if [[ ! -f "${rpm_archive}" ]]; then
+        rpm_url="$(get_ghpkg_url "${2}" "${3}" "${4:-}")"
+        curl_get "${rpm_archive}" "${rpm_url}"
+        echo "${rpm_archive}"
+    else
+        echo "${rpm_archive}"
+    fi
     { brief_trace; } 2>/dev/null
 }
 

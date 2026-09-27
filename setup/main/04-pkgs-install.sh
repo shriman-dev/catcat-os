@@ -4,20 +4,6 @@ set -euo pipefail
 
 log "INFO" "Defining packages..."
 
-# Download remote RPMs to cache
-rpm_dl() {
-    local rpm_archive="${BUILD_CACHE_DIR}/rpm/${1}.rpm" rpm_url
-    { brief_trace; } 2>/dev/null
-    if [[ ! -f "${rpm_archive}" ]]; then
-        rpm_url="$(get_ghpkg_url "${2}" "${3}" "${4:-}")"
-        curl_get "${rpm_archive}" "${rpm_url}"
-        echo "${rpm_archive}"
-    else
-        echo "${rpm_archive}"
-    fi
-    { brief_trace; } 2>/dev/null
-}
-
 DESKTOP_EXTRAS=(
     # Shell setup
     ##lsd zellij
@@ -359,53 +345,8 @@ COMMON=(
     "dnf5-plugins"
 )
 
-process_installations() {
-    case "${1}" in
-        kernel)
-            kernel_add
-            ;;
-        common)
-            pkgs_install "${1}" "${COMMON[@]}"
-            ;;
-        hwaccel)
-            pkgs_hwaccel
-            ;;
-        desktop_comm)
-            pkgs_install "${1}" "${DESKTOP_COMMON[@]}"
-            ;;
-        desktop_extra)
-            pkgs_install "${1}" "${DESKTOP_EXTRAS[@]}"
-            ;;
-        desktop)
-            pkgs_install "${1}" "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
-            ;;
-        all)
-            kernel_add
-            pkgs_hwaccel
-            pkgs_install "${1}" "${COMMON[@]}" "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
-            ;;
-        *) die "Unknown argument: ${1}";;
-    esac
-}
-
-case "${1}" in
-    batch-start)
-        rpm_repos enable
-        shift
-        ;;
-    batch-end)
-        trap "rpm_repos disable" EXIT
-        shift
-        ;;
-    no-batch)
-        rpm_repos enable
-        trap "rpm_repos disable" EXIT
-        shift
-        ;;
-    *) true ;;
-esac
-
-# Process all provided arguments
-for arg in "$@"; do
-    process_installations "${arg}"
-done
+rpm_repos enable
+kernel_add
+pkgs_hwaccel
+pkgs_install "All Desktop" "${COMMON[@]}" "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
+rpm_repos disable
