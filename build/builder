@@ -171,8 +171,8 @@ cosign_image() {
     echo "${purple}" " Push Registry - ${PUSH_REGISTRY}${noc}"
     sect_border
 
-    COSIGN_EXPERIMENTAL=false \
     { brief_trace; } 2>/dev/null
+    COSIGN_EXPERIMENTAL=false \
     cosign sign -y --key env://COSIGN_PRIVATE_KEY "${PUSH_REGISTRY}/${IMAGE_NAME}@${digest}"
     { brief_trace; } 2>/dev/null
 
