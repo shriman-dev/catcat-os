@@ -16,7 +16,6 @@ run_step "green" "Preparing System Environment" \
 # Exit when image is being re/built on base image of current project
 [[ -f "/run/CURRENT_PROJECT" ]] && exit 0
 
-
 run_step "blue" "Cleaning Up" \
          "${BUILD_SETUP_DIR}/main/01-cleanup.sh"
 
