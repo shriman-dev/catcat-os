@@ -1,0 +1,3 @@
+[submodule "files/system/etc/skel"]
+	path = files/system/etc/skel
+	url = https://github.com/shriman-dev/skel-dots.git

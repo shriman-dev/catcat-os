@@ -45,9 +45,8 @@ fi
 # Remove stuffs in skel
 #/etc/skel/.config/autostart
 #/etc/skel/.config/user-tmpfiles.d \
-rm -rvf /etc/skel/.mozilla \
-        /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vapor.palette \
-        /etc/skel/.local/share/org.gnome.Ptyxis/palettes/vgui2.palette
+rm -rvf /etc/skel/.git \
+        /etc/skel/.mozilla
 
 # Remove symlink resolv conf and create empty one
 if [[ -L "/etc/resolv.conf" ]]; then

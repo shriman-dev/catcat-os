@@ -32,7 +32,7 @@ install-mcontrolcenter:
     rm -rf "${TMP_DIR}"
     log "INFO" "All Done."
 
-# Install llama.cpp vulkan. Running this again will update llama.cpp
+# Install llama.cpp vulkan. Rerunning this will update llama.cpp
 [group("apps")]
 llama-cpp-vk:
     #!/usr/bin/env -S sudo -- /bin/bash
@@ -56,9 +56,9 @@ llama-cpp-vk:
         log "NOTE" "Restoring previous version of llama-cpp-vk"
         bakrestore "${LIBEXEC_DIR}/llama-cpp-vk"
         rm -rf "${TMP_DIR}"
-        exit 0
+        exit 1
     }
     rm -rf "${LIBEXEC_DIR}/llama-cpp-vk.bak"
-    log "INFO" "Operation done for: llama-cpp-vk"
     rm -rf "${TMP_DIR}"
+    log "INFO" "Operation done for: llama-cpp-vk"
 
