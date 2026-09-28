@@ -29,12 +29,6 @@ enable_rpm_repos() {
         dnf5 -y copr enable "${copr}"
     done
 
-    log "INFO" "Setting metalinks in RPM repos to use HTTPS protocol"
-    for dnf_repo in /etc/yum.repos.d/*.repo; do
-        grep -E '^metalink=.*metalink\?protocol=https&' "${dnf_repo}" ||
-            sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
-    done
-
     # Always remove cisco repo
     if [[ -f "/etc/yum.repos.d/fedora-cisco-openh264.repo" ]]; then
         rm -vf "/etc/yum.repos.d/fedora-cisco-openh264.repo"
@@ -76,6 +70,11 @@ enable_rpm_repos() {
 #    dnf5 -y install \
 #    https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
 #    https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    log "INFO" "Setting metalinks in RPM repos to use HTTPS protocol"
+    for dnf_repo in /etc/yum.repos.d/*.repo; do
+        grep -E '^metalink=.*metalink\?protocol=https&' "${dnf_repo}" ||
+            sed -i 's/metalink?/metalink?protocol=https\&/g' "${dnf_repo}"
+    done
 }
 
 disable_rpm_repos() {
