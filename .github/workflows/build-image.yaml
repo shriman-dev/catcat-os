@@ -107,7 +107,7 @@ jobs:
         id: push-image
         env:
           build_tags: ${{ steps.build-image.outputs.build_tags }}
-          IMAGE_NAME: ${{ inputs.image_name }}
+          IMAGE_NAME: ${{ env.image_name }}
           IMG_FLAVOR: ${{ inputs.img_flavor }}
         shell: bash
         run: |
