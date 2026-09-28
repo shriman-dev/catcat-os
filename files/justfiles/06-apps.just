@@ -2,7 +2,7 @@
 [group("apps")]
 install-catcat-flatpaks:
     #!/usr/bin/bash
-    sudo /usr/libexec/catcat-flatpak-manager --install-all
+    sudo /usr/libexec/catcat-flatpak-manager --system --install-all
 
 # App for controlling fans on msi laptops
 [group("apps")]
