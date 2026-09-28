@@ -198,7 +198,7 @@ theme_flatpak_apps() {
 
     local floverrides_global="${LOCALSHARE}/flatpak/overrides/global"
 
-    ensure_dir "$(direname "${floverrides_global}")"
+    ensure_dir "$(dirname "${floverrides_global}")"
     ensure_file "${floverrides_global}"
 
     if ! grep 'devices=.*!all' "${floverrides_global}" | grep 'devices=.*!kvm'; then

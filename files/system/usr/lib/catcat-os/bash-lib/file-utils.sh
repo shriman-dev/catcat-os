@@ -3,7 +3,7 @@ ensure_file() {
     local _file
     for _file in "$@"; do
         if [[ ! -f "${_file}" ]]; then
-            touch "${_file}" || die "Failed touch file: ${_file}"
+            touch "${_file}" || { err "Failed touch file: ${_file}"; return 1; }
         fi
     done
 }
@@ -12,7 +12,7 @@ ensure_dir() {
     local _dir
     for _dir in "$@"; do
         if [[ ! -d "${_dir}" ]]; then
-            mkdir ${VERBOSE:+-v} -p -- "${_dir}" || die "Failed create directory: ${_dir}"
+            mkdir ${VERBOSE:+-v} -p -- "${_dir}" || { err "Failed create directory: ${_dir}"; return 1; }
         fi
     done
 }
