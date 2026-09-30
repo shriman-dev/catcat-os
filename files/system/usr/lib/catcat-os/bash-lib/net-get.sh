@@ -173,43 +173,42 @@ get_fonts() {
     local fonts_dir="${FONTS_DIR:-/usr/share/fonts}" tmpdir="${TMP_DIR:-/tmp/get_fonts}"
     local font_dest="${fonts_dir}/${font_name}" font_tmpd="${tmpdir}/${font_name}"
     local url_file fontfile
+    [[ -z "${font_url}" ]] && font_dest="${fonts_dir}/nerd-fonts/${font_name}"
 
-    [[ -z "${font_url}" ]] &&
-    font_dest="${fonts_dir}/nerd-fonts/${font_name}"
     mkdir ${VERBOSE:+-v} -p "${font_tmpd}" "${font_dest}"
-    if [[ -d "${font_dest}" && -n "$(ls -A "${font_dest}")" ]]; then
-        log "NOTE" "Font skipped - Non-empty directory exists: ${font_dest}"
-    else
-        if [[ -z "${font_url}" ]]; then
-            font_url="$(get_ghpkg_url 'ryanoasis/nerd-fonts' '.' 2>/dev/null | \
-                        grep -i "/${font_name}\.tar")"
-            if [[ -z "${font_url}" ]]; then
-                err "No Nerd Font with name: ${font_name}"
-                die "No URL provided to get the font"
-            fi
-        fi
-        url_file="$(basename "${font_url}")"
-        log "INFO" "Adding font(s): ${font_name}"
-        log "INFO" "From URL: ${font_url}"
 
-        case "${font_url}" in
-            *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-                curl_get "${tmpdir}/${url_file}" "${font_url}"
-                unarchive "${tmpdir}/${url_file}" "${font_tmpd}" >/dev/null
-                ;;
-            *.otf|*.ttf)
-                curl_get "${font_tmpd}/${url_file}" "${font_url}"
-                ;;
-            *.git)
-                git clone --depth 1 "${font_url}" "${font_tmpd}"
-                ;;
-            *)
-                err "Fonts can only be added from URL pointing to an archive format, font file (.otf/.ttf) or git repo (.git)"
-                die "Unsupported URL: ${font_url}"
-                ;;
-        esac
-        find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf" | while read -r fontfile; do
-            cp ${VERBOSE:+-v} -f "${fontfile}" "${font_dest}"/
-        done
+    if [[ -d "${font_dest}" && -n "$(ls -A "${font_dest}")" ]]; then
+        log "NOTE" "Font skipped - Non-empty directory exists: ${font_dest}"; return 0
     fi
+    if [[ -z "${font_url}" ]]; then
+        font_url="$(get_ghpkg_url 'ryanoasis/nerd-fonts' '.' 2>/dev/null | \
+                        grep -i "/${font_name}\.tar")"
+        if [[ -z "${font_url}" ]]; then
+            err "No Nerd Font with name: ${font_name}"
+            die "No URL provided to get the font"
+        fi
+    fi
+    url_file="$(basename "${font_url}")"
+    log "DEBUG" "Adding font(s): ${font_name}"
+    log "DEBUG" "From URL: ${font_url}"
+
+    case "${font_url}" in
+        *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
+            curl_get "${tmpdir}/${url_file}" "${font_url}"
+            unarchive "${tmpdir}/${url_file}" "${font_tmpd}" >/dev/null
+            ;;
+        *.otf|*.ttf)
+            curl_get "${font_tmpd}/${url_file}" "${font_url}"
+            ;;
+        *.git)
+            git clone --depth 1 "${font_url}" "${font_tmpd}"
+            ;;
+        *)
+            err "Fonts can only be added from URL pointing to an archive format, font file (.otf/.ttf) or git repo (.git)"
+            die "Unsupported URL: ${font_url}"
+            ;;
+    esac
+    find "${font_tmpd}" -type f -name "*.otf" -o -name "*.ttf" | while read -r fontfile; do
+        cp ${VERBOSE:+-v} -f "${fontfile}" "${font_dest}"/
+    done
 }

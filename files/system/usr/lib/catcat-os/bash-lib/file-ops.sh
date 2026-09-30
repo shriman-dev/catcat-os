@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 bak_before() {
-    if [[ -e "${1}" ]]; then
-        if [[ ! -e "${1}.og.bak" ]]; then
-            cp ${VERBOSE:+-v} -drf -- "${1}" "${1}.og.bak" || err "Backup failed for orignal ${1}"
-        fi
-        cp ${VERBOSE:+-v} -drf -- "${1}" "${1}.bak" || err "Backup failed for ${1}"
+    [[ -e "${1}" ]] || { log "WARN" "Does not exists: ${1}"; return 0; }
+    if [[ ! -e "${1}.og.bak" ]]; then
+        cp ${VERBOSE:+-v} -drf -- "${1}" "${1}.og.bak" ||
+            { err "Backup failed for orignal ${1}"; return 1; }
     fi
+    cp ${VERBOSE:+-v} -drf -- "${1}" "${1}.bak" || { err "Backup failed for ${1}"; return 1; }
 }
 
 bakitup() { mv ${VERBOSE:+-v} -- "${1}" "${1}.bak"; }

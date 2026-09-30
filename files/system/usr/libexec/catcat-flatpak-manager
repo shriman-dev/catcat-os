@@ -35,10 +35,6 @@ install_flatpaks() {
     fi
 }
 
-FLATPAK_PATHS=("/var/lib/flatpak/app")
-[[ ${UID} -ne 0 ]] && FLATPAK_PATHS+=("${HOME}/.local/share/flatpak/app")
-readarray -t FLATPAK_APPS < \
-            <(find "${FLATPAK_PATHS[@]}" -maxdepth 1 -mindepth 1 -type d -printf "%f\n")
 
 flapply_perms() {
     local msg="${1}"; shift
@@ -50,9 +46,11 @@ flapply_perms() {
 
     for app in "${apps_array[@]}"; do
         if [[ " ${FLATPAK_APPS[*]} " =~ " ${app} " ]]; then
-            echo ""
-            log "INFO" "${msg} for app: ${app}"
-            flatpak override "${SCOPE}" "${flags[@]}" "${app}" || err "Failed to override perms"
+            [[ ! -f "${FL_OVERRIDES_DIR}/${app}" ]] && {
+                echo ""
+                log "INFO" "${msg} for app: ${app}"
+                flatpak override "${SCOPE}" "${flags[@]}" "${app}" || err "Failed to override perms"
+            }
         fi
     done
 }
@@ -95,10 +93,8 @@ remove_filesystem_access() {
     for app in "${apps_array[@]}"; do
         if [[ " ${FLATPAK_APPS[*]} " =~ " ${app} " && \
                 ! -f "/var/lib/flatpak/overrides/${app}" ]]; then
-            log "INFO" "Remove existing filesystem permissions for app: ${app}"
             metadata="/var/lib/flatpak/app/${app}/current/active/metadata"
             permitted_filesystem="$(grep 'filesystems=' "${metadata}")" || true
-
             if [[ -n "${permitted_filesystem}" ]]; then
                 perms=()
                 permitted_filesystem="${permitted_filesystem#*=}"
@@ -107,8 +103,12 @@ remove_filesystem_access() {
                 for _perm in ${permitted_filesystem}; do
                     perms+=("--nofilesystem=${_perm%%:*}")
                 done
-                log "INFO" "Removing permissions: '${permitted_filesystem}'"
-                flatpak override "${SCOPE}" "${perms[@]}" "${app}" || err "Failed to override perms"
+                [[ ! -f "${FL_OVERRIDES_DIR}/${app}" ]] && {
+                    log "INFO" "Remove existing filesystem permissions for app: ${app}"
+                    log "INFO" "Removing permissions: '${permitted_filesystem}'"
+                    flatpak override "${SCOPE}" "${perms[@]}" "${app}" ||
+                        err "Failed to override perms"
+                }
             fi
         fi
   done
@@ -117,6 +117,7 @@ remove_filesystem_access() {
 # secure flatpak apps
 apply_global_restrictions() {
     log "INFO" "Restricting unnecessary permissions and allowing read-only permissions"
+    bak_before "${FL_OVERRIDES_DIR}/global"
     flatpak override "${SCOPE}" \
             --unshare=ipc \
             --nosocket={{session,system}-bus,ssh-auth,pcsc,cups,gpg-agent,inherit-wayland-socket} \
@@ -260,56 +261,66 @@ EOF
 }
 
 main() {
-  SCOPE="--system"
-  if [[ $# -eq 0 ]]; then
-    grep 'devices=.*!all' "/var/lib/flatpak/overrides/global" | grep 'devices=.*!kvm' || {
-        ensure_dir /var/lib/flatpak/overrides
-        apply_global_restrictions
+    SCOPE="--system"
+    FLATPAK_PATHS=("/var/lib/flatpak/app")
+    FL_OVERRIDES_DIR="${FLATPAK_PATHS[0]/app/overrides}"
+    [[ ${UID} -ne 0 ]] && {
+        SCOPE="--user"
+        FLATPAK_PATHS+=("${HOME}/.local/share/flatpak/app")
+        FL_OVERRIDES_DIR="${FLATPAK_PATHS[1]/app/overrides}"
     }
-  fi
+    readarray -t FLATPAK_APPS < \
+        <(find "${FLATPAK_PATHS[@]}" -maxdepth 1 -mindepth 1 -type d -printf "%f\n")
 
-  while [[ $# -gt 0 ]]; do
-    case ${1} in
-      -h|--help)
-        show_help
+    # When flatpak global perms does not contain OS defaults apply them
+    ensure_dir "${FL_OVERRIDES_DIR}"
+    if [[ $# -eq 0 ]]; then
+        grep 'devices=.*!all' "${FL_OVERRIDES_DIR}/global" | grep 'devices=.*!kvm' ||
+            apply_global_restrictions
         exit 0
-        ;;
-      --user|--system)
-        SCOPE="${1}"
-        ;;
-      --install-all)
-        install_flatpaks
-        remove_filesystem_access
-        ;;
-      -a|--all)
-        remove_filesystem_access
-        apply_global_restrictions
-        allow_home
-        allow_gpu_acceleration
-        app_specific_perms
-        configure_gaming_apps
-        ;;
-      -g|--global)
-        apply_global_restrictions
-        ;;
-      --allow-home)
-        allow_home
-        ;;
-      --allow-gpu)
-        allow_gpu_acceleration
-        ;;
-      --app-specific)
-        app_specific_perms
-        ;;
-      --gaming)
-        configure_gaming_apps
-        ;;
-      *)
-        die "Unknown option: ${1}"
-        ;;
-    esac
-    shift
-  done
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            --user|--system)
+                SCOPE="${1}"
+                ;;
+            --install-all)
+                install_flatpaks
+                remove_filesystem_access
+                ;;
+            -a|--all)
+                remove_filesystem_access
+                allow_home
+                allow_gpu_acceleration
+                app_specific_perms
+                configure_gaming_apps
+                ;;
+            -g|--global)
+                apply_global_restrictions
+                ;;
+            --allow-home)
+                allow_home
+                ;;
+            --allow-gpu)
+                allow_gpu_acceleration
+                ;;
+            --app-specific)
+                app_specific_perms
+                ;;
+            --gaming)
+                configure_gaming_apps
+                ;;
+            *)
+                die "Unknown option: ${1}"
+                ;;
+        esac
+        shift
+    done
 }
 
 main "$@"

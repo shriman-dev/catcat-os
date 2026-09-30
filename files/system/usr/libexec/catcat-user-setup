@@ -196,20 +196,10 @@ shell_setup() {
 theme_flatpak_apps() {
     log "INFO" "Setting theme, icons and permissions for flatpak apps..."
 
-    local floverrides_global="${LOCALSHARE}/flatpak/overrides/global"
+    /usr/libexec/catcat-flatpak-manager || err "Failed to configure user global flatpak permissions"
+    /usr/libexec/catcat-flatpak-manager --user --all || err "Failed to configure flatpak permissions"
 
-    ensure_dir "$(dirname "${floverrides_global}")"
-    ensure_file "${floverrides_global}"
-
-    if ! grep 'devices=.*!all' "${floverrides_global}" | grep 'devices=.*!kvm'; then
-        [[ -f "${floverrides_global}" ]] &&
-            bak_before "${floverrides_global}"
-
-        /usr/libexec/catcat-flatpak-manager --user --all ||
-            err "Failed to configure flatpak permissions"
-    fi
-
-    if [[ ! "$(ls -Al "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]]; then
+    if [[ ! "$(readlink "${HOME_DIR}/.themes" )"  =~ '.local/share/themes' ]]; then
         ensure_dir "${LOCALSHARE}"/{themes,icons,fonts}
         local _dir
         for _dir in themes icons; do

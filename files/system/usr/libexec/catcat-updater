@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 source /usr/lib/catcat-os/bash-lib.sh
-source /etc/catcat-os/build_info
+source /usr/etc/catcat-os/build_info
 
 FREQ_UPDATE_FLATPAK_APPS=(
     "org.mozilla.firefox"

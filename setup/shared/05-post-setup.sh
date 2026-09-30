@@ -91,7 +91,7 @@ find /var/cache/ -mindepth 1 -maxdepth 1 -type d \
 
 
 log "INFO" "Post setup configuration"
-mkdir -vp /var/tmp
-chmod -vR 1777 /var/tmp
+mkdir -vp "/var/tmp" "/var/log/${PROJECT_NAME}"
+chmod -vR 1777 "/var/tmp"
 
 #gdu /usr --non-interactive
