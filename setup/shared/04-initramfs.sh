@@ -4,7 +4,7 @@ set -euox pipefail
 
 log "INFO" "Regenerating initramfs"
 readarray -t KERNEL_PATH < \
-    <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname {} \;)
+    <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname -- {} \;)
 
 DRACUT="/usr/bin/dracut"
 
@@ -33,7 +33,7 @@ fi
 export TMPDIR="/var/cache/dracut-build"
 mkdir -vp "${TMPDIR}"
 for kernel_path in "${KERNEL_PATH[@]}"; do
-    kernel_ver="$(basename "${kernel_path}")"
+    kernel_ver="$(basename -- "${kernel_path}")"
     initramfs_image="${kernel_path}/initramfs.img"
     log "INFO" "Starting initramfs regeneration for kernel version: ${kernel_ver}"
     ${DRACUT} --kver "${kernel_ver}" \

@@ -17,7 +17,7 @@ if ! grep "${nix_user_path}" "${sudoersd_file}"; then
     chmod -v 640 "${sudoersd_file}"
     sed -i "/secure_path = /s|$|:${nix_user_path}|" "${sudoersd_file}"
     # Correct sudoers.d perms
-    chmod -v --recursive 440 "$(dirname "${sudoersd_file}")"
+    chmod -v --recursive 440 "$(dirname -- "${sudoersd_file}")"
 fi
 
 # Mount tmpfs on /var/tmp

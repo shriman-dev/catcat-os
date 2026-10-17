@@ -13,10 +13,11 @@ mv -v "${cachy}/usr/lib/modprobe.d"/*amdgpu.conf \
       "${cachy}/usr/lib/modprobe.d/cachy-amdgpu.conf" || true
 mv -v "${cachy}/usr/lib/modprobe.d"/*blacklist.conf \
       "${cachy}/usr/lib/modprobe.d/cachy-blacklist.conf" || true
-ocopy "${cachy}" / \
-      'usr/bin/dlss-swapper*' \
-      'usr/lib/modprobe.d/nvidia.conf' \
-      'usr/lib/udev/rules.d/71-nvidia.rules'
+ocopy --ttar-opts \
+      --exclude='usr/bin/dlss-swapper*' \
+      --exclude='usr/lib/modprobe.d/nvidia.conf' \
+      --exclude='usr/lib/udev/rules.d/71-nvidia.rules' \
+      "${cachy}" /
 unset cachy
 
 # Default settings

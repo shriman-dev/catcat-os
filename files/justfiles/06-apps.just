@@ -13,7 +13,7 @@ install-mcontrolcenter:
     TMP_DIR="/tmp/extra_pkgs"
     pkg_name="mcontrolcenter"
     latest_pkg_url="$(get_ghpkg_url 'dmitry-s93/MControlCenter' 'bin\.tar\.gz$')"
-    pkg_archive="${TMP_DIR}/$(basename ${latest_pkg_url})"
+    pkg_archive="${TMP_DIR}/$(basename -- ${latest_pkg_url})"
 
     umask 0022
     mkdir -vp "${pkg_archive}.extract"
@@ -44,7 +44,7 @@ llama-cpp-vk:
     LIBEXEC_DIR="/usr/local/libexec"
     GHPKG_PRERELEASE=1
 
-    bakitup "${LIBEXEC_DIR}/llama-cpp-vk"
+    bakstore "${LIBEXEC_DIR}/llama-cpp-vk"
 
     log "INFO" "Installing and setting up: llama-cpp-vk"
     (

@@ -66,7 +66,7 @@ log "INFO" "Applying system fixes"
 # Fix if dconf user profile does not exists or is not configured for distro db
 dconf_profile="/etc/dconf/profile/user"
 if [[ ! -f "${dconf_profile}" ]]; then
-    ensure_dir "$(dirname "${dconf_profile}")"
+    ensure_dir "$(dirname -- "${dconf_profile}")"
     echo "user-db:user
 system-db:local
 system-db:site

@@ -34,7 +34,7 @@ ucat_setup() {
         # Copy justfiles to ucat default directory
         cp -vf "${justf}" "${import_dir}"/
         # Add import line if it does not exists already
-        import_line="import \"${import_dir}/$(basename "${justf}")\""
+        import_line="import \"${import_dir}/$(basename -- "${justf}")\""
         grep -w "${import_line}" "${import_file}" || {
             sed -i "/# Imports/a\\${import_line}" "${import_file}"
             log "INFO" "Added: '${import_line}' to ${import_file}"
@@ -263,4 +263,6 @@ done
 rm -rf "${TMP_DIR}"
 
 log "INFO" "Copying cached files"
-ocopy "${SYS_CACHE}" /
+if [[ -d "${SYS_CACHE}" ]]; then
+    ocopy "${SYS_CACHE}" /
+fi

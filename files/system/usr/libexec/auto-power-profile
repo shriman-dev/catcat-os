@@ -36,10 +36,9 @@ previous_profile=""
 while true; do
     system_load=$(cut -d' ' -f2 /proc/loadavg)
     battery_power_state=$(upower -d | awk '$1 == "state:" && ($2 == "charging" || $2 == "discharging") {print $2; exit}') || true
-    override_profile="${OVERRIDE_POWER_PROFILE}"
 
-    if [[ -n "${override_profile}" ]]; then
-        target_profile="${override_profile}"
+    if [[ -f "/run/override_auto_power_profile" ]]; then
+        target_profile="$(< /run/override_auto_power_profile)"
     elif [[ "${battery_power_state}" == "discharging" ]]; then
         target_profile="powersave"
     else

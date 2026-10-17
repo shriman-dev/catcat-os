@@ -8,41 +8,13 @@ bak_before() {
     cp ${VERBOSE:+-v} -drf -- "${1}" "${1}.bak" || { err "Backup failed for ${1}"; return 1; }
 }
 
-bakitup() { mv ${VERBOSE:+-v} -- "${1}" "${1}.bak"; }
-bakrestore() { mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"; }
-
-ocopy() {
-    local verbose="" src="" dst="" excludes=()
-
-    while [[ $# -gt 0 ]]; do
-        case "${1}" in
-            -v) verbose="-v" ;;
-             *)
-                if [[ -z "${src}" ]]; then
-                    src="${1}"
-                elif [[ -z "${dst}" ]]; then
-                    dst="${1}"
-                else
-                    excludes+=("--exclude=${1}")
-                fi
-                ;;
-        esac
-        shift
-    done
-
-    if [[ ! -d "${src}" ]]; then
-        log "WARN" "Source does not exists: ${src}"
-        return 0
+bakstore() {
+    if [[ -d "${1}" && ! -d "${1}.bak" ]]; then
+        mv ${VERBOSE:+-v} -- "${1}" "${1}.bak"
     fi
-
-    ensure_dir "${dst}"
-    tar -C "${src}" "${excludes[@]}" -cf - . | \
-    tar "${verbose}" \
-        --touch \
-        --no-same-owner \
-        --no-same-permissions \
-        -C "${dst}" -xf -
 }
+
+bakrestore() { mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"; }
 
 unarchive() {
     local archive="${1}" dest="${2}"
@@ -73,4 +45,148 @@ unarchive() {
             die "Unknown archive file: ${archive}"
             ;;
     esac
+}
+
+ocopy() {
+    local verbose=0 skip_perms=1 spray_mode=1 over_write=1 paths=() ttargs=() xtargs=()
+
+    # SC2030 - Modification of variable is local (to subshell caused by (..) group)
+    # shellcheck disable=SC2030
+    _otar_strm() (
+        set -o pipefail
+        local srcd_path="${1}"; shift
+        [[ ${over_write} -eq 0 ]] && xtargs+=("--keep-old-files")
+        [[ ${skip_perms} -eq 1 ]] && xtargs+=("--no-same-owner" "--no-same-permissions")
+
+        tar -C "${srcd_path}" "${ttargs[@]}" -cf - -- "$@" | \
+        tar -C "${dest_path}" "${xtargs[@]}" -xf -
+    )
+
+    _otar_opts() {
+        local -n opts="${1}"; shift
+        while [[ $# -gt 0 ]]; do
+            case "${1}" in
+                --)
+                    shift; paths+=("$@"); return 0 ;;
+                --*)
+                    opts+=("${1}") ;;
+                -*)
+                    err "Unknown option ${1}"; return 1 ;;
+                *)
+                    paths+=("$@"); return 0 ;;
+            esac; shift
+        done
+    }
+
+    # SC2031 - Variable was modified in a subshell. That change might be lost.
+    # shellcheck disable=SC2031
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -v|--verbose)
+                verbose=1
+                xtargs+=("-v")
+                ;;
+            -a|--archive)
+                ttargs+=("--xattrs" "--xattrs-include=*" "--acls" "--selinux")
+                xtargs+=("--xattrs" "--xattrs-include=*" "--acls" "--selinux")
+                ;;
+            --keep-perms)
+                skip_perms=0
+                ;;
+            --no-force)
+                over_write=0
+                ;;
+            --no-spray)
+                spray_mode=0
+                ;;
+            --)
+                shift
+                paths+=("$@")
+                break
+                ;;
+            --ttar-opts)
+                shift
+                _otar_opts ttargs "$@" || { err "Ocopy failed"; return 1; }
+                break
+                ;;
+            --xtar-opts)
+                shift
+                _otar_opts xtargs "$@" || { err "Ocopy failed"; return 1; }
+                break
+                ;;
+            --*)
+                err "Unknown option ${1}"; return 1
+                ;;
+            -*)
+                err "Unknown option ${1}"; return 1
+                ;;
+             *)
+                paths+=("${1}")
+                ;;
+        esac
+        shift
+    done
+
+    [[ ${#paths[@]} -lt 2 ]] && { err "Provide source and destination paths"; return 1; }
+
+    local dest_path="${paths[${#paths[@]}-1]}" rem_paths=("${paths[@]:0:${#paths[@]}-1}") path
+
+    for path in "${rem_paths[@]}"; do
+        if [[ ! -e "${path}" && ! -L "${path}" ]]; then
+            err "Source does not exist: ${path}"; return 1
+        fi
+    done
+
+    if [[ ${#rem_paths[@]} -gt 1 ]]; then
+        local prnt_srcd="" chld_srcs=() path prnt chld
+        ensure_dir "${dest_path}" || { err "Ocopy failed"; return 1; }
+        for path in "${rem_paths[@]}"; do
+            prnt="$(dirname -- "${path}")"
+            chld="$(basename -- "${path}")"
+            [[ "${path}" == "/" ]] && { prnt="/"; chld="."; }
+
+            if [[ -n "${prnt_srcd}" && "${prnt_srcd}" != "${prnt}" ]]; then
+                _otar_strm "${prnt_srcd}" "${chld_srcs[@]}" || { err "Ocopy failed"; return 1; }
+                chld_srcs=()
+            fi
+            prnt_srcd="${prnt}"
+            chld_srcs+=("${chld}")
+        done
+        if [[ -n "${prnt_srcd}" ]]; then
+            _otar_strm "${prnt_srcd}" "${chld_srcs[@]}" || { err "Ocopy failed"; return 1; }
+        fi
+    else
+        local srce_path="${rem_paths[0]}" srce_prnt srce_chld
+        srce_prnt="$(dirname -- "${srce_path}")"
+        srce_chld="$(basename -- "${srce_path}")"
+        [[ "${srce_path}" == "/" ]] && { srce_prnt="/"; srce_chld="."; }
+
+        local dest_prnt dest_chld dest_temp
+        dest_prnt="$(dirname -- "${dest_path}")"
+        dest_chld="$(basename -- "${dest_path}")"
+        [[ "${dest_path}" == "/" ]] && { dest_prnt="/"; dest_chld="."; }
+
+        if [[ -d "${srce_path}" ]]; then
+            [[ ${spray_mode} -eq 1 ]] && { srce_prnt="${srce_path}"; srce_chld="."; }
+            ensure_dir "${dest_path}" || { err "Ocopy failed"; return 1; }
+            _otar_strm "${srce_prnt}" "${srce_chld}" || { err "Ocopy failed"; return 1; }
+            return 0
+        fi
+
+        if [[ -d "${dest_path}" ]]; then
+            _otar_strm "${srce_prnt}" "${srce_chld}" || { err "Ocopy failed"; return 1; }
+            return 0
+        fi
+
+        [[ ${over_write} -eq 0 && -e "${dest_path}" ]] &&
+            { err "Path exists on destination: ${dest_path}"; return 1; }
+        dest_temp="${dest_prnt}/.ocopy_temp_$$"
+        dest_path="${dest_temp}"
+        ensure_dir "${dest_path}" >/dev/null || { err "Ocopy failed"; return 1; }
+        _otar_strm "${srce_prnt}" "${srce_chld}" ||
+            { err "Ocopy failed"; rm -rf -- "${dest_temp}"; return 1; }
+        mv -f -- "${dest_temp}/${srce_chld}" "${dest_prnt}/${dest_chld}" ||
+            { err "Ocopy failed"; rm -rf -- "${dest_temp}"; return 1; }
+        rm -rf -- "${dest_temp}"
+    fi
 }

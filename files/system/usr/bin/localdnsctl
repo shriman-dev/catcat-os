@@ -82,7 +82,7 @@ toggle_localdns() {
     else
         # Normal behavior
         # Ensure NM dns server override conf
-        ensure_dir "$(dirname "${NM_OVERRIDE_CONF}")"
+        ensure_dir "$(dirname -- "${NM_OVERRIDE_CONF}")"
         if [[ ! -f "${NM_OVERRIDE_CONF}" ]]; then
             printf "%s\n" "${NM_LOCALDNS_OVERRIDE}" > "${NM_OVERRIDE_CONF}" || die_msg
         fi
@@ -249,7 +249,7 @@ setup_localdns() {
 
     # Store blocklist
     store_dir="${LOCALDNS_DATAD}/${BACKEND_TYPE}"
-    store_archive="${store_dir}/$(basename "${blocklist_archive}")"
+    store_archive="${store_dir}/$(basename -- "${blocklist_archive}")"
     if [[ ! -d "${store_dir}" && -w "/usr/share" ]]; then
         # Clear anything inside LOCALDNS_DATAD
         # For configured backend's blocklist archive to be added
@@ -412,7 +412,7 @@ show_log() {
 
 show_help() {
     cat <<EOF
-Usage: $(basename "${0}") [OPTIONS]
+Usage: $(basename -- "${0}") [OPTIONS]
 Configure and manage DNS to block Ad/Malware using blocklist or monitor DNS logs with localdns
 
 Options:

@@ -100,7 +100,7 @@ update_system() {
 
 show_help() {
     cat << EOF
-Usage: $(basename "$0") [command1] [command2] [command3] ...
+Usage: $(basename -- "$0") [command1] [command2] [command3] ...
 
 Global Options:
   -h|--help|help  Display this help message

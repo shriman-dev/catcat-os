@@ -45,7 +45,7 @@ if [[ ! -f "${firstboot_file}" ]]; then
     # Permit main user
     #usermod -aG libvirt ${U1000}
 
-    mkdir -pv "$(dirname "${firstboot_file}")"
+    mkdir -pv "$(dirname -- "${firstboot_file}")"
     echo 'first boot' > "${firstboot_file}"
 fi
 

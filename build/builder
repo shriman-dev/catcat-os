@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 umask 0022
-SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-source "$(dirname "${SCRIPT_DIR}")/setup/lib/bash-lib.sh"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+source "$(dirname -- "${SCRIPT_DIR}")/setup/lib/bash-lib.sh"
 
 prep_metadata() {
     BUILD_ARGS=(
@@ -71,7 +71,7 @@ build_image() {
     sect_border
 
     _cmd_test_timer_start=${EPOCHSECONDS}
-    cd "$(dirname "${SCRIPT_DIR}")"
+    cd "$(dirname -- "${SCRIPT_DIR}")"
     { brief_trace; } 2>/dev/null
     podman build "$@" \
                  --pull=newer \
@@ -183,7 +183,7 @@ cosign_image() {
 
 show_help() {
     cat <<EOF
-Usage: $(basename "${0}") [global_options] command1 [options] [command2 [options] ...
+Usage: $(basename -- "${0}") [global_options] command1 [options] [command2 [options] ...
 
 Global Options:
   -h, --help          Show this help message
@@ -198,7 +198,7 @@ Commands:
   cosign              Signing container image using Sigstore
 
 Example:
-  $(basename "${0}") build chunk push cosign -i my-image -t main -b quay.io/fedora-ostree-desktops/silverblue
+  $(basename -- "${0}") build chunk push cosign -i my-image -t main -b quay.io/fedora-ostree-desktops/silverblue
 EOF
 }
 

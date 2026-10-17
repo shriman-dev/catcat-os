@@ -47,11 +47,11 @@ SBMOK_DER="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.der"
 SBMOK_CRT="/usr/share/${PROJECT_NAME}/certs/${PROJECT_NAME}-mok.pem"
 SBMOK_KEY="/run/secrets/sbmok_priv" # Placed via podman build --secret or build yaml
 readarray -t KERNEL_PATH < \
-    <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname {} \;)
+    <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname -- {} \;)
 
 sbsign_modules() {
     local kpath="${1}" kver modules_dir sign_file _kmodules _kmod
-    kver="$(basename "${kpath}")"
+    kver="$(basename -- "${kpath}")"
     modules_dir="${kpath}/extra"
     sign_file="$(find "/usr/src/kernels/${kver}" -type f -name 'sign-file' -print -quit)"
 
@@ -114,7 +114,7 @@ if [[ -f "${SBMOK_KEY}" && -f "${SBMOK_DER}" ]]; then
     fi
 
     for kernel_path in "${KERNEL_PATH[@]}"; do
-        kernel_ver="$(basename "${kernel_path}")"
+        kernel_ver="$(basename -- "${kernel_path}")"
         vmlinuz_image="${kernel_path}/vmlinuz"
         # Remove any existing kernel signature before signing
         sbattach --remove "${vmlinuz_image}" || true

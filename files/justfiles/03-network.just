@@ -128,7 +128,7 @@ toggle-iwd ACTION="":
         "Enable IWD Persistently"|enable)
             log "INFO" "Enabling IWD..."
             sudo rm -f "${IWD_CONF}"
-            ensure_dir "$(dirname ${IWD_CONF})"
+            ensure_dir "$(dirname -- ${IWD_CONF})"
             printf "[device]\nwifi.backend=iwd\nwifi.iwd.autoconnect=yes" | \
                 sudo tee "${IWD_CONF}" > /dev/null
             sudo systemctl mask wpa_supplicant.service

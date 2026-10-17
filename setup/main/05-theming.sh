@@ -100,15 +100,15 @@ install_icon_themes() {
         log "INFO" "Papirus icons"
         JQ_FILTER='.tarball_url'
         icons_url="$(get_ghpkg_url 'PapirusDevelopmentTeam/papirus-icon-theme')"
-        icons_archive="/tmp/icons/$(basename "${icons_url}").tar"
+        icons_archive="/tmp/icons/$(basename -- "${icons_url}").tar"
 
-        mkdir -vp "$(dirname "${icons_archive}")"
+        mkdir -vp "$(dirname -- "${icons_archive}")"
         curl_get "${icons_archive}" "${icons_url}"
         unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
 
         find "${icons_archive}.extract" -type d -name "24x24" | while read -r papirus_subd; do
-            papirus_dir="$(dirname "${papirus_subd}")"
-            ocopy "${papirus_dir}" "${ICONS_DIR}/$(basename "${papirus_dir}")"
+            papirus_dir="$(dirname -- "${papirus_subd}")"
+            ocopy "${papirus_dir}" "${ICONS_DIR}/$(basename -- "${papirus_dir}")"
         done
     fi
 
@@ -129,9 +129,9 @@ install_gtk_themes() {
         log "INFO" "Lavanda-gtk-theme"
         JQ_FILTER='.tarball_url'
         theme_url="$(get_ghpkg_url 'vinceliuice/Lavanda-gtk-theme')"
-        theme_archive="/tmp/themes/$(basename "${theme_url}").tar"
+        theme_archive="/tmp/themes/$(basename -- "${theme_url}").tar"
 
-        mkdir -vp "$(dirname "${theme_archive}")"
+        mkdir -vp "$(dirname -- "${theme_archive}")"
         curl_get "${theme_archive}" "${theme_url}"
         unarchive "${theme_archive}" "${theme_archive}.extract" >/dev/null
 
@@ -167,9 +167,9 @@ build_gdm_theme() {
     gmd_theme_tmp="/tmp/gnome-shell"
     gmd_theme_path="${SYS_CACHE}/usr/share/themes/Catppuccin-Orange-Dark/gnome-shell"
     background_wall="/usr/share/backgrounds/catcat-os/altos_odyssey_blurred.jpg"
-    gdm_xml="$(basename "${gdm_resource}").xml"
+    gdm_xml="$(basename -- "${gdm_resource}").xml"
 
-    log "INFO" "Using GTK theme: $(basename "$(dirname "${gmd_theme_path}")")"
+    log "INFO" "Using GTK theme: $(basename -- "$(dirname -- "${gmd_theme_path}")")"
     # Create directories and extract resources from gresource file
     log "INFO" "Creating directories and extracting resources from gresource file"
     readarray -t gdm_resource_list < <(gresource list "${gdm_resource}")
@@ -211,7 +211,7 @@ $(find "${gmd_theme_tmp}/theme"/ -type f -not -wholename '*.gresource*' -printf 
     # Compile all resources and apply them to the gdm theme
     log "INFO" "Compiling all resources and apply them to the gdm theme"
     glib-compile-resources --sourcedir="${gmd_theme_tmp}/theme"/ "${gmd_theme_tmp}/theme/${gdm_xml}"
-    mv -v "${gmd_theme_tmp}/theme/$(basename "${gdm_resource}")" "${gdm_resource}"
+    mv -v "${gmd_theme_tmp}/theme/$(basename -- "${gdm_resource}")" "${gdm_resource}"
 
     rm -rf "${gmd_theme_tmp}"
 
@@ -223,7 +223,7 @@ $(find "${gmd_theme_tmp}/theme"/ -type f -not -wholename '*.gresource*' -printf 
     # To allow GDM re-theming
 #    log "INFO" "Allowing GDM re-theming"
 #    mv -v   "${gdm_resource}" "${gdm_resource}.og"
-#    ln -svf "/usr/local/share/gnome-shell/$(basename ${gdm_resource})" "${gdm_resource}"
+#    ln -svf "/usr/local/share/gnome-shell/$(basename -- ${gdm_resource})" "${gdm_resource}"
 
     log "INFO" "All done"
     log "INFO" "Custom theme has been built and set for GDM"

@@ -1,8 +1,8 @@
 #!/usr/bin/bash
-SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 format="${1}"; shift
 
-cd "$(dirname "$(dirname "${SCRIPT_DIR}")")" || exit 1
+cd "$(dirname -- "$(dirname -- "${SCRIPT_DIR}")")" || exit 1
 readarray -t found_scripts < <(fd -HI -t f \
                                   -E 'syncro\.d/**' \
                                   -E '**/bin/pipes\.sh' \

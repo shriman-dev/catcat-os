@@ -81,7 +81,7 @@ add-keyfile-luks DEVICE_PATH KEY_FILE ITER_VALUE:
     if [[ ! -f {{ KEY_FILE }} ]]; then
         echo "Keyfile not found: {{ KEY_FILE }}"
         echo "Creating keyfile: {{ KEY_FILE }}"
-        mkdir -p $(dirname {{ KEY_FILE }})
+        mkdir -p $(dirname -- {{ KEY_FILE }})
         dd if=/dev/urandom of={{ KEY_FILE }} bs=1024 count=4 &&
         chmod 0400 {{ KEY_FILE }} &&
         echo "Done."

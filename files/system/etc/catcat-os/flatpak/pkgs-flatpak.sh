@@ -27,7 +27,6 @@ DESKTOP_EXTRAS=(
     "app/com.usebottles.bottles/x86_64/stable"
     "app/io.github.Faugus.faugus-launcher/x86_64/stable"
     "app/com.vysp3r.ProtonPlus/x86_64/stable"
-    "app/page.kramo.Cartridges/x86_64/stable"
     "app/io.github.radiolamp.mangojuice/x86_64/stable"
     "app/io.github.benjamimgois.goverlay/x86_64/stable"
     "app/io.github.ilya_zlobintsev.LACT/x86_64/stable"

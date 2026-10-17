@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-SRC_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/bash-lib"
+SRC_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/bash-lib"
 QUIET=${QUIET:-false}
 VERBOSE=${VERBOSE:-2}
 

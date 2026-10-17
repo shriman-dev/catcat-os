@@ -108,7 +108,7 @@ if command -q nix-env
     alias nirb="nix-env --rollback"
     alias nirp="nix-store --verify --check-contents --repair"
     alias niss="nix-channel --update && nix-env -qas" # use '' to search
-    alias nils="nix-channel --update && nix-env -q"
+    alias nils="nix-env -q"
     alias nidg="nix-env -u --always"
     alias nicln="nix-store --optimise && nix-collect-garbage"
     alias niinf="nix-channel --update && nix-env -qas --description"

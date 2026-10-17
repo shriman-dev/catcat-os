@@ -105,7 +105,7 @@ trim() {
 
 show_help() {
     cat <<EOF
-Usage: $(basename "${0}") [global_options] command1 [options] [command2] [options] ..."
+Usage: $(basename -- "${0}") [global_options] command1 [options] [command2] [options] ..."
 
 Global Options:
   -h, --help              Show this help message

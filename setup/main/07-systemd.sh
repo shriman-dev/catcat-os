@@ -139,6 +139,6 @@ if [[ $# -gt 0 ]]; then
     case "${1}" in
         enable) services_enable;;
         disable) services_disable;;
-        *) die "Usage: $(basename "${0}") [enable|disable]";;
+        *) die "Usage: $(basename -- "${0}") [enable|disable]";;
     esac
 fi

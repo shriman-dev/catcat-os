@@ -25,7 +25,7 @@ run_step "yellow" "Debloating" \
 run_step "cyan" "Copying System Default Files" \
          "${BUILD_SETUP_DIR}/main/03-copy-sysfiles.sh"
 
-run_step "purple" "Adding Kernel Packages" \
+run_step "purple" "Installing Desktop Packages" \
          "${BUILD_SETUP_DIR}/main/04-pkgs-install.sh"
 
 run_step "green" "Applying Various Themes" \

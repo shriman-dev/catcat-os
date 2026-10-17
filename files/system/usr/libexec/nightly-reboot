@@ -26,8 +26,8 @@ watch_cancel_file() {
     local max_attempts=${REBOOT_DELAY}
 
     log "INFO" "Watching for cancellation"
-    mkdir -p "$(dirname "${cancel_file}")"
-    chmod -R 1777 "$(dirname "${cancel_file}")"
+    mkdir -p "$(dirname -- "${cancel_file}")"
+    chmod -R 1777 "$(dirname -- "${cancel_file}")"
     while [[ ${attempt} -lt ${max_attempts} ]]; do
         if [[ -f "${cancel_file}" ]]; then
             log "INFO" "Cancel file detected: ${cancel_file}"

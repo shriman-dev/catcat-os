@@ -24,6 +24,8 @@ DECK_PACKAGES=(
     "adjustor"
     "kernel-headers"
     "${CUSTOM_KERNEL:-kernel}-devel-matched"
+    "greenboot"
+    "greenboot-default-health-checks"
     "++acpi_call"
 )
 

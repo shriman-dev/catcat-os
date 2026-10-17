@@ -95,9 +95,9 @@ get_ghpkg() {
 
     pkg_url="${pkg_vals[0]}"
     pkg_sha="${pkg_vals[1]}"
-    pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/${pkg_name}/$(basename "${pkg_url}")"
+    pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/${pkg_name}/$(basename -- "${pkg_url}")"
 
-    ensure_dir "$(dirname "${pkg_archive}")"
+    ensure_dir "$(dirname -- "${pkg_archive}")"
     curl_get "${pkg_archive}" "${pkg_url}"
 
     # Verify checksum with retries
@@ -121,7 +121,7 @@ get_ghpkg() {
 
     # Install a direct package
     if [[ ${DIRECT_GHPKG:-0} -eq 1 ]]; then
-        place_executable "$(dirname "${pkg_archive}")" "$(basename "${pkg_url}")"
+        place_executable "$(dirname -- "${pkg_archive}")" "$(basename -- "${pkg_url}")"
         return 0
     fi
 
@@ -163,7 +163,7 @@ get_ghraw() {
         [[ -z "${branch}" ]] &&
         branch="${GIT_BRANCH:-"$(curl_fetch "${gh_api}" | jq -r '.default_branch')"}"
         raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
-        ensure_dir "$(dirname "${dest_path}")"
+        ensure_dir "$(dirname -- "${dest_path}")"
         curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
     done
 }
@@ -188,7 +188,7 @@ get_fonts() {
             die "No URL provided to get the font"
         fi
     fi
-    url_file="$(basename "${font_url}")"
+    url_file="$(basename -- "${font_url}")"
     log "DEBUG" "Adding font(s): ${font_name}"
     log "DEBUG" "From URL: ${font_url}"
 

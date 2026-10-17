@@ -39,7 +39,7 @@ run_as_users() {
     fi
 
     for running_user in /run/user/*; do
-        some_user_id="$(basename "${running_user}")"
+        some_user_id="$(basename -- "${running_user}")"
         some_user="$(id -un "${some_user_id}")"
         if [[ ! "${some_user}" =~ ^(root|gdm)$ ]]; then
             log "DEBUG" "Running given commancatd as user: ${some_user}"
@@ -53,7 +53,7 @@ notify_users() {
     local running_user some_user_id some_user
     if systemctl is-active display-manager; then
         for running_user in /run/user/*; do
-            some_user_id="$(basename "${running_user}")"
+            some_user_id="$(basename -- "${running_user}")"
             some_user="$(id -un "${some_user_id}")"
             log "DEBUG" "Sending notification to user: ${some_user}"
             sudo -u "${some_user}" \
