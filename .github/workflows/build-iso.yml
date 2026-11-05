@@ -101,8 +101,8 @@ jobs:
           UPLOAD_DIR="${GITHUB_WORKSPACE}/upload"
 
           mkdir -vp "${UPLOAD_DIR}"
-          mv -v "${ISO_PATH}" "${UPLOAD_DIR}/${ISO_NAME}"
           sha256sum "${ISO_PATH}" | tee "${UPLOAD_DIR}/${ISO_NAME}-CHECKSUM"
+          mv -v "${ISO_PATH}" "${UPLOAD_DIR}/${ISO_NAME}"
 
           tree -a "${UPLOAD_DIR}"
           echo "iso-dir=${UPLOAD_DIR}" >> "${GITHUB_OUTPUT}"
