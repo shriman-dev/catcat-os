@@ -23,35 +23,35 @@ concurrency:
   cancel-in-progress: true  # Cancels in-progress runs if a new one is triggered
 
 jobs:
-  build-main:
-    name: Build Main
-    uses: ./.github/workflows/build-image.yaml
-    secrets: inherit        # Uses secrets from parent workflow
+#  build-main:
+#    name: Build Main
+#    uses: ./.github/workflows/build-image.yaml
+#    secrets: inherit        # Uses secrets from parent workflow
 
-  build-variants:
-    name: Build Variants
-    needs: [build-main]
-    strategy:
-      fail-fast: false      # Other builds even if one fails
-      matrix:
-        include:
-          - image_name: catcat-os-nv
-            base_image: ghcr.io/shriman-dev/catcat-os
-            img_flavor: nvidia
-          - image_name: catcat-os-hh
-            base_image: ghcr.io/shriman-dev/catcat-os
-            img_flavor: deck
-    uses: ./.github/workflows/build-image.yaml
-    with:
-      image_name: ${{ matrix.image_name }}
-      base_image: ${{ matrix.base_image }}
-      img_flavor: ${{ matrix.img_flavor }}
-    secrets: inherit        # Uses secrets from parent workflow
+#  build-variants:
+#    name: Build Variants
+#    needs: [build-main]
+#    strategy:
+#      fail-fast: false      # Other builds even if one fails
+#      matrix:
+#        include:
+#          - image_name: catcat-os-nv
+#            base_image: ghcr.io/shriman-dev/catcat-os
+#            img_flavor: nvidia
+#          - image_name: catcat-os-hh
+#            base_image: ghcr.io/shriman-dev/catcat-os
+#            img_flavor: deck
+#    uses: ./.github/workflows/build-image.yaml
+#    with:
+#      image_name: ${{ matrix.image_name }}
+#      base_image: ${{ matrix.base_image }}
+#      img_flavor: ${{ matrix.img_flavor }}
+#    secrets: inherit        # Uses secrets from parent workflow
 
   build-iso:
     name: Build ISOs
     if: github.event_name != 'schedule'
-    needs: [build-variants]
+#    needs: [build-variants]
     uses: ./.github/workflows/build-iso.yml
     secrets: inherit
 

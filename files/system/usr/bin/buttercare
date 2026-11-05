@@ -191,14 +191,10 @@ main() {
     rem_args=()
     while [[ $# -gt 0 ]]; do
         case "${1}" in
-            -h|--help)
-                show_help;         exit 0 ;;
-            -v|--verbose)
-                VERBOSE=1;          shift ;;
-            -vv)
-                VERBOSE=3;          shift ;;
-            *)
-                rem_args+=("${1}"); shift ;;
+            -h|--help)    show_help;          exit  0 ;;
+            -v|--verbose) VERBOSE=1;          shift 1 ;;
+            -vv)          VERBOSE=3;          shift 1 ;;
+            *)            rem_args+=("${1}"); shift 1 ;;
         esac
     done
 

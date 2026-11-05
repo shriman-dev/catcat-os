@@ -68,11 +68,16 @@ jobs:
 
       - name: Build Payload
         id: build-payload
+        env:
+          IMAGE_NAME: ${{ matrix.image_name }}
         shell: bash
         run: |
           set -euo pipefail
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
           sudo -E "${GITHUB_WORKSPACE}/build/builder" \
-                iso --payloadfile "${GITHUB_WORKSPACE}/build/iso/payloadfile" \
+                iso --image-name "${IMAGE_NAME}" \
+                    --registry "${PROJECT_REGISTRY}" \
+                    --payloadfile "${GITHUB_WORKSPACE}/build/iso/payloadfile" \
                     --payloadonly
 
       - name: Build ISO
@@ -83,10 +88,10 @@ jobs:
 
       - name: Prepare Upload Directory
         id: prep-upload
-        shell: bash
         env:
           IMAGE_NAME: ${{ matrix.image_name }}
           ISO_PATH: ${{ steps.build.outputs.iso-dest }}
+        shell: bash
         run: |
           set -euox pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"

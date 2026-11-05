@@ -20,5 +20,3 @@ run_step "blue" "Regenerating Initramfs" \
 run_step "yellow" "Post Build Setup" \
          "${BUILD_SETUP_DIR}/shared/05-post-setup.sh"
 
-set -x
-ostree container commit

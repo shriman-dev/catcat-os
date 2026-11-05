@@ -426,19 +426,15 @@ main() {
     rem_args=()
     while [[ $# -gt 0 ]]; do
         case "${1}" in
-            -h|--help)
-                show_help;          exit  0 ;;
-            -i|--image-name)
-                [[ -n "${2:-}" ]] || die "Provide image name"
-                IMAGE_NAME="${2}";  shift 2 ;;
-            -b|--base-image)
-                BASE_IMAGE="${2}";  shift 2 ;;
-            -f|--img-flavor)
-                IMG_FLAVOR="${2}";     shift 2 ;;
-            *)
-                rem_args+=("${1}"); shift   ;;
+            -h|--help)       show_help;          exit  0 ;;
+            -i|--image-name) IMAGE_NAME="${2}";  shift 2 ;;
+            -b|--base-image) BASE_IMAGE="${2}";  shift 2 ;;
+            -f|--img-flavor) IMG_FLAVOR="${2}";  shift 2 ;;
+            *)               rem_args+=("${1}"); shift 1 ;;
         esac
     done
+
+    [[ -n "${IMAGE_NAME:-}" ]] || die "Provide image name"
 
     # Execute subcommands
     for arg in "${rem_args[@]}"; do
