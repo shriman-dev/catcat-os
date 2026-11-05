@@ -31,7 +31,7 @@ get_ghraw \
     --dstd "${SYS_CACHE}/usr/share/wireplumber/wireplumber.conf.d" \
     --repo "${bazz_repo}" \
     --repod "${shareddk}/usr/share/wireplumber/wireplumber.conf.d" \
-    --flist "alsa-card0.conf" "alsa-card1.conf" "alsa-ps-controller.conf" "bluez.conf"
+    --flist "alsa-ps-controller.conf" "bluez.conf"
 
 log "INFO" "Copying cached files"
 ocopy "${SYS_CACHE}" /
