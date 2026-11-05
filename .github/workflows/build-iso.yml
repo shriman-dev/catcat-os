@@ -102,7 +102,7 @@ jobs:
 
           mkdir -vp "${UPLOAD_DIR}"
           mv -v "${ISO_PATH}" "${UPLOAD_DIR}/${ISO_NAME}"
-          sha256sum "${ISO_PATH}" > "${UPLOAD_DIR}/${ISO_NAME}-CHECKSUM"
+          sha256sum "${ISO_PATH}" | tee "${UPLOAD_DIR}/${ISO_NAME}-CHECKSUM"
 
           tree -a "${UPLOAD_DIR}"
           echo "iso-dir=${UPLOAD_DIR}" >> "${GITHUB_OUTPUT}"
