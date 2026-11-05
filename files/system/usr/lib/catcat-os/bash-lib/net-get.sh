@@ -79,12 +79,10 @@ get_ghpkg() {
     if [[ ${overwrite} -eq 0 ]]; then
         local lib_pkgd="${libexec_dir}/${pkg_name}"
         [[ ${islibexec} -eq 1 && -d "${lib_pkgd}" && -n "$(ls -A "${lib_pkgd}")" ]] && {
-            log "NOTE" "Package skipped - Non-empty directory exists: ${lib_pkgd}"
-            return 0; }
+            log "NOTE" "Package skipped - Non-empty directory exists: ${lib_pkgd}"; return 0; }
 
         [[ ${islibexec} -eq 0 && -x "${bin_dir}/${pkg_name}" ]] && {
-            log "NOTE" "Package skipped - Executable exists: ${bin_dir}/${pkg_name}"
-            return 0; }
+            log "NOTE" "Package skipped - Executable exists: ${bin_dir}/${pkg_name}"; return 0; }
     fi
 
     # Retrieve metadata

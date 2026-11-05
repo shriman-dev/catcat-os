@@ -10,7 +10,7 @@ if [[ ! -f "${firstboot_file}" ]]; then
     /usr/libexec/catcat-kargs
 
     # Setup grub
-    mkdir -vp /boot/grub_themes && cp -af /usr/share/grub/themes/* /boot/grub_themes/
+    ocopy /usr/share/grub/themes/* /boot/grub_themes
     declare -A grub_vars=(
         ["GRUB_TIMEOUT"]="2"
         ["GRUB_DEFAULT"]="saved"
@@ -56,17 +56,17 @@ fi
 update_info="/usr/etc/catcat-os/build_info"
 lastup_info="/etc/catcat-os/log/.build_info_previous"
 if ! diff -q "${update_info}" "${lastup_info}"; then
-    ru_config_d="/root/.config"
-    ru_local_share="/root/.local/share"
-    ru_catcat_d="${ru_local_share}/catcat-os"
+    r_config_d="/root/.config"
+    r_local_share="/root/.local/share"
+    r_catcat_d="${r_local_share}/catcat-os"
 
-    ensure_dir "${ru_catcat_d}/LS_COLORS_DIR" "/var/log/usbguard" "/var/lib/waydroid"
+    ensure_dir "${r_catcat_d}/LS_COLORS_DIR" "/var/log/usbguard" "/var/lib/waydroid"
 
     cp -vaf /usr/share/catcat-os/LS_COLORS_DIR/* \
-            "${ru_catcat_d}/LS_COLORS_DIR"/
+            "${r_catcat_d}/LS_COLORS_DIR"/
 
-    [[ ! -e "${ru_config_d}/bat" ]] &&
-            { mkdir -vp "${ru_config_d}"; ln -Tsvf /etc/bat "${ru_config_d}"/; }
+    [[ ! -e "${r_config_d}/bat" ]] &&
+            { mkdir -vp "${r_config_d}"; ln -Tsvf /etc/bat "${r_config_d}"/; }
     /usr/bin/bat cache --build
 
     restorecon -vR "/var/log/usbguard"
@@ -81,8 +81,8 @@ if ! diff -q "${update_info}" "${lastup_info}"; then
         if [[ ! -f "/usr/local/${gdm_shell}/no_update_gdm_theme" ]]; then
             cp -vaf "/usr/${gdm_shell}/${gdm_resource}.og" "/usr/local/${gdm_shell}/${gdm_resource}"
         fi
-        /usr/bin/dconf update
     fi
+    /usr/bin/dconf update
 
     # Restore /boot perms to 755, often reset by system update
     restorecon -vR "/boot"

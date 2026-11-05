@@ -2,13 +2,14 @@
 set -euo pipefail
 
 ENVAR=(
+    "ARCH=x86_64"
     "PRETTY_NAME=CatCat OS"
     "PROJECT_NAME=catcat-os"
     "PROJECT_DESCRP=Meow"
     "PROJECT_VENDOR=shriman-dev"
     "PROJECT_SOURCE=https://raw.githubusercontent.com/shriman-dev/catcat-os"
     "PROJECT_README=https://raw.githubusercontent.com/shriman-dev/catcat-os/refs/heads/main/README.md"
-    "PUSH_REGISTRY=ghcr.io/shriman-dev"
+    "PROJECT_REGISTRY=ghcr.io/shriman-dev"
     "DEFAULT_TAG=latest"
     "MAJOR_VERSION=44"
     "CUSTOM_KERNEL=kernel-cachyos"
@@ -23,12 +24,4 @@ ENVAR=(
 declare -x "${ENVAR[@]}"
 
 # Define tags
-_build_tags=("${DEFAULT_TAG}" "${MAJOR_VERSION}")
-declare -x BUILD_TAGS="${_build_tags[*]}"
-
-# Export variables to GITHUB_ENV
-if [[ -n "${GITHUB_ENV:-}" ]]; then
-    if ! grep "${PROJECT_NAME}" <<< "${GITHUB_ENV}"; then
-        printf '%s\n' "${ENVAR[@]}" >> "${GITHUB_ENV}"
-    fi
-fi
+declare -x BUILD_TAGS="${DEFAULT_TAG} ${MAJOR_VERSION}"

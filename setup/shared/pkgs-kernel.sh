@@ -37,7 +37,7 @@ cachy_kernel() {
     # Post kernel install setup
     depmod -a "$(rpm -q "${CUSTOM_KERNEL}" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n')"
 
-    # NOTE: Do not disable custom kernel copr/repo to support building down stream images
+    # NOTE: Do not disable custom kernel copr/repo to support building downstream or variant images
     # Disable cachy copr
 #    dnf5 -y copr disable "bieszczaders/kernel-cachyos"
 }

@@ -10,19 +10,18 @@ DESKTOP_EXTRAS=(
     "nu"
     "zsh"
     "++grex"
-    "++yazi"
+    "yazi" # From terra
 
     # Secure
     #bubblejail
     "++hblock"
-    #$(rpm_dl 'opensnitch' 'evilsocket/opensnitch' 'x86_64.rpm$')
-    #$(rpm_dl 'opensnitch-noarch' 'evilsocket/opensnitch' 'noarch\.rpm$')
+    #"opensnitch" # From terra
 
     # Monitoring Tools
     #"htop" "btop"
     "wireshark"
-    "++bandwhich"
-    "$(rpm_dl 'amdgpu_top' 'Umio-Yasuno/amdgpu_top' 'x86_64\.rpm$')"
+    "bandwhich" # From terra
+    "amdgpu_top" # From terra
 
     # Disk Operations and Analyze
     #ncdu dua-cli duf
@@ -34,7 +33,7 @@ DESKTOP_EXTRAS=(
     "syncthing"
     "archivemount"
     "cryfs"
-    "++gocryptfs"
+    "gocryptfs"
 
     # Parallelization and Testing
     "s-tui"
@@ -61,22 +60,21 @@ DESKTOP_EXTRAS=(
     "fortune-mod"
     "asciiquarium"
     "++pipes-sh"
-    "++chess-tui"
-    "++ascii-image-converter"
+    #"++chess-tui"
 
     # Dev Tools
     ##criu criu-amdgpu-plugin ptyxis ghostty lazygit
     "pv" # tool for monitoring the progress of data through a pipeline
     "glow"
-    "++uv"
+    "uv"
     "neovim"
     #"++llama-cpp"
     "moreutils"
     "ShellCheck"
-    "$(rpm_dl 'vscodium' 'VSCodium/vscodium' 'x86_64\.rpm$')"
+    "codium" # From terra
 
     # Android Tools
-    "++scrcpy"
+    "scrcpy" # From terra
     "android-tools"
 
     # waydroid stuff
@@ -118,7 +116,7 @@ DESKTOP_EXTRAS=(
     "swtpm"
     "swtpm-tools"
     "podman-machine"
-    "++ls-iommu"
+    "ls-iommu" # From terra
 
     # Gaming packages
     ##coolercontrol mfancontrol liquidctl lsfg-vk
@@ -130,8 +128,8 @@ DESKTOP_EXTRAS=(
     "openrgb"
     "openrgb-udev-rules"
     "libratbag-ratbagd" # DBus daemon to access programmable input devices, mainly gaming mice
-    #"$(rpm_dl 'lact' 'ilya-zlobintsev/LACT' "x86_64\.fedora-$(rpm -E %fedora)\.rpm$" 'headless')"
-    #"$(rpm_dl 'lsfg-vk' 'PancakeTAS/lsfg-vk' 'x86_64\.rpm$')"
+    #"lact" # From terra
+    #"lsfg-vk" # From terra
 
     # Extras deps
     "++extras"
@@ -260,10 +258,10 @@ COMMON=(
     "bash-completion"
     "bash-color-prompt"
     "$(rpm_dl 'fastfetch' 'fastfetch-cli/fastfetch' 'linux-amd64\.rpm$')"
-    "starship" # from terra repo
+    "starship" # From terra
     "fzf"
     "bat"
-    "++eza"
+    "eza"
     "zoxide"
     "ripgrep"
     "fd-find"
@@ -274,7 +272,7 @@ COMMON=(
     "usbguard"
     "sbsigntools" # Tools to add signatures to efi binaries and drivers
     "setools-console"
-    "++dnscrypt-proxy"
+    "dnscrypt-proxy"
 
     # Monitoring Tools
     "procs"

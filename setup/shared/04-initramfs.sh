@@ -7,7 +7,6 @@ readarray -t KERNEL_PATH < \
     <(find /usr/lib/modules -mindepth 2 -maxdepth 2 -type f -name "vmlinuz" -exec dirname -- {} \;)
 
 DRACUT="/usr/bin/dracut"
-
 # Use dracut cliwrap if already installed
 [[ -f "/usr/libexec/rpm-ostree/wrapped/dracut" ]] &&
     DRACUT="/usr/libexec/rpm-ostree/wrapped/dracut"
@@ -36,8 +35,11 @@ for kernel_path in "${KERNEL_PATH[@]}"; do
     kernel_ver="$(basename -- "${kernel_path}")"
     initramfs_image="${kernel_path}/initramfs.img"
     log "INFO" "Starting initramfs regeneration for kernel version: ${kernel_ver}"
-    ${DRACUT} --kver "${kernel_ver}" \
-              --no-hostonly --reproducible --add ostree --force "${initramfs_image}"
+    ${DRACUT} --reproducible --no-hostonly \
+              --zstd --force \
+              --add "ostree" \
+              --kver "${kernel_ver}"
+              "${initramfs_image}"
     chmod -v 0600 "${initramfs_image}"
 done
 

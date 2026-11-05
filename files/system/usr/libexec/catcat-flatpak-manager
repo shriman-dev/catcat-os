@@ -29,7 +29,7 @@ install_flatpaks() {
         flatpak remote-add "${SCOPE}" --if-not-exists \
                 flathub "https://dl.flathub.org/repo/flathub.flatpakrepo"
         flatpak remote-modify "${SCOPE}" --prio=10 flathub
-        flatpak install "${SCOPE}" -y --noninteractive \
+        flatpak install --or-update "${SCOPE}" -y --noninteractive \
                 flathub "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
         runtimes
     fi

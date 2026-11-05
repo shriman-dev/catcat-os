@@ -1,0 +1,7 @@
+label: "catcat-os-live"
+grub2:
+  timeout: 5
+  entries:
+    - name: "CatCat OS Live ISO"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=catcat-os-live enforcing=0 rd.live.image"
+      initrd: "/images/pxeboot/initrd.img"

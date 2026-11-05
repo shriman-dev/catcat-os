@@ -105,31 +105,48 @@ trim() {
 
 show_help() {
     cat <<EOF
-Usage: $(basename -- "${0}") [global_options] command1 [options] [command2] [options] ..."
+Usage: $(basename -- "${0}") [global_options] command1 [options] [command2 [options] ...
 
 Global Options:
-  -h, --help              Show this help message
-  -v, --verbose           Enable verbose output (use -vv for debug mode)
+  -h, --help                  Show this help message
+  -v, --verbose               Enable verbose output (use -vv for debug mode)
 
 Commands:
-  usage <path>            Show BTRFS filesystem usage and disk space information
+  usage
+        Show BTRFS filesystem usage and disk space information
+        Options:
+            <path>            The BTRFS mount path to inspect
 
-  balance [path]          Start balance operation on BTRFS filesystem
-                          Options: -m [musage] -d [dusage] -p [path|all]
-                          (Defaults: musage=50, dusage=80, path=all)
+  balance
+        Start a balance operation on BTRFS filesystems
+        Note: If no path is specified, all BTRFS mount points are auto-detected
+        Options:
+            -m <musage>       Minimum usage percentage (default: 50)
+            -d <dusage>       Data usage percentage (default: 80)
+            -p <path|all>     Specific path or 'all' (default: all)
 
-  defrag                  Defragment the BTRFS filesystem using a specified compression algorithm
-                          Options: -c <algorithm> -l [level] -p <path>
+  defrag
+        Defragment the BTRFS filesystem using a specified compression algorithm
+        Options:
+            -c <algorithm>    Compression algorithm to use
+            -l <level>        Compression level (optional)
+            -p <path>         The BTRFS mount path to defragment
 
-  scrub <path>            Start a scrub operation on BTRFS filesystem
+  scrub
+        Start a scrub operation on the BTRFS filesystem
+        Options:
+            <path>            The BTRFS mount path to scrub
 
-  trim [path]             Perform TRIM operation on the path
+  trim
+        Perform TRIM operation to free up unused blocks
+        Note: If no path is specified, TRIM is run on all fstab entries
+        Options:
+            <path>            The BTRFS mount path to trim (optional)
 
-Notes:
-  * Balance operation auto detects all BTRFS mount points if no path specified.
-
-  * TRIM operation uses fstab entries if no path specified.
-
+Example:
+      $(basename -- "${0}") -v balance -p all -m 40 -d 70
+      $(basename -- "${0}") defrag -c zstd -l 3 -p /
+      $(basename -- "${0}") trim
 EOF
 }
 

@@ -1,0 +1,139 @@
+name: Build ISO
+on:
+  workflow_call:
+  schedule:
+    - cron: "0 0 1 * *"     # Runs at 00:00 UTC on the 1st of every month
+  workflow_dispatch:        # Allows manual trigger of workflow
+
+concurrency:
+  group: build-iso-${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build_iso:
+    name: Build All ISO Images
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image_name: ["catcat-os", "catcat-os-nv", "catcat-os-hh"]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Maximize Build Space
+        uses: hastd/free-disk-space@v0.1.2
+        with:
+          skip-if-available: "80G"
+
+      - name: Mount Container Storage BTRFS Loopback
+        shell: bash
+        run: |
+          sudo truncate -s 75G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
+          sudo podman system reset --force
+          sudo systemctl stop podman.service
+          LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
+          sudo mkdir -p /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "${LOOP}" /mnt/podman-storage
+          sudo mkdir -p /mnt/podman-storage/{storage,tmp}
+          sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
+          sudo systemctl start podman.service
+
+      - name: Prepare Environment
+        id: prep-env
+        shell: bash
+        run: |
+          set -euox pipefail
+          # Env Info
+          id
+          lsblk --all -o +FSUSED,FSSIZE,LABEL,FSTYPE
+          free -hm
+          nproc --all
+          pwd
+          ls -A1
+          # Set Build Env
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
+          printf '%s\n' "${ENVAR[@]}" >> "${GITHUB_ENV}"
+
+      - name: Build Payload
+        id: build-payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -E "${GITHUB_WORKSPACE}/build/builder" \
+                iso --payloadfile "${GITHUB_WORKSPACE}/build/iso/payloadfile" \
+                    --payloadonly
+
+      - name: Build ISO
+        uses: ublue-os/titanoboa@main
+        id: build-iso
+        with:
+          image-ref: ${{ steps.build-payload.outputs.payload_image }}
+
+      - name: Prepare Upload Directory
+        id: prep-upload
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ matrix.image_name }}
+          ISO_PATH: ${{ steps.build.outputs.iso-dest }}
+        run: |
+          set -euox pipefail
+          source "${GITHUB_WORKSPACE}/build/ENVAR"
+
+          ISO_NAME="${IMAGE_NAME}-${MAJOR_VERSION}.${DATETIMESTAMP}.${ARCH}.iso"
+          UPLOAD_DIR="${GITHUB_WORKSPACE}/upload"
+
+          mkdir -vp "${UPLOAD_DIR}"
+          mv -v "${ISO_PATH}" "${UPLOAD_DIR}/${ISO_NAME}"
+          sha256sum "${ISO_PATH}" > "${UPLOAD_DIR}/${ISO_NAME}-CHECKSUM"
+
+          tree -a "${UPLOAD_DIR}"
+          echo "iso-dir=${UPLOAD_DIR}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload ISO and Checksum as Artifacts
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.image_name }}-iso
+          path: ${{ steps.prep-upload.outputs.iso-dir }}
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+#      - name: Make URL Artifact
+#        shell: bash
+#        id: url
+#        env:
+#          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+#        run: |
+#          echo "|[${{ matrix.image_name }}](${{ env.ARTIFACT_URL }})|" \
+#              > url-${{ matrix.image_name }}.txt
+
+#      - name: Upload ISO URL for Release
+#        id: upload-url
+#        uses: actions/upload-artifact@v7
+#        with:
+#          name: url-${{ matrix.image_name }}
+#          path: url-${{ matrix.image_name }}.txt
+#          if-no-files-found: error
+#          retention-days: 0
+#          compression-level: 0
+#          overwrite: true
+
+#  create-release:
+#    name: Create Release
+#    if: ${{ github.workflow_ref != job.workflow_ref }}
+#    uses: ./.github/workflows/create-release.yml
+

@@ -4,7 +4,6 @@ set -euox pipefail
 
 # Container image policy
 log "INFO" "Configuring container signing policy"
-PROJECT_REGISTRY="${PUSH_REGISTRY}"
 TEMPLATE_POLICY="${BUILD_SETUP_DIR}/setup_files/policy.json"
 COSIGN_PUB_KEY="/usr/share/pki/containers/${PROJECT_NAME}.pub"
 POLICY_FILE="/etc/containers/policy.json"

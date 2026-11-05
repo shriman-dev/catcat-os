@@ -39,9 +39,7 @@ sync_default_configs() {
             systemctl is-active gdm &&
                 rsync -au "${SKEL}/.local/share/gnome-shell/extensions" "${LOCALSHARE}/gnome-shell"/
 
-            # TODO: replace with ocopy
-            { rm -rf "${LOCALSHARE}/themes"/*{Catppuccin,Lavanda}*
-              cp -drf /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"/; } ||
+            { ocopy /usr/share/themes/*{Catppuccin,Lavanda}* "${LOCALSHARE}/themes"; } ||
                 err "Theme update failed"
             cp -vf "${update_info}" "${lastup_info}_ii" || err "SHA update failed"
         fi
@@ -122,7 +120,7 @@ setup_bookmarks_userdirs() {
     if ! grep "HOME/Me/" "${user_dirs_file}"; then
         log "INFO" "Setting up default user directories..."
         bak_before "${user_dirs_file}"
-        cp -drvf "${SKEL}/.config/user-dirs.dirs" "${CONFIG}"/ ||
+        cp -drvf "${SKEL}/.config/user-dirs.dirs" "${user_dirs_file}" ||
                 err "Failed to set default user directories"
     fi
 
@@ -130,8 +128,8 @@ setup_bookmarks_userdirs() {
     if systemctl is-active gdm; then
         if ! grep "admin:/// AdminRoot" "${bookmarks}"; then
         log "INFO" "Adding Bookmarks"
-        ensure_dir "$(dirname -- "${bookmarks}")"
         bak_before "${bookmarks}"
+        ensure_dir "$(dirname -- "${bookmarks}")"
         echo "file:///home/${USER}/Me Me
 file:///home/${USER}/Me/Documents Documents
 file:///home/${USER}/Me/Downloads Downloads
@@ -204,13 +202,13 @@ theme_flatpak_apps() {
         local _dir
         for _dir in themes icons; do
             [[ -d "${HOME_DIR}/.${_dir}" ]] &&
-            cp -drf "${HOME_DIR}/.${_dir}"/* "${LOCALSHARE}/${_dir}"/ &&
+            ocopy "${HOME_DIR}/.${_dir}"/* "${LOCALSHARE}/${_dir}" &&
             rm -rvf "${HOME_DIR}/.${_dir}"
             ln -srfTv "${LOCALSHARE}/${_dir}" "${HOME_DIR}/.${_dir}"
         done
 
-        [[ -d "${CONFIG}/gtk-4.0" && -n "$(ls -A "${CONFIG}/gtk-4.0")" ]] ||
-            cp -drvf "${SKEL}/.config/gtk-4.0" "${CONFIG}"/
+        [[ ! -d "${CONFIG}/gtk-4.0" || -n "$(ls -A "${CONFIG}/gtk-4.0")" ]] ||
+            ocopy "${SKEL}/.config/gtk-4.0" "${CONFIG}"
     fi
     log "INFO" "Done"
 }
@@ -221,7 +219,7 @@ setup_apps() {
     log "INFO" "Configuring apps and desktop files..."
 
     local desktopfiles_d="${LOCALSHARE}/applications"
-    local fl_desktopfiles_d="/var/lib/flatpak/exports/share/applications"
+    local fl_global_desktopfiles_d="/var/lib/flatpak/exports/share/applications"
     ensure_dir "${desktopfiles_d}"
 
     # Modify app icons
@@ -235,7 +233,7 @@ setup_apps() {
     local _app _src _dst
     for _app in "${!app_icons[@]}"; do
         _dst="${desktopfiles_d}/${_app}.desktop"
-        _src="${fl_desktopfiles_d}/${_app}.desktop"
+        _src="${fl_global_desktopfiles_d}/${_app}.desktop"
         if [[ ! -f "${_dst}" || ! -s "${_dst}" ]]; then
             if [[ " ${FLATPAK_APPS[*]} " =~ " ${_app} " ]]; then
                 cp -vf "${_src}" "${_dst}"
@@ -245,14 +243,15 @@ setup_apps() {
     done
 
     # Setup additional apps config
-    [[ ! -f "${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-CatCat.palette" ]] && {
-        cp -drvf "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}"/ ||
+    local ptyxis_catppuccin="${LOCALSHARE}/org.gnome.Ptyxis/palettes/Catppuccin-Mocha-CatCat.palette"
+    [[ ! -f "${ptyxis_catppuccin}" ]] && {
+        ocopy "${SKEL}/.local/share/org.gnome.Ptyxis" "${LOCALSHARE}" ||
             err "Failed to configure Ptyxis"
     }
 
     local gedit_catppuccin="${HOME_DIR}/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles/catppuccin-mocha.xml"
     [[ ! -f "${gedit_catppuccin}" ]] && {
-        cp -drvf "${SKEL}/.var/app/org.gnome.gedit" "${HOME_DIR}/.var/app"/ ||
+        ocopy "${SKEL}/.var/app/org.gnome.gedit" "${HOME_DIR}/.var/app" ||
             err "Failed to configure Gedit"
     }
 
@@ -261,11 +260,11 @@ setup_apps() {
     ensure_dir "${vs_extdir}"
     if [[ -d "${SKEL}/.vscode-oss" ]]; then
         ls -A1d "${vs_extdir}"/*atppuccin* || {
-            cp -drf "${SKEL}/.vscode-oss/extensions"/* "${vs_extdir}"/
+            ocopy "${SKEL}/.vscode-oss/extensions"/* "${vs_extdir}"
         }
     fi
 
-    [[ ! -d "${CONFIG}/VSCodium" ]] && cp -drf "${SKEL}/.config/VSCodium" "${CONFIG}"/
+    [[ ! -d "${CONFIG}/VSCodium" ]] && ocopy "${SKEL}/.config/VSCodium" "${CONFIG}"
 
     log "INFO" "Done"
 }

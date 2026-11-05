@@ -17,13 +17,13 @@ bakstore() {
 bakrestore() { mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"; }
 
 unarchive() {
-    local archive="${1}" dest="${2}"
+    local archive="${1}" archive_lc="${1,,}" dest="${2}"
 
     [[ -z "${archive}" || -z "${dest}" ]] && die "No archive or destination path was provided"
 
     ensure_dir "${dest}"
-    case "${archive}" in
-        *.zip|*.ZIP)
+    case "${archive_lc}" in
+        *.zip)
             log "DEBUG" "Extracting ZIP archive in: ${dest}"
             unzip "${archive}" -d "${dest}"
             ;;
@@ -48,7 +48,7 @@ unarchive() {
 }
 
 ocopy() {
-    local verbose=0 skip_perms=1 spray_mode=1 over_write=1 paths=() ttargs=() xtargs=()
+    local verbose=0 skip_perms=1 spray_mode=1 over_write=1 taropt paths=() ttargs=() xtargs=()
 
     # SC2030 - Modification of variable is local (to subshell caused by (..) group)
     # shellcheck disable=SC2030
@@ -61,22 +61,6 @@ ocopy() {
         tar -C "${srcd_path}" "${ttargs[@]}" -cf - -- "$@" | \
         tar -C "${dest_path}" "${xtargs[@]}" -xf -
     )
-
-    _otar_opts() {
-        local -n opts="${1}"; shift
-        while [[ $# -gt 0 ]]; do
-            case "${1}" in
-                --)
-                    shift; paths+=("$@"); return 0 ;;
-                --*)
-                    opts+=("${1}") ;;
-                -*)
-                    err "Unknown option ${1}"; return 1 ;;
-                *)
-                    paths+=("$@"); return 0 ;;
-            esac; shift
-        done
-    }
 
     # SC2031 - Variable was modified in a subshell. That change might be lost.
     # shellcheck disable=SC2031
@@ -99,23 +83,25 @@ ocopy() {
             --no-spray)
                 spray_mode=0
                 ;;
+            --ttar-opts|--xtar-opts)
+                case "${1}" in
+                    --ttar-opts) taropt=tt ;;
+                    --xtar-opts) taropt=xt ;;
+                    *) err "Unknown option ${1}"; return 1 ;;
+                esac
+                ;;
             --)
                 shift
                 paths+=("$@")
                 break
                 ;;
-            --ttar-opts)
-                shift
-                _otar_opts ttargs "$@" || { err "Ocopy failed"; return 1; }
-                break
-                ;;
-            --xtar-opts)
-                shift
-                _otar_opts xtargs "$@" || { err "Ocopy failed"; return 1; }
-                break
-                ;;
             --*)
-                err "Unknown option ${1}"; return 1
+                [[ -z "${taropt}" ]] && { err "Unknown option ${1}"; return 1; }
+                case "${taropt}" in
+                    tt) ttargs+=("${1}") ;;
+                    xt) xtargs+=("${1}") ;;
+                    *) err "Unknown option ${1}"; return 1 ;;
+                esac
                 ;;
             -*)
                 err "Unknown option ${1}"; return 1

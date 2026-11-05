@@ -48,11 +48,12 @@ jobs:
       img_flavor: ${{ matrix.img_flavor }}
     secrets: inherit        # Uses secrets from parent workflow
 
-#  build-iso:
-#    name: Build ISOs
-#    needs: [build-main]
-#    uses: ./.github/workflows/build-iso.yml
-#    secrets: inherit
+  build-iso:
+    name: Build ISOs
+    if: github.event_name != 'schedule'
+    needs: [build-variants]
+    uses: ./.github/workflows/build-iso.yml
+    secrets: inherit
 
 #  create-release:
 #    name: Create Release

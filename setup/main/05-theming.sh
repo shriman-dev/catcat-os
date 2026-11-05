@@ -38,6 +38,8 @@ desktop_files() {
         "org.gtk.Demo4"
         "org.gtk.gtk4.NodeEditor"
         "org.gtk.PrintEditor4"
+        "scrcpy-console.desktop"
+        "scrcpy.desktop"
     )
     for dfile in "${dfiles[@]}"; do
         desktop-file-edit --set-key="NoDisplay" --set-value="true" \
@@ -181,7 +183,7 @@ build_gdm_theme() {
 
     # Copy custom theme files and background wallpaper to working directory
     log "INFO" "Copying custom theme files and background wallpaper to working directory"
-    cp -vaf "${gmd_theme_path}"/* "${gmd_theme_tmp}/theme"/
+    ocopy -v "${gmd_theme_path}"/* "${gmd_theme_tmp}/theme"
     cp -vf "${background_wall}" "${gmd_theme_tmp}/theme/background"
 
     # Set background wallpaper and modify CSS for login and lock screen
@@ -237,8 +239,8 @@ apply_default_configs() {
             /usr/share/icons/default/index.theme
 
     local default_gtk_theme="${SYS_CACHE}/usr/share/themes/Catppuccin-Orange-Dark"
-    cp -af "${default_gtk_theme}"/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default/
-    cp -af "${default_gtk_theme}/gtk-4.0" /etc/skel/.config/
+    ocopy "${default_gtk_theme}"/{gtk-2.0,gtk-3.0,gtk-4.0} /usr/share/themes/Default
+    ocopy "${default_gtk_theme}/gtk-4.0" /etc/skel/.config
 
     mkdir -vp /etc/skel/.config/dconf
     /usr/bin/dconf update

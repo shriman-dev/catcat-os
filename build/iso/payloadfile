@@ -1,0 +1,17 @@
+ARG PROJECT_REGISTRY
+ARG DEFAULT_TAG
+
+ARG IMAGE_NAME
+
+FROM ${PROJECT_REGISTRY}/${IMAGE_NAME}:${DEFAULT_TAG}
+
+ARG PROJECT_REGISTRY
+ARG DEFAULT_TAG
+
+ARG IMAGE_NAME
+
+RUN --mount=type=tmpfs,dst=/tmp \
+    --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/lib/flatpak \
+    --mount=type=bind,source=./,target=/src,rw \
+    /src/payload.sh

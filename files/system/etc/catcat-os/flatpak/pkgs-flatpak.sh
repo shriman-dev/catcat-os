@@ -78,13 +78,12 @@ DESKTOP_COMMON=(
     "app/org.gnome.gedit/x86_64/stable"
     "app/io.github.mrvladus.List/x86_64/stable"
     "app/com.github.johnfactotum.Foliate/x86_64/stable"
-    "app/garden.jamie.Morphosis/x86_64/stable"
     "app/com.github.flxzt.rnote/x86_64/stable"
     "app/org.libreoffice.LibreOffice/x86_64/stable"
 
     # Net and Browser
     "app/io.gitlab.librewolf-community/x86_64/stable"
-    "app/io.freetubeapp.FreeTube/x86_64/stable"
+    #"app/io.freetubeapp.FreeTube/x86_64/stable"
     "app/io.github.giantpinkrobots.varia/x86_64/stable"
 
     # Monitoring Apps

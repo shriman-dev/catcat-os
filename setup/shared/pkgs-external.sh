@@ -226,9 +226,6 @@ process_package() {
         pipes-sh)
             chmod -v +x "/usr/bin/pipes.sh"
             ;;
-        ascii-image-converter)
-            chmod -v +x "/usr/bin/${1}"
-            ;;
         ls-iommu)
             get_ghpkg --name "${1}" --repo "HikariKnight/ls-iommu" \
                       --regx 'Linux_x86_64\.tar\.gz$'

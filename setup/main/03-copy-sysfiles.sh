@@ -47,8 +47,8 @@ ocopy -v "${FETCHED}/gamedev_udev/game-devices-udev/src" \
 get_ghraw --dstd "${SYS_CACHE}/usr/lib/modprobe.d" --repo "secureblue/secureblue" \
           --repod "files/system/usr/lib/modprobe.d" \
           --flist "secureblue.conf" "secureblue-framebuffer.conf"
-sed -i -e "s|install bluetooth|#install bluetooth|" \
-       -e "s|install btusb|#install btusb|" "${SYS_CACHE}/usr/lib/modprobe.d/secureblue.conf"
+sed -i -e "s|^install bluetooth|#install bluetooth|" \
+       -e "s|^install btusb|#install btusb|" "${SYS_CACHE}/usr/lib/modprobe.d/secureblue.conf"
 
 # Chrony Configuration
 get_ghraw --dstd "${SYS_CACHE}/etc" --repo "secureblue/secureblue" \
