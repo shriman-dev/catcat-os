@@ -1,4 +1,4 @@
-name: Build ISO
+name: Build ISOs
 on:
   workflow_call:
   schedule:
@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build_iso:
-    name: Build All ISO Images
+    name: Build ISO
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
@@ -137,8 +137,8 @@ jobs:
 #          compression-level: 0
 #          overwrite: true
 
-#  create-release:
-#    name: Create Release
-#    if: ${{ github.workflow_ref != job.workflow_ref }}
-#    uses: ./.github/workflows/create-release.yml
+  create-release:
+    name: Create Release
+    if: ${{ github.workflow_ref != job.workflow_ref }}
+    uses: ./.github/workflows/create-release.yml
 

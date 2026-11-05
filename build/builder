@@ -269,6 +269,8 @@ build_iso() {
         log "INFO" "Creating payload container"
         { brief_trace; } 2>/dev/null
         podman build --pull=newer \
+                     --cap-add sys_admin \
+                     --security-opt label=disable \
                      --file "${payloadfile}" \
                      --build-arg "IMAGE_NAME=${IMAGE_NAME}" \
                      --build-arg "PROJECT_REGISTRY=${PROJECT_REGISTRY}" \
@@ -346,7 +348,7 @@ Commands:
 
   iso
         Builds a bootable ISO installer
-        Note: Root privileges required for only ISO build
+        Note: Root privileges required for ISO build
         Options:
             --payloadfile <file>    Containerfile used to build the payload image
             --payloadonly           Build only the payload image (skips ISO creation)
