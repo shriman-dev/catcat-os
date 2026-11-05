@@ -280,6 +280,7 @@ build_iso() {
 
         # End function here with build stats when payloadonly is set
         if [[ ${payloadonly:-0} -eq 1 ]]; then
+            _cmd_test_timer_end=$(cmd_test_timer)
             sect_border
             echo "${green}"  " Built Payload - ${IMAGE_NAME}-payload:${DEFAULT_TAG}${noc}"
             echo "${purple}" " Build Time    - ${_cmd_test_timer_end}${noc}"
@@ -305,6 +306,7 @@ build_iso() {
     mv -vf "${output_dir}"/*/*.iso \
            "${output_dir}/${IMAGE_NAME}-${MAJOR_VERSION}.${DATETIMESTAMP}.${ARCH}.iso"
     { brief_trace; } 2>/dev/null
+    _cmd_test_timer_end=$(cmd_test_timer)
 
     sect_border
     echo "${green}"  " Built ISO     - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
