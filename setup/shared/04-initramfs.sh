@@ -38,7 +38,7 @@ for kernel_path in "${KERNEL_PATH[@]}"; do
     ${DRACUT} --reproducible --no-hostonly \
               --zstd --force \
               --add "ostree" \
-              --kver "${kernel_ver}"
+              --kver "${kernel_ver}" \
               "${initramfs_image}"
     chmod -v 0600 "${initramfs_image}"
 done
