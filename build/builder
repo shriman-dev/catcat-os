@@ -264,7 +264,6 @@ build_iso() {
     sect_border
 
     _cmd_test_timer_start=${EPOCHSECONDS}
-    ensure_dir "${output_dir}" >/dev/null
     # Create payload container
     if [[ -n ${payloadfile:-} ]]; then
         log "INFO" "Creating payload container"
@@ -291,6 +290,7 @@ build_iso() {
     fi
 
     log "INFO" "Building ISO with reference image: ${image_full}"
+    ensure_dir "${output_dir}" >/dev/null
     { brief_trace; } 2>/dev/null
     podman run --rm --privileged \
                --net=host --security-opt label=type:unconfined_t \
