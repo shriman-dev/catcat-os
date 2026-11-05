@@ -90,11 +90,12 @@ jobs:
         id: prep-upload
         env:
           IMAGE_NAME: ${{ matrix.image_name }}
-          ISO_PATH: ${{ steps.build.outputs.iso-dest }}
+          ISO_PATH: ${{ steps.build-iso.outputs.iso-dest }}
         shell: bash
         run: |
-          set -euox pipefail
+          set -euo pipefail
           source "${GITHUB_WORKSPACE}/build/ENVAR"
+          set -x
 
           ISO_NAME="${IMAGE_NAME}-${MAJOR_VERSION}.${DATETIMESTAMP}.${ARCH}.iso"
           UPLOAD_DIR="${GITHUB_WORKSPACE}/upload"

@@ -60,15 +60,13 @@ dnf5 install -y "${ISO_PACKAGES[@]}"
 
 # Install Flatpak Packages
 # Add flathub repo
-#curl_get /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak remote-add --system --if-not-exists flathub "https://dl.flathub.org/repo/flathub.flatpakrepo"
+curl_get /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak remote-modify --system --prio=10 flathub
 
 # Install flatpaks
 source /etc/catcat-os/flatpak/pkgs-flatpak.sh
 flatpak install --or-update --system -y --noninteractive \
-        flathub \
-        "app/io.gitlab.librewolf-community/x86_64/stable"
+        flathub "${DESKTOP_COMMON[@]}" "${DESKTOP_EXTRAS[@]}"
 
 # Configure Systemd Services
 systemctl disable bootloader-update.service
@@ -161,7 +159,7 @@ cp /src/files/iso.yaml /usr/lib/bootc-image-builder/iso.yaml
 # Mount a larger tmpfs to /var/tmp at boot time to avoid this issue.
 rm -rf /var/tmp
 mkdir /var/tmp
-cat > /etc/systemd/system/var-tmp.mount << 'EOF'
+tee /etc/systemd/system/var-tmp.mount << 'EOF'
 [Unit]
 Description=Larger tmpfs for /var/tmp on live system
 
