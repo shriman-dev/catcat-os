@@ -31,8 +31,8 @@ aria2_get() {
                      --max-tries=5 \
                      --auto-file-renaming=false \
                      --allow-overwrite=true \
-                     --out="$(dirname -- "${out_file}")" \
-                     --dir="$(basename -- "${out_file}")"\
+                     --out="$(basename -- "${out_file}")" \
+                     --dir="$(dirname -- "${out_file}")" \
                      "${url}"
 }
 
