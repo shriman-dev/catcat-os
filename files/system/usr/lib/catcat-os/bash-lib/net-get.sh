@@ -96,7 +96,7 @@ get_ghpkg() {
     pkg_archive="${TMP_DIR:-/tmp/get_ghpkg}/${pkg_name}/$(basename -- "${pkg_url}")"
 
     ensure_dir "$(dirname -- "${pkg_archive}")"
-    curl_get "${pkg_archive}" "${pkg_url}"
+    get_file "${pkg_archive}" "${pkg_url}"
 
     # Verify checksum with retries
     if [[ -n "${pkg_sha}" && "${pkg_sha}" != "null" ]]; then
@@ -110,7 +110,7 @@ get_ghpkg() {
             log "INFO" "Retrying ${ii}..."
             rm "${pkg_archive}"
             sleep 0.5
-            curl_get "${pkg_archive}" "${pkg_url}"
+            get_file "${pkg_archive}" "${pkg_url}"
         done
         unset ii
     else
@@ -162,7 +162,7 @@ get_ghraw() {
         branch="${GIT_BRANCH:-"$(curl_fetch "${gh_api}" | jq -r '.default_branch')"}"
         raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
         ensure_dir "$(dirname -- "${dest_path}")"
-        curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
+        get_file "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
     done
 }
 
@@ -190,13 +190,13 @@ get_fonts() {
     log "DEBUG" "Adding font(s): ${font_name}"
     log "DEBUG" "From URL: ${font_url}"
 
-    case "${font_url}" in
+    case "${font_url,,}" in
         *.zip|*.7z|*.rar|*.tar.*|*.tar|*.tbz|*.tbz2|*.tgz|*.tlz|*.txz|*.tzst)
-            curl_get "${tmpdir}/${url_file}" "${font_url}"
+            get_file "${tmpdir}/${url_file}" "${font_url}"
             unarchive "${tmpdir}/${url_file}" "${font_tmpd}" >/dev/null
             ;;
         *.otf|*.ttf)
-            curl_get "${font_tmpd}/${url_file}" "${font_url}"
+            get_file "${font_tmpd}/${url_file}" "${font_url}"
             ;;
         *.git)
             git clone --depth 1 "${font_url}" "${font_tmpd}"

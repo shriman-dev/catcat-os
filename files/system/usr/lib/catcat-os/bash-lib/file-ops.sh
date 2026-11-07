@@ -17,12 +17,12 @@ bakstore() {
 bakrestore() { mv ${VERBOSE:+-v} -- "${1}.bak" "${1}"; }
 
 unarchive() {
-    local archive="${1}" archive_lc="${1,,}" dest="${2}"
+    local archive="${1}" dest="${2}"
 
     [[ -z "${archive}" || -z "${dest}" ]] && die "No archive or destination path was provided"
 
     ensure_dir "${dest}"
-    case "${archive_lc}" in
+    case "${archive,,}" in
         *.zip)
             log "DEBUG" "Extracting ZIP archive in: ${dest}"
             unzip "${archive}" -d "${dest}"

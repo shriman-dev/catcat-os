@@ -17,7 +17,7 @@ install-mcontrolcenter:
 
     umask 0022
     mkdir -vp "${pkg_archive}.extract"
-    curl_get "${pkg_archive}" "${latest_pkg_url}"
+    get_file "${pkg_archive}" "${latest_pkg_url}"
     unarchive "${pkg_archive}" "${pkg_archive}.extract"
 
     auto_fold_dir=($(populated_or_afile_dirs "${pkg_archive}.extract"))
@@ -32,17 +32,21 @@ install-mcontrolcenter:
     rm -rf "${TMP_DIR}"
     log "INFO" "All Done."
 
-# Install llama.cpp vulkan. Rerunning this will update llama.cpp
+# Install llama.cpp vulkan. Rerunning this will reinstall/update llama.cpp
 [group("apps")]
 llama-cpp-vk:
-    #!/usr/bin/env -S sudo -- /bin/bash
+    #!/usr/bin/bash
     set -euo pipefail
     source /usr/lib/catcat-os/bash-lib.sh
-    umask 0022
 
     TMP_DIR="/tmp/extra_pkgs"
-    LIBEXEC_DIR="/usr/local/libexec"
+    LIBEXEC_DIR="${HOME}/.local/lib"
     GHPKG_PRERELEASE=1
+
+    if [[ ${EUID} -eq 0 ]]; then
+        umask 0022
+        LIBEXEC_DIR="/usr/local/libexec"
+    fi
 
     bakstore "${LIBEXEC_DIR}/llama-cpp-vk"
 

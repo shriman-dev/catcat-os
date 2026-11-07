@@ -24,6 +24,7 @@ DESKTOP_EXTRAS=(
     "app/com.logseq.Logseq/x86_64/stable"
 
     # Gaming Apps
+    "app/com.valvesoftware.Steam/x86_64/stable"
     "app/com.usebottles.bottles/x86_64/stable"
     "app/io.github.Faugus.faugus-launcher/x86_64/stable"
     "app/com.vysp3r.ProtonPlus/x86_64/stable"
@@ -35,6 +36,8 @@ DESKTOP_EXTRAS=(
     "app/com.github.qarmin.czkawka/x86_64/stable"
 
     # Runtimes
+    "runtime/com.valvesoftware.Steam.CompatibilityTool.Proton-GE/x86_64/stable"
+    "runtime/com.valvesoftware.Steam.Utility.InhibitScreensaver/x86_64/stable"
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/25.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/24.08"
     "runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/23.08"

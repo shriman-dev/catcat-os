@@ -171,7 +171,7 @@ rpm_dl() {
     { brief_trace; } 2>/dev/null
     if [[ ! -f "${rpm_archive}" ]]; then
         rpm_url="$(get_ghpkg_url "${2}" "${3}" "${4:-}")"
-        curl_get "${rpm_archive}" "${rpm_url}"
+        get_file "${rpm_archive}" "${rpm_url}"
         echo "${rpm_archive}"
     else
         echo "${rpm_archive}"

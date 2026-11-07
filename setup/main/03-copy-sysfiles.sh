@@ -33,7 +33,7 @@ get_ghraw --dstd "${SYS_CACHE}/usr/lib/udev/rules.d" --repo "M0Rf30/android-udev
           -f "51-android.rules"
 
 if [[ ! -d "${FETCHED}/gamedev_udev" ]]; then
-    curl_get "/tmp/game-devices-udev.zip" \
+    get_file "/tmp/game-devices-udev.zip" \
         "https://codeberg.org/fabiscafe/game-devices-udev/archive/main.zip" &&
     unarchive "/tmp/game-devices-udev.zip" "${FETCHED}/gamedev_udev"
 fi

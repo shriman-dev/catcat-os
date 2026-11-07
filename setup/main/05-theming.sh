@@ -105,7 +105,7 @@ install_icon_themes() {
         icons_archive="/tmp/icons/$(basename -- "${icons_url}").tar"
 
         mkdir -vp "$(dirname -- "${icons_archive}")"
-        curl_get "${icons_archive}" "${icons_url}"
+        get_file "${icons_archive}" "${icons_url}"
         unarchive "${icons_archive}" "${icons_archive}.extract" >/dev/null
 
         find "${icons_archive}.extract" -type d -name "24x24" | while read -r papirus_subd; do
@@ -134,7 +134,7 @@ install_gtk_themes() {
         theme_archive="/tmp/themes/$(basename -- "${theme_url}").tar"
 
         mkdir -vp "$(dirname -- "${theme_archive}")"
-        curl_get "${theme_archive}" "${theme_url}"
+        get_file "${theme_archive}" "${theme_url}"
         unarchive "${theme_archive}" "${theme_archive}.extract" >/dev/null
 
         install_exec="$(find "${theme_archive}.extract" -type f -name 'install.sh' -print -quit)"

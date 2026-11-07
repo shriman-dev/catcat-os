@@ -250,8 +250,8 @@ build_iso() {
     done
 
     [[ -n "${PROJECT_REGISTRY:-}" ]] || die "Missing container registry"
+    [[ ${EUID} -eq 0 ]] || die "Root privileges required for ISO build"
     if [[ ${payloadonly:-0} -eq 0 ]]; then
-        [[ ${EUID} -ne 0 ]] && die "Root privileges required for ISO build"
         [[ -n "${output_dir:-}" ]] || die "Missing output directory"
     fi
 
@@ -350,7 +350,7 @@ Commands:
 
   iso
         Builds a bootable ISO installer
-        Note: Root privileges required for ISO build
+        Note: Root privileges required
         Options:
             --payloadfile <file>    Containerfile used to build the payload image
             --payloadonly           Build only the payload image (skips ISO creation)

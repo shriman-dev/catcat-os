@@ -143,7 +143,7 @@ update_blocklist() {
     esac
 
     log "INFO" "Downloading blocklist..."
-    curl_get "${TMP_DIR}/${src_file}.tar.zst" "${blocklist_archive}" ||
+    get_file "${TMP_DIR}/${src_file}.tar.zst" "${blocklist_archive}" ||
         die "Failed to download blocklist"
 
     log "INFO" "Extracting blocklist..."
@@ -268,7 +268,7 @@ setup_localdns() {
 
         # Check if blocklist archive is cached
         if [[ ! -f "${TMP_DIR}/${src_file}.tar.zst" ]]; then
-            curl_get "${TMP_DIR}/${src_file}.tar.zst" "${blocklist_archive}" ||
+            get_file "${TMP_DIR}/${src_file}.tar.zst" "${blocklist_archive}" ||
                 die "Failed to download blocklist"
         else
             log "NOTE" "Blocklist archive is cached"
