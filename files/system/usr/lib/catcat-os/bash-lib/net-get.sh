@@ -162,7 +162,7 @@ get_ghraw() {
         branch="${GIT_BRANCH:-"$(curl_fetch "${gh_api}" | jq -r '.default_branch')"}"
         raw_url="https://raw.githubusercontent.com/${repo_raw}/refs/heads/${branch}"
         ensure_dir "$(dirname -- "${dest_path}")"
-        get_file "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
+        curl_get "${dest_path}" "${raw_url}/${repo_dir:+${repo_dir}/}${ffile}"
     done
 }
 
@@ -196,7 +196,7 @@ get_fonts() {
             unarchive "${tmpdir}/${url_file}" "${font_tmpd}" >/dev/null
             ;;
         *.otf|*.ttf)
-            get_file "${font_tmpd}/${url_file}" "${font_url}"
+            curl_get "${font_tmpd}/${url_file}" "${font_url}"
             ;;
         *.git)
             git clone --depth 1 "${font_url}" "${font_tmpd}"

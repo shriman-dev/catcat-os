@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Set custom TMP and CACHE directories
-export TMPDIR="/tmp/local-build-tmp"
+export TMPDIR="${TMPDIR:-"/var/tmp/local-build-tmp"}"
 mkdir -p "${TMPDIR}"
 if [[ -n "${PERSISTENT_CACHE_DIR:-}" ]]; then
     ln -Tvsf "${PERSISTENT_CACHE_DIR}" "${TMPDIR}/buildah-cache-${UID}"
