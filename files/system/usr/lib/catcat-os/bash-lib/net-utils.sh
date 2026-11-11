@@ -26,8 +26,8 @@ aria2_get() {
                      --continue=true \
                      --file-allocation=none \
                      --max-connection-per-server=16 \
-                     --min-split-size=1M \
                      --split=16 \
+                     --min-split-size=1M \
                      --max-tries=5 \
                      --auto-file-renaming=false \
                      --allow-overwrite=true \

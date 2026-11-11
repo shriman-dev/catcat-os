@@ -5,6 +5,8 @@ set -euox pipefail
 log "INFO" "Debloating..."
 dnf5 -y remove \
         amdgpu_top \
+        rocm \
+        rocm-core \
         rocm-hip \
         rocm-opencl \
         rocm-clinfo \

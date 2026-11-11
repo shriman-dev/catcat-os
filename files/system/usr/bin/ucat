@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-/usr/bin/just --justfile /usr/share/catcat-os/justfile "${@}"
+exec just --justfile /usr/share/catcat-os/justfile "${@}"

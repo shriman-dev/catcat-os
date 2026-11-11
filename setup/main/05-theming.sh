@@ -38,8 +38,8 @@ desktop_files() {
         "org.gtk.Demo4"
         "org.gtk.gtk4.NodeEditor"
         "org.gtk.PrintEditor4"
-        "scrcpy-console.desktop"
-        "scrcpy.desktop"
+        "scrcpy-console"
+        "scrcpy"
     )
     for dfile in "${dfiles[@]}"; do
         desktop-file-edit --set-key="NoDisplay" --set-value="true" \
