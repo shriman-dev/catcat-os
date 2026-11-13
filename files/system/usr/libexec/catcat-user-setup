@@ -27,6 +27,9 @@ sync_default_configs() {
         ensure_dir "${CATCAT_CONFD}"/{log,LS_COLORS_DIR}
         cp -vf /usr/share/catcat-os/LS_COLORS_DIR/* "${CATCAT_CONFD}/LS_COLORS_DIR"/
 
+        cp -vf /etc/skel/.config/MangoHud/MangoHud.conf.default \
+               "${CONFIG}/MangoHud/MangoHud.conf.default"
+
         rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
             err "Skel update failed"
 

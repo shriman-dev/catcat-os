@@ -9,6 +9,7 @@ systemctl -f enable nvctk-cdi.service
 DISABLE_SERVICES=(
     "akmods-keygen@akmods-keygen.service"
     "akmods-keygen.target"
+    "nvidia-persistenced.service"
 )
 
 log "INFO" "Disabling and masking system services"

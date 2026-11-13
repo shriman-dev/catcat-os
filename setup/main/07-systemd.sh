@@ -11,7 +11,6 @@ services_enable() {
         catcat-system-setup.service \
         catcat-os-update.timer \
         catcat-maintenance.timer \
-        input-remapper.service \
         dmemcg-booster-system.service
 
 #dualsense-catppuccin-rainbow.service
@@ -26,47 +25,45 @@ services_enable() {
 #setroubleshootd.service
 #packagekitd.service
 #sshd-keygen.target
+#fedora-atomic-desktop-appstream-cache-refresh.service
 DISABLE_SERVICES=(
-    "avahi-daemon.service"
-    "avahi-daemon.socket"
+    # Ublue/Bazzite
     "bazzite-flatpak-manager.service"
     "bazzite-libvirtd-setup.service"
+    "flatpak-system-update.timer"
+    "ntfs-nag.service"
+    "tailscaled.service"
+    "ublue-os-media-automount.service"
+    "ublue-update.service"
+    "ublue-update.timer"
+    "uupd.service"
+    "uupd.timer"
+
+    # Brew
     "brew-dir-fix.service"
     "brew-setup.service"
-    "brew-update.service"
-    "brew-upgrade.service"
-    "bolt.service"
-    "bootc-fetch-apply-updates.timer"
-    "cups-browsed.service"
-    "cups.path"
-    "cups.service"
-    "cups.socket"
-    "dconf-update.service"
-    "flatpak-add-fedora-repos.service"
-    "flatpak-system-update.timer"
-    "fstrim.timer"
-    "geoclue.service"
-    "gssproxy.service"
+    "brew-update.timer"
+    "brew-upgrade.timer"
+
+    # Network
+    "avahi-daemon.service"
+    "avahi-daemon.socket"
     "httpd.service"
-    "input-remapper.service"
-    "iscsid.service"
-    "iscsid.socket"
-    "iscsiuio.service"
-    "iscsiuio.socket"
-    "iwd.service" # Mask iwd by default to provide wider hardware support via wpa_supplicant
-    "localsearch-3.service"
-    "localsearch-control-3.service"
-    "localsearch-writeback-3.service"
+    "iwd.service" # Masked to provide wider hardware support via wpa_supplicant
     "ModemManager.service"
     "NetworkManager-wait-online.service"
-    "nfs-blkmap.service"
-    "nfs-client.target"
-    "nfs-idmapd.service"
-    "nfs-mountd.service"
-    "nfs-server.service"
-    "nfs-utils.service"
-    "nfsdcld.service"
-    "ntfs-nag.service"
+
+    # Remote Access
+    ## SSH
+    "sshd.service"
+    "sshd.socket"
+    "sshd-unix-local.socket"
+    "sshd-vsock.socket"
+    ## SSSD (System Security Services Daemon)
+    "sssd.service"
+    "sssd-kcm.service"
+    "sssd-kcm.socket"
+    ## RPC (Remote Procedure Call)
     "rpc-gssd.service"
     "rpc-statd-notify.service"
     "rpc-statd.service"
@@ -74,29 +71,65 @@ DISABLE_SERVICES=(
     "rpcbind.service"
     "rpcbind.socket"
     "rpcbind.target"
+    "gssproxy.service"
+
+    # Remote Storage
+    ## iSCSI (Internet Small Computer Systems Interface) storage
+    "iscsid.service"
+    "iscsid.socket"
+    "iscsiuio.service"
+    "iscsiuio.socket"
+    ## NFS (Network File System)
+    "nfs-blkmap.service"
+    "nfs-client.target"
+    "nfs-idmapd.service"
+    "nfs-mountd.service"
+    "nfs-server.service"
+    "nfs-utils.service"
+    "nfsdcld.service"
+    "var-lib-nfs-rpc_pipefs.mount"
+
+    # Bootc and Ostree
+    "bootc-fetch-apply-updates.timer"
     "rpm-ostree-countme.service"
     "rpm-ostree-countme.timer"
     "rpm-ostreed-automatic.timer"
-    "sshd.service"
-    "sshd.socket"
-    "sshd-unix-local.socket"
-    "sshd-vsock.socket"
-    "sssd.service"
-    "sssd-kcm.service"
-    "sssd-kcm.socket"
-    "supergfxd.service"
-    "systemd-remount-fs.service"
-    "tailscaled.service"
+
+    # Fedora and Flatpak
+    "fedora-atomic-desktop-appstream-cache-refresh.service"
+    "flatpak-add-fedora-repos.service"
+    "flatpak-system-update.timer"
+
+    # Desktop Environment
+    ## Gnome
+    "dconf-update.service"
+    "geoclue.service"
+    "localsearch-3.service"
+    "localsearch-control-3.service"
+    "localsearch-writeback-3.service"
     "tracker-miner-fs-3.service"
     "tracker-miner-fs-control-3.service"
     "tracker-miner-rss-3.service"
     "tracker-writeback-3.service"
     "tracker-xdg-portal-3.service"
-    "ublue-os-media-automount.service"
-    "ublue-update.service"
-    "ublue-update.timer"
-    "uupd.service"
-    "uupd.timer"
+
+    # Hardware and Peripherals
+    "bolt.service"
+    "cups-browsed.service"
+    "cups.path"
+    "cups.service"
+    "cups.socket"
+    "input-remapper.service"
+    "supergfxd.service"
+
+     # Systemd Unneeded
+    "fstrim.timer"
+    "systemd-homed.service"
+    "systemd-homed-activate.service"
+    "systemd-homed-firstboot.service"
+    "systemd-nsresourced.service"
+    "systemd-nsresourced.socket"
+    "systemd-remount-fs.service"
 )
 
 GLOBAL_DISABLE_SERVICES=(

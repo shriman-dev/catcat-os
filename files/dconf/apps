@@ -4,6 +4,7 @@ download-updates=false
 download-updates-notify=false
 enable-repos-dialog=true
 first-run=false
+install-timestamp=int64 1789579513
 show-ratings=true
 
 [org/fedoraproject/FirewallConfig]
@@ -27,7 +28,7 @@ scheme='catpuccin-mocha'
 [org/x/editor/preferences/ui]
 menubar-visible=true
 minimap-visible=false
-side-panel-active-page=-1970755255
+side-panel-active-page=827629879
 side-panel-visible=false
 statusbar-visible=true
 toolbar-visible=false
@@ -178,7 +179,7 @@ captions=['size', 'date_modified', 'permissions']
 default-zoom-level='medium'
 
 [org/gnome/nautilus/list-view]
-default-column-order=['size', 'name', 'type', 'owner', 'date_modified', 'date_accessed', 'date_created', 'recency', 'permissions', 'group', 'detailed_type', 'rp-game-id', 'rp-title-id', 'rp-media-id', 'rp-os-version', 'rp-encryption-key', 'rp-pixel-format', 'rp-region-code', 'rp-category']
+default-column-order=['size', 'name', 'type', 'detailed_type', 'date_modified', 'date_accessed', 'date_created', 'recency', 'permissions', 'owner', 'group', 'rp-game-id', 'rp-title-id', 'rp-media-id', 'rp-os-version', 'rp-encryption-key', 'rp-pixel-format', 'rp-region-code', 'rp-category', 'rp-ripped-by', 'rp-version']
 default-visible-columns=['size', 'name', 'date_modified', 'permissions', 'group']
 default-zoom-level='medium'
 use-tree-view=true
@@ -196,7 +197,7 @@ show-create-link=true
 show-delete-permanently=true
 show-directory-item-counts='always'
 show-hidden-files=true
-show-image-thumbnails='always'
+show-image-thumbnails='local-only'
 
 
 [org/nemo/compact-view]
@@ -204,7 +205,7 @@ all-columns-have-same-width=false
 default-zoom-level='standard'
 
 [org/nemo/icon-view]
-captions=['size', 'date_modified_with_time', 'permissions']
+captions=['size', 'date_modified_with_time', 'octal_permissions']
 default-zoom-level='standard'
 
 [org/nemo/list-view]

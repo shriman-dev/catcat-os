@@ -82,7 +82,7 @@ build_image() {
 
     prep_metadata build
     ensure_dir "${log_dir}" >/dev/null
-    {
+
     sect_border
     echo "${green}"  " Building      - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     echo "${purple}" " Base Image    - ${BASE_IMAGE}${noc}"
@@ -91,6 +91,7 @@ build_image() {
     sect_border
 
     _cmd_test_timer_start=${EPOCHSECONDS}
+    {
     cd "$(dirname -- "${SCRIPT_DIR}")"
     { brief_trace; } 2>/dev/null
     podman build "${extra_opts[@]}" \
@@ -102,12 +103,6 @@ build_image() {
                  "${build_tags[@]}" \
                  .
     { brief_trace; } 2>/dev/null
-    _cmd_test_timer_end=$(cmd_test_timer)
-
-    sect_border
-    echo "${green}"  " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
-    echo "${purple}" " Build Time    - ${_cmd_test_timer_end}${noc}"
-    sect_border
     } \
     2>&1 | perl -MTime::HiRes=gettimeofday -ne '
         $|=1;
@@ -115,41 +110,52 @@ build_image() {
         ($sec,$min,$hour,$mday,$mon,$year) = localtime($s);
         printf("[%02d:%02d:%02d.%03d] %s", $hour, $min, $sec, $usec/1000, $_);' \
     2>&1 | tee -a "${log_file}"
-
     ln -sf "${log_file}" "${log_dir}/${IMAGE_NAME}.last.log"
-}
+    _cmd_test_timer_end=$(cmd_test_timer)
 
-containerized_rpm_ostree() {
-    podman run --rm --privileged \
-               -v /var/lib/containers:/var/lib/containers \
-               --entrypoint /usr/bin/rpm-ostree \
-               "${BASE_IMAGE}:${MAJOR_VERSION}" \
-               "$@"
+    sect_border
+    echo "${green}"  " Build Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${purple}" " Build Time    - ${_cmd_test_timer_end}${noc}"
+    sect_border
 }
 
 chunk_image() {
+    local chunkah_conf chunked_image chunkah_outdir="${CHUNKAH_OUTPUT_DIR:-"/var/tmp/${IMAGE_NAME}"}"
+    chunkah_conf="$(mktemp)"
+
     sect_border
-    echo "${green}" " Chunking       - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${green}" " Chunking Image - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
     sect_border
 
-    [[ -n "${BASE_IMAGE:-}" ]] || die "Missing BASE IMAGE"
-
-    RPM_OSTREE="$(command -v rpm-ostree)" || true
-    if [[ ! -x "${RPM_OSTREE:-}" ]]; then
-        [[ ${EUID} -ne 0 ]] &&
-            die "Root privileges required. Command missing on current system: rpm-ostree"
-        RPM_OSTREE="containerized_rpm_ostree"
-    fi
+    ensure_dir "${chunkah_outdir}" >/dev/null
 
     _cmd_test_timer_start=${EPOCHSECONDS}
     { brief_trace; } 2>/dev/null
-    ${RPM_OSTREE} compose \
-                  build-chunked-oci \
-                  --bootc --max-layers 250 --format-version=2 \
-                  --from "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
-                  --output containers-storage:"localhost/${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
+
+    podman inspect "${IMAGE_NAME}:${DEFAULT_TAG}" > "${chunkah_conf}"
+    podman run --rm \
+               -v "${chunkah_conf}:/chunkah-config.json:ro,Z" \
+               -v "${chunkah_outdir}:/run/out:Z" \
+               --mount=type=image,src="${IMAGE_NAME}:${DEFAULT_TAG}",target=/chunkah \
+               quay.io/coreos/chunkah:latest \
+                    build --verbose \
+                          --compressed \
+                          --compression-level 9 \
+                          --max-layers 128 \
+                          --prune /sysroot/ \
+                          --label ostree.commit- --label ostree.final-diffid- \
+                          --config /chunkah-config.json \
+                          --output oci:/run/out/chunked
+
+    chunked_image="$(podman pull --policy newer "oci:${chunkah_outdir}/chunked")"
+    podman tag "${chunked_image}" "${IMAGE_NAME}-chunked:${DEFAULT_TAG}"
+
     { brief_trace; } 2>/dev/null
     _cmd_test_timer_end=$(cmd_test_timer)
+
+    # Cleanup
+    rm -f "${chunkah_conf}"
+    rm -rf "${chunkah_outdir}"
 
     sect_border
     echo "${green}"  " Chunk Done    - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
@@ -196,7 +202,7 @@ push_image() {
     _cmd_test_timer_end=$(cmd_test_timer)
 
     sect_border
-    echo "${green}"  " Push Done     - ${IMAGE_NAME}:${DEFAULT_TAG}${noc}"
+    echo "${green}"  " Push Done     - ${push_image}:${DEFAULT_TAG}${noc}"
     echo "${purple}" " Push Time     - ${_cmd_test_timer_end}${noc}"
     sect_border
 }
@@ -331,9 +337,7 @@ Commands:
             --extra-opts <args>     Additional arguments for podman build
 
   chunk
-        Create a chunked OCI image using rpm-ostree
-        Note: Root privileges required when if 'rpm-ostree' command is missing
-              Furthermore, later operations (push or cosign) may also require root
+        Create a chunked OCI image using chunkah
 
   push
         Push the image with tag(s) to a container registry
@@ -381,6 +385,9 @@ gh_hook() {
                 echo "build_tags=${BUILD_TAGS}" >> "${GITHUB_OUTPUT}"
                 # Add real image_name
                 echo "image_name=${IMAGE_NAME}" >> "${GITHUB_OUTPUT}"
+                ;;
+            pre-chunk)
+                CHUNKAH_OUTPUT_DIR="$(mktemp -d ./"${IMAGE_NAME}"_chunkah_XXXXXX)"
                 ;;
             post-chunk)
                 # Add chunked image_name

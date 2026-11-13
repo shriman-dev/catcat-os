@@ -37,6 +37,24 @@ unset app
 
 ##########################################################################################
 
+# Update appstream data daily
+# This is replacement for fedora-atomic-desktop-appstream-cache-refresh.service
+# So the service can be disabled safely
+one_day=86400
+appstream_log="/etc/catcat-os/log/appstream.log"
+
+ensure_dir "$(dirname -- "${appstream_log}")"
+ensure_file "${appstream_log}"
+
+if check_network_connection; then
+    if is_older_than "${appstream_log}" "${one_day}"; then
+        date "+%a %b %d %H:%M:%S %Y" > "${appstream_log}"
+        appstreamcli refresh --force >> "${appstream_log}"
+    fi
+fi
+
+##########################################################################################
+
 notify_all() {
     notify_users "/usr/share/pixmaps/catcat-os-logo.svg" "CatCat OS Update" "${1}" "${2}"
 }

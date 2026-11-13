@@ -5,11 +5,16 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 LOCALNET_IP="$(hostname -I | tr ' ' '\n' | grep -E '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)')"
 source "$(dirname -- "${SCRIPT_DIR}")/setup/lib/bash-lib.sh"
 source "${SCRIPT_DIR}/ENVAR"
-
 #set -x
 
-BUILD_TARGETS=()
+# Set custom TMP and CACHE directories
+export TMPDIR="${TMPDIR:-"/var/tmp/local-build-tmp"}"
+mkdir -p "${TMPDIR}"
+if [[ -n "${PERSISTENT_CACHE_DIR:-}" ]]; then
+    ln -Tvsf "${PERSISTENT_CACHE_DIR}" "${TMPDIR}/buildah-cache-${UID}"
+fi
 
+BUILD_TARGETS=()
 [[ $# -eq 0 ]] && die "No option provided"
 while [[ $# -gt 0 ]]; do
     case "${1}" in
@@ -37,20 +42,14 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-# Set custom TMP and CACHE directories
-export TMPDIR="${TMPDIR:-"/var/tmp/local-build-tmp"}"
-mkdir -p "${TMPDIR}"
-if [[ -n "${PERSISTENT_CACHE_DIR:-}" ]]; then
-    ln -Tvsf "${PERSISTENT_CACHE_DIR}" "${TMPDIR}/buildah-cache-${UID}"
-fi
-
-
 # Set local container registry
 # This is useful for building images completely without root privileges
 # Switch to locally built image with command:
 # sudo bootc switch 127.0.0.1:5000/catcat-os:latest
-if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
+local_registry() {
+    local registries_confd reg_status local_registry_dir
     registries_confd="/etc/containers/registries.conf.d"
+
     if [[ ! -f "${registries_confd}/local-registry.conf" ]]; then
         echo "[[registry]]
 location = \"${LOCAL_REGISTRY_ADR}\"
@@ -63,11 +62,11 @@ insecure = true" | sudo tee "${registries_confd}/localnet-registry.conf"
 
     # Run local container registry server
     reg_status="$(podman inspect -f "{{.State.Running}}" local-registry)" || true
-    
+    local_registry_dir="${LOCAL_REGISTRY_DIR:-"${HOME}/.local/share/containers/local-registry"}"
+
     if [[ "${reg_status:-false}" == "false" ]]; then
         log "INFO" "Running local container registry in background"
-        local_registry_dir="${HOME}/.local/share/containers/local-registry"
-        mkdir -p "${local_registry_dir}"
+        ensure_dir "${local_registry_dir}"
         podman run --name local-registry \
                    --pull=missing --detach \
                    -p "${LOCAL_REGISTRY_ADR}:5000" \
@@ -75,9 +74,10 @@ insecure = true" | sudo tee "${registries_confd}/localnet-registry.conf"
                    -v "${local_registry_dir}:/var/lib/registry:Z" \
                    --replace --restart unless-stopped \
                    registry:2
-        unset local_registry_dir
     fi
-    unset registries_confd reg_status
+}
+if [[ ${LOCAL_REGISTRY:-} -eq 1 ]]; then
+    local_registry
 fi
 
 # Define builds
