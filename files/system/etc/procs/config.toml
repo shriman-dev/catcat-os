@@ -95,6 +95,27 @@ nonnumeric_search = false
 align = "Left"
 
 [[columns]]
+kind = "ReadBytes"
+style = "ByUnit"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
+kind = "WriteBytes"
+style = "ByUnit"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
+kind = "Separator"
+style = "White|BrightBlack"
+numeric_search = false
+nonnumeric_search = false
+align = "Left"
+
+[[columns]]
 kind = "Command"
 style = "BrightWhite|Black"
 numeric_search = false
@@ -110,20 +131,6 @@ align = "Left"
 
 [[columns]]
 kind = "VmSize"
-style = "ByUnit"
-numeric_search = false
-nonnumeric_search = false
-align = "Left"
-
-[[columns]]
-kind = "ReadBytes"
-style = "ByUnit"
-numeric_search = false
-nonnumeric_search = false
-align = "Left"
-
-[[columns]]
-kind = "WriteBytes"
 style = "ByUnit"
 numeric_search = false
 nonnumeric_search = false
