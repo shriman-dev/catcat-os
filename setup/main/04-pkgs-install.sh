@@ -298,7 +298,7 @@ COMMON=(
     # Backup, Archive. Encryption and Compression
     "++buttersnap"
     "rsync"
-    "unrar"
+    #"unrar"
     "unzip"
     "7zip"
     "7zip-standalone-all"
