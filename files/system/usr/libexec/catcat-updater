@@ -9,17 +9,18 @@ FREQ_UPDATE_FLATPAK_APPS=(
     "org.garudalinux.firedragon"
     "one.ablaze.floorp"
     "app.zen_browser.zen"
+    "net.waterfox.waterfox"
     "org.torproject.torbrowser-launcher"
+    "org.kde.falkon"
+    "org.gnome.Epiphany"
+    "re.sonny.Tangram"
+    "io.github.ungoogled_software.ungoogled_chromium"
     "org.chromium.Chromium"
     "com.brave.Browser"
-    "io.github.ungoogled_software.ungoogled_chromium"
     "com.vivaldi.Vivaldi"
     "com.opera.Opera"
     "com.microsoft.Edge"
     "com.google.Chrome"
-    "org.kde.falkon"
-    "org.gnome.Epiphany"
-    "re.sonny.Tangram"
 )
 
 FLATPAK_PATHS=("/var/lib/flatpak/app")

@@ -14,14 +14,6 @@ sed -i -E "s|^[#[:space:]]*AutomaticUpdatePolicy=.*|AutomaticUpdatePolicy=none|"
 log "INFO" "Enabling support for disk discard"
 sed -i -E "s|^([[:space:]]*)[#[:space:]]*issue_discards =.*|\1issue_discards = 1|" /etc/lvm/lvm.conf
 
-# Libvirt setup
-if [[ -f /etc/libvirt/libvirtd.conf ]]; then
-    log "INFO" "Setting up libvirtd.conf"
-    sed -i -Ee 's|^[#[:space:]]*unix_sock_group =.*|unix_sock_group = "libvirt"|' \
-            -e 's|^[#[:space:]]*unix_sock_rw_perms =.*|unix_sock_rw_perms = "0770"|' \
-            /etc/libvirt/libvirtd.conf
-fi
-
 # Ignore inhabitors for suspend
 #log "INFO" "Tweaking logind to ignore inhabitors for suspend"
 #sed -i "s|.*SuspendKeyIgnoreInhibited=.*|SuspendKeyIgnoreInhibited=yes|" /usr/lib/systemd/logind.conf

@@ -5,7 +5,7 @@ HOME_DIR="${HOME}"
 CONFIG="${HOME_DIR}/.config"
 LOCALSHARE="${HOME_DIR}/.local/share"
 CATCAT_CONFD="${LOCALSHARE}/catcat-os"
-SKEL="/etc/skel"
+SKEL="/usr/etc/skel"
 
 on_first_boot() {
     local firstboot_file="${CATCAT_CONFD}/log/.first-boot-done"
@@ -24,14 +24,29 @@ sync_default_configs() {
     log "INFO" "Updating configs..."
     if ! diff -q "${update_info}" "${lastup_info}" >/dev/null 2>&1; then
         CATCAT_SYSTEM_UPDATED=true
+
+        # LS_COLORS_DIR
         ensure_dir "${CATCAT_CONFD}"/{log,LS_COLORS_DIR}
         cp -vf /usr/share/catcat-os/LS_COLORS_DIR/* "${CATCAT_CONFD}/LS_COLORS_DIR"/
 
-        cp -vf /etc/skel/.config/MangoHud/MangoHud.conf.default \
-               "${CONFIG}/MangoHud/MangoHud.conf.default"
+        # MangoHud
+        local mangohud_preset=".config/MangoHud/default/MangoHud.conf.preset"
+        local mangohud_conf="${CONFIG}/MangoHud/MangoHud.conf"
 
+        ensure_dir "$(dirname -- "${CONFIG}/${mangohud_preset}")"
+        cp -vf "${SKEL}/${mangohud_preset}" "${CONFIG}/${mangohud_preset}"
+
+        ln -srfv "${CONFIG}/${mangohud_preset}" "${mangohud_conf}"
+        # TODO: Enable this after few versions
+#        if [[ ! -e "${mangohud_conf}" ]] || \
+#              [[ -L "${mangohud_conf}" && \
+#                 "$(readlink -f "${mangohud_conf}")" != "${CONFIG}/${mangohud_preset}" ]]; then
+#            ln -srfv "${CONFIG}/${mangohud_preset}" "${mangohud_conf}"
+#        fi
+
+        # All
         rsync -aK --ignore-existing --exclude='*.gitkeep*' "${SKEL}"/ "${HOME_DIR}"/ ||
-            err "Skel update failed"
+            err "Update from SKEL failed"
 
         cp -vf "${update_info}" "${lastup_info}" || err "SHA update failed"
     fi
